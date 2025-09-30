@@ -23,8 +23,7 @@
         </label>
         <div class="col-sm-3">
             <input name="failcounter_clear_timeout" class="form-control"
-                   type="number"
-                   min="0"
+                   pattern="\d+"
                    ng-model="params.failcounter_clear_timeout"
                    placeholder="0"/>
         </div>
@@ -85,8 +84,7 @@
 
         <div class="col-sm-3">
             <input name="AutoResyncTimeout" class="form-control"
-                   type="number"
-                   min="0"
+                   pattern="\d+"
                    ng-disabled="!params.AutoResync"
                    ng-model="params.AutoResyncTimeout"
                    placeholder="300"/>
@@ -103,16 +101,14 @@
             <button type="button"
                     ng-click="deleteUserCache()"
                     class="btn btn-transparent btn-danger"
-                    type="number"
-                    min="0"
+                    pattern="\d+"
                     translate>
             Delete User Cache
             </button>
         </div>
         <div class="col-sm-3">
             <input name="UserCacheExpiration" class="form-control"
-                   type="number"
-                   min="0"
+                   pattern="\d+"
                    ng-model="params.UserCacheExpiration"
                    placeholder="0"/>
         </div>
@@ -162,8 +158,7 @@
 
             <div class="col-sm-3">
                 <input name="DefaultOtpLen" class="form-control"
-                       type="number"
-                       min="0"
+                       pattern="\d+"
                        ng-model="params.DefaultOtpLen"
                        placeholder="6"/>
             </div>
@@ -178,8 +173,7 @@
 
             <div class="col-sm-3">
                 <input name="DefaultCountWindow" class="form-control"
-                       type="number"
-                       min="0"
+                       pattern="\d+"
                        ng-model="params.DefaultCountWindow"
                        placeholder="10"/>
             </div>
@@ -193,8 +187,7 @@
 
             <div class="col-sm-3">
                 <input name="DefaultMaxFailCount" class="form-control"
-                       type="number"
-                       min="0"
+                       pattern="\d+"
                        ng-model="params.DefaultMaxFailCount"
                        placeholder="10"/>
             </div>
@@ -207,8 +200,7 @@
 
             <div class="col-sm-3">
                 <input name="DefaultSyncWindow" class="form-control"
-                       type="number"
-                       min="0"
+                       pattern="\d+"
                        ng-model="params.DefaultSyncWindow"
                        placeholder="1000"/>
             </div>
@@ -223,8 +215,7 @@
             <div class="col-sm-3">
                 <input name="DefaultChallengeValidityTime"
                        class="form-control"
-                       type="number"
-                       min="0"
+                       pattern="\d+"
                        ng-model="params.DefaultChallengeValidityTime"
                        placeholder="120"/>
             </div>

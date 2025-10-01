@@ -26,6 +26,7 @@ It also contains the error handlers.
 """
 
 import copy
+import json
 
 from flask_babel import gettext
 
@@ -197,6 +198,60 @@ def before_userendpoint_request():
 @admin_required
 def before_admin_request():
     before_request()
+
+
+@container_blueprint.after_request
+def after_auth_free_container_request(response):
+    """
+    This function is executed after a request to an authentication-free container endpoint.
+    """
+    if not response or not response.json:
+        return response
+
+    error_mapping = {
+        "/container/register/finalize": "Error when finalizing container registration",
+        "/container/register/terminate/client": "Error when terminating container registration",
+        "/container/challenge": "Error when creating challenge for container",
+        "/container/synchronize": "Error when synchronizing container",
+        "/container/rollover": "Error when initializing container rollover",
+    }
+
+    if request.path not in error_mapping:
+        return response
+
+    error_message = gettext(error_mapping[request.path])
+    error_code = -400
+    http_status = 400
+
+    content = response.json
+    result = content.get("result", {})
+
+    # Return unchanged, unless there is a 4XX or 5XX HTTP status and an error property.
+    if response.status_code not in range(400, 600) or not result.get("error"):
+        return response
+
+    # Return unchanged, unless a matching policy is set.
+    if not Match.user(
+        g,
+        scope=SCOPE.CONTAINER,
+        action=PolicyAction.HIDE_SPECIFIC_ERROR_MESSAGE,
+        user_object=request.User if hasattr(request, "User") else None,
+    ).any():
+        return response
+
+    # Overwrite the error and detail properties, so that the content is always the same
+    content["detail"] = None
+    content["result"] = {
+        "error": {
+            "code": error_code,
+            "message": error_message,
+        },
+        "status": False,
+    }
+    response.data = json.dumps(content)
+    response.status_code = http_status
+
+    return response
 
 
 @container_blueprint.before_request

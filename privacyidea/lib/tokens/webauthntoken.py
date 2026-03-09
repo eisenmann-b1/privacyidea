@@ -969,7 +969,7 @@ class WebAuthnTokenClass(TokenClass):
 
         :param param: Parameters from the token init.
         :type param: dict
-        :param reset_failcount: Passed through to base update handling.
+        :param reset_failcount: Passed through to base update handling, whether to reset the fail count of the token.
         :type reset_failcount: bool
         :return: Nothing
         :rtype: None

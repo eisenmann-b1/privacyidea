@@ -1005,10 +1005,11 @@ myApp.directive("verifyEnrolledToken", ["instanceUrl", "versioningSuffixProvider
             },
             templateUrl: instanceUrl + "/static/components/directives/views/directive.verifyEnrolledToken.html" + versioningSuffixProvider.$get(),
             link: function (scope, element, attr) {
+                scope.verifyData = {response: ""};
                 scope.sendVerifyResponse = function () {
                     const params = {
                         "serial": scope.enrolledToken.serial,
-                        "verify": scope.verifyResponse,
+                        "verify": scope.verifyData.response,
                         "type": scope.tokenType
                     };
                     if (scope.enrolledToken.init_params) {
@@ -1024,7 +1025,7 @@ myApp.directive("verifyEnrolledToken", ["instanceUrl", "versioningSuffixProvider
                             inform.add(gettextCatalog.getString("Token successfully verified"),
                                 {type: "success", ttl: 10000});
                         }
-                        scope.verifyResponse = "";
+                        scope.verifyData.response = "";
                         scope.callback(data);
                     });
                 };

@@ -2304,7 +2304,14 @@ class KeycloakResolverTestCase(MyTestCase):
         self.assertSetEqual({"elizabeth", "eli"}, set([user["username"] for user in user_list]))
 
         # At least one parameter needs to use wildcards to enable substring search
-        user_list = resolver.getUserList({"username": "*eli*", "firstName": "Elizabeth"})
+        responses.add(responses.GET, "http://localhost:8080/admin/realms/master/users?username=eli&firstName=Elizabeth&exact=false",
+                      status=200,
+                      body="""[{"username": "elizabeth", "firstName": "Elizabeth", "lastName": "Zott", 
+                                                "id": "6ea91a8d-e32e-41a1-b7bd-d2d185eed0e0"},
+                                                {"username": "eli", "firstName": "Elizabeth", "lastName": "Einstein",
+                                                 "id": "4562bcc8-c436-4f95-b7c0-4f8ce89dca5e"}]""")
+
+        user_list = resolver.getUserList({"username": "*eli*", "givenname": "Elizabeth"})
         self.assertEqual(2, len(user_list))
         self.assertSetEqual({"elizabeth", "eli"}, set([user["username"] for user in user_list]))
 

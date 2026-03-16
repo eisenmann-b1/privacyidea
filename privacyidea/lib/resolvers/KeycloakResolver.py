@@ -161,7 +161,7 @@ class KeycloakResolver(HTTPResolver):
         return config
 
     @staticmethod
-    def _is_wildcard_search(search_dict: dict or None) -> bool:
+    def _is_wildcard_search(search_dict: dict | None) -> bool:
         """
         Checks if the search dict contains a wildcard search. Since substring search can only be applied for username,
         given name, surname, and email, we only check if asterisk is contained in at least one of the values of the

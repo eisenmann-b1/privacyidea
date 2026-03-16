@@ -6314,8 +6314,9 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
         tok = init_token({"serial": serial,
                           "type": "hotp",
                           "otpkey": "31323334353637383940"})
-        # Token is in ENROLLED state (default), not VERIFY_PENDING
-        self.assertEqual(tok.token.rollout_state, RolloutState.ENROLLED)
+        # Token that are enrolled directly without verify or 2step have the empty enrollment state
+        # TODO should be unified
+        self.assertEqual(tok.token.rollout_state, "")
 
         builder = EnvironBuilder(method='POST', data={}, headers={})
         env = builder.get_environ()
@@ -6326,9 +6327,9 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
         result = verify_enrollment(req, None)
         self.assertIsNone(result)
 
-        # Token should still be in enrolled state (unchanged)
+        # Token should still be empty (unchanged)
         tok = get_tokens(serial=serial)[0]
-        self.assertEqual(tok.token.rollout_state, RolloutState.ENROLLED)
+        self.assertEqual(tok.token.rollout_state, "")
         remove_token(serial)
 
     def test_20f_verify_enrollment_success(self):

@@ -37,6 +37,11 @@ import {
   NotificationService,
   NotificationServiceInterface
 } from "../../../../services/notification/notification.service";
+import { SystemService, SystemServiceInterface } from "../../../../services/system/system.service";
+
+export const TOTP_HASHLIB = "totp.hashlib";
+export const TOTP_OTP_LENGTH = "totp.otplen";
+export const TOTP_TIME_STEP = "totp.timestep";
 
 export interface TotpEnrollmentOptions extends TokenEnrollmentData {
   type: "totp";
@@ -71,6 +76,7 @@ export class EnrollTotpComponent implements OnInit {
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   protected readonly authService: AuthServiceInterface = inject(AuthService);
   protected readonly notificationService: NotificationServiceInterface = inject(NotificationService);
+  protected readonly systemService: SystemServiceInterface = inject(SystemService);
   readonly otpLengthOptions = [6, 8];
   readonly hashAlgorithmOptions = [
     { value: "sha1", viewValue: "SHA1" },
@@ -94,14 +100,27 @@ export class EnrollTotpComponent implements OnInit {
   generateOnServerFormControl = new FormControl<boolean>(true, [Validators.required]);
   otpLengthFormControl = new FormControl<number>(6, [Validators.required]);
   otpKeyFormControl = new FormControl<string>({ value: "", disabled: true });
-  hashAlgorithmControl = new FormControl<string>("sha1", [Validators.required]);
-  timeStepControl = new FormControl<number | string>(30, [Validators.required]);
+  defaultHashlib = computed(() => this.systemService.systemConfig()[TOTP_HASHLIB] ?? "sha1");
+  hashAlgorithmControl = new FormControl<string>(this.defaultHashlib(), [Validators.required]);
+  defaultTimeStep = computed(() => {
+    let timeStep = 30;
+    const configTimeStep = this.systemService.systemConfig()[TOTP_TIME_STEP];
+    if (configTimeStep) {
+      const parsedTimeStep = parseInt(configTimeStep, 10);
+      if (!isNaN(parsedTimeStep)) {
+        timeStep = parsedTimeStep;
+      }
+    }
+    return timeStep;
+  });
+  timeStepControl = new FormControl<number | string>(this.defaultTimeStep(), [Validators.required]);
   totpForm = new FormGroup({
     generateOnServer: this.generateOnServerFormControl,
     otpLength: this.otpLengthFormControl,
     otpKey: this.otpKeyFormControl,
     hashAlgorithm: this.hashAlgorithmControl,
-    timeStep: this.timeStepControl
+    timeStep: this.timeStepControl,
+    twoStep: this.twoStepControl
   });
 
   disabled = input<boolean>(false);
@@ -145,8 +164,8 @@ export class EnrollTotpComponent implements OnInit {
       this.generateOnServerFormControl.setValue(enrollmentData.generateOnServer ?? true, { emitEvent: eventEmit });
       this.otpLengthFormControl.setValue(enrollmentData.otpLength ?? 6, { emitEvent: eventEmit });
       this.otpKeyFormControl.setValue(enrollmentData.otpKey ?? "", { emitEvent: eventEmit });
-      this.hashAlgorithmControl.setValue(enrollmentData.hashAlgorithm ?? "sha1", { emitEvent: eventEmit });
-      this.timeStepControl.setValue(enrollmentData.timeStep ?? 30, { emitEvent: eventEmit });
+      this.hashAlgorithmControl.setValue(enrollmentData.hashAlgorithm ?? this.defaultHashlib(), { emitEvent: eventEmit });
+      this.timeStepControl.setValue(enrollmentData.timeStep ?? this.defaultTimeStep(), { emitEvent: eventEmit });
     }
   }
 
@@ -169,17 +188,31 @@ export class EnrollTotpComponent implements OnInit {
     if (this.authService.checkForceServerGenerateOTPKey("totp")) {
       this.generateOnServerFormControl.disable({ emitEvent: false });
     } else {
-      this.generateOnServerFormControl.valueChanges.subscribe((generate) => {
-        if (!generate) {
-          this.otpKeyFormControl.enable({ emitEvent: false });
-          this.otpKeyFormControl.setValidators([Validators.required, Validators.minLength(16)]);
-        } else {
-          this.otpKeyFormControl.disable({ emitEvent: false });
-          this.otpKeyFormControl.clearValidators();
-          this.otpKeyFormControl.setValue("");
-        }
-        this.otpKeyFormControl.updateValueAndValidity();
+      this.generateOnServerFormControl.valueChanges.subscribe(() => {
+        this._enableDisableOtpKeyControl(false);
       });
+    }
+
+    const hashlib = this.authService.rightsWithValues()[TOTP_HASHLIB];
+    if (hashlib) {
+      this.hashAlgorithmControl.setValue(hashlib, { emitEvent: false });
+      this.hashAlgorithmControl.disable({ emitEvent: false });
+    }
+    const otpLength = this.authService.rightsWithValues()[TOTP_OTP_LENGTH];
+    if (otpLength) {
+      const otpLengthNumber = parseInt(otpLength, 10);
+      if (!isNaN(otpLengthNumber)) {
+        this.otpLengthFormControl.setValue(otpLengthNumber, { emitEvent: false });
+        this.otpLengthFormControl.disable({ emitEvent: false });
+      }
+    }
+    const timeStep = this.authService.rightsWithValues()[TOTP_TIME_STEP];
+    if (timeStep) {
+      const timeStepNumber = parseInt(timeStep, 10);
+      if (!isNaN(timeStepNumber)) {
+        this.timeStepControl.setValue(timeStepNumber, { emitEvent: false });
+        this.timeStepControl.disable({ emitEvent: false });
+      }
     }
   }
 
@@ -212,8 +245,25 @@ export class EnrollTotpComponent implements OnInit {
     };
   };
 
+  private _enableDisableOtpKeyControl(emitEvent: boolean = true): void {
+    if (!this.generateOnServerFormControl.value) {
+      this.otpKeyFormControl.enable({ emitEvent });
+      this.otpKeyFormControl.setValidators([Validators.required, Validators.minLength(16)]);
+    } else {
+      this.otpKeyFormControl.disable({ emitEvent });
+      this.otpKeyFormControl.clearValidators();
+      this.otpKeyFormControl.setValue("");
+    }
+    this.otpKeyFormControl.updateValueAndValidity();
+  }
+
   private _enableFormControls(): void {
-    this.totpForm.enable({ emitEvent: false });
+    this.generateOnServerFormControl.enable();
+    this.otpLengthFormControl.enable();
+    this._enableDisableOtpKeyControl();
+    this.hashAlgorithmControl.enable();
+    this.timeStepControl.enable();
+    this.twoStepControl.enable();
     this._applyPolicies();
   }
 }

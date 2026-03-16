@@ -66,7 +66,7 @@ export class PrivacyideaServerService implements PrivacyideaServerServiceInterfa
   readonly privacyideaServerBaseUrl = environment.proxyUrl + "/privacyideaserver/";
 
   remoteServerResource = httpResource<PiResponse<PrivacyideaServers>>(() => {
-    if (!this.contentService.onExternalPrivacyIdea()) {
+    if (!this.contentService.onExternalPrivacyIdea() && !this.contentService.onTokenEnrollmentLikely()) {
       return undefined;
     }
     return {

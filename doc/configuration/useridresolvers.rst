@@ -886,10 +886,10 @@ In Keycloak, the user's password is checked using the OpenID Connect token endpo
 
 **User List**
 
-The Keycloak API only allows substring search for the username, givenname, lastname, and email attributes.
-If any of these attributes are used as search parameters, containing the wildcard character ``*``, the request parameter
-``{"exact": false}`` is set to enable substring search for these attributes.
-If no asterisk is present in these attributes, the request parameter ``{"exact": true}`` is set to disable substring
+The Keycloak API only allows substring search for the username, givenname, surname, and email attributes.
+If any of these attributes are used as search parameters and contain the wildcard character ``*``, the query parameter
+``exact=false`` is set to enable substring search for these attributes.
+If no asterisk is present in these attributes, the query parameter ``exact=true`` is set to disable substring
 search and only return exact matches.
 
 Note that this can only globally enable/disable substring search for all attributes.
@@ -898,7 +898,7 @@ Note that this can only globally enable/disable substring search for all attribu
 **Get user by name**
 
 There is no endpoint to retrieve a user by name. Instead, the user list endpoint is used to search for users filtered
-by the user name. Additionally, the request parameter ``{"exact": true}`` is set to only return users with an exact
+by the user name. Additionally, the query parameter ``exact=true`` is set to only return users with an exact
 match of the user name. If multiple users are found, a ``ResolverError`` is raised.
 
 **Create user**

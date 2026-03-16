@@ -6233,13 +6233,17 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
         self.assertIsNone(result)
 
     def test_20b_verify_enrollment_token_not_found(self):
-        """Test verify_enrollment prepolicy with non-existent serial - should return early"""
+        """Test verify_enrollment prepolicy with non-existent serial - should return early
+
+        This tests the early exit when len(token_list) != 1 (specifically when len == 0).
+        The case where len > 1 cannot occur because serial is a unique database constraint.
+        """
         builder = EnvironBuilder(method='POST', data={}, headers={})
         env = builder.get_environ()
         req = Request(env)
         req.all_data = {"serial": "NONEXISTENT", "verify": "123456"}
 
-        # Should return None without error (early exit - token not found)
+        # Should return None without error (early exit - token not found, len(token_list) == 0)
         result = verify_enrollment(req, None)
         self.assertIsNone(result)
 
@@ -6325,6 +6329,42 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
         # Token should still be in enrolled state (unchanged)
         tok = get_tokens(serial=serial)[0]
         self.assertEqual(tok.token.rollout_state, RolloutState.ENROLLED)
+        remove_token(serial)
+
+    def test_20f_verify_enrollment_success(self):
+        """Test verify_enrollment prepolicy happy path - successful verification"""
+        from privacyidea.lib.tokenclass import RolloutState
+
+        otpkey_hex = ("5287c8247735148e48cc66412e8510de0414eb996da86edf18d944dd9844d13f9b804fce48a4c6d3f43f27788f70122b"
+                      "457dffc12563e8d319c23c8b6fac5395")
+        first_otp = "148752"
+
+        serial = "HOTP_VERIFY_SUCCESS"
+        tok = init_token({"serial": serial,
+                          "type": "hotp",
+                          "otpkey": otpkey_hex})
+        # Set token to VERIFY_PENDING state
+        tok.token.rollout_state = RolloutState.VERIFY_PENDING
+        tok.save()
+
+        builder = EnvironBuilder(method='POST', data={}, headers={})
+        env = builder.get_environ()
+        req = Request(env)
+        req.all_data = {"serial": serial, "verify": first_otp, "type": "hotp"}
+
+        # Should succeed without raising an error
+        result = verify_enrollment(req, None)
+        self.assertIsNone(result)  # prepolicy returns None on success
+
+        # Token should now be in ENROLLED state
+        tok = get_tokens(serial=serial)[0]
+        self.assertEqual(tok.token.rollout_state, RolloutState.ENROLLED)
+
+        # Verify that the OTP counter was incremented (token consumed the OTP)
+        # The same OTP should not work again
+        r = tok.check_otp(first_otp)
+        self.assertEqual(r, -1)  # -1 means OTP already used
+
         remove_token(serial)
 
     def test_21_preferred_client_mode_for_user_allowed(self):

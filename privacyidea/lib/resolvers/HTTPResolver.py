@@ -858,7 +858,7 @@ class HTTPResolver(UserIdResolver):
         if not attributes:
             attributes = self.attribute_mapping_pi_to_user_store.keys()
 
-        unknown_attributes = set(attributes).difference(set(self.attribute_mapping_pi_to_user_store.keys()))
+        unknown_attributes = set(attributes).difference(set(self.get_available_info_keys()))
         known_attributes = set(attributes) - unknown_attributes
         if unknown_attributes:
             unknown_attributes = ", ".join(unknown_attributes)

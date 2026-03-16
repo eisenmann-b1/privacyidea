@@ -884,6 +884,17 @@ Keycloak API.
 In Keycloak, the user's password is checked using the OpenID Connect token endpoint. Check out the
 `Keycloak OpenID Connect documentation <https://www.keycloak.org/securing-apps/oidc-layers>`_ for more information.
 
+**User List**
+
+The Keycloak API only allows substring search for the username, givenname, lastname, and email attributes.
+If any of these attributes are used as search parameters, containing the wildcard character ``*``, the request parameter
+``{"exact": false}`` is set to enable substring search for these attributes.
+If no asterisk is present in these attributes, the request parameter ``{"exact": true}`` is set to disable substring
+search and only return exact matches.
+
+Note that this can only globally enable/disable substring search for all attributes.
+
+
 **Get user by name**
 
 There is no endpoint to retrieve a user by name. Instead, the user list endpoint is used to search for users filtered

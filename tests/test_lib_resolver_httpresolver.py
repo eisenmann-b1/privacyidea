@@ -2322,6 +2322,14 @@ class KeycloakResolverTestCase(MyTestCase):
         self.assertEqual(1, len(user_list))
         self.assertSetEqual({"eli"}, set([user["username"] for user in user_list]))
 
+        # Use wildcards in not allowed attributes performs an exact search
+        responses.add(responses.GET, "http://localhost:8080/admin/realms/master/users?username=eli&id=456&exact=true",
+                      status=200,
+                      body="""[]""")
+
+        user_list = resolver.getUserList({"username": "eli", "userid": "*456*"})
+        self.assertEqual(0, len(user_list))
+
     @responses.activate
     def test_06_getUserList_with_groups(self):
         resolver = self.set_up_resolver()

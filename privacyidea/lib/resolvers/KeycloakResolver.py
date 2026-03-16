@@ -163,12 +163,19 @@ class KeycloakResolver(HTTPResolver):
     @staticmethod
     def _is_wildcard_search(search_dict: dict or None) -> bool:
         """
-        Checks if the search dict contains a wildcard search.
+        Checks if the search dict contains a wildcard search. Since substring search can only be applied for username,
+        given name, surname, and email, we only check if asterisk is contained in at least one of the values of the
+        search dict.
+        If the search dict is None or empty, it is not a wildcard search.
 
         :param search_dict: The search dictionary containing the search parameters
         :return: True if it is a wildcard search, False otherwise
         """
-        return any("*" in value for value in search_dict.values()) if search_dict else False
+        if not search_dict:
+            return False
+
+        wildcard_keys = {"username", "givenname", "surname", "email"}
+        return any("*" in str(search_dict.get(key, "")) for key in wildcard_keys if key in search_dict)
 
     def _get_user_list(self, search_dict: dict, config: RequestConfig, attributes: list[str] = None) -> list[dict]:
         """

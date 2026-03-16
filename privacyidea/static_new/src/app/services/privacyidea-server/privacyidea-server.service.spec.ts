@@ -103,7 +103,7 @@ describe("PrivacyideaServerService", () => {
 
   it("privacyideaServerResource should not do request and return undefined on unexpected route", () => {
     contentService.routeUrl.set(ROUTE_PATHS.TOKENS);
-    const resource = service.privacyideaServerResource.value();
+    const resource = service.remoteServerResource.value();
     expect(resource).toBeUndefined();
     // No HTTP request should be made
     const requests = httpMock.match(() => true);
@@ -120,7 +120,7 @@ describe("PrivacyideaServerService", () => {
       req.flush(mockResponse);
       await lastValueFrom(of({})); // Wait for async updates
 
-      const response = service.privacyideaServerResource.value();
+      const response = service.remoteServerResource.value();
       expect(response).toBeDefined();
       expect(response).toEqual(mockResponse);
       expect(response?.result?.value).toEqual(piServerResponse);

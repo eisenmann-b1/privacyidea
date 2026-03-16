@@ -299,6 +299,7 @@ export class TableUtilsService implements TableUtilsServiceInterface {
       case "failcount":
       case "active":
       case "revoke":
+      case "maxfail":
       case "delete":
         return "flex-center";
       case "realms":

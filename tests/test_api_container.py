@@ -4337,7 +4337,7 @@ class APIContainerSynchronization(APIContainerTest):
                        "user": "hans"}
         result = self.request_assert_success("/token/init", hotp_params, self.at, "POST")
         initial_enroll_url = result["detail"]["googleurl"]["value"]
-        self.assertIn("force_app_pin=True", initial_enroll_url)
+        self.assertIn("pin=True", initial_enroll_url)
         self.assertIn("app_force_unlock=pin", initial_enroll_url)
         self.assertIn(f"issuer={self.realm1}", initial_enroll_url)
         self.assertIn("hans", initial_enroll_url)

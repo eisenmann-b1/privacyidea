@@ -213,7 +213,7 @@ required = False
 
 DEFAULT_ANDROID_APP_URL = "https://play.google.com/store/apps/details?id=it.netknights.piauthenticator"
 DEFAULT_IOS_APP_URL = "https://apps.apple.com/us/app/privacyidea-authenticator/id1445401301"
-DEFAULT_PREFERRED_CLIENT_MODE_LIST = ['interactive', 'webauthn', 'poll', 'u2f']
+DEFAULT_PREFERRED_CLIENT_MODE_LIST = ['interactive', 'webauthn', 'poll']
 
 comma_escape_text = lazy_gettext("Note: If you use a comma in the message, you "
                                  "need to escape it with a backslash.")
@@ -2581,8 +2581,9 @@ def get_static_policy_definitions(scope=None):
             },
             PolicyAction.ENROLL_VIA_MULTICHALLENGE_PASSKEY_OFFLINE: {
                 'type': 'bool',
-                'desc': _('If enabled, a successful registration with the enroll_via_multichallenge action for passkeys '
-                          'will directly mark the token for offline use and send the offline data.')
+                'desc': _(
+                    'If enabled, a successful registration with the enroll_via_multichallenge action for passkeys '
+                    'will directly mark the token for offline use and send the offline data.')
             },
             PolicyAction.PASSTHRU: {
                 'type': 'str',

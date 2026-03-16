@@ -56,7 +56,6 @@ from privacyidea.lib.policies.actions import PolicyAction
 from privacyidea.lib.policy import SCOPE, GROUP
 from privacyidea.lib.token import get_tokens
 from privacyidea.lib.tokenclass import TokenClass, CLIENTMODE, ROLLOUTSTATE
-from privacyidea.lib.tokens.u2ftoken import IMAGES
 from privacyidea.lib.tokens.webauthn import (CoseAlgorithm, webauthn_b64_encode, webauthn_b64_decode, TRANSPORTS,
                                              WebAuthnUser, AuthenticationRejectedException,
                                              UserVerificationLevel, AttestationLevel)
@@ -471,7 +470,10 @@ native encoding of the language (usually utf-16).
 
 from privacyidea.models import Challenge, TokenCredentialIdHash, db
 
-IMAGES = IMAGES
+IMAGES = {"yubico": "privacyidea/static/img/FIDO-U2F-Security-Key-444x444.png",
+          "plug-up": "privacyidea/static/img/plugup.jpg",
+          "u2fzero.com": "privacyidea/static/img/u2fzero.png",
+          "solokeys": "privacyidea/static/img/solokeys.png"}
 
 DEFAULT_DESCRIPTION = lazy_gettext('Generic WebAuthn Token')
 

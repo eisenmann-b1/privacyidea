@@ -85,7 +85,7 @@ from datetime import datetime, timedelta, timezone
 from dateutil.parser import parse as parse_date_string, ParserError
 from dateutil.tz import tzlocal, tzutc
 from flask_babel import lazy_gettext
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, delete
 
 from privacyidea.lib import _
 from privacyidea.lib.crypto import (decryptPassword,
@@ -104,7 +104,7 @@ from .policydecorators import libpolicy, auth_otppin, challenge_response_allowed
 from .user import (User)
 from ..api.lib.utils import getParam
 from ..models import (TokenOwner, TokenTokengroup, Challenge, cleanup_challenges, TokenInfo, db, TokenRealm, Realm,
-                      Tokengroup, MachineToken, TokenCredentialIdHash, Token)
+                      Tokengroup, TokenCredentialIdHash, Token)
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M%z'
 AUTH_DATE_FORMAT = "%Y-%m-%d %H:%M:%S.%f%z"
@@ -144,7 +144,6 @@ class CLIENTMODE(object):
     """
     INTERACTIVE = 'interactive'
     POLL = 'poll'
-    U2F = 'u2f'
     WEBAUTHN = 'webauthn'
 
 

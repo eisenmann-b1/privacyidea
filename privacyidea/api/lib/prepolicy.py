@@ -102,7 +102,6 @@ from privacyidea.lib.tokens.certificatetoken import ACTION as CERTIFICATE_ACTION
 from privacyidea.lib.tokens.indexedsecrettoken import PIIXACTION
 from privacyidea.lib.tokens.passkeytoken import PasskeyTokenClass
 from privacyidea.lib.tokens.pushtoken import PUSH_ACTION
-from privacyidea.lib.tokens.u2ftoken import (U2FACTION)
 # Token specific imports!
 from privacyidea.lib.tokens.webauthn import (AUTHENTICATOR_ATTACHMENT_TYPES,
                                              USER_VERIFICATION_LEVELS, ATTESTATION_LEVELS,
@@ -1880,34 +1879,6 @@ def pushtoken_add_config(request, action):
     if ttype and ttype.lower() == "push":
         push_config = get_pushtoken_add_config(g, request.all_data, request.User)
         g.policies.update(push_config)
-
-
-def u2ftoken_verify_cert(request, action):
-    """
-    This is a token specific wrapper for u2f token for the endpoint
-    /token/init
-    According to the policy scope=SCOPE.ENROLL,
-    action=U2FACTION.NO_VERIFY_CERT it can add a parameter to the
-    enrollment parameters to not verify the attestation certificate.
-    The default is to verify the cert.
-    :param request:
-    :param action:
-    :return:
-    """
-    # Get the registration data of the 2nd step of enrolling a U2F device
-    ttype = request.all_data.get("type")
-    if ttype and ttype.lower() == "u2f":
-        # Add the default to verify the cert.
-        request.all_data["u2f.verify_cert"] = True
-        user_object = request.User
-        do_not_verify_the_cert = Match.user(g, scope=SCOPE.ENROLL, action=U2FACTION.NO_VERIFY_CERT,
-                                            user_object=user_object if user_object else None).policies()
-        if do_not_verify_the_cert:
-            request.all_data["u2f.verify_cert"] = False
-
-        log.debug("Should we not verify the attestation certificate? "
-                  "Policies: {0!s}".format(do_not_verify_the_cert))
-    return True
 
 
 def indexedsecret_force_attribute(request, action):

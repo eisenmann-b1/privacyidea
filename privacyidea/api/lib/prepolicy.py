@@ -769,9 +769,6 @@ def verify_enrollment(request=None, action=None):
 
     # Lookup the token
     token_list = get_tokens(serial=serial)
-    if len(token_list) != 1:
-        return
-
     token = token_list[0]
     # Early exit: token not in verify_pending state
     if token.rollout_state != RolloutState.VERIFY_PENDING:

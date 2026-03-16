@@ -6221,7 +6221,7 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
         self.assertEqual(tok.token.rollout_state, RolloutState.VERIFY_PENDING)
         delete_policy("verify_toks")
 
-    def test_20a_verify_enrollment_prepolicy_no_serial(self):
+    def test_20a_verify_enrollment_no_serial(self):
         """Test verify_enrollment prepolicy with no serial - should return early"""
         builder = EnvironBuilder(method='POST', data={}, headers={})
         env = builder.get_environ()
@@ -6232,7 +6232,7 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
         result = verify_enrollment(req, None)
         self.assertIsNone(result)
 
-    def test_20b_verify_enrollment_prepolicy_token_not_found(self):
+    def test_20b_verify_enrollment_token_not_found(self):
         """Test verify_enrollment prepolicy with non-existent serial - should return early"""
         builder = EnvironBuilder(method='POST', data={}, headers={})
         env = builder.get_environ()
@@ -6243,8 +6243,8 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
         result = verify_enrollment(req, None)
         self.assertIsNone(result)
 
-    def test_20c_verify_enrollment_prepolicy_missing_verify_param(self):
-        """Test verify_enrollment prepolicy with token in verify_pending but no verify param - should raise error"""
+    def test_20c_verify_enrollment_missing_verify_param(self):
+        """Test verify_enrollment prepolicy with token in verify_pending but no verify param - should raise an error"""
         from privacyidea.lib.tokenclass import RolloutState
         from privacyidea.lib.error import ParameterError
 
@@ -6273,7 +6273,7 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
         self.assertEqual(tok.token.rollout_state, RolloutState.VERIFY_PENDING)
         remove_token(serial)
 
-    def test_20d_verify_enrollment_prepolicy_wrong_verify_value(self):
+    def test_20d_verify_enrollment_wrong_verify_value(self):
         """Test verify_enrollment prepolicy with wrong verify value - should raise error"""
         from privacyidea.lib.tokenclass import RolloutState
         from privacyidea.lib.error import ParameterError
@@ -6300,6 +6300,31 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
         # Token should still be in verify_pending state
         tok = get_tokens(serial=serial)[0]
         self.assertEqual(tok.token.rollout_state, RolloutState.VERIFY_PENDING)
+        remove_token(serial)
+
+    def test_20e_verify_enrollment_not_in_verify_pending_state(self):
+        """Test verify_enrollment prepolicy with token not in verify_pending state - should exit early"""
+        from privacyidea.lib.tokenclass import RolloutState
+
+        serial = "HOTP_NOT_VERIFY_PENDING"
+        tok = init_token({"serial": serial,
+                          "type": "hotp",
+                          "otpkey": "31323334353637383940"})
+        # Token is in ENROLLED state (default), not VERIFY_PENDING
+        self.assertEqual(tok.token.rollout_state, RolloutState.ENROLLED)
+
+        builder = EnvironBuilder(method='POST', data={}, headers={})
+        env = builder.get_environ()
+        req = Request(env)
+        req.all_data = {"serial": serial, "verify": "123456"}
+
+        # Should return None without error (early exit - not in verify_pending state)
+        result = verify_enrollment(req, None)
+        self.assertIsNone(result)
+
+        # Token should still be in enrolled state (unchanged)
+        tok = get_tokens(serial=serial)[0]
+        self.assertEqual(tok.token.rollout_state, RolloutState.ENROLLED)
         remove_token(serial)
 
     def test_21_preferred_client_mode_for_user_allowed(self):

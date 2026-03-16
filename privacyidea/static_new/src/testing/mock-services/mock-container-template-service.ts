@@ -35,15 +35,10 @@ export class MockContainerTemplateService implements ContainerTemplateServiceInt
     undefined
   ) as unknown as HttpResourceRef<PiResponse<{ templates: ContainerTemplate[] }, unknown> | undefined>;
 
-  templates = signal<ContainerTemplate[]>([]) as WritableSignal<ContainerTemplate[]>;
-
-  templateTokenTypesResource = new MockHttpResourceRef<PiResponse<TemplateTokenTypes, unknown> | undefined>(
-    undefined
-  ) as unknown as HttpResourceRef<PiResponse<TemplateTokenTypes, unknown> | undefined>;
-
-  templateTokenTypes = signal<TemplateTokenTypes>({}) as Signal<TemplateTokenTypes>;
-
-  availableContainerTypes = signal<string[]>([]) as Signal<string[]>;
+  templates = signal<ContainerTemplate[]>([]);
+  templateTokenTypesResource = new MockHttpResourceRef<PiResponse<TemplateTokenTypes, unknown> | undefined>(undefined);
+  templateTokenTypes = signal<TemplateTokenTypes>({});
+  availableContainerTypes = signal<string[]>([]);
 
   emptyContainerTemplate: ContainerTemplate = {
     name: "",

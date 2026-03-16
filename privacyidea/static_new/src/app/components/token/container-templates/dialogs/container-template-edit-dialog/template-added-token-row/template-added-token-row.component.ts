@@ -133,6 +133,7 @@ export class TemplateAddedTokenRowComponent {
     ) => { data: TokenEnrollmentData; mapper: TokenApiPayloadMapper<TokenEnrollmentData> } | null
   ) {
     this.enrollmentArgsGetterSignal.set(enrollmentArgsGetter);
+    this.updateToken(this.tokenEnrollmentData() ?? {});
   }
 
   // Token Management Methods
@@ -145,7 +146,6 @@ export class TemplateAddedTokenRowComponent {
         initialPatch[key] = control.value;
 
         control.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((value) => {
-          console.log(`Form control '${key}' changed to:`, value);
           this.updateToken({ [key]: value });
         });
       }
@@ -161,7 +161,6 @@ export class TemplateAddedTokenRowComponent {
   }
 
   private updateToken(enrollmentData: Partial<TokenEnrollmentData>) {
-    console.log("Updating token with data:", enrollmentData);
     const updatedEnrollmentData = { ...this.tokenEnrollmentData(), ...enrollmentData };
 
     this.tokenEnrollmentData.set(updatedEnrollmentData);
@@ -173,10 +172,8 @@ export class TemplateAddedTokenRowComponent {
       type: this.tokenEnrollmentPayload().type,
       ...updatedEnrollmentData
     });
-    console.log("Enrollment args from getter:", args);
     if (args) {
       const mappedData = args.mapper.toApiPayload(args.data);
-      console.log("Mapped API payload:", mappedData);
       this.onEditToken.emit(mappedData);
     }
   }

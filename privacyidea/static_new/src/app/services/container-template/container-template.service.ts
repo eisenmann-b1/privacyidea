@@ -131,7 +131,8 @@ export class ContainerTemplateService implements ContainerTemplateServiceInterfa
   copyTemplate(template: ContainerTemplate, newName: string): Promise<boolean> {
     const newTemplate: ContainerTemplate = {
       ...template,
-      name: newName
+      name: newName,
+      default: false
     };
     return this.postTemplateEdits(newTemplate);
   }

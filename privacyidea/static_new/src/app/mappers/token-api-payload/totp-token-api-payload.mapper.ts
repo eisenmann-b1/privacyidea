@@ -24,6 +24,7 @@ import {
   TokenEnrollmentPayload
 } from "./_token-api-payload.mapper";
 import { TokenDetails } from "../../services/token/token.service";
+import { parseBooleanValue } from "../../utils/parse-boolean-value";
 
 export interface TotpEnrollmentData extends TokenEnrollmentData {
   type: "totp";
@@ -37,25 +38,24 @@ export interface TotpEnrollmentData extends TokenEnrollmentData {
 }
 
 export interface TotpEnrollmentPayload extends TokenEnrollmentPayload {
-  otpkey: string | null;
+  otpkey: string;
   genkey: 0 | 1;
   otplen?: number;
   hashlib?: string;
-  timeStep?: number;
-  serial?: string | null;
+  timeStep?: number | string;
+  serial?: string;
   "2stepinit"?: boolean;
   otpkeyformat?: string;
 }
 
 @Injectable({ providedIn: "root" })
 export class TotpApiPayloadMapper extends BaseApiPayloadMapper implements TokenApiPayloadMapper<TotpEnrollmentData> {
-
   override toApiPayload(data: TotpEnrollmentData): TotpEnrollmentPayload {
     const basePayload = super.toApiPayload(data);
     const payload: TotpEnrollmentPayload = {
       ...basePayload,
-      otpkey: data.generateOnServer ? null : (data.otpKey ?? null),
       genkey: data.generateOnServer ? 1 : 0,
+      otpkey: data.generateOnServer === true ? "" : (data.otpKey ?? ""),
       ...(data.otpLength !== undefined && { otplen: Number(data.otpLength) }),
       ...(data.hashAlgorithm !== undefined && { hashlib: data.hashAlgorithm }),
       ...(data.timeStep !== undefined && { timeStep: Number(data.timeStep) }),
@@ -64,14 +64,24 @@ export class TotpApiPayloadMapper extends BaseApiPayloadMapper implements TokenA
     };
     if (data.onlyAddToRealm) {
       payload.realm = data.realm;
-      payload.user = null;
+      delete payload.user;
     }
     return payload;
   }
 
-  override fromApiPayload(payload: any): TotpEnrollmentData {
-    // Placeholder: Implement transformation from API payload. We will replace this later.
-    return payload as TotpEnrollmentData;
+  override fromApiPayload(payload: TotpEnrollmentPayload): TotpEnrollmentData {
+    const baseData = super.fromApiPayload(payload);
+    return {
+      ...baseData,
+      type: "totp",
+      ...(payload.genkey !== undefined && { generateOnServer: parseBooleanValue(payload.genkey) }),
+      otpKey: payload.otpkey ?? undefined,
+      otpLength: payload.otplen ? Number(payload.otplen) : undefined,
+      hashAlgorithm: payload.hashlib ?? undefined,
+      timeStep: payload.timeStep !== undefined ? Number(payload.timeStep) : undefined,
+      ...(payload["2stepinit"] !== undefined && { twoStepInit: payload["2stepinit"] }),
+      otpKeyFormat: payload.otpkeyformat ?? undefined
+    };
   }
 
   override fromTokenDetailsToEnrollmentData(details: TokenDetails): TotpEnrollmentData {

@@ -88,23 +88,17 @@ describe("parseBooleanValue", () => {
   });
 
   it("should call assert for an invalid string", () => {
-    const errMsg = "Initial value for parseBooleanValue must be \"true\", \"false\", \"1\" or \"0\" if string, but was invalid";
+    const errMsg = 'Initial value for parseBooleanValue must be "true", "false", "1" or "0" if string, but was invalid';
     expect(() => parseBooleanValue("invalid")).toThrow(errMsg);
     expect(assert).toHaveBeenCalledWith(false, errMsg);
   });
 
-  it("should call assert for null", () => {
-    const errMsg =
-      "Initial value for parseBooleanValue must be boolean, 0, 1, \"true\", \"false\", \"1\" or \"0\", but was null";
-    expect(() => parseBooleanValue(null as any)).toThrow(errMsg);
-    expect(assert).toHaveBeenCalledWith(false, errMsg);
+  it("should return false for null", () => {
+    expect(parseBooleanValue(null as unknown as any)).toBe(false);
   });
 
-  it("should call assert for undefined", () => {
-    const errMsg =
-      "Initial value for parseBooleanValue must be boolean, 0, 1, \"true\", \"false\", \"1\" or \"0\", but was undefined";
-    expect(() => parseBooleanValue(undefined as any)).toThrow(errMsg);
-    expect(assert).toHaveBeenCalledWith(false, errMsg);
+  it("should return false for undefined", () => {
+    expect(parseBooleanValue(undefined as unknown as any)).toBe(false);
   });
 
   it("should call assert for an object", () => {

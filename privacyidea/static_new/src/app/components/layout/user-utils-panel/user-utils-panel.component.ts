@@ -62,15 +62,7 @@ import { ConfigService, ConfigServiceInterface } from "../../../services/config/
 
 @Component({
   selector: "app-user-utils-panel",
-  imports: [
-    MatIcon,
-    MatIconButton,
-    MatTooltip,
-    ThemeSwitcherComponent,
-    MatFabButton,
-    NgClass,
-    DatePipe
-  ],
+  imports: [MatIcon, MatIconButton, MatTooltip, ThemeSwitcherComponent, MatFabButton, NgClass, DatePipe],
   templateUrl: "./user-utils-panel.component.html",
   styleUrl: "./user-utils-panel.component.scss"
 })
@@ -137,12 +129,10 @@ export class UserUtilsPanelComponent {
       this.tokenService.tokenDetailResource.reload();
       this.containerService.containerResource.reload();
       return;
-
     } else if (this.contentService.onTokensContainersDetails()) {
       this.containerService.containerDetailResource.reload();
       this.tokenService.tokenResource.reload();
       return;
-
     } else if (this.contentService.onUserDetails()) {
       this.userService.usersResource.reload();
       this.tokenService.tokenResource.reload();
@@ -200,7 +190,7 @@ export class UserUtilsPanelComponent {
         this.smsGatewayService.smsGatewayResource.reload();
         break;
       case ROUTE_PATHS.EXTERNAL_SERVICES_PRIVACYIDEA:
-        this.privacyideaService.privacyideaServerResource.reload();
+        this.privacyideaService.remoteServerResource.reload();
         break;
       case ROUTE_PATHS.EXTERNAL_SERVICES_TOKENGROUPS:
         this.tokengroupService.tokengroupResource.reload();

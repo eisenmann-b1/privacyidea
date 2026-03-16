@@ -26,7 +26,7 @@ import {
 } from "../../app/services/privacyidea-server/privacyidea-server.service";
 
 export class MockPrivacyideaServerService implements PrivacyideaServerServiceInterface {
-  privacyideaServerResource: HttpResourceRef<PiResponse<PrivacyideaServers> | undefined> = {
+  remoteServerResource: HttpResourceRef<PiResponse<PrivacyideaServers> | undefined> = {
     value: signal(undefined),
     status: signal(0) as any,
     error: signal(null),
@@ -41,10 +41,7 @@ export class MockPrivacyideaServerService implements PrivacyideaServerServiceInt
     destroy: function (): void {}
   } as any;
 
-  privacyideaServers = computed<PrivacyideaServer[]>(() => []);
-
-  remoteServerResource = this.privacyideaServerResource;
-  remoteServerOptions = this.privacyideaServers;
+  remoteServerOptions = computed<PrivacyideaServer[]>(() => []);
 
   postPrivacyideaServer = jest.fn(async (_server: PrivacyideaServer): Promise<void> => {
     return Promise.resolve();

@@ -73,7 +73,7 @@ export class PrivacyideaServersComponent {
   filterString = signal<string>("");
   pageSizeOptions = this.tableUtilsService.pageSizeOptions;
   totalLength: WritableSignal<number> = computed(
-    () => this.privacyideaServerService.privacyideaServers().length
+    () => this.privacyideaServerService.remoteServerOptions().length
   ) as WritableSignal<number>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -83,7 +83,7 @@ export class PrivacyideaServersComponent {
   displayedColumns: string[] = ["identifier", "url", "tls", "description", "actions"];
 
   privacyideaDataSource = computed(() => {
-    const servers = this.privacyideaServerService.privacyideaServers();
+    const servers = this.privacyideaServerService.remoteServerOptions();
     const dataSource = new MatTableDataSource(servers);
     dataSource.paginator = this.paginator;
     dataSource.sort = this.sort;

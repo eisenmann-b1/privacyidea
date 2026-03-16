@@ -90,6 +90,9 @@ describe("ContentService", () => {
     emitNav(ROUTE_PATHS.TOKENS_DETAILS + "/SER1");
     expect(service.onTokenEnrollmentLikely()).toBe(true);
 
+    emitNav(ROUTE_PATHS.TOKENS_CONTAINERS_TEMPLATES);
+    expect(service.onTokenEnrollmentLikely()).toBe(true);
+
     emitNav(ROUTE_PATHS.TOKENS);
     expect(service.onTokenEnrollmentLikely()).toBe(false);
   });

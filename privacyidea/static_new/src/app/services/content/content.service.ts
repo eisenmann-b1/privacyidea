@@ -106,7 +106,7 @@ export class ContentService implements ContentServiceInterface {
   onTokensEnrollment = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_ENROLLMENT);
   onTokenEnrollmentLikely = computed(() =>
     // allow token details for rollover
-    this.onTokensEnrollment() || this.onTokenDetails() || this.onTokensWizard()
+    this.onTokensEnrollment() || this.onTokenDetails() || this.onTokensWizard() || this.onTokensContainersTemplates()
   );
   onTokensChallenges = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_CHALLENGES);
   onTokensApplications = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_APPLICATIONS);

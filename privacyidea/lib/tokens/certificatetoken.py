@@ -47,7 +47,7 @@ import secrets
 import traceback
 
 from privacyidea.lib.utils import b64encode_and_unicode, to_byte_string
-from privacyidea.lib.tokenclass import TokenClass, ROLLOUTSTATE
+from privacyidea.lib.tokenclass import TokenClass, RolloutState
 from privacyidea.lib.log import log_with
 from privacyidea.api.lib.utils import getParam, get_optional
 from privacyidea.lib.caconnector import get_caconnector_object, get_caconnector_list
@@ -57,7 +57,7 @@ from privacyidea.lib.decorators import check_token_locked
 from privacyidea.lib import _
 from privacyidea.lib.policy import SCOPE, GROUP, Match
 from privacyidea.lib.policies.actions import PolicyAction as BASE_ACTION
-from privacyidea.lib.error import privacyIDEAError, CSRError, CSRPending, CAError
+from privacyidea.lib.error import PrivacyIDEAError, CSRError, CSRPending, CAError
 
 optional = True
 required = False
@@ -155,7 +155,7 @@ def verify_certificate(certificate: Certificate, chain: list):
     :return: raises an exception
     """
     if not chain:
-        raise privacyIDEAError("Can not verify certificate against an empty chain.")  # pragma: no cover
+        raise PrivacyIDEAError("Can not verify certificate against an empty chain.")  # pragma: no cover
     # first reverse the list, since it can be popped better
     chain = list(reversed(chain))
     chain = [load_pem_x509_certificate(c.encode()) for c in chain]
@@ -400,7 +400,7 @@ class CertificateTokenClass(TokenClass):
         :return: the status of the rollout
         """
         status = -1
-        if self.rollout_state == ROLLOUTSTATE.PENDING:
+        if self.rollout_state == RolloutState.PENDING:
             request_id = self.get_tokeninfo(REQUEST_ID)
             ca = self.get_tokeninfo("CA")
             if ca and request_id:
@@ -413,11 +413,11 @@ class CertificateTokenClass(TokenClass):
                     log.info("The certificate {0!s} has been issued by the CA.".format(self.token.serial))
                     certificate = cacon.get_issued_certificate(request_id)
                     # Update the rollout state
-                    self.token.rollout_state = ROLLOUTSTATE.ENROLLED
+                    self.token.rollout_state = RolloutState.ENROLLED
                     self.add_tokeninfo("certificate", certificate)
                 elif status == 2:  # denied
                     log.warning("The certificate {0!s} has been denied by the CA.".format(self.token.serial))
-                    self.token.rollout_state = ROLLOUTSTATE.DENIED
+                    self.token.rollout_state = RolloutState.DENIED
                     self.token.save()
                 else:
                     log.info("The certificate {0!s} is still pending.".format(self.token.serial))
@@ -468,7 +468,7 @@ class CertificateTokenClass(TokenClass):
                 # Restore the request string with newlines
                 request = request_csr.public_bytes(encoding=serialization.Encoding.PEM).decode('utf-8')
                 if not request_csr.is_signature_valid:
-                    raise privacyIDEAError("request has invalid signature.")
+                    raise PrivacyIDEAError("request has invalid signature.")
                 # If a request is sent, we can have an attestation certificate
                 attestation = getParam(param, "attestation", optional)
                 verify_attestation = getParam(param, "verify_attestation", optional)
@@ -478,7 +478,7 @@ class CertificateTokenClass(TokenClass):
                     attestation_numbers = attestation_cert.public_key().public_numbers()
                     if request_numbers != attestation_numbers:
                         log.warning("certificate request does not match attestation certificate.")
-                        raise privacyIDEAError("certificate request does not match attestation certificate.")
+                        raise PrivacyIDEAError("certificate request does not match attestation certificate.")
 
                     try:
                         verified = verify_certificate_path(attestation_cert,
@@ -492,7 +492,7 @@ class CertificateTokenClass(TokenClass):
                     if not verified:
                         log.warning("Failed to verify certificate chain of attestation certificate.")
                         if verify_attestation:
-                            raise privacyIDEAError("Failed to verify certificate chain of attestation certificate.")
+                            raise PrivacyIDEAError("Failed to verify certificate chain of attestation certificate.")
 
             # During the initialization process, we need to create the certificate
             # TODO: We should check for a pending CSR from the MSCA connector
@@ -550,12 +550,12 @@ class CertificateTokenClass(TokenClass):
                     options={"template": template_name})
 
             except CSRPending as e:
-                self.token.rollout_state = ROLLOUTSTATE.PENDING
+                self.token.rollout_state = RolloutState.PENDING
                 if hasattr(e, "requestId"):
                     request_id = e.requestId
             except (CSRError, CAError):
                 # Mark the token as broken
-                self.token.rollout_state = ROLLOUTSTATE.FAILED
+                self.token.rollout_state = RolloutState.FAILED
                 # Reraise the error
                 raise
 

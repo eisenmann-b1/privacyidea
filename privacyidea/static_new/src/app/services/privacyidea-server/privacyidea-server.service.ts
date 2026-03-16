@@ -44,8 +44,6 @@ export type PrivacyideaServers = {
 };
 
 export interface PrivacyideaServerServiceInterface {
-  privacyideaServerResource: HttpResourceRef<PiResponse<PrivacyideaServers> | undefined>;
-  readonly privacyideaServers: Signal<PrivacyideaServer[]>;
   remoteServerResource: HttpResourceRef<PiResponse<PrivacyideaServers> | undefined>;
   readonly remoteServerOptions: Signal<PrivacyideaServer[]>;
 
@@ -67,7 +65,7 @@ export class PrivacyideaServerService implements PrivacyideaServerServiceInterfa
 
   readonly privacyideaServerBaseUrl = environment.proxyUrl + "/privacyideaserver/";
 
-  privacyideaServerResource = httpResource<PiResponse<PrivacyideaServers>>(() => {
+  remoteServerResource = httpResource<PiResponse<PrivacyideaServers>>(() => {
     if (!this.contentService.onExternalPrivacyIdea() && !this.contentService.onTokenEnrollmentLikely()) {
       return undefined;
     }
@@ -77,8 +75,8 @@ export class PrivacyideaServerService implements PrivacyideaServerServiceInterfa
       headers: this.authService.getHeaders()
     };
   });
-  privacyideaServers = computed<PrivacyideaServer[]>(() => {
-    const res = this.privacyideaServerResource.value();
+  remoteServerOptions = computed<PrivacyideaServer[]>(() => {
+    const res = this.remoteServerResource.value();
     const values = res?.result?.value;
     if (values) {
       return Object.entries(values).map(([identifier, server]) => ({
@@ -91,10 +89,6 @@ export class PrivacyideaServerService implements PrivacyideaServerServiceInterfa
     return [];
   });
 
-  get remoteServerResource() { return this.privacyideaServerResource; }
-
-  get remoteServerOptions() { return this.privacyideaServers; }
-
   async postPrivacyideaServer(server: PrivacyideaServer): Promise<void> {
     const url = `${this.privacyideaServerBaseUrl}${server.identifier}`;
     const request = this.http.post<PiResponse<any>>(url, server, { headers: this.authService.getHeaders() });
@@ -102,7 +96,7 @@ export class PrivacyideaServerService implements PrivacyideaServerServiceInterfa
     return lastValueFrom(request)
       .then(() => {
         this.notificationService.openSnackBar($localize`Successfully saved privacyIDEA server.`);
-        this.privacyideaServerResource.reload();
+        this.remoteServerResource.reload();
       })
       .catch((error) => {
         const message = error.error?.result?.error?.message || "";
@@ -118,7 +112,7 @@ export class PrivacyideaServerService implements PrivacyideaServerServiceInterfa
     return lastValueFrom(request)
       .then(() => {
         this.notificationService.openSnackBar($localize`Successfully deleted privacyIDEA server: ${identifier}.`);
-        this.privacyideaServerResource.reload();
+        this.remoteServerResource.reload();
       })
       .catch((error) => {
         const message = error.error?.result?.error?.message || "";

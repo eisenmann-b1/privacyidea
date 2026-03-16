@@ -49,9 +49,9 @@ export interface EmailEnrollmentOptions extends TokenEnrollmentData {
   styleUrl: "./enroll-email.component.scss"
 })
 export class EnrollEmailComponent implements OnInit {
+  protected readonly enrollmentMapper: EmailApiPayloadMapper = inject(EmailApiPayloadMapper);
   protected readonly systemService: SystemServiceInterface = inject(SystemService);
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);
-  protected readonly enrollmentMapper: EmailApiPayloadMapper = inject(EmailApiPayloadMapper);
   protected readonly contentService: ContentServiceInterface = inject(ContentService);
   protected readonly authService: AuthServiceInterface = inject(AuthService);
 

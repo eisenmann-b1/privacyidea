@@ -44,6 +44,7 @@ Wrapping the functions in a decorator class enables easy modular testing.
 
 The functions of this module are tested in tests/test_api_lib_policy.py
 """
+from flask_babel import _, lazy_gettext
 import copy
 import datetime
 import functools
@@ -57,7 +58,6 @@ from flask import g, current_app, make_response, Request
 
 from privacyidea.api.lib.utils import get_all_params
 from privacyidea.config import ConfigKey
-from privacyidea.lib import _, lazy_gettext
 from privacyidea.lib.auth import ROLE
 from privacyidea.lib.config import get_multichallenge_enrollable_types, get_token_class, get_privacyidea_node
 from privacyidea.lib.crypto import Sign
@@ -72,7 +72,7 @@ from privacyidea.lib.subscriptions import (subscription_status,
                                            SubscriptionError,
                                            EXPIRE_MESSAGE)
 from privacyidea.lib.token import get_tokens, assign_token, get_one_token, init_token
-from privacyidea.lib.tokenclass import ROLLOUTSTATE, CHALLENGE_SESSION
+from privacyidea.lib.tokenclass import RolloutState, ChallengeSession
 from privacyidea.lib.tokens.passkeytoken import PasskeyTokenClass
 from privacyidea.lib.utils import (create_img, get_version, AUTH_RESPONSE,
                                    get_plugin_info_from_useragent)
@@ -82,9 +82,7 @@ from ...lib.container import (get_all_containers, init_container, init_registrat
                               create_container_tokens_from_template)
 from ...lib.containers.container_info import SERVER_URL, CHALLENGE_TTL, REGISTRATION_TTL, SSL_VERIFY, RegistrationState
 from ...lib.policies.actions import PolicyAction
-from ...lib.user import User
 from ...lib.users.custom_user_attributes import InternalCustomUserAttributes
-from ...models import Challenge
 
 log = logging.getLogger(__name__)
 
@@ -366,9 +364,9 @@ def preferred_client_mode(request, response):
     """
     This policy function is used to add the preferred client mode.
     The admin can set the list of client modes in the policy in the
-    same order as  he preferred them. The faction will pick the first
+    same order as he preferred them. The function will pick the first
     client mode from the list, that is also in the multichallenge and
-    set it as preferred client mode
+    set it as preferred_client_mode
 
     :param request:
     :param response:
@@ -392,7 +390,7 @@ def preferred_client_mode(request, response):
                                           user_object=user).allowed()
     last_used_token_type = None
     if client_mode_per_user_pol:
-        user_agent, _, _ = get_plugin_info_from_useragent(request.user_agent.string)
+        user_agent, __, __ = get_plugin_info_from_useragent(request.user_agent.string)
         user_attributes = user.attributes
         last_used_token_type = user_attributes.get(f"{InternalCustomUserAttributes.LAST_USED_TOKEN}_{user_agent}")
 
@@ -401,7 +399,7 @@ def preferred_client_mode(request, response):
         if detail.get("multi_challenge"):
             multi_challenge = detail.get("multi_challenge")
 
-            # First try to use the users preferred token type
+            # First, try to use the users' preferred token type
             preferred = None
             if last_used_token_type:
                 for challenge in multi_challenge:
@@ -411,7 +409,7 @@ def preferred_client_mode(request, response):
                         break
 
             if not preferred:
-                # User preferred client mode not found, check the policy
+                # User preferred_client_mode not found, check the policy
                 client_modes = [x.get('client_mode') for x in multi_challenge]
                 try:
                     preferred = [x for x in preferred_client_mode_list if x in client_modes][0]
@@ -941,7 +939,7 @@ def container_create_via_multichallenge(request: Request, content: dict, contain
         res = init_registration(container, False, server_url, registration_ttl, ssl_verify, challenge_ttl,
                                 request.all_data)
         challenge = get_challenges(container.serial, transaction_id=res["transaction_id"])[0]
-        challenge.session = CHALLENGE_SESSION.ENROLLMENT
+        challenge.session = ChallengeSession.ENROLLMENT
         challenge.save()
 
         # Write registration info to the response
@@ -976,7 +974,7 @@ def hide_specific_error_message(request, response):
         if hide_message:
             content = response.json
             threadid = content.get("detail", {}).get("threadid")
-            detail = {"message": _("Authentication failed.")}
+            detail = {"message": str(_("Authentication failed."))}
             if threadid:
                 detail["threadid"] = threadid
             # Overwrite the whole detail object so that it always has the same content
@@ -1253,8 +1251,8 @@ def check_verify_enrollment(request, response):
                 content = response.json
                 options = {"g": g, "user": request.User, "exception": request.all_data.get("exception", 0)}
                 content["detail"]["verify"] = token.prepare_verify_enrollment(options=options)
-                content["detail"]["rollout_state"] = ROLLOUTSTATE.VERIFYPENDING
-                token.token.rollout_state = ROLLOUTSTATE.VERIFYPENDING
+                content["detail"]["rollout_state"] = RolloutState.VERIFY_PENDING
+                token.token.rollout_state = RolloutState.VERIFY_PENDING
                 token.token.save()
                 response.set_data(json.dumps(content))
     else:

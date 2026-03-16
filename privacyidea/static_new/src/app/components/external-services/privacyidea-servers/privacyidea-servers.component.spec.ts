@@ -44,6 +44,10 @@ describe("PrivacyideaServersComponent", () => {
         { identifier: "server1", url: "http://s1", tls: true, description: "desc1" },
         { identifier: "server2", url: "http://s2", tls: false, description: "desc2" }
       ]),
+      remoteServerOptions: signal([
+        { identifier: "server1", url: "http://s1", tls: true, description: "desc1" },
+        { identifier: "server2", url: "http://s2", tls: false, description: "desc2" }
+      ]),
       deletePrivacyideaServer: jest.fn()
     };
 

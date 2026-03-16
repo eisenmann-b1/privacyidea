@@ -68,8 +68,8 @@ export interface DaypasswordEnrollmentOptions extends TokenEnrollmentData {
   styleUrl: "./enroll-daypassword.component.scss"
 })
 export class EnrollDaypasswordComponent implements OnInit {
-  protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   protected readonly enrollmentMapper: DaypasswordApiPayloadMapper = inject(DaypasswordApiPayloadMapper);
+  protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   protected readonly authService: AuthServiceInterface = inject(AuthService);
   protected readonly notificationService: NotificationServiceInterface = inject(NotificationService);
   protected readonly systemService: SystemServiceInterface = inject(SystemService);

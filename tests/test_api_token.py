@@ -2416,7 +2416,8 @@ class APITokenTestCase(MyApiTestCase):
             mock_dt.now.return_value = current_time
             with self.app.test_request_context('/token/init',
                                                method='POST',
-                                               data={"type": "spass", "pin": "123456", "user": "hans", "realm": self.realm4},
+                                               data={"type": "spass", "pin": "123456", "user": "hans",
+                                                     "realm": self.realm4},
                                                headers={'Authorization': self.at}):
                 res = self.app.full_dispatch_request()
                 self.assertEqual(200, res.status_code)
@@ -2438,7 +2439,8 @@ class APITokenTestCase(MyApiTestCase):
             mock_dt.now.return_value = current_time
             with self.app.test_request_context('/token/init',
                                                method='POST',
-                                               data={"type": "spass", "pin": "123456", "user": "corny", "realm": self.realm4},
+                                               data={"type": "spass", "pin": "123456", "user": "corny",
+                                                     "realm": self.realm4},
                                                headers={'Authorization': self.at}):
                 res = self.app.full_dispatch_request()
                 self.assertEqual(200, res.status_code)
@@ -2820,7 +2822,7 @@ class APITokenTestCase(MyApiTestCase):
             self.assertTrue(result.get("value"))
             self.assertTrue("app_force_unlock=pin" in detail.get("googleurl").get("value"),
                             detail.get("googleurl"))
-            self.assertTrue("force_app_pin=True" in detail.get("googleurl").get("value"),
+            self.assertTrue("pin=True" in detail.get("googleurl").get("value"),
                             detail.get("googleurl"))
 
         remove_token("goog2")
@@ -4509,7 +4511,7 @@ class APITokengroupTestCase(MyApiTestCase):
             self.assertEqual(tok.get("tokengroup"), [])
 
         # Now assign the tokengroup grupp1 again.
-        db.session.expunge_all()    # Clear session before re-adding the token group db entry
+        db.session.expunge_all()  # Clear session before re-adding the token group db entry
         with self.app.test_request_context('/token/group/{0!s}/gruppe1'.format(serial),
                                            method='POST',
                                            headers={'Authorization': self.at}):

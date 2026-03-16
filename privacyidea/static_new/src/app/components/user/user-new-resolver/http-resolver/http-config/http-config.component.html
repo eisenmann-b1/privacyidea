@@ -51,7 +51,7 @@
     </mat-form-field>
   </div>
 
-  <mat-form-field class="width-100">
+  <mat-form-field class="input-width-xl">
     <mat-label i18n>Headers (JSON format)</mat-label>
     <textarea
       formControlName="headers"
@@ -59,7 +59,7 @@
       placeholder='{"Content-Type":"application/json; charset=UTF-8"}'></textarea>
   </mat-form-field>
 
-  <mat-form-field class="width-100">
+  <mat-form-field class="input-width-xl">
     <mat-label i18n>Request Mapping (JSON format)</mat-label>
     <textarea
       formControlName="requestMapping"
@@ -70,7 +70,7 @@
     }
   </mat-form-field>
 
-  <mat-form-field class="width-100">
+  <mat-form-field class="input-width-xl">
     <mat-label i18n>Response Mapping (JSON format)</mat-label>
     <textarea
       formControlName="responseMapping"
@@ -86,7 +86,7 @@
   </mat-checkbox>
 
   @if (formGroup.get('hasSpecialErrorHandler')?.value) {
-    <mat-form-field class="width-100">
+    <mat-form-field class="input-width-xl">
       <mat-label i18n>Response Contains (JSON format)</mat-label>
       <textarea
         formControlName="errorResponse"

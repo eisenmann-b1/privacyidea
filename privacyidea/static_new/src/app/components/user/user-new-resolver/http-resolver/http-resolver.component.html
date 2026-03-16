@@ -59,7 +59,7 @@
           }
         </mat-form-field>
 
-        <mat-form-field class="input-width-l">
+        <mat-form-field class="input-width-xl">
           <mat-label i18n>Endpoint (URL)</mat-label>
           <app-clearable-input
             (onClick)="endpointControl.setValue('')"
@@ -76,7 +76,7 @@
         </mat-form-field>
       </div>
 
-      <mat-form-field class="input-width-l">
+      <mat-form-field class="input-width-xl">
         <mat-label i18n>Request Mapping (JSON Format)</mat-label>
         <textarea
           [formControl]="requestMappingControl"
@@ -88,7 +88,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field class="input-width-l">
+      <mat-form-field class="input-width-xl">
         <mat-label i18n>Headers (JSON Format)</mat-label>
         <textarea
           [formControl]="headersControl"
@@ -100,7 +100,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field class="input-width-l">
+      <mat-form-field class="input-width-xl">
         <mat-label i18n>Response Mapping (JSON Format)</mat-label>
         <textarea
           [formControl]="responseMappingControl"
@@ -152,7 +152,7 @@
     }
 
     <div class="flex-column">
-      <mat-form-field class="input-width-l">
+      <mat-form-field class="input-width-xl">
         <mat-label i18n>Base URL</mat-label>
         <app-clearable-input
           (onClick)="baseUrlControl.setValue('')"
@@ -173,7 +173,10 @@
     </div>
 
     <div class="mapping-header">
-      <h4 i18n>Attribute Mapping</h4>
+      <h4
+        class="margin-0"
+        i18n>Attribute Mapping
+      </h4>
     </div>
 
     <table
@@ -307,7 +310,7 @@
       [userGroupsControl]="userGroupsControl"></app-http-groups-attribute>
 
     <div class="flex-column margin-top-16">
-      <mat-form-field class="input-width-l">
+      <mat-form-field class="input-width-xl">
         <mat-label i18n>Headers (JSON Format)</mat-label>
         <textarea
           [formControl]="globalHeadersControl"
@@ -383,7 +386,7 @@
                 of these settings in the app registration in the Entra Admin Center or you also have to add them there.
               </p>
               <div class="flex-column">
-                <mat-form-field class="input-width-l">
+                <mat-form-field class="input-width-xl">
                   <mat-label i18n>Authority</mat-label>
                   <app-clearable-input
                     (onClick)="authorityControl.setValue('')"

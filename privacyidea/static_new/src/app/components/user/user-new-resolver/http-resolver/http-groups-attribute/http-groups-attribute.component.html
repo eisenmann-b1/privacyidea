@@ -22,6 +22,7 @@
   class="flex-column margin-top-16">
   <div class="flex-row gap-16 ali-center margin-bottom-16">
     <mat-slide-toggle
+      class="margin-bottom-16"
       [formControlName]="'active'"
       [matTooltip]="slideToggleTooltipSignal()"></mat-slide-toggle>
     <mat-form-field
@@ -41,7 +42,7 @@
       }
     </mat-form-field>
 
-  @if (resolverType !== "entraidresolver") {
+    @if (resolverType !== "entraidresolver") {
       <mat-form-field class="input-width-s">
         <mat-label i18n>Method</mat-label>
         <mat-select
@@ -69,7 +70,7 @@
           }
         </mat-hint>
       </mat-form-field>
-  }
+    }
   </div>
 </div>
 

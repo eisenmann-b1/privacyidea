@@ -356,7 +356,7 @@
         </mat-form-field>
       </div>
 
-      <mat-form-field class="input-width-l">
+      <mat-form-field class="input-width-xl">
         <mat-label i18n>Search Filter</mat-label>
         <app-clearable-input
           (onClick)="ldapSearchFilterControl.setValue('')"
@@ -372,7 +372,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field class="input-width-l">
+      <mat-form-field class="input-width-xl">
         <mat-label i18n>Attribute Mapping</mat-label>
         <textarea
           [formControl]="userInfoControl"
@@ -385,7 +385,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field class="input-width-l">
+      <mat-form-field class="input-width-xl">
         <mat-label i18n>Multivalue Attributes</mat-label>
         <app-clearable-input
           (onClick)="multivalueAttributesControl.setValue('')"
@@ -404,7 +404,7 @@
       </mat-checkbox>
 
       @if (recursiveGroupSearchControl.value) {
-        <mat-form-field class="input-width-l">
+        <mat-form-field class="input-width-xl">
           <mat-label i18n>
             Base DN of User Groups
           </mat-label>
@@ -422,7 +422,7 @@
           </app-clearable-input>
         </mat-form-field>
 
-        <mat-form-field class="input-width-l">
+        <mat-form-field class="input-width-xl">
           <mat-label i18n>
             Search Filter for User Groups
           </mat-label>

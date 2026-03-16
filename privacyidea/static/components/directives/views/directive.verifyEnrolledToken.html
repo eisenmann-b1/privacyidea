@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 <!-- Verify Token enrollment -->
-<form ng-submit="sendVerifyResponse()">
+<form ng-submit="sendVerifyResponse()" ng-if="enrolledToken.rollout_state === 'verify'">
     <div class="form-group">
         <label for="verifyResponse">{{ enrolledToken.verify.message }}</label>
         <input type="text" ng-model="verifyResponse"

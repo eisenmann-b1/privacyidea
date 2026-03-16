@@ -834,13 +834,15 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
             if not resolver:
                 continue
             log.debug("With this search dictionary: %r", search_dict)
-            user_list = resolver.getUserList(search_dict, requested_attributes)
+            requested_pi_user_attributes = list({"resolver", "editable"}.intersection(requested_attributes)) if requested_attributes else []
+            requested_user_store_attributes = list(set(requested_attributes) - set(requested_pi_user_attributes)) if requested_attributes else None
+            user_list = resolver.getUserList(search_dict, requested_user_store_attributes)
             # Add resolvername to the list
             realm_id = get_realm_id(param_realm or user_realm)
             for user_info in user_list:
-                if not requested_attributes or "resolver" in requested_attributes:
+                if not requested_attributes or "resolver" in requested_pi_user_attributes:
                     user_info["resolver"] = resolver_name
-                if not requested_attributes or "editable" in requested_attributes:
+                if not requested_attributes or "editable" in requested_pi_user_attributes:
                     user_info["editable"] = resolver.editable
                 if include_custom_attributes and realm_id is not None:
                     # Add the custom attributes, by class method from User
@@ -920,3 +922,4 @@ def is_attribute_at_all() -> bool:
     Check if there are custom user attributes at all
     """
     return bool(CustomUserAttribute.query.count())
+

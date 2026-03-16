@@ -17,22 +17,21 @@
 # SPDX-FileCopyrightText: 2025 Jelina Unger <jelina.unger@netknights.it>
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import copy
+import json
+import logging
 import re
 import time
-import copy
 from dataclasses import dataclass
 from enum import Enum
 from typing import Union, Optional
+from urllib.parse import urlencode
 
+import requests
+from pydash import get
 from requests import Response, HTTPError
 
 from .UserIdResolver import UserIdResolver
-import requests
-import logging
-import json
-from urllib.parse import urlencode
-from pydash import get
-
 from ..error import ParameterError, ResolverError
 from ..log import log_with
 from ..utils import is_true
@@ -213,7 +212,6 @@ class RequestConfig:
 
 
 class HTTPResolver(UserIdResolver):
-
     fields = {
         "endpoint": 1,
         "method": 1,
@@ -845,6 +843,7 @@ class HTTPResolver(UserIdResolver):
         Maps the attributes from the user store to the attributes used in privacyidea.
 
         :param user: Dictionary containing user attributes from the user store
+        :param attributes: List of attributes to be included in the returned dictionary. If None, all attributes are included.
         :return: Dictionary containing user attributes mapped to privacyidea
         """
         pi_user = {}
@@ -859,12 +858,19 @@ class HTTPResolver(UserIdResolver):
         if not attributes:
             attributes = self.attribute_mapping_pi_to_user_store.keys()
 
-        for pi_attribute in attributes:
+        unknown_attributes = set(attributes).difference(set(self.attribute_mapping_pi_to_user_store.keys()))
+        known_attributes = set(attributes) - unknown_attributes
+        if unknown_attributes:
+            unknown_attributes = ", ".join(unknown_attributes)
+            log.debug(
+                "No mapping for privacyidea attributes %s found. They are excluded from the user info dictionary.",
+                unknown_attributes)
+        for pi_attribute in known_attributes:
             user_store_attribute = self.attribute_mapping_pi_to_user_store.get(pi_attribute)
             if user_store_attribute:
                 pi_user[pi_attribute] = user.get(user_store_attribute, "")
             else:
-                log.debug(f"No mapping for privacyidea attribute '{pi_attribute}' found.")
+                log.debug("No mapping for privacyidea attribute '%s' found.", pi_attribute)
 
         return pi_user
 

@@ -24,6 +24,7 @@ import {
   TokenEnrollmentPayload
 } from "./_token-api-payload.mapper";
 import { TokenDetails } from "../../services/token/token.service";
+import { parseBooleanValue } from "../../utils/parse-boolean-value";
 
 // Interface for DayPassword-specific enrollment data
 export interface DaypasswordEnrollmentData extends TokenEnrollmentData {
@@ -73,7 +74,7 @@ export class DaypasswordApiPayloadMapper
       otpLength: payload.otplen !== undefined ? Number(payload.otplen) : undefined,
       hashAlgorithm: payload.hashlib ?? undefined,
       ...(payload.timeStep !== undefined && { timeStep: `${payload.timeStep}` }),
-      generateOnServer: payload.otpkey == null // If otpkey is not set, we assume it will be generated on the server
+      ...(payload.genkey !== undefined && { generateOnServer: parseBooleanValue(payload.genkey) }),
     };
   }
 

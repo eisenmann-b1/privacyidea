@@ -24,6 +24,7 @@ import {
   TokenEnrollmentPayload
 } from "./_token-api-payload.mapper";
 import { TokenDetails } from "../../services/token/token.service";
+import { parseBooleanValue } from "../../utils/parse-boolean-value";
 
 export interface TotpEnrollmentData extends TokenEnrollmentData {
   type: "totp";
@@ -73,7 +74,7 @@ export class TotpApiPayloadMapper extends BaseApiPayloadMapper implements TokenA
     return {
       ...baseData,
       type: "totp",
-      ...(payload.genkey !== undefined && { generateOnServer: payload.genkey === 1 }),
+      ...(payload.genkey !== undefined && { generateOnServer: parseBooleanValue(payload.genkey) }),
       otpKey: payload.otpkey ?? undefined,
       otpLength: payload.otplen ? Number(payload.otplen) : undefined,
       hashAlgorithm: payload.hashlib ?? undefined,

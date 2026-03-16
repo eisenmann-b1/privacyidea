@@ -70,7 +70,6 @@ export class HotpApiPayloadMapper extends BaseApiPayloadMapper implements TokenA
 
   override fromApiPayload(payload: HotpEnrollmentPayload): HotpEnrollmentData {
     const baseData = super.fromApiPayload(payload);
-    console.log("Mapping HOTP API payload to enrollment data:", payload);
     return {
       ...baseData,
       type: "hotp",

@@ -24,6 +24,7 @@ import {
 } from "./_token-api-payload.mapper";
 import { Injectable } from "@angular/core";
 import { TokenDetails } from "../../services/token/token.service";
+import { parseBooleanValue } from "../../utils/parse-boolean-value";
 
 // Interface for Application Specific Password enrollment data
 export interface ApplspecEnrollmentData extends TokenEnrollmentData {
@@ -65,7 +66,7 @@ export class ApplspecApiPayloadMapper
     return {
       ...baseData,
       type: "applspec",
-      generateOnServer: payload.genkey === 1,
+      ...(payload.genkey !== undefined && { generateOnServer: parseBooleanValue(payload.genkey) }),
       otpKey: payload.otpkey ?? undefined,
       serviceId: payload.service_id ?? undefined
     };

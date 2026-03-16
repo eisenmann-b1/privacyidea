@@ -780,7 +780,6 @@ def verify_enrollment(request=None, action=None):
     # Check if verify parameter is present
     verify = getParam(request.all_data, "verify", optional)
     if not verify:
-        from privacyidea.lib.error import ParameterError
         raise ParameterError("Token is in verify_pending state but 'verify' parameter is missing.")
 
     # Verify the token enrollment
@@ -793,7 +792,6 @@ def verify_enrollment(request=None, action=None):
         token.token.rollout_state = RolloutState.ENROLLED
         token.token.save()  # todo evaluate
     else:
-        from privacyidea.lib.error import ParameterError
         raise ParameterError("Verification of the new token failed.")
 
 

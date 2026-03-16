@@ -37,6 +37,9 @@ import {
 } from "../../../../services/notification/notification.service";
 import { SystemService, SystemServiceInterface } from "../../../../services/system/system.service";
 
+export const HOTP_HASHLIB = "hotp.hashlib";
+export const HOTP_OTP_LENGTH = "hotp.otplen";
+
 export interface HotpEnrollmentOptions extends TokenEnrollmentData {
   type: "hotp";
   generateOnServer: boolean;
@@ -93,7 +96,7 @@ export class EnrollHotpComponent implements OnInit {
   generateOnServerFormControl = new FormControl<boolean>(true, [Validators.required]);
   otpLengthFormControl = new FormControl<number>(6, [Validators.required]);
   otpKeyFormControl = new FormControl<string>({ value: "", disabled: true });
-  defaultHashlib = computed(() => this.systemService.systemConfig()["hotp.hashlib"] ?? "sha1");
+  defaultHashlib = computed(() => this.systemService.systemConfig()[HOTP_HASHLIB] ?? "sha1");
   hashAlgorithmFormControl = new FormControl<string>(this.defaultHashlib(), [Validators.required]);
 
   constructor() {
@@ -154,12 +157,12 @@ export class EnrollHotpComponent implements OnInit {
       });
     }
 
-    const hashlib = this.authService.rightsWithValues()["hotp_hashlib"];
+    const hashlib = this.authService.rightsWithValues()[HOTP_HASHLIB];
     if (hashlib) {
       this.hashAlgorithmFormControl.setValue(hashlib, { emitEvent: false });
       this.hashAlgorithmFormControl.disable({ emitEvent: false });
     }
-    const otpLength = this.authService.rightsWithValues()["hotp_otplen"];
+    const otpLength = this.authService.rightsWithValues()[HOTP_OTP_LENGTH];
     if (otpLength) {
       const otpLengthNumber = parseInt(otpLength, 10);
       if (!isNaN(otpLengthNumber)) {

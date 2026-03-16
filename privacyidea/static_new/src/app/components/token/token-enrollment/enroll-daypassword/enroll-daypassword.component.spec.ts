@@ -18,7 +18,12 @@
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { EnrollDaypasswordComponent } from "./enroll-daypassword.component";
+import {
+  DAYPASSWORD_HASHLIB,
+  DAYPASSWORD_OTP_LENGTH,
+  DAYPASSWORD_TIME_STEP,
+  EnrollDaypasswordComponent
+} from "./enroll-daypassword.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { provideHttpClient } from "@angular/common/http";
 import { provideHttpClientTesting } from "@angular/common/http/testing";
@@ -26,6 +31,7 @@ import { MockSystemService } from "../../../../../testing/mock-services";
 import { SystemService } from "../../../../services/system/system.service";
 import { MockAuthService } from "../../../../../testing/mock-services/mock-auth-service";
 import { AuthService } from "../../../../services/auth/auth.service";
+import { TOTP_HASHLIB, TOTP_TIME_STEP } from "@components/token/token-enrollment/enroll-totp/enroll-totp.component";
 
 describe("EnrollDaypasswordComponent", () => {
   let component: EnrollDaypasswordComponent;
@@ -68,10 +74,10 @@ describe("EnrollDaypasswordComponent", () => {
 
   it("Default values from system config are used", () => {
     const mockConfig = {
-      "totp.hashlib": "sha256",
-      "totp.timeStep": 60,
-      "daypassword.hashlib": "sha512",
-      "daypassword.timeStep": "12h"
+      [TOTP_HASHLIB]: "sha256",
+      [TOTP_TIME_STEP]: 60,
+      [DAYPASSWORD_HASHLIB]: "sha512",
+      [DAYPASSWORD_TIME_STEP]: "12h"
     };
     systemService.systemConfig.set(mockConfig);
     fixture = TestBed.createComponent(EnrollDaypasswordComponent);
@@ -86,14 +92,14 @@ describe("EnrollDaypasswordComponent", () => {
 
   it("Uses policy values for hashlib, otplen, and time step over system config defaults", () => {
     const mockConfig = {
-      "daypassword.hashlib": "sha512",
-      "daypassword.timeStep": "12h"
+      [DAYPASSWORD_HASHLIB]: "sha512",
+      [DAYPASSWORD_TIME_STEP]: "12h"
     };
     systemService.systemConfig.set(mockConfig);
     authService.rightsWithValues.set({
-      daypassword_hashlib: "sha256",
-      daypassword_otplen: "8",
-      daypassword_timestep: "48h"
+      [DAYPASSWORD_HASHLIB]: "sha256",
+      [DAYPASSWORD_OTP_LENGTH]: "8",
+      [DAYPASSWORD_TIME_STEP]: "48h"
     });
     fixture = TestBed.createComponent(EnrollDaypasswordComponent);
     component = fixture.componentInstance;

@@ -18,15 +18,15 @@
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { EnrollTotpComponent } from "./enroll-totp.component";
+import { EnrollTotpComponent, TOTP_HASHLIB, TOTP_OTP_LENGTH, TOTP_TIME_STEP } from "./enroll-totp.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { provideHttpClient } from "@angular/common/http";
 import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { AuthService } from "../../../../services/auth/auth.service";
 import { MockAuthService } from "../../../../../testing/mock-services/mock-auth-service";
-import { signal } from "@angular/core";
 import { MockSystemService } from "../../../../../testing/mock-services";
 import { SystemService } from "../../../../services/system/system.service";
+import { HOTP_HASHLIB } from "@components/token/token-enrollment/enroll-hotp/enroll-hotp.component";
 
 describe("EnrollTotpComponent", () => {
   let component: EnrollTotpComponent;
@@ -69,9 +69,9 @@ describe("EnrollTotpComponent", () => {
 
   it("Default values from system config are used", () => {
     const mockConfig = {
-      "totp.hashlib": "sha256",
-      "totp.timeStep": "60",
-      "hotp.hashlib": "sha512"
+      [TOTP_HASHLIB]: "sha256",
+      [TOTP_TIME_STEP]: "60",
+      [HOTP_HASHLIB]: "sha512"
     };
     systemService.systemConfig.set(mockConfig);
     fixture = TestBed.createComponent(EnrollTotpComponent);
@@ -86,11 +86,11 @@ describe("EnrollTotpComponent", () => {
 
   it("Uses policy values for hashlib, otplen, and time step over system config defaults", () => {
     const mockConfig = {
-      "totp.hashlib": "sha256",
-      "totp.timeStep": 60
+      [TOTP_HASHLIB]: "sha256",
+      [TOTP_TIME_STEP]: 60
     };
     systemService.systemConfig.set(mockConfig);
-    authService.rightsWithValues.set({ totp_hashlib: "sha512", totp_otplen: "8", totp_timestep: "45" });
+    authService.rightsWithValues.set({ [TOTP_HASHLIB]: "sha512", [TOTP_OTP_LENGTH]: "8", [TOTP_TIME_STEP]: "45" });
     fixture = TestBed.createComponent(EnrollTotpComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

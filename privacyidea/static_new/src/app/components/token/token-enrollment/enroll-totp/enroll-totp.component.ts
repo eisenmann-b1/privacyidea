@@ -39,6 +39,10 @@ import {
 } from "../../../../services/notification/notification.service";
 import { SystemService, SystemServiceInterface } from "../../../../services/system/system.service";
 
+export const TOTP_HASHLIB = "totp.hashlib";
+export const TOTP_OTP_LENGTH = "totp.otplen";
+export const TOTP_TIME_STEP = "totp.timestep";
+
 export interface TotpEnrollmentOptions extends TokenEnrollmentData {
   type: "totp";
   generateOnServer: boolean;
@@ -96,11 +100,11 @@ export class EnrollTotpComponent implements OnInit {
   generateOnServerFormControl = new FormControl<boolean>(true, [Validators.required]);
   otpLengthFormControl = new FormControl<number>(6, [Validators.required]);
   otpKeyFormControl = new FormControl<string>({ value: "", disabled: true });
-  defaultHashlib = computed(() => this.systemService.systemConfig()["totp.hashlib"] ?? "sha1");
+  defaultHashlib = computed(() => this.systemService.systemConfig()[TOTP_HASHLIB] ?? "sha1");
   hashAlgorithmControl = new FormControl<string>(this.defaultHashlib(), [Validators.required]);
   defaultTimeStep = computed(() => {
     let timeStep = 30;
-    const configTimeStep = this.systemService.systemConfig()["totp.timeStep"];
+    const configTimeStep = this.systemService.systemConfig()[TOTP_TIME_STEP];
     if (configTimeStep) {
       const parsedTimeStep = parseInt(configTimeStep, 10);
       if (!isNaN(parsedTimeStep)) {
@@ -173,12 +177,12 @@ export class EnrollTotpComponent implements OnInit {
       });
     }
 
-    const hashlib = this.authService.rightsWithValues()["totp_hashlib"];
+    const hashlib = this.authService.rightsWithValues()[TOTP_HASHLIB];
     if (hashlib) {
       this.hashAlgorithmControl.setValue(hashlib, { emitEvent: false });
       this.hashAlgorithmControl.disable({ emitEvent: false });
     }
-    const otpLength = this.authService.rightsWithValues()["totp_otplen"];
+    const otpLength = this.authService.rightsWithValues()[TOTP_OTP_LENGTH];
     if (otpLength) {
       const otpLengthNumber = parseInt(otpLength, 10);
       if (!isNaN(otpLengthNumber)) {
@@ -186,7 +190,7 @@ export class EnrollTotpComponent implements OnInit {
         this.otpLengthFormControl.disable({ emitEvent: false });
       }
     }
-    const timeStep = this.authService.rightsWithValues()["totp_timestep"];
+    const timeStep = this.authService.rightsWithValues()[TOTP_TIME_STEP];
     if (timeStep) {
       const timeStepNumber = parseInt(timeStep, 10);
       if (!isNaN(timeStepNumber)) {

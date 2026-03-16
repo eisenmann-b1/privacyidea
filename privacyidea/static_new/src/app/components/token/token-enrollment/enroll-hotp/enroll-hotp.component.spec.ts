@@ -18,7 +18,7 @@
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { EnrollHotpComponent } from "./enroll-hotp.component";
+import { EnrollHotpComponent, HOTP_HASHLIB, HOTP_OTP_LENGTH } from "./enroll-hotp.component";
 
 import { TokenService } from "../../../../services/token/token.service";
 import { AuthService } from "../../../../services/auth/auth.service";
@@ -26,6 +26,7 @@ import { HotpApiPayloadMapper } from "../../../../mappers/token-api-payload/hotp
 import { MockSystemService, MockTokenService } from "../../../../../testing/mock-services";
 import { MockAuthService } from "../../../../../testing/mock-services/mock-auth-service";
 import { SystemService } from "../../../../services/system/system.service";
+import { TOTP_HASHLIB, TOTP_TIME_STEP } from "@components/token/token-enrollment/enroll-totp/enroll-totp.component";
 
 
 describe("EnrollHotpComponent", () => {
@@ -91,9 +92,9 @@ describe("EnrollHotpComponent", () => {
   it("Default values from system config are used", () => {
     createAndInit();
     const mockConfig = {
-      "totp.hashlib": "sha256",
-      "totp.timeStep": "60",
-      "hotp.hashlib": "sha512"
+      [TOTP_HASHLIB]: "sha256",
+      [TOTP_TIME_STEP]: "60",
+      [HOTP_HASHLIB]: "sha512"
     };
     systemService.systemConfig.set(mockConfig);
 
@@ -111,7 +112,7 @@ describe("EnrollHotpComponent", () => {
       "hotp.hashlib": "sha512"
     };
     systemService.systemConfig.set(mockConfig);
-    authService.rightsWithValues.set({ hotp_hashlib: "sha256", hotp_otplen: "8" });
+    authService.rightsWithValues.set({ [HOTP_HASHLIB]: "sha256", [HOTP_OTP_LENGTH]: "8" });
     fixture = TestBed.createComponent(EnrollHotpComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

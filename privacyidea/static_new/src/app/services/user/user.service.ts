@@ -452,9 +452,9 @@ export class UserService implements UserServiceInterface {
   createUser(resolver: string, userData: EditUserData) {
     const payload = { ...userData };
     // Rename username to user
-    if (payload['username']) {
-      payload['user'] = payload['username'];
-      delete (payload as any)['username'];
+    if (payload["username"]) {
+      payload["user"] = payload["username"];
+      delete (payload as any)["username"];
     }
     payload["resolver"] = resolver;
     return this.http.post<PiResponse<number>>(this.baseUrl, payload, {
@@ -472,9 +472,9 @@ export class UserService implements UserServiceInterface {
   editUser(resolver: string, userData: EditUserData) {
     const payload = { ...userData };
     // Rename username to user
-    if (payload['username']) {
-      payload['user'] = payload['username'];
-      delete (payload as any)['username'];
+    if (payload["username"]) {
+      payload["user"] = payload["username"];
+      delete (payload as any)["username"];
     }
     payload["resolver"] = resolver;
     return this.http.put<PiResponse<number>>(this.baseUrl, payload, { headers: this.authService.getHeaders() })

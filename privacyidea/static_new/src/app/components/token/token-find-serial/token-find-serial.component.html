@@ -37,7 +37,7 @@
   </p>
   <div class="flex-row gap-16 ali-center margin-left-16">
     <mat-form-field
-      class="width-66">
+      class="input-width-m">
       <mat-label i18n>OTP Value</mat-label>
       <input
         #otpValueInput
@@ -54,7 +54,7 @@
     <button
       (click)="onClickRunSearch()"
       [disabled]="otpValue() === ''"
-      class="action-button-primary button-width-m"
+      class="action-button-primary button-width-m margin-bottom-16"
       i18n
       mat-stroked-button>
       <mat-icon>{{ currentStep() !== "searching" ? "play_arrow" : "stop" }}</mat-icon>
@@ -66,36 +66,39 @@
     <h4 i18n>
       Search Configuration
     </h4>
-    <mat-form-field class="width-66">
-      <mat-label i18n>Token Type</mat-label>
-      <mat-select
-        [(ngModel)]="tokenType"
-        [value]="tokenType()"
-        i18n-placeholder
-        placeholder="Select token type">
-        @for (type of tokenTypesWithOTP(); track type) {
-          <mat-option [value]="type['key']">{{ type["info"] }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-    <mat-form-field class="width-66">
-      <mat-label i18n>Assignment State</mat-label>
-      <mat-select
-        [(ngModel)]="assignmentState"
-        [value]="assignmentState()"
-        i18n-placeholder
-        placeholder="Specify assignment state">
-        @for (assignment of assignmentStates; track assignment) {
-          <mat-option
-            [value]="assignment.key"
-            i18n>
-            {{ assignment.info }}
-          </mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
     <div class="flex-row gap-16">
-      <mat-form-field class="width-66">
+      <mat-form-field class="input-width-l">
+        <mat-label i18n>Token Type</mat-label>
+        <mat-select
+          [(ngModel)]="tokenType"
+          [value]="tokenType()"
+          i18n-placeholder
+          placeholder="Select token type">
+          @for (type of tokenTypesWithOTP(); track type) {
+            <mat-option [value]="type['key']">{{ type["info"].split(':')[0] }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="input-width-l">
+        <mat-label i18n>Assignment State</mat-label>
+        <mat-select
+          [(ngModel)]="assignmentState"
+          [value]="assignmentState()"
+          i18n-placeholder
+          placeholder="Specify assignment state">
+          @for (assignment of assignmentStates; track assignment) {
+            <mat-option
+              [value]="assignment.key"
+              i18n>
+              {{ assignment.info }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="flex-row gap-16">
+      <mat-form-field class="input-width-l">
         <mat-label i18n>Serial Substring</mat-label>
         <input
           [(ngModel)]="serialSubstring"

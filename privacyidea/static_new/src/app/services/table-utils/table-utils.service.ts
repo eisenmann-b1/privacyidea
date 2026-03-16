@@ -47,7 +47,8 @@ export type ColumnKey =
   | "count"
   | "rounds"
   | "service_id"
-  | "user";
+  | "user"
+  | "actions";
 
 export type ColumnDef<K extends ColumnKey = ColumnKey> = Readonly<{
   key: K;
@@ -72,7 +73,8 @@ export const COLUMN_REGISTRY: Readonly<Record<ColumnKey, ColumnDef>> = {
   count: { key: "count", label: "Count" },
   rounds: { key: "rounds", label: "Rounds" },
   service_id: { key: "service_id", label: "Service ID" },
-  user: { key: "user", label: "SSH User" }
+  user: { key: "user", label: "SSH User" },
+  actions: { key: "actions", label: "Actions" },
 } as const;
 
 type ColumnsTuple<K extends readonly ColumnKey[]> = {

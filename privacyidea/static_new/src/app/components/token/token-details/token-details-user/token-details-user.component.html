@@ -44,7 +44,9 @@
         @switch (element.keyMap.key) {
           @case ("username") {
             @if (isEditingUser() && userService.selectedUserRealm() !== "") {
-              <mat-form-field class="input-width-m height-52">
+              <mat-form-field
+                class="input-width-m height-52"
+                subscriptSizing="dynamic">
                 <mat-label i18n>Enter User</mat-label>
                 <app-clearable-input
                   (onClick)="userService.selectionFilter.set('')"
@@ -70,7 +72,9 @@
           }
           @case ("user_realm") {
             @if (isEditingUser()) {
-              <mat-form-field class="input-width-m height-52">
+              <mat-form-field
+                class="input-width-m height-52"
+                subscriptSizing="dynamic">
                 <mat-label i18n>Select Realm of User</mat-label>
                 <mat-select
                   [(ngModel)]="userService.selectedUserRealm"

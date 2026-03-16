@@ -104,7 +104,7 @@ export class ContainerDetailsTokenTableComponent {
 
   readonly columnsKeyMap = this.tableUtilsService.pickColumns("serial", "tokentype", "active", "username");
   readonly columnKeys = [...this.tableUtilsService.getColumnKeys(this.columnsKeyMap)];
-  displayedColumns: string[] = [...this.columnsKeyMap.map((column) => column.key)];
+  displayedColumns: string[] = [...this.columnKeys, "actions"];
   pageSize = 5;
   pageSizeOptions = this.tableUtilsService.pageSizeOptions;
   pageIndex = this.tokenService.pageIndex;
@@ -148,12 +148,6 @@ export class ContainerDetailsTokenTableComponent {
   });
 
   constructor() {
-    if (this.authService.actionAllowed("container_remove_token")) {
-      this.displayedColumns.push("remove");
-    }
-    if (this.authService.actionAllowed("delete")) {
-      this.displayedColumns.push("delete");
-    }
     effect(() => {
       if (!this.containerTokenData) {
         return;

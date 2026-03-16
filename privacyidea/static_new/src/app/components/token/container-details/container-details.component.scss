@@ -37,12 +37,8 @@ $gap-small: 8px;
   border-collapse: collapse;
 }
 
-.pad-top-10 {
-  padding-top: 10px;
-}
-
 ::ng-deep .cdk-overlay-container div.mat-mdc-autocomplete-panel {
-  max-height: 516px;
+  max-height: 265px;
 
   &.user-selection-autocomplete {
     max-height: 256px;

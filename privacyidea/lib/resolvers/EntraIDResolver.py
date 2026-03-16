@@ -87,7 +87,7 @@ class EntraIDResolver(HTTPResolver):
                                                REQUEST_MAPPING: "client_id={client_id}&scope=https://graph.microsoft.com"
                                                                 "/.default&username={username}&password={password}&"
                                                                 "grant_type=password&client_secret={client_credential}"}})
-        self.config_get_user_groups = {"active": True, USER_GROUPS_ATTRIBUTE: "displayName"}
+        self.config_get_user_groups = {ACTIVE: True, USER_GROUPS_ATTRIBUTE: "displayName"}
         self.wildcard = ""  # No wildcards supported
 
         # Custom attributes
@@ -490,7 +490,7 @@ class EntraIDResolver(HTTPResolver):
         :return: List of dictionaries containing pi conform user attributes
         """
         request_params = config.request_mapping if config.request_mapping else {}
-        search_for_groups = self.config_get_user_groups.get(ACTIVE) and (not attributes or "groups" in attributes)
+        search_for_groups = self.config_get_user_groups.get(ACTIVE) and (not attributes or self.pi_user_groups_key in attributes)
         request_params.update(self._get_search_params(search_dict, allow_endswith=search_for_groups))
         config.headers.update(self._get_auth_header())
 
@@ -527,7 +527,7 @@ class EntraIDResolver(HTTPResolver):
         config.headers.update(self._get_auth_header())
         request_params = config.request_mapping if config.request_mapping else {}
 
-        if self.config_get_user_groups.get(ACTIVE) and (not attributes or "groups" in attributes):
+        if self.config_get_user_groups.get(ACTIVE) and (not attributes or self.pi_user_groups_key in attributes):
             # If groups are requested, we need to expand the memberOf relationship
             if "$expand" in request_params:
                 if "memberOf" not in request_params["$expand"]:

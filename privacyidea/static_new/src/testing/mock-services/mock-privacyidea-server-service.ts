@@ -43,9 +43,6 @@ export class MockPrivacyideaServerService implements PrivacyideaServerServiceInt
 
   remoteServerOptions = computed<PrivacyideaServer[]>(() => []);
 
-  remoteServerResource = this.remoteServerResource;
-  remoteServerOptions = this.remoteServerOptions;
-
   postPrivacyideaServer = jest.fn(async (_server: PrivacyideaServer): Promise<void> => {
     return Promise.resolve();
   });

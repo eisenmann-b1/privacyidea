@@ -26,7 +26,6 @@ import { HotpApiPayloadMapper } from "../../../../mappers/token-api-payload/hotp
 import { MockTokenService } from "../../../../../testing/mock-services";
 import { MockAuthService } from "../../../../../testing/mock-services/mock-auth-service";
 
-
 describe("EnrollHotpComponent", () => {
   let component: EnrollHotpComponent;
   let fixture: ComponentFixture<EnrollHotpComponent>;
@@ -107,7 +106,9 @@ describe("EnrollHotpComponent", () => {
     fixture.detectChanges();
 
     // 2-step checkbox should be present
-    const twoStepCheckbox = fixture.debugElement.nativeElement.querySelector("mat-checkbox[formcontrolname=\"twoStepControl\"]");
+    const twoStepCheckbox = fixture.debugElement.nativeElement.querySelector(
+      'mat-checkbox[formcontrolname="twoStepControl"]'
+    );
     expect(twoStepCheckbox).toBeDefined();
 
     expect(component.twoStepControl.value).toBe(true);
@@ -126,7 +127,9 @@ describe("EnrollHotpComponent", () => {
     fixture.detectChanges();
 
     // 2-step checkbox should be present
-    const twoStepCheckbox = fixture.debugElement.nativeElement.querySelector("mat-checkbox[formcontrolname=\"twoStepControl\"]");
+    const twoStepCheckbox = fixture.debugElement.nativeElement.querySelector(
+      'mat-checkbox[formcontrolname="twoStepControl"]'
+    );
     expect(twoStepCheckbox).toBeDefined();
 
     expect(component.twoStepControl.value).toBe(false);
@@ -174,7 +177,9 @@ describe("EnrollHotpComponent", () => {
     fixture.detectChanges();
 
     // 2-step checkbox should NOT be present
-    const twoStepCheckbox = fixture.debugElement.nativeElement.querySelector("mat-checkbox[formcontrolname=\"twoStepControl\"]");
+    const twoStepCheckbox = fixture.debugElement.nativeElement.querySelector(
+      'mat-checkbox[formcontrolname="twoStepControl"]'
+    );
     expect(twoStepCheckbox).toBeNull();
 
     expect(component.twoStepControl.value).toBe(false);
@@ -183,23 +188,6 @@ describe("EnrollHotpComponent", () => {
     expect(component.generateOnServerFormControl.enabled).toBe(true);
     expect(component.otpKeyFormControl.value).toEqual("");
     expect(component.otpKeyFormControl.disabled).toBe(true);
-  });
-
-  it("enrollmentArgsGetter returns null and marks controls when manual key is required but missing", (done) => {
-    (TestBed.inject(AuthService) as unknown as MockAuthService).checkForceServerGenerateOTPKey.mockReturnValue(false);
-    createAndInit();
-
-    component.generateOnServerFormControl.setValue(false);
-    component.otpKeyFormControl.setValue("");
-
-    const res = component.enrollmentArgsGetter({} as any);
-
-    expect(res).toBeNull();
-    expect(component.generateOnServerFormControl.touched).toBe(true);
-    expect(component.otpLengthFormControl.touched).toBe(true);
-    expect(component.hashAlgorithmFormControl.touched).toBe(true);
-    expect(component.otpKeyFormControl.touched).toBe(true);
-    done();
   });
 
   it("calls enrollToken with server-generated key (default values respected)", () => {

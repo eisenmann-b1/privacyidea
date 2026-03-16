@@ -132,7 +132,7 @@ export class PoliciesTableComponent {
   readonly selectedPolicies = linkedSignal<PolicyDetail[], Set<string>>({
     source: () => this.policiesListFiltered(),
     computation: (source, previous) => {
-      const selected = previous?.value ?? new Set<string>();
+      const selected = new Set(previous?.value ?? [])
       if (this.policyService.allPolicies().length === 0) return new Set();
       const currentNames = new Set(source.map((p) => p.name));
       for (const name of selected) {

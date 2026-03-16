@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: translations@privacyidea.org\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2026-03-14 15:09+0000\n"
+"PO-Revision-Date: 2026-03-16 10:53+0000\n"
 "Last-Translator: Nils Behlen <nils.behlen@netknights.it>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/privacyidea/"
 "privacyidea-webui/de/>\n"
@@ -607,9 +607,8 @@ msgid "Base DN"
 msgstr "Base-DN"
 
 #: privacyidea/static/components/config/views/config.resolvers.ldap.html:350
-#, fuzzy
 msgid "Base DN of User Groups"
-msgstr "Rekursive Suche von Benutzergruppen"
+msgstr "Base-DN für Benutzergruppen"
 
 #: privacyidea/static/components/config/views/config.resolvers.http.advanced.html:20
 msgid "Base URL"
@@ -703,7 +702,6 @@ msgid "Cancel"
 msgstr "Abbrechen"
 
 #: privacyidea/static/components/config/views/config.smtp.edit.html:118
-#, fuzzy
 msgid "Certificate"
 msgstr "Zertifikat"
 
@@ -755,7 +753,6 @@ msgid "Check OTP only."
 msgstr "Nur den OTP-Wert prüfen."
 
 #: privacyidea/static/components/config/views/config.policies.details.html:234
-#, fuzzy
 msgid ""
 "Check all possible resolvers of a user to match the resolver in this policy."
 msgstr ""
@@ -785,9 +782,8 @@ msgstr "Lösche den Fehlerzähler nach Minuten"
 #: privacyidea/static/components/directives/views/directive.filter.table.html:22
 #: privacyidea/static/components/token/views/token.list.html:96
 #: privacyidea/static/components/token/views/token.list.html:97
-#, fuzzy
 msgid "Clear filter"
-msgstr "Suchfilter"
+msgstr "Filter zurücksetzen"
 
 #: privacyidea/static/components/token/views/token.enrolled.daypassword.html:27
 #: privacyidea/static/components/token/views/token.enrolled.hotp.html:27
@@ -1701,9 +1697,8 @@ msgid "Endpoint (URL)"
 msgstr "Endpunkt (URL)"
 
 #: privacyidea/static/components/config/views/config.resolvers.http.advanced.html:149
-#, fuzzy
 msgid "Endpoint with possible tags:"
-msgstr "Mögliche Tags:"
+msgstr "Endpunkt mit möglichen Tags:"
 
 #: privacyidea/static/components/token/views/token.containerdetails.html:576
 #: privacyidea/static/components/user/views/user.details.html:274
@@ -1871,12 +1866,10 @@ msgid "File name"
 msgstr "Dateiname"
 
 #: privacyidea/static/components/token/views/token.list.html:123
-#, fuzzy
 msgid "Filter by realm"
-msgstr "Realms bearbeiten"
+msgstr "Nach Realm filtern"
 
 #: privacyidea/static/components/config/views/config.resolvers.ldap.html:371
-#, fuzzy
 msgid ""
 "Filter to get the groups of a single user. Possible tags: <code>{base_dn}</"
 "code> (from\n"
@@ -2031,9 +2024,8 @@ msgid "Given name"
 msgstr "Vorname"
 
 #: privacyidea/static/components/config/views/config.resolvers.http.advanced.html:132
-#, fuzzy
 msgid "Group Attribute in EntraID"
-msgstr "Gruppennamenattribut"
+msgstr "Gruppennamenattribut in EntraID"
 
 #: privacyidea/static/components/config/views/config.resolvers.ldap.html:378
 msgid "Group Name Attribute"
@@ -2050,9 +2042,8 @@ msgstr ""
 "zugeordnet werden."
 
 #: privacyidea/static/components/config/views/config.resolvers.http.advanced.html:142
-#, fuzzy
 msgid "HTTP Method"
-msgstr "Methode"
+msgstr "HTTP Methode"
 
 #: privacyidea/static/components/directives/views/directive.policyconditions.html:10
 msgid "Handle Missing Data"
@@ -3292,9 +3283,8 @@ msgid "PrivacyIDEA Attribute"
 msgstr "privacyIDEA Attribut"
 
 #: privacyidea/static/components/config/views/config.smtp.edit.html:127
-#, fuzzy
 msgid "Private Key"
-msgstr "Preshared Key"
+msgstr "Privater Schlüssel"
 
 #: privacyidea/static/components/token/views/token.import.html:136
 msgid "Progress"
@@ -3879,9 +3869,8 @@ msgstr "Geltungsbereich"
 #: privacyidea/static/components/directives/views/directive.filter.table.html:17
 #: privacyidea/static/components/token/views/token.list.html:102
 #: privacyidea/static/components/token/views/token.list.html:103
-#, fuzzy
 msgid "Search"
-msgstr "Suchfilter"
+msgstr "Suche"
 
 #: privacyidea/static/components/config/views/config.mresolvers.ldap.html:185
 #: privacyidea/static/components/config/views/config.resolvers.ldap.html:298
@@ -4184,7 +4173,6 @@ msgid ""
 msgstr "Spezielle Fehlerbehandlung"
 
 #: privacyidea/static/components/config/views/config.resolvers.http.advanced.html:305
-#, fuzzy
 msgid ""
 "Specify the path to the private key file of the servers certificate. If you "
 "use\n"
@@ -4967,7 +4955,6 @@ msgstr ""
 "gespeichert werden (Schlüssel des Attribut-Mappings)."
 
 #: privacyidea/static/components/config/views/config.resolvers.http.advanced.html:107
-#, fuzzy
 msgid ""
 "The left column defines the user attributes used in privacyIDEA and the "
 "right column the equivalent\n"
@@ -5707,9 +5694,8 @@ msgstr "Realm-Filter ein-/ausblenden"
 
 #: privacyidea/static/components/token/views/token.list.html:85
 #: privacyidea/static/components/token/views/token.list.html:86
-#, fuzzy
 msgid "Toggle user filter"
-msgstr "Benutzerfilter"
+msgstr "Benutzerfilter ein/ausschalten"
 
 #: privacyidea/static/components/token/views/token.html:114
 msgid "Token Applications"
@@ -5870,9 +5856,8 @@ msgid "Type a password"
 msgstr "Geben Sie ein Passwort ein"
 
 #: privacyidea/static/components/directives/views/directive.assignuser.html:34
-#, fuzzy
 msgid "Type username and press Enter"
-msgstr "Der Benutzername auf dem Remote-Server"
+msgstr "Benutzernamen eingeben, dann Enter drücken"
 
 #: privacyidea/static/components/config/views/config.token.u2f.html:1
 msgid "U2F Token settings"
@@ -5956,7 +5941,6 @@ msgstr "SSL verwenden"
 
 #: privacyidea/static/components/config/views/config.mresolvers.ldap.html:48
 #: privacyidea/static/components/config/views/config.resolvers.ldap.html:62
-#, fuzzy
 msgid "Use STARTTLS on a plain LDAP connection, usually on port 389."
 msgstr "STARTTLS mit einer LDAP-Verbindung auf Port 389 benutzen."
 
@@ -5994,9 +5978,8 @@ msgid ""
 msgstr "Benutzer Cache - Gültigkeit in Sekunden"
 
 #: privacyidea/static/components/config/views/config.resolvers.http.advanced.html:120
-#, fuzzy
 msgid "User Groups"
-msgstr "Benutzer"
+msgstr "Benutzergruppen"
 
 #: privacyidea/static/components/token/views/token.containerdetails.html:386
 #: privacyidea/static/components/token/views/token.details.html:568
@@ -6068,7 +6051,6 @@ msgid "Username"
 msgstr "Benutzer"
 
 #: privacyidea/static/components/config/views/config.policies.details.html:254
-#, fuzzy
 msgid "Username case-insensitive"
 msgstr "Groß-/Kleinschreibung bei Benutzernamen ignorieren."
 
@@ -6225,9 +6207,8 @@ msgid "You are not allowed to enroll this token type! It will be skipped!"
 msgstr "Sie dürfen diesen Token Typ nicht ausrollen! Aktion wird übersprungen!"
 
 #: privacyidea/static/components/token/controllers/containerControllers.js:918
-#, fuzzy
 msgid "You are not authorized to delete the following tokens:"
-msgstr "Der Container beinhaltet die folgenden Offline-Token:"
+msgstr "Keine Berechtigung zum Löschen der folgenden Token:"
 
 #: privacyidea/static/components/login/controllers/loginControllers.js:591
 msgid ""

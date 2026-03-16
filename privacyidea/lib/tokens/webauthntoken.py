@@ -1034,6 +1034,7 @@ class WebAuthnTokenClass(TokenClass):
                 if self._credential_id_is_already_registered(credential_id_b64, credential_id_hash):
                     raise ValueError("Credential already exists.")
 
+                # Getting trusted anchors
                 pem_root_certs_bytes_by_fmt = None
                 if attestation_level == AttestationLevel.TRUSTED:
                     trust_anchor_dir = get_from_config(FIDO2ConfigOptions.TRUST_ANCHOR_DIR)
@@ -1044,6 +1045,7 @@ class WebAuthnTokenClass(TokenClass):
                         fmt: pem_root_certs_bytes for fmt in AttestationFormat if fmt != AttestationFormat.NONE
                     }
 
+                # Verifying the registration
                 registration_verification: VerifiedRegistration = verify_registration_response(
                     credential={
                         "id": credential_id_b64,

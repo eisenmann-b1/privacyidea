@@ -19,7 +19,11 @@
 <h3
   class="margin-8 external-service-dialog-title"
   i18n>
-  {{ isEditMode ? 'Edit privacyIDEA Server' : 'Create privacyIDEA Server' }}
+  @if (isEditMode) {
+    Edit privacyIDEA Server
+  } @else {
+    Create privacyIDEA Server
+  }
 </h3>
 
 <mat-dialog-content class="privacyidea-server-dialog-content">
@@ -76,7 +80,7 @@
 
     <mat-form-field
       appearance="fill"
-      class="width-100 margin-top-16">
+      class="input-width-xl margin-top-16">
       <mat-label i18n>Description</mat-label>
       <app-clearable-input
         (onClick)="privacyideaForm.get('description')?.setValue('')"

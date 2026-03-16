@@ -19,7 +19,11 @@
 <h3
   class="margin-8 external-service-dialog-title"
   i18n>
-  {{ isEditMode ? 'Edit SMS Gateway' : 'Create SMS Gateway' }}
+  @if (isEditMode) {
+     Edit SMS Gateway
+  } @else {
+     Create SMS Gateway
+  }
 </h3>
 
 <mat-dialog-content class="sms-gateway-dialog-content">
@@ -64,7 +68,7 @@
 
     <mat-form-field
       appearance="fill"
-      class="width-100">
+      class="input-width-xl">
       <mat-label i18n>Description</mat-label>
       <app-clearable-input
         (onClick)="smsForm.get('description')?.setValue('')"
@@ -83,50 +87,46 @@
       [formGroup]="parametersForm"
       class="parameters-form">
       @for (param of parameterEntries(); track param.key) {
-        <div>
-          <mat-form-field
-            appearance="fill"
-            [ngClass]="{
-              'input-width-l': param.value.type !== 'text',
-              'width-100': param.value.type === 'text'
-            }"
-            class="margin-bottom-16">
-            <mat-label>{{ param.key }}</mat-label>
+        <mat-form-field
+          appearance="fill"
+          [class.input-width-l]="param.key !== 'REGEXP' && param.value.type !== 'text'"
+          [class.input-width-xl]="param.key === 'REGEXP' || param.value.type === 'text'"
+          class="margin-bottom-16">
+          <mat-label>{{ param.key }}</mat-label>
 
-            @if (param.value.values) {
-              <mat-select [formControlName]="param.key">
-                @for (val of param.value.values; track val) {
-                  <mat-option [value]="val">
-                    {{ val }}
-                  </mat-option>
-                }
-              </mat-select>
-            }
+          @if (param.value.values) {
+            <mat-select [formControlName]="param.key">
+              @for (val of param.value.values; track val) {
+                <mat-option [value]="val">
+                  {{ val }}
+                </mat-option>
+              }
+            </mat-select>
+          }
 
-            @if (!param.value.values && param.value.type === 'text') {
-              <textarea
+          @if (!param.value.values && param.value.type === 'text') {
+            <textarea
+              [formControlName]="param.key"
+              matInput
+              rows="2"></textarea>
+          }
+
+          @if (!param.value.values && param.value.type !== 'text') {
+            <app-clearable-input
+              (onClick)="parametersForm.get(param.key)?.setValue('')"
+              [showClearButton]="!!parametersForm.get(param.key)?.value">
+              <input
                 [formControlName]="param.key"
-                matInput
-                rows="2"></textarea>
-            }
+                matInput />
+            </app-clearable-input>
+          }
 
-            @if (!param.value.values && param.value.type !== 'text') {
-              <app-clearable-input
-                (onClick)="parametersForm.get(param.key)?.setValue('')"
-                [showClearButton]="!!parametersForm.get(param.key)?.value">
-                <input
-                  [formControlName]="param.key"
-                  matInput />
-              </app-clearable-input>
-            }
+          <mat-hint>{{ param.value.description }}</mat-hint>
 
-            <mat-hint>{{ param.value.description }}</mat-hint>
-
-            @if (parametersForm.get(param.key)?.hasError('required')) {
-              <mat-error i18n>This {{ param.key }} is <strong>required</strong></mat-error>
-            }
-          </mat-form-field>
-        </div>
+          @if (parametersForm.get(param.key)?.hasError('required')) {
+            <mat-error i18n>This {{ param.key }} is <strong>required</strong></mat-error>
+          }
+        </mat-form-field>
       }
     </form>
   }

@@ -42,14 +42,6 @@
                 placeholder="Filter by name or description" />
             </app-clearable-input>
           </mat-form-field>
-          <button
-            (click)="openEditDialog()"
-            class="action-button-primary button-width-l margin-left-16"
-            i18n
-            mat-stroked-button>
-            <mat-icon>add</mat-icon>
-            Create Service ID
-          </button>
         </div>
         <mat-paginator
           [length]="totalLength()"
@@ -58,11 +50,23 @@
           showFirstLastButtons />
       </div>
     </div>
+    <div class="actions-container">
+      <button
+        (click)="openEditDialog()"
+        class="action-button-primary button-width-l"
+        i18n
+        mat-stroked-button>
+        <mat-icon>add</mat-icon>
+        Create Service ID
+      </button>
+    </div>
 
     <p
       class="margin-bottom-16"
       i18n>
-      Service IDs can be used to attach e.g. SSH keys to certain machines and services. To view attached tokens go to
+      Service IDs can be used to attach e.g. SSH keys to certain machines and services.
+      <br />
+      To view attached tokens go to
       <a [routerLink]="[ROUTE_PATHS.TOKENS_APPLICATIONS]">token applications.</a>
     </p>
 

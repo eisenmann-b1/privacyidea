@@ -42,14 +42,6 @@
                 placeholder="Filter by name or type" />
             </app-clearable-input>
           </mat-form-field>
-          <button
-            (click)="openEditDialog()"
-            class="action-button-primary button-width-l margin-left-16"
-            i18n
-            mat-stroked-button>
-            <mat-icon>add</mat-icon>
-            Create CA Connector
-          </button>
         </div>
         <mat-paginator
           [length]="totalLength()"
@@ -57,6 +49,16 @@
           [pageSize]="pageSizeOptions()[1]"
           showFirstLastButtons />
       </div>
+    </div>
+    <div class="actions-container">
+      <button
+        (click)="openEditDialog()"
+        class="action-button-primary button-width-l"
+        i18n
+        mat-stroked-button>
+        <mat-icon>add</mat-icon>
+        Create CA Connector
+      </button>
     </div>
     <table
       [dataSource]="caConnectorDataSource()"

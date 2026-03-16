@@ -19,7 +19,11 @@
 <h3
   class="margin-8 external-service-dialog-title"
   i18n>
-  {{ isEditMode ? 'Edit Service ID' : 'Create Service ID' }}
+  @if (isEditMode) {
+    Edit Service ID
+  } @else {
+    Create Service ID
+  }
 </h3>
 
 <mat-dialog-content class="service-id-dialog-content">
@@ -49,7 +53,7 @@
 
       <mat-form-field
         appearance="fill"
-        class="width-600">
+        class="input-width-xl">
         <mat-label i18n>Description</mat-label>
         <app-clearable-input
           (onClick)="serviceIdForm.get('description')?.setValue('')"

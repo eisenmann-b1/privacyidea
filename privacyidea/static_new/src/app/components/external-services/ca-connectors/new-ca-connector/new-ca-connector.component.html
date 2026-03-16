@@ -19,7 +19,11 @@
 <h3
   class="margin-8 external-service-dialog-title"
   i18n>
-  {{ isEditMode ? 'Edit CA Connector' : 'Create CA Connector' }}
+  @if (isEditMode) {
+    Edit CA Connector
+  } @else {
+    Create CA Connector
+  }
 </h3>
 
 <mat-dialog-content class="ca-connector-dialog-content">

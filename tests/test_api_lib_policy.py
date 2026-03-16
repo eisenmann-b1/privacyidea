@@ -6137,7 +6137,7 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
 
         # preferred client mode policy with webauthn first, but user prefers push
         set_policy("preferred_client_mode", scope=SCOPE.AUTH,
-                   action={PolicyAction.PREFERREDCLIENTMODE: "webauthn interactive poll u2f"})
+                   action={PolicyAction.PREFERREDCLIENTMODE: "webauthn interactive poll"})
         response = jsonify(response_data)
 
         preferred_client_mode(request, response)
@@ -6206,7 +6206,7 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
 
         # user_client_mode not allowed: use preferred_client_mode policy: webauthn
         set_policy("preferred_client_mode", scope=SCOPE.AUTH,
-                   action={PolicyAction.PREFERREDCLIENTMODE: "webauthn interactive poll u2f"})
+                   action={PolicyAction.PREFERREDCLIENTMODE: "webauthn interactive poll"})
         response = jsonify(response_data)
 
         preferred_client_mode(request, response)

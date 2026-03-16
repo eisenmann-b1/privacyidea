@@ -2642,7 +2642,7 @@ def get_static_policy_definitions(scope=None):
             PolicyAction.PREFERREDCLIENTMODE: {
                 'type': 'str',
                 'desc': _('You can set the client modes in the order that you prefer. '
-                          'For example: "interactive webauthn poll u2f". Accepted '
+                          'For example: "interactive webauthn poll". Accepted '
                           'values are: <code>interactive webauthn poll u2f</code>')
             },
             PolicyAction.FORCE_CHALLENGE_RESPONSE: {

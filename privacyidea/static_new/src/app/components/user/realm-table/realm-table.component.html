@@ -249,96 +249,90 @@
 
             <td
               *matFooterCellDef
-              [ngClass]="{
-                'width-18rem': column.key === 'resolvers',
-                'actions-cell': column.key === 'actions'
-              }"
               mat-footer-cell>
-              <div>
-                @switch (column.key) {
-                  @case ("name") {
-                    <mat-form-field
-                      class="input-width-l"
-                      subscriptSizing="dynamic">
-                      <mat-label i18n>Realm Name</mat-label>
-                      <input
-                        (input)="newRealmName.set($any($event.target).value)"
-                        [value]="newRealmName()"
-                        matInput />
-                    </mat-form-field>
-                  }
-                  @case ("resolvers") {
-                    <div class="node-resolvers-groups">
-                      @for (group of allNodeGroups(); track group.id) {
-                        <div class="node-resolvers-group">
-                          <div class="resolver-node-label">
-                            <mat-icon
-                              aria-hidden="true"
-                              class="resolver-node-icon">
-                              dns
-                            </mat-icon>
-                            <span>{{ group.label }}</span>
-                          </div>
-
-                          <mat-form-field
-                            class="input-width-l"
-                            subscriptSizing="dynamic">
-                            <mat-label i18n>Resolvers</mat-label>
-                            <mat-select
-                              (selectionChange)="onNewRealmNodeResolversChange(group.id, $event.value)"
-                              [value]="getCreateNodeResolverNames(group.id)"
-                              multiple>
-                              @for (res of resolverOptions(); track res.name) {
-                                <mat-option [value]="res.name"> {{ res.name }} ({{ res.type }})</mat-option>
-                              }
-                            </mat-select>
-                          </mat-form-field>
-
-                          <div class="resolver-priority-list">
-                            @for (r of getCreateNodeResolvers(group.id); track r.name) {
-                              <div class="resolver-priority-item">
-                                <span class="priority-label">{{ r.name }}</span>
-                                <input
-                                  (ngModelChange)="setNewRealmResolverPriority(group.id, r.name, $event)"
-                                  [ngModel]="r.priority"
-                                  class="resolver-priority-input"
-                                  max="999"
-                                  min="1"
-                                  type="number" />
-                              </div>
-                            }
-                          </div>
-                        </div>
-                      }
-                    </div>
-                  }
-                  @case ("actions") {
-                    <div class="actions-buttons flex-column">
-                      <button
-                        (click)="onCreateRealm()"
-                        [disabled]="!canSubmitNewRealm()"
-                        class="action-button-primary button-width-s"
-                        mat-stroked-button
-                        type="button">
-                        <mat-icon>add</mat-icon>
-                        <span i18n>Create</span>
-                      </button>
-                      <button
-                        (click)="resetCreateForm()"
-                        [disabled]="isCreatingRealm()"
-                        class="action-button-secondary button-width-s"
-                        mat-stroked-button
-                        matTooltip="Reset form"
-                        type="button">
-                        <span i18n>Reset</span>
-                      </button>
-                    </div>
-                  }
-                  @default {
-                    <span></span>
-                  }
+              @switch (column.key) {
+                @case ("name") {
+                  <mat-form-field
+                    class="input-width-l margin-top-16"
+                    subscriptSizing="dynamic">
+                    <mat-label i18n>Realm Name</mat-label>
+                    <input
+                      (input)="newRealmName.set($any($event.target).value)"
+                      [value]="newRealmName()"
+                      matInput />
+                  </mat-form-field>
                 }
-              </div>
+                @case ("resolvers") {
+                  <div class="node-resolvers-groups">
+                    @for (group of allNodeGroups(); track group.id) {
+                      <div class="node-resolvers-group">
+                        <div class="resolver-node-label">
+                          <mat-icon
+                            aria-hidden="true"
+                            class="resolver-node-icon">
+                            dns
+                          </mat-icon>
+                          <span>{{ group.label }}</span>
+                        </div>
+
+                        <mat-form-field
+                          class="input-width-l"
+                          subscriptSizing="dynamic">
+                          <mat-label i18n>Resolvers</mat-label>
+                          <mat-select
+                            (selectionChange)="onNewRealmNodeResolversChange(group.id, $event.value)"
+                            [value]="getCreateNodeResolverNames(group.id)"
+                            multiple>
+                            @for (res of resolverOptions(); track res.name) {
+                              <mat-option [value]="res.name"> {{ res.name }} ({{ res.type }})</mat-option>
+                            }
+                          </mat-select>
+                        </mat-form-field>
+
+                        <div class="resolver-priority-list">
+                          @for (r of getCreateNodeResolvers(group.id); track r.name) {
+                            <div class="resolver-priority-item">
+                              <span class="priority-label">{{ r.name }}</span>
+                              <input
+                                (ngModelChange)="setNewRealmResolverPriority(group.id, r.name, $event)"
+                                [ngModel]="r.priority"
+                                class="resolver-priority-input"
+                                max="999"
+                                min="1"
+                                type="number" />
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+                @case ("actions") {
+                  <div class="actions-buttons flex-column">
+                    <button
+                      (click)="onCreateRealm()"
+                      [disabled]="!canSubmitNewRealm()"
+                      class="action-button-primary button-width-s"
+                      mat-stroked-button
+                      type="button">
+                      <mat-icon>add</mat-icon>
+                      <span i18n>Create</span>
+                    </button>
+                    <button
+                      (click)="resetCreateForm()"
+                      [disabled]="isCreatingRealm()"
+                      class="action-button-secondary button-width-s"
+                      mat-stroked-button
+                      matTooltip="Reset form"
+                      type="button">
+                      <span i18n>Reset</span>
+                    </button>
+                  </div>
+                }
+                @default {
+                  <span></span>
+                }
+              }
             </td>
           </ng-container>
         }

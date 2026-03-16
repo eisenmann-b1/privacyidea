@@ -40,18 +40,18 @@
   class="flex-column gap-16">
   @for (optionName of Object.keys(actionOptions()); track optionName) {
     @if (checkOptionVisibility(optionName)) {
-      <div class="pad-0 width-100">
+      <div class="pad-0">
         @if (actionOptions()[optionName].type == "bool") {
           <mat-checkbox
             [formControlName]="optionName"
-            class="margin-0 width-100">
+            class="margin-0">
             {{ optionName }}
           </mat-checkbox>
         } @else {
           <mat-form-field
             [ngClass]="{
               'input-width-l': actionOptions()[optionName].type !== 'text',
-              'width-100': actionOptions()[optionName].type === 'text'
+              'input-width-xl': actionOptions()[optionName].type === 'text'
             }">
             <mat-label>
               {{ optionName }}
@@ -99,7 +99,7 @@
         @if (!(selectedOptions.get(optionName)?.invalid && (selectedOptions.get(optionName)?.dirty ||
           selectedOptions.get(optionName)?.touched))) {
           <div
-            class="checkbox-hint"
+            class="checkbox-hint input-width-xl"
             [innerHTML]="actionOptions()[optionName].desc || actionOptions()[optionName].description || ''"
             [ngClass]="{'margin-top--16': actionOptions()[optionName].type !== 'bool'}">
           </div>

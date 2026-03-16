@@ -82,13 +82,13 @@
                 <div class="flex ali-center">
                   {{ column.label }}
                   <div class="margin-left-16 flex">
-                    @if (apiFilterKeyMap[column.key] && tokenService.apiFilter.includes(column.key)) {
+                    @if (apiFilterKeyMap[column.key] && tokenService.apiFilter.includes(apiFilterKeyMap[column.key])) {
                       <button
                         (click)="onKeywordClick(apiFilterKeyMap[column.key])"
                         class="filter-button"
                         mat-icon-button>
                         <mat-icon class="keyword-button-icon margin-left-0">
-                          {{ getFilterIconName(column.key) }}
+                          {{ getFilterIconName(apiFilterKeyMap[column.key]) }}
                         </mat-icon>
                       </button>
                     }

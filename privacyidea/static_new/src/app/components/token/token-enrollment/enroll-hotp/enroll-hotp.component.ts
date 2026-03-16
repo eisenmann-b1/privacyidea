@@ -122,7 +122,16 @@ export class EnrollHotpComponent implements OnInit {
       this.generateOnServerFormControl.setValue(enrollmentData.generateOnServer ?? true, {
         emitEvent: eventEmit
       });
+      if (enrollmentData.generateOnServer) {
+        this.otpKeyFormControl.disable({ emitEvent: eventEmit });
+        this.twoStepControl.disable({ emitEvent: eventEmit });
+      } else {
+        this.otpKeyFormControl.enable({ emitEvent: eventEmit });
+        this.otpKeyFormControl.disable({ emitEvent: eventEmit });
+      }
+      this.twoStepControl.setValue(enrollmentData.twoStepInit ?? false, { emitEvent: eventEmit });
       this.otpLengthFormControl.setValue(enrollmentData.otpLength ?? 6, { emitEvent: eventEmit });
+      this.otpKeyFormControl.setValue(enrollmentData.otpKey ?? "", { emitEvent: eventEmit });
       this.hashAlgorithmFormControl.setValue(enrollmentData.hashAlgorithm ?? "sha1", { emitEvent: eventEmit });
     }
   }
@@ -166,22 +175,6 @@ export class EnrollHotpComponent implements OnInit {
     data: HotpEnrollmentData;
     mapper: TokenApiPayloadMapper<HotpEnrollmentData>;
   } | null => {
-    if (
-      this.generateOnServerFormControl.invalid ||
-      this.otpLengthFormControl.invalid ||
-      this.hashAlgorithmFormControl.invalid ||
-      (!this.generateOnServerFormControl.value && this.otpKeyFormControl.invalid)
-    ) {
-      this.generateOnServerFormControl.markAsTouched();
-      this.otpLengthFormControl.markAsTouched();
-      this.hashAlgorithmFormControl.markAsTouched();
-      if (!this.generateOnServerFormControl.value) {
-        this.otpKeyFormControl.markAsTouched();
-      }
-      this.notificationService.openSnackBar($localize`Invalid enrollment data.`);
-      return null;
-    }
-
     const enrollmentData: HotpEnrollmentOptions = {
       ...basicOptions,
       type: "hotp",

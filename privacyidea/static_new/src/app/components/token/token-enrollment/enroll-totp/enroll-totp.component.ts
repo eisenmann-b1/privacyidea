@@ -108,10 +108,15 @@ export class EnrollTotpComponent implements OnInit {
 
   constructor() {
     effect(() => (this.disabled() ? this.totpForm.disable({ emitEvent: false }) : this._enableFormControls()));
+    effect(() => {
+      if (this.enrollmentData()) {
+        this._setInitialFormValues({ enrollmentData: this.enrollmentData(), eventEmit: false });
+      }
+    });
   }
 
   ngOnInit(): void {
-    this._setInitialFormValues();
+    this._setInitialFormValues({ enrollmentData: this.enrollmentData() });
     this.additionalFormFieldsChange.emit({
       twoStep: this.twoStepControl,
       generateOnServer: this.generateOnServerFormControl,
@@ -124,12 +129,24 @@ export class EnrollTotpComponent implements OnInit {
     this._applyPolicies();
   }
 
-  private _setInitialFormValues() {
-    if (!!this.enrollmentData()) {
-      this.generateOnServerFormControl.setValue(this.enrollmentData()?.generateOnServer ?? true, { emitEvent: false });
-      this.otpLengthFormControl.setValue(this.enrollmentData()?.otpLength ?? 6, { emitEvent: false });
-      this.hashAlgorithmControl.setValue(this.enrollmentData()?.hashAlgorithm ?? "sha1", { emitEvent: false });
-      this.timeStepControl.setValue(this.enrollmentData()?.timeStep ?? 30, { emitEvent: false });
+  private _setInitialFormValues(args: { enrollmentData?: TotpEnrollmentData | null; eventEmit?: boolean }) {
+    const { enrollmentData, eventEmit } = args;
+    if (enrollmentData) {
+      this.twoStepControl.setValue(enrollmentData.twoStepInit ?? this.twoStep() === "force", {
+        emitEvent: eventEmit
+      });
+      if (enrollmentData.generateOnServer) {
+        this.otpKeyFormControl.disable({ emitEvent: eventEmit });
+        this.twoStepControl.disable({ emitEvent: eventEmit });
+      } else {
+        this.otpKeyFormControl.enable({ emitEvent: eventEmit });
+        this.otpKeyFormControl.disable({ emitEvent: eventEmit });
+      }
+      this.generateOnServerFormControl.setValue(enrollmentData.generateOnServer ?? true, { emitEvent: eventEmit });
+      this.otpLengthFormControl.setValue(enrollmentData.otpLength ?? 6, { emitEvent: eventEmit });
+      this.otpKeyFormControl.setValue(enrollmentData.otpKey ?? "", { emitEvent: eventEmit });
+      this.hashAlgorithmControl.setValue(enrollmentData.hashAlgorithm ?? "sha1", { emitEvent: eventEmit });
+      this.timeStepControl.setValue(enrollmentData.timeStep ?? 30, { emitEvent: eventEmit });
     }
   }
 
@@ -138,8 +155,7 @@ export class EnrollTotpComponent implements OnInit {
       this.twoStepControl.setValue(true, { emitEvent: false });
       this.twoStepControl.disable({ emitEvent: false });
       this.generateOnServerFormControl.disable({ emitEvent: false });
-    }
-    else if (this.twoStep() === "allow") {
+    } else if (this.twoStep() === "allow") {
       this.twoStepControl.valueChanges.subscribe((twoStepEnabled) => {
         if (twoStepEnabled) {
           this.generateOnServerFormControl.disable({ emitEvent: false });
@@ -167,16 +183,12 @@ export class EnrollTotpComponent implements OnInit {
     }
   }
 
-  enrollmentArgsGetter = (basicOptions: TokenEnrollmentData): {
+  enrollmentArgsGetter = (
+    basicOptions: TokenEnrollmentData
+  ): {
     data: TotpEnrollmentData;
     mapper: TokenApiPayloadMapper<TotpEnrollmentData>;
   } | null => {
-    if (this.totpForm.invalid) {
-      this.notificationService.openSnackBar($localize`Invalid enrollment data.`);
-      this.totpForm.markAllAsTouched();
-      return null;
-    }
-
     const timeStepValue =
       typeof this.timeStepControl.value === "string"
         ? parseInt(this.timeStepControl.value, 10)

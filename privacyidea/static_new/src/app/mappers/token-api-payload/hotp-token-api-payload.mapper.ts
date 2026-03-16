@@ -24,6 +24,7 @@ import {
   TokenEnrollmentPayload
 } from "./_token-api-payload.mapper";
 import { TokenDetails } from "../../services/token/token.service";
+import { parseBooleanValue } from "src/app/utils/parse-boolean-value";
 
 export interface HotpEnrollmentData extends TokenEnrollmentData {
   type: "hotp";
@@ -41,7 +42,7 @@ export interface HotpEnrollmentPayload extends TokenEnrollmentPayload {
   otplen?: number;
   hashlib?: string;
   serial?: string;
-  "2stepinit"?: boolean;
+  "2stepinit"?: boolean | 0 | 1;
   otpkeyformat?: string;
 }
 
@@ -69,14 +70,15 @@ export class HotpApiPayloadMapper extends BaseApiPayloadMapper implements TokenA
 
   override fromApiPayload(payload: HotpEnrollmentPayload): HotpEnrollmentData {
     const baseData = super.fromApiPayload(payload);
+    console.log("Mapping HOTP API payload to enrollment data:", payload);
     return {
       ...baseData,
       type: "hotp",
-      generateOnServer: payload.genkey === 1,
+      ...(payload.genkey !== undefined && { generateOnServer: parseBooleanValue(payload.genkey) }),
       otpKey: payload.otpkey ?? undefined,
       otpLength: payload.otplen !== undefined ? Number(payload.otplen) : undefined,
       hashAlgorithm: payload.hashlib ?? undefined,
-      twoStepInit: payload["2stepinit"] ?? undefined,
+      ...(payload["2stepinit"] !== undefined && { twoStepInit: parseBooleanValue(payload["2stepinit"]) }),
       otpKeyFormat: payload.otpkeyformat ?? undefined
     };
   }

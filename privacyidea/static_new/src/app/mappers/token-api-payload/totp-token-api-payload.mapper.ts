@@ -53,8 +53,8 @@ export class TotpApiPayloadMapper extends BaseApiPayloadMapper implements TokenA
     const basePayload = super.toApiPayload(data);
     const payload: TotpEnrollmentPayload = {
       ...basePayload,
-      otpkey: data.generateOnServer === true ? "" : (data.otpKey ?? ""),
       genkey: data.generateOnServer ? 1 : 0,
+      otpkey: data.generateOnServer === true ? "" : (data.otpKey ?? ""),
       ...(data.otpLength !== undefined && { otplen: Number(data.otpLength) }),
       ...(data.hashAlgorithm !== undefined && { hashlib: data.hashAlgorithm }),
       ...(data.timeStep !== undefined && { timeStep: Number(data.timeStep) }),
@@ -73,9 +73,13 @@ export class TotpApiPayloadMapper extends BaseApiPayloadMapper implements TokenA
     return {
       ...baseData,
       type: "totp",
+      ...(payload.genkey !== undefined && { generateOnServer: payload.genkey === 1 }),
+      otpKey: payload.otpkey ?? undefined,
       otpLength: payload.otplen ? Number(payload.otplen) : undefined,
       hashAlgorithm: payload.hashlib ?? undefined,
-      timeStep: payload.timeStep !== undefined ? Number(payload.timeStep) : undefined
+      timeStep: payload.timeStep !== undefined ? Number(payload.timeStep) : undefined,
+      ...(payload["2stepinit"] !== undefined && { twoStepInit: payload["2stepinit"] }),
+      otpKeyFormat: payload.otpkeyformat ?? undefined
     };
   }
 

@@ -33,7 +33,7 @@ from privacyidea.lib.resolvers.HTTPResolver import (HTTPResolver, METHOD, ENDPOI
                                                     CONFIG_GET_USER_BY_ID, RequestConfig, ADVANCED,
                                                     CONFIG_CREATE_USER, CONFIG_EDIT_USER,
                                                     CONFIG_DELETE_USER, REQUEST_MAPPING, HEADERS, CONFIG_USER_AUTH,
-                                                    Error, USER_GROUPS_ATTRIBUTE, ACTIVE)
+                                                    Error, USER_GROUPS_ATTRIBUTE, ACTIVE, PI_USER_GROUPS_KEY)
 from privacyidea.lib.resolvers.util import delete_user_error_handling_no_content
 
 CLIENT_ID = "client_id"
@@ -87,7 +87,8 @@ class EntraIDResolver(HTTPResolver):
                                                REQUEST_MAPPING: "client_id={client_id}&scope=https://graph.microsoft.com"
                                                                 "/.default&username={username}&password={password}&"
                                                                 "grant_type=password&client_secret={client_credential}"}})
-        self.config_get_user_groups = {ACTIVE: True, USER_GROUPS_ATTRIBUTE: "displayName"}
+        self.config_get_user_groups = {ACTIVE: True, USER_GROUPS_ATTRIBUTE: "displayName",
+                                       PI_USER_GROUPS_KEY: self.pi_user_groups_key}
         self.wildcard = ""  # No wildcards supported
 
         # Custom attributes
@@ -490,7 +491,8 @@ class EntraIDResolver(HTTPResolver):
         :return: List of dictionaries containing pi conform user attributes
         """
         request_params = config.request_mapping if config.request_mapping else {}
-        search_for_groups = self.config_get_user_groups.get(ACTIVE) and (not attributes or self.pi_user_groups_key in attributes)
+        search_for_groups = self.config_get_user_groups.get(ACTIVE) and (
+                    not attributes or self.pi_user_groups_key in attributes)
         request_params.update(self._get_search_params(search_dict, allow_endswith=search_for_groups))
         config.headers.update(self._get_auth_header())
 

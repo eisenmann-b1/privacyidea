@@ -1088,11 +1088,12 @@ class HTTPResolverTestCase(MyTestCase):
 
         # advanced settings with groups
         config = dict(self.advanced_config)
+        custom_groups_key = "custom-groups"
         config[CONFIG_GET_USER_GROUPS] = {ACTIVE: True, METHOD: "GET", ENDPOINT: "/users/{userid}/groups",
-                                          USER_GROUPS_ATTRIBUTE: "name", PI_USER_GROUPS_KEY: "custom-groups"}
+                                          USER_GROUPS_ATTRIBUTE: "name", PI_USER_GROUPS_KEY: custom_groups_key}
         resolver.loadConfig(config)
         keys = resolver.get_available_info_keys()
-        self.assertSetEqual({"username", "userid", "givenname", "surname", "custom-groups"}, set(keys))
+        self.assertSetEqual({"username", "userid", "givenname", "surname", custom_groups_key}, set(keys))
 
 
 class ConfidentialClientApplicationMock:
@@ -1378,16 +1379,17 @@ class EntraIDResolverTestCase(MyTestCase):
                 self.assertListEqual([], user["groups"])
 
         # with custom groups key
-        resolver.config_get_user_groups = {ACTIVE: True, USER_GROUPS_ATTRIBUTE: "displayName", PI_USER_GROUPS_KEY: "custom-groups"}
-        resolver.pi_user_groups_key = "custom-groups"
+        custom_groups_key = "custom-groups"
+        resolver.config_get_user_groups = {ACTIVE: True, USER_GROUPS_ATTRIBUTE: "displayName", PI_USER_GROUPS_KEY: custom_groups_key}
+        resolver.pi_user_groups_key = custom_groups_key
         user_list = resolver.getUserList()
         self.assertEqual(2, len(user_list))
         self.assertSetEqual({"Adams@contoso.com", "admin@contoso.com"}, set(user["username"] for user in user_list))
         for user in user_list:
             if user["username"] == "Adams@contoso.com":
-                self.assertSetEqual({"Group1", "Group2"}, set(user["custom-groups"]))
+                self.assertSetEqual({"Group1", "Group2"}, set(user[custom_groups_key]))
             else:
-                self.assertListEqual([], user["custom-groups"])
+                self.assertListEqual([], user[custom_groups_key])
 
         # without groups
         resolver.config_get_user_groups = {ACTIVE: False, USER_GROUPS_ATTRIBUTE: "displayName"}
@@ -1401,8 +1403,9 @@ class EntraIDResolverTestCase(MyTestCase):
     @responses.activate
     def test_06_getUserList_attributes(self):
         resolver = self.set_up_resolver()
-        resolver.config_get_user_groups = {ACTIVE: True, USER_GROUPS_ATTRIBUTE: "displayName", PI_USER_GROUPS_KEY: "custom-groups"}
-        resolver.pi_user_groups_key = "custom-groups"
+        custom_groups_key = "custom-groups"
+        resolver.config_get_user_groups = {ACTIVE: True, USER_GROUPS_ATTRIBUTE: "displayName", PI_USER_GROUPS_KEY: custom_groups_key}
+        resolver.pi_user_groups_key = custom_groups_key
 
         # without groups
         responses.add(responses.GET, "https://graph.microsoft.com/v1.0/users", status=200,
@@ -1464,18 +1467,18 @@ class EntraIDResolverTestCase(MyTestCase):
             self.assertSetEqual({"username", "email"}, set(user.keys()))
 
         # request specific attributes with groups
-        user_list = resolver.getUserList(attributes=["username", "custom-groups"])
+        user_list = resolver.getUserList(attributes=["username", custom_groups_key])
         for user in user_list:
-            self.assertSetEqual({"username", "custom-groups"}, set(user.keys()))
+            self.assertSetEqual({"username", custom_groups_key}, set(user.keys()))
             if user["username"] == "Adams@contoso.com":
-                self.assertSetEqual({"Group1", "Group2"}, set(user["custom-groups"]))
+                self.assertSetEqual({"Group1", "Group2"}, set(user[custom_groups_key]))
             else:
-                self.assertListEqual([], user["custom-groups"])
+                self.assertListEqual([], user[custom_groups_key])
 
         # request without attributes defined should return all attributes
         user_list = resolver.getUserList()
         for user in user_list:
-            self.assertSetEqual({"username", "userid", "givenname", "surname", "email", "mobile", "phone", "custom-groups"},
+            self.assertSetEqual({"username", "userid", "givenname", "surname", "email", "mobile", "phone", custom_groups_key},
                                 set(user.keys()))
 
     @responses.activate

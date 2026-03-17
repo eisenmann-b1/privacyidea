@@ -17,22 +17,21 @@
 # SPDX-FileCopyrightText: 2025 Jelina Unger <jelina.unger@netknights.it>
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import copy
+import json
+import logging
 import re
 import time
-import copy
 from dataclasses import dataclass
 from enum import Enum
 from typing import Union, Optional
+from urllib.parse import urlencode
 
+import requests
+from pydash import get
 from requests import Response, HTTPError
 
 from .UserIdResolver import UserIdResolver
-import requests
-import logging
-import json
-from urllib.parse import urlencode
-from pydash import get
-
 from ..error import ParameterError, ResolverError
 from ..log import log_with
 from ..utils import is_true
@@ -52,6 +51,7 @@ CONFIG_USER_AUTH = "config_user_auth"
 CONFIG_GET_USER_GROUPS = "config_get_user_groups"
 ACTIVE = "active"
 USER_GROUPS_ATTRIBUTE = "user_groups_attribute"
+PI_USER_GROUPS_KEY = "pi_user_groups_key"
 METHOD = "method"
 ENDPOINT = "endpoint"
 PARAMS = "params"
@@ -213,7 +213,6 @@ class RequestConfig:
 
 
 class HTTPResolver(UserIdResolver):
-
     fields = {
         "endpoint": 1,
         "method": 1,
@@ -230,6 +229,7 @@ class HTTPResolver(UserIdResolver):
         self.headers = {}
         self.config_get_user_by_id = {}
         self.config_get_user_groups = {}
+        self.pi_user_groups_key = "groups"
         self.config_user_auth = {}
         self.attribute_mapping_pi_to_user_store = {}
         self.attribute_mapping_user_store_to_pi = {}
@@ -417,7 +417,7 @@ class HTTPResolver(UserIdResolver):
             response_mapping = config.response_mapping
             attributes = list(response_mapping.keys())
         if self.config_get_user_groups.get(ACTIVE):
-            attributes.append("groups")
+            attributes.append(self.pi_user_groups_key)
         return attributes
 
     def getUserList(self, search_dict: Optional[dict] = None, attributes: list[str] = None) -> list[dict]:
@@ -655,6 +655,8 @@ class HTTPResolver(UserIdResolver):
             self.attribute_mapping_user_store_to_pi = {store_key: pi_key for pi_key, store_key in
                                                        self.attribute_mapping_pi_to_user_store.items()}
         self.config_get_user_groups = self.config.get(CONFIG_GET_USER_GROUPS, self.config_get_user_groups)
+        self.pi_user_groups_key = self.config_get_user_groups.get(PI_USER_GROUPS_KEY,
+                                                                  self.pi_user_groups_key) or self.pi_user_groups_key
         self.authorization_config = config.get(CONFIG_AUTHORIZATION, self.authorization_config)
         if self.authorization_config:
             self.username = config.get(USERNAME)
@@ -849,10 +851,10 @@ class HTTPResolver(UserIdResolver):
         """
         pi_user = {}
 
-        if not attributes or "groups" in attributes:
+        if not attributes or self.pi_user_groups_key in attributes:
             if self.config_get_user_groups.get(ACTIVE, False):
-                pi_user["groups"] = self.get_user_groups(user)
-            elif attributes and "groups" in attributes:
+                pi_user[self.pi_user_groups_key] = self.get_user_groups(user)
+            elif attributes and self.pi_user_groups_key in attributes:
                 log.debug("Groups are requested in the attributes but not active in the configuration. "
                           "Not including groups attribute.")
 

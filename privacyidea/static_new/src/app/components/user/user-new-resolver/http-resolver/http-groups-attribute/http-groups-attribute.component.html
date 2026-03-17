@@ -22,25 +22,38 @@
   class="flex-column margin-top-16">
   <div class="flex-row gap-16 ali-center margin-bottom-16">
     <mat-slide-toggle
-      class="margin-bottom-16"
       [formControlName]="'active'"
-      [matTooltip]="slideToggleTooltipSignal()"></mat-slide-toggle>
-    <mat-form-field
-      class="input-width-l">
-      @if (resolverType === "entraidresolver") {
-        <mat-label i18n>Group Identifier</mat-label>
-      } @else {
-        <mat-label i18n>User Store Attribute</mat-label>
-      }
-      <input
-        formControlName="user_groups_attribute"
-        matInput />
-      @if (resolverType === "entraidresolver") {
-        <mat-hint i18n>Group identifier from EntraID mapped to the users group list.</mat-hint>
-      } @else {
-        <mat-hint i18n>Key of the group's name in the user store response.</mat-hint>
-      }
-    </mat-form-field>
+      [matTooltip]="slideToggleTooltipSignal()"
+      class="margin-bottom-16"></mat-slide-toggle>
+
+    <div class="flex-row gap-16">
+      <mat-form-field
+        class="flex-size-1"
+        subscriptSizing="dynamic">
+        <mat-label i18n>privacyIDEA User Groups Key</mat-label>
+        <input
+          formControlName="pi_user_groups_key"
+          matInput />
+        <mat-hint i18n>Key to store the groups of the user in privacyIDEA.</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field
+        class="input-width-l">
+        @if (resolverType === "entraidresolver") {
+          <mat-label i18n>Group Identifier</mat-label>
+        } @else {
+          <mat-label i18n>User Store Attribute</mat-label>
+        }
+        <input
+          formControlName="user_groups_attribute"
+          matInput />
+        @if (resolverType === "entraidresolver") {
+          <mat-hint i18n>Group identifier from EntraID mapped to the users group list.</mat-hint>
+        } @else {
+          <mat-hint i18n>Key of the group's name in the user store response.</mat-hint>
+        }
+      </mat-form-field>
+    </div>
 
     @if (resolverType !== "entraidresolver") {
       <mat-form-field class="input-width-s">
@@ -78,8 +91,7 @@
   <div
     class="hint margin-top-16 margin-bottom-16"
     i18n>
-    Receive the users groups via the <code>memberOf</code> attribute and store them under the privacyIDEA attribute
-    <code>groups</code>.
+    Receive the users groups via the <code>memberOf</code> attribute.
   </div>
 } @else {
   <div

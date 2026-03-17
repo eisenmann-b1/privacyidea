@@ -18,39 +18,46 @@
 -->
 <mat-expansion-panel>
   <mat-expansion-panel-header>
-    <mat-panel-title i18n>U2F Token Settings</mat-panel-title>
+    <mat-panel-title i18n>U2F</mat-panel-title>
   </mat-expansion-panel-header>
   <div class="panel-content">
-    <p i18n>The U2F token is a hardware token, that communicates with the browser. You need to set the correct appId,
-            which in fact is the URL of your privacyIDEA installation.
+    <p i18n>The U2F token is a hardware token, that communicates with the browser.
+      <br>
+            You need to set the correct appId, which in fact is the URL of your privacyIDEA installation.
+      <br>
     </p>
 
-    <mat-form-field
-      appearance="fill"
-      class="input-width-l margin-bottom-32">
-      <mat-label i18n>AppID</mat-label>
-      <input
-        [(ngModel)]="formData()['u2f.appId']"
-        matInput
-        placeholder="https://pi.server.com"
-        required
-        type="url">
-    </mat-form-field>
+    <div class="flex-row gap-16 ali-center">
+      <mat-form-field
+        appearance="fill"
+        class="input-width-l"
+        subscriptSizing="dynamic">
+        <mat-label i18n>AppID</mat-label>
+        <input
+          [(ngModel)]="formData()['u2f.appId']"
+          matInput
+          placeholder="https://pi.server.com"
+          required
+          type="url">
+      </mat-form-field>
+    </div>
     <span
       class="hint"
-      i18n>The URL of your privacyIDEA installation. This must be a valid FQDN with also a valid top level
-                     domain - otherwise you might receive a U2F Error 2 (Bad Request).</span>
+      i18n>The URL of your privacyIDEA installation.<br> This must be a valid FQDN with also a valid top level
+                     domain - otherwise you might receive a U2F Error 2 (Bad Request).<br></span>
 
     @if (formData()['u2f.appId'] && !formData()['u2f.appId'].startsWith('https:')) {
       <div
         class="alert alert-warning"
         i18n>The AppID needs to start with "https".
+        <br>
       </div>
     }
     @if (formData()['u2f.appId'] && formData()['u2f.appId'].endsWith('/')) {
       <div
         class="alert alert-warning"
         i18n>The AppID must not end with a "/".
+        <br>
       </div>
     }
   </div>

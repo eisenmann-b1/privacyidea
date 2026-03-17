@@ -18,30 +18,32 @@
 -->
 <mat-expansion-panel>
   <mat-expansion-panel-header>
-    <mat-panel-title i18n>Questionnaire Token Settings</mat-panel-title>
+    <mat-panel-title i18n>Questionnaire</mat-panel-title>
   </mat-expansion-panel-header>
   <div class="panel-content">
-    <p i18n>The questionnaire lets you define a set of questions. The questionnaire token needs to define answers to
+    <p i18n>The questionnaire lets you define a set of questions.<br> The questionnaire token needs to define answers to
             these questions and the user will be presented with random questions and needs to provide his previously
-            defined answer.
+            defined answer.<br>
     </p>
 
-    <mat-form-field
-      appearance="fill"
-      class="input-width-s">
-      <mat-label i18n>Number of Answers</mat-label>
-      <input
-        [(ngModel)]="formData()['question.num_answers']"
-        matInput
-        placeholder="5"
-        required
-        type="number">
-    </mat-form-field>
+    <div class="flex-row gap-16 ali-center">
+      <mat-form-field
+        appearance="fill"
+        class="input-width-s">
+        <mat-label i18n>Number of Answers</mat-label>
+        <input
+          [(ngModel)]="formData()['question.num_answers']"
+          matInput
+          placeholder="5"
+          required
+          type="number">
+      </mat-form-field>
 
-    <span class="hint" i18n>This is the number of answers a user needs to define to enroll a token.</span>
+      <span class="hint" i18n>This is the number of answers a user needs to define to enroll a token.<br></span>
+    </div>
 
     <h4 i18n>Questionnaire</h4>
-    <p i18n>These are the possible questions, a user may define answers to.</p>
+    <p i18n>These are the possible questions, a user may define answers to.<br></p>
 
     <table class="table">
       <thead>
@@ -69,10 +71,10 @@
         }
       </tbody>
     </table>
-    <div class="new-question-row margin-top-16">
+    <div class="flex-row gap-16 ali-center margin-top-16">
       <mat-form-field
         appearance="fill"
-        class="width-100">
+        class="input-width-xl">
         <mat-label i18n>Question</mat-label>
         <input
           [(ngModel)]="newQuestionText"

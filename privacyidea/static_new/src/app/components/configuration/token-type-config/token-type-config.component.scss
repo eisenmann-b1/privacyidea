@@ -5,7 +5,6 @@
   max-width: 100%;
   max-height: var(--max-height);
   overflow: auto;
-  width: 1000px;
 
   h2 {
     margin-bottom: 20px;
@@ -15,27 +14,24 @@
     .panel-content {
       padding: 0;
 
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0 16px;
-      align-items: start;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
 
       p,
       h3,
       h4,
       .alert,
       table,
-      .table {
-        grid-column: 1 / -1;
-      }
-
-      @media (max-width: 900px) {
-        grid-template-columns: 1fr;
+      .table,
+      .flex-row {
+        max-width: 800px;
+        width: 100%;
       }
 
       p {
-        margin: 0 0 16px 0;
         color: var(--mat-sys-on-surface-variant);
+        margin-top: 0;
       }
     }
 

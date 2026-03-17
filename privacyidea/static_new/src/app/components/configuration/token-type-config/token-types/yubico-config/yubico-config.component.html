@@ -18,14 +18,14 @@
 -->
 <mat-expansion-panel>
   <mat-expansion-panel-header>
-    <mat-panel-title i18n>Yubico Token Settings</mat-panel-title>
+    <mat-panel-title i18n>Yubico</mat-panel-title>
   </mat-expansion-panel-header>
   <div class="panel-content">
-    <p i18n>The Yubico Token is a Yubikey that is registered with the YubiCloud service. The Yubikey emits a 44
-            character one time password. The first 12 characters are a unique ID which is used to bind the device to the
-            user.
+    <p i18n>The Yubico Token is a Yubikey that is registered with the YubiCloud service.<br> The Yubikey emits a 44
+            character one time password.<br> The first 12 characters are a unique ID which is used to bind the device to the
+            user.<br>
     </p>
-    <p i18n>The authentication request is forwarded to the YubiCloud. For accessing the YubiCloud you need to enter an
+    <p i18n>The authentication request is forwarded to the YubiCloud.<br> For accessing the YubiCloud you need to enter an
             API Client ID and an API Key, which you can request
       <a
         href="https://upgrade.yubico.com/getapikey/"
@@ -33,38 +33,42 @@
       </a>
     </p>
 
-    <mat-form-field
-      appearance="fill"
-      class="input-width-m">
-      <mat-label i18n>API Client ID</mat-label>
-      <input
-        [(ngModel)]="formData()['yubico.id']"
-        matInput
-        placeholder="The client ID"
-        required>
-    </mat-form-field>
+    <div class="flex-row gap-16 ali-center">
+      <mat-form-field
+        appearance="fill"
+        class="input-width-l">
+        <mat-label i18n>API Key</mat-label>
+        <input
+          [(ngModel)]="formData()['yubico.secret']"
+          matInput
+          placeholder="API Key"
+          required>
+      </mat-form-field>
 
-    <mat-form-field
-      appearance="fill"
-      class="input-width-l">
-      <mat-label i18n>API Key</mat-label>
-      <input
-        [(ngModel)]="formData()['yubico.secret']"
-        matInput
-        placeholder="API Key"
-        required>
-    </mat-form-field>
+      <mat-form-field
+        appearance="fill"
+        class="input-width-l">
+        <mat-label i18n>API Client ID</mat-label>
+        <input
+          [(ngModel)]="formData()['yubico.id']"
+          matInput
+          placeholder="The client ID"
+          required>
+      </mat-form-field>
+    </div>
 
-    <mat-form-field
-      appearance="fill"
-      class="input-width-l">
-      <mat-label i18n>Yubico URL</mat-label>
-      <input
-        [(ngModel)]="formData()['yubico.url']"
-        matInput
-        placeholder="https://api.yubico.com/wsapi/2.0/verify"
-        required
-        type="url">
-    </mat-form-field>
+    <div class="flex-row gap-16 ali-center">
+      <mat-form-field
+        appearance="fill"
+        class="input-width-xl">
+        <mat-label i18n>Yubico URL</mat-label>
+        <input
+          [(ngModel)]="formData()['yubico.url']"
+          matInput
+          placeholder="https://api.yubico.com/wsapi/2.0/verify"
+          required
+          type="url">
+      </mat-form-field>
+    </div>
   </div>
 </mat-expansion-panel>

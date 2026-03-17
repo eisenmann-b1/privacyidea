@@ -27,8 +27,8 @@ from privacyidea.lib.resolvers.HTTPResolver import (HTTPResolver, METHOD, ENDPOI
                                                     CONFIG_GET_USER_BY_NAME, CONFIG_GET_USER_LIST, REQUEST_MAPPING,
                                                     RequestConfig, HEADERS, ADVANCED, RESPONSE_MAPPING,
                                                     CONFIG_CREATE_USER, CONFIG_DELETE_USER, CONFIG_EDIT_USER,
-                                                    CONFIG_USER_AUTH, Error, CONFIG_GET_USER_GROUPS, ACTIVE,
-                                                    USER_GROUPS_ATTRIBUTE)
+                                                    CONFIG_USER_AUTH, Error, ACTIVE,
+                                                    USER_GROUPS_ATTRIBUTE, PI_USER_GROUPS_KEY)
 from privacyidea.lib.resolvers.util import delete_user_error_handling_no_content
 
 log = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ class KeycloakResolver(HTTPResolver):
                             })
         self.config_get_user_groups = {ACTIVE: True, METHOD: "get",
                                        ENDPOINT: "/admin/realms/{realm}/users/{userid}/groups",
-                                       USER_GROUPS_ATTRIBUTE: "name"}
+                                       USER_GROUPS_ATTRIBUTE: "name", PI_USER_GROUPS_KEY: self.pi_user_groups_key}
         self.attribute_mapping_pi_to_user_store = {"username": "username",
                                                    "userid": "id",
                                                    "givenname": "firstName",

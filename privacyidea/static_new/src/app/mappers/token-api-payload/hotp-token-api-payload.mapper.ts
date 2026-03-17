@@ -24,6 +24,7 @@ import {
   TokenEnrollmentPayload
 } from "./_token-api-payload.mapper";
 import { TokenDetails } from "../../services/token/token.service";
+import { parseBooleanValue } from "src/app/utils/parse-boolean-value";
 
 export interface HotpEnrollmentData extends TokenEnrollmentData {
   type: "hotp";
@@ -36,24 +37,23 @@ export interface HotpEnrollmentData extends TokenEnrollmentData {
 }
 
 export interface HotpEnrollmentPayload extends TokenEnrollmentPayload {
-  otpkey: string | null;
   genkey: 0 | 1;
+  otpkey?: string;
   otplen?: number;
   hashlib?: string;
-  serial?: string | null;
-  "2stepinit"?: boolean;
+  serial?: string;
+  "2stepinit"?: boolean | 0 | 1;
   otpkeyformat?: string;
 }
 
 @Injectable({ providedIn: "root" })
 export class HotpApiPayloadMapper extends BaseApiPayloadMapper implements TokenApiPayloadMapper<HotpEnrollmentData> {
-
   override toApiPayload(data: HotpEnrollmentData): HotpEnrollmentPayload {
     const basePayload = super.toApiPayload(data);
     const payload: HotpEnrollmentPayload = {
       ...basePayload,
-      otpkey: data.generateOnServer ? null : (data.otpKey ?? null),
       genkey: data.generateOnServer ? 1 : 0,
+      ...(data.generateOnServer ? { otpkey: null as any } : data.otpKey !== undefined && { otpkey: data.otpKey }),
       ...(data.otpLength !== undefined && { otplen: Number(data.otpLength) }),
       ...(data.hashAlgorithm !== undefined && { hashlib: data.hashAlgorithm }),
       ...(data.twoStepInit !== undefined && { "2stepinit": data.twoStepInit }),
@@ -62,15 +62,24 @@ export class HotpApiPayloadMapper extends BaseApiPayloadMapper implements TokenA
 
     if (data.onlyAddToRealm) {
       payload.realm = data.realm;
-      payload.user = null;
+      delete payload.user;
     }
 
     return payload;
   }
 
-  override fromApiPayload(payload: any): HotpEnrollmentData {
-    // Placeholder: Implement transformation from API payload. We will replace this later.
-    return payload as HotpEnrollmentData;
+  override fromApiPayload(payload: HotpEnrollmentPayload): HotpEnrollmentData {
+    const baseData = super.fromApiPayload(payload);
+    return {
+      ...baseData,
+      type: "hotp",
+      ...(payload.genkey !== undefined && { generateOnServer: parseBooleanValue(payload.genkey) }),
+      otpKey: payload.otpkey ?? undefined,
+      otpLength: payload.otplen !== undefined ? Number(payload.otplen) : undefined,
+      hashAlgorithm: payload.hashlib ?? undefined,
+      ...(payload["2stepinit"] !== undefined && { twoStepInit: parseBooleanValue(payload["2stepinit"]) }),
+      otpKeyFormat: payload.otpkeyformat ?? undefined
+    };
   }
 
   override fromTokenDetailsToEnrollmentData(details: TokenDetails): HotpEnrollmentData {

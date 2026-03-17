@@ -56,7 +56,7 @@ from privacyidea.api.lib.prepolicy import (check_token_upload,
                                            check_token_action, check_user_params,
                                            check_client_container_action, container_registration_config,
                                            smartphone_config, check_client_container_disabled_action, rss_age,
-                                           hide_container_info, force_server_generate_key)
+                                           hide_container_info, force_server_generate_key, verify_enrollment)
 from privacyidea.lib.auth import ROLE
 from privacyidea.lib.config import set_privacyidea_config, SYSCONF
 from privacyidea.lib.container import (init_container, find_container_by_serial, create_container_template,
@@ -6220,6 +6220,153 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
         # Also check the token object.
         self.assertEqual(tok.token.rollout_state, RolloutState.VERIFY_PENDING)
         delete_policy("verify_toks")
+
+    def test_20a_verify_enrollment_no_serial(self):
+        """Test verify_enrollment prepolicy with no serial - should return early"""
+        builder = EnvironBuilder(method='POST', data={}, headers={})
+        env = builder.get_environ()
+        req = Request(env)
+        req.all_data = {"verify": "123456"}  # verify present but no serial
+
+        # Should return None without error (early exit)
+        result = verify_enrollment(req, None)
+        self.assertIsNone(result)
+
+    def test_20b_verify_enrollment_token_not_found(self):
+        """Test verify_enrollment prepolicy with non-existent serial - should return early
+
+        This tests the early exit when len(token_list) != 1 (specifically when len == 0).
+        The case where len > 1 cannot occur because serial is a unique database constraint.
+        """
+        builder = EnvironBuilder(method='POST', data={}, headers={})
+        env = builder.get_environ()
+        req = Request(env)
+        req.all_data = {"serial": "NONEXISTENT", "verify": "123456"}
+
+        # Should return None without error (early exit - token not found, len(token_list) == 0)
+        result = verify_enrollment(req, None)
+        self.assertIsNone(result)
+
+    def test_20c_verify_enrollment_missing_verify_param(self):
+        """Test verify_enrollment prepolicy with token in verify_pending but no verify param - should raise an error"""
+        from privacyidea.lib.tokenclass import RolloutState
+        from privacyidea.lib.error import ParameterError
+
+        serial = "HOTP_VERIFY_PENDING"
+        tok = init_token({"serial": serial,
+                          "type": "hotp",
+                          "otpkey": "31323334353637383940"})
+        # Set token to VERIFY_PENDING state
+        tok.token.rollout_state = RolloutState.VERIFY_PENDING
+        tok.save()
+
+        builder = EnvironBuilder(method='POST', data={}, headers={})
+        env = builder.get_environ()
+        req = Request(env)
+        req.all_data = {"serial": serial}  # No verify parameter
+
+        # Should raise ParameterError
+        with self.assertRaises(ParameterError) as cm:
+            verify_enrollment(req, None)
+
+        self.assertIn("verify_pending", str(cm.exception))
+        self.assertIn("verify", str(cm.exception).lower())
+
+        # Token should still be in verify_pending state
+        tok = get_tokens(serial=serial)[0]
+        self.assertEqual(tok.token.rollout_state, RolloutState.VERIFY_PENDING)
+        remove_token(serial)
+
+    def test_20d_verify_enrollment_wrong_verify_value(self):
+        """Test verify_enrollment prepolicy with wrong verify value - should raise error"""
+        from privacyidea.lib.tokenclass import RolloutState
+        from privacyidea.lib.error import ParameterError
+
+        serial = "HOTP_VERIFY_WRONG"
+        tok = init_token({"serial": serial,
+                          "type": "hotp",
+                          "otpkey": "31323334353637383940"})
+        # Set token to VERIFY_PENDING state
+        tok.token.rollout_state = RolloutState.VERIFY_PENDING
+        tok.save()
+
+        builder = EnvironBuilder(method='POST', data={}, headers={})
+        env = builder.get_environ()
+        req = Request(env)
+        req.all_data = {"serial": serial, "verify": "wrong_value"}
+
+        # Should raise ParameterError for wrong verification
+        with self.assertRaises(ParameterError) as cm:
+            verify_enrollment(req, None)
+
+        self.assertIn("Verification of the new token failed", str(cm.exception))
+
+        # Token should still be in verify_pending state
+        tok = get_tokens(serial=serial)[0]
+        self.assertEqual(tok.token.rollout_state, RolloutState.VERIFY_PENDING)
+        remove_token(serial)
+
+    def test_20e_verify_enrollment_not_in_verify_pending_state(self):
+        """Test verify_enrollment prepolicy with token not in verify_pending state - should exit early"""
+        from privacyidea.lib.tokenclass import RolloutState
+
+        serial = "HOTP_NOT_VERIFY_PENDING"
+        tok = init_token({"serial": serial,
+                          "type": "hotp",
+                          "otpkey": "31323334353637383940"})
+        # Token that are enrolled directly without verify or 2step have the empty enrollment state
+        # TODO should be unified
+        self.assertEqual(tok.token.rollout_state, "")
+
+        builder = EnvironBuilder(method='POST', data={}, headers={})
+        env = builder.get_environ()
+        req = Request(env)
+        req.all_data = {"serial": serial, "verify": "123456"}
+
+        # Should return None without error (early exit - not in verify_pending state)
+        result = verify_enrollment(req, None)
+        self.assertIsNone(result)
+
+        # Token should still be empty (unchanged)
+        tok = get_tokens(serial=serial)[0]
+        self.assertEqual(tok.token.rollout_state, "")
+        remove_token(serial)
+
+    def test_20f_verify_enrollment_success(self):
+        """Test verify_enrollment prepolicy happy path - successful verification"""
+        from privacyidea.lib.tokenclass import RolloutState
+
+        otpkey_hex = ("5287c8247735148e48cc66412e8510de0414eb996da86edf18d944dd9844d13f9b804fce48a4c6d3f43f27788f70122b"
+                      "457dffc12563e8d319c23c8b6fac5395")
+        first_otp = "148752"
+
+        serial = "HOTP_VERIFY_SUCCESS"
+        tok = init_token({"serial": serial,
+                          "type": "hotp",
+                          "otpkey": otpkey_hex})
+        # Set token to VERIFY_PENDING state
+        tok.token.rollout_state = RolloutState.VERIFY_PENDING
+        tok.save()
+
+        builder = EnvironBuilder(method='POST', data={}, headers={})
+        env = builder.get_environ()
+        req = Request(env)
+        req.all_data = {"serial": serial, "verify": first_otp, "type": "hotp"}
+
+        # Should succeed without raising an error
+        result = verify_enrollment(req, None)
+        self.assertIsNone(result)  # prepolicy returns None on success
+
+        # Token should now be in ENROLLED state
+        tok = get_tokens(serial=serial)[0]
+        self.assertEqual(tok.token.rollout_state, RolloutState.ENROLLED)
+
+        # Verify that the OTP counter was incremented (token consumed the OTP)
+        # The same OTP should not work again
+        r = tok.check_otp(first_otp)
+        self.assertEqual(r, -1)  # -1 means OTP already used
+
+        remove_token(serial)
 
     def test_21_preferred_client_mode_for_user_allowed(self):
         """

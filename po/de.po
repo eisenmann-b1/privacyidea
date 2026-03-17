@@ -5,7 +5,7 @@
 # Felix E <felix@eckhofer.com>, 2024.
 # pablo-knight <julio.storch@netknights.it>, 2024.
 # Jelina Unger <jelina.unger@netknights.it>, 2024.
-# Nils Behlen <nils.behlen@netknights.it>, 2024, 2025.
+# Nils Behlen <nils.behlen@netknights.it>, 2024, 2025, 2026.
 # Moonwalk4797 <moonwalk4797@users.noreply.hosted.weblate.org>, 2024.
 # Lucas Scholz <lucas.scholz@netknights.it>, 2026.
 msgid ""
@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: translations@privacyidea.org\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2026-02-28 09:09+0000\n"
-"Last-Translator: Lucas Scholz <lucas.scholz@netknights.it>\n"
+"PO-Revision-Date: 2026-03-16 10:53+0000\n"
+"Last-Translator: Nils Behlen <nils.behlen@netknights.it>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/privacyidea/"
 "privacyidea-webui/de/>\n"
 "Language: de\n"
@@ -22,7 +22,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.16.1-dev\n"
+"X-Generator: Weblate 5.17-dev\n"
 
 # This is the level in the subscriptions
 #. level of subscription
@@ -70,8 +70,8 @@ msgstr ""
 #: privacyidea/static/components/dialogs/views/dialog.welcome.html:91
 msgid ""
 "<li>Support and\n"
-"                        <a target=\"netknights\" href=\"https://netknights."
-"it/en/leistungen/service-level-agreements/\">\n"
+"                        <a target=\"netknights\" href=\"https://"
+"netknights.it/en/leistungen/service-level-agreements/\">\n"
 "                            Service Level Agreements by NetKnights</a>, "
 "Germany.\n"
 "                    </li>\n"
@@ -88,8 +88,8 @@ msgid ""
 "                    <li>Depending on the support level you get help with "
 "updates and yearly consultancy.</li>\n"
 "                    <li>By buying the\n"
-"                        <a target=\"netknights\" href=\"https://netknights."
-"it/en/produkte/privacyidea/\">privacyIDEA Enterprise Edition</a>\n"
+"                        <a target=\"netknights\" href=\"https://"
+"netknights.it/en/produkte/privacyidea/\">privacyIDEA Enterprise Edition</a>\n"
 "                        you ensure that professional developers can work "
 "full time\n"
 "                        on privacyIDEA, add new features and fix bugs in a "
@@ -607,9 +607,8 @@ msgid "Base DN"
 msgstr "Base-DN"
 
 #: privacyidea/static/components/config/views/config.resolvers.ldap.html:350
-#, fuzzy
 msgid "Base DN of User Groups"
-msgstr "Rekursive Suche von Benutzergruppen"
+msgstr "Base-DN für Benutzergruppen"
 
 #: privacyidea/static/components/config/views/config.resolvers.http.advanced.html:20
 msgid "Base URL"
@@ -703,7 +702,6 @@ msgid "Cancel"
 msgstr "Abbrechen"
 
 #: privacyidea/static/components/config/views/config.smtp.edit.html:118
-#, fuzzy
 msgid "Certificate"
 msgstr "Zertifikat"
 
@@ -755,7 +753,6 @@ msgid "Check OTP only."
 msgstr "Nur den OTP-Wert prüfen."
 
 #: privacyidea/static/components/config/views/config.policies.details.html:234
-#, fuzzy
 msgid ""
 "Check all possible resolvers of a user to match the resolver in this policy."
 msgstr ""
@@ -785,9 +782,8 @@ msgstr "Lösche den Fehlerzähler nach Minuten"
 #: privacyidea/static/components/directives/views/directive.filter.table.html:22
 #: privacyidea/static/components/token/views/token.list.html:96
 #: privacyidea/static/components/token/views/token.list.html:97
-#, fuzzy
 msgid "Clear filter"
-msgstr "Suchfilter"
+msgstr "Filter zurücksetzen"
 
 #: privacyidea/static/components/token/views/token.enrolled.daypassword.html:27
 #: privacyidea/static/components/token/views/token.enrolled.hotp.html:27
@@ -1454,11 +1450,11 @@ msgstr "Token nicht verifizieren"
 
 #: privacyidea/static/components/token/views/dialog.ask_token_delete.html:15
 msgid ""
-"Do you really want to delete the Token {{ tokenSerial }} from user {{ token."
-"username }}?"
+"Do you really want to delete the Token {{ tokenSerial }} from user "
+"{{ token.username }}?"
 msgstr ""
-"Wollen Sie wirklich den Token {{ tokenSerial }} des Benutzers {{ token."
-"username }} löschen?"
+"Wollen Sie wirklich den Token {{ tokenSerial }} des Benutzers "
+"{{ token.username }} löschen?"
 
 #: privacyidea/static/components/token/views/dialog.ask_token_delete.html:18
 msgid "Do you really want to delete the Token {{ tokenSerial }}?"
@@ -1505,7 +1501,7 @@ msgstr "Domänen-CA"
 
 #: privacyidea/static/components/config/views/config.smtp.edit.html:163
 msgid "Don't send on signing error"
-msgstr ""
+msgstr "Nicht senden wenn signieren fehlschlägt"
 
 #: privacyidea/static/components/directives/views/directive.csvdownload.html:3
 msgid "Download"
@@ -1701,9 +1697,8 @@ msgid "Endpoint (URL)"
 msgstr "Endpunkt (URL)"
 
 #: privacyidea/static/components/config/views/config.resolvers.http.advanced.html:149
-#, fuzzy
 msgid "Endpoint with possible tags:"
-msgstr "Mögliche Tags:"
+msgstr "Endpunkt mit möglichen Tags:"
 
 #: privacyidea/static/components/token/views/token.containerdetails.html:576
 #: privacyidea/static/components/user/views/user.details.html:274
@@ -1781,6 +1776,8 @@ msgid ""
 "                                in the same base DN as defined for the users "
 "above."
 msgstr ""
+"Basis-DN für Benutzergruppen eingeben. Feld leer lassen, falls die Gruppen "
+"in der oben definierten Basis-DN der Benutzer liegen."
 
 #: privacyidea/static/components/token/views/token.enroll.daypassword.html:31
 msgid "Enter the secret..."
@@ -1869,12 +1866,10 @@ msgid "File name"
 msgstr "Dateiname"
 
 #: privacyidea/static/components/token/views/token.list.html:123
-#, fuzzy
 msgid "Filter by realm"
-msgstr "Realms bearbeiten"
+msgstr "Nach Realm filtern"
 
 #: privacyidea/static/components/config/views/config.resolvers.ldap.html:371
-#, fuzzy
 msgid ""
 "Filter to get the groups of a single user. Possible tags: <code>{base_dn}</"
 "code> (from\n"
@@ -1929,16 +1924,17 @@ msgid ""
 "For SMS tokens to work properly you need to set the\n"
 "    <a ui-sref=\"config.tokens({tokentype:'sms'})\">SMS Token Config</a>!"
 msgstr ""
-"Damit SMS-Token richtig funktionieren, müssen Sie die  <a ui-sref=\"config."
-"tokens({tokentype:'sms'})\">SMS-Token Konfiguration</a> setzen!"
+"Damit SMS-Token richtig funktionieren, müssen Sie die  <a ui-"
+"sref=\"config.tokens({tokentype:'sms'})\">SMS-Token Konfiguration</a> setzen!"
 
 #: privacyidea/static/components/token/views/token.enroll.tiqr.html:1
 msgid ""
 "For TiQR tokens to work properly you need to set the\n"
 "    <a ui-sref=\"config.tokens({tokentype:'tiqr'})\">TiQR Token Config</a>!"
 msgstr ""
-"Damit TiQR-Token richtig funktionieren, müssen Sie die  <a ui-sref=\"config."
-"tokens({tokentype:'tiqr'})\">TiQR-Token Konfiguration</a> setzen!"
+"Damit TiQR-Token richtig funktionieren, müssen Sie die  <a ui-"
+"sref=\"config.tokens({tokentype:'tiqr'})\">TiQR-Token Konfiguration</a> "
+"setzen!"
 
 #: privacyidea/static/components/token/views/token.enroll.yubico.html:8
 msgid ""
@@ -1946,8 +1942,9 @@ msgid ""
 "    <a ui-sref=\"config.tokens({tokentype:'yubico'})\">Yubico Token Config</"
 "a>!"
 msgstr ""
-"Damit Yubico-Token richtig funktionieren, müssen Sie die <a ui-sref=\"config."
-"tokens({tokentype:'yubico'})\">Yubico-Token Konfiguration</a> setzen!"
+"Damit Yubico-Token richtig funktionieren, müssen Sie die <a ui-"
+"sref=\"config.tokens({tokentype:'yubico'})\">Yubico-Token Konfiguration</a> "
+"setzen!"
 
 #: privacyidea/static/components/token/views/token.enroll.push.html:6
 msgid ""
@@ -2027,9 +2024,8 @@ msgid "Given name"
 msgstr "Vorname"
 
 #: privacyidea/static/components/config/views/config.resolvers.http.advanced.html:132
-#, fuzzy
 msgid "Group Attribute in EntraID"
-msgstr "Gruppennamenattribut"
+msgstr "Gruppennamenattribut in EntraID"
 
 #: privacyidea/static/components/config/views/config.resolvers.ldap.html:378
 msgid "Group Name Attribute"
@@ -2046,9 +2042,8 @@ msgstr ""
 "zugeordnet werden."
 
 #: privacyidea/static/components/config/views/config.resolvers.http.advanced.html:142
-#, fuzzy
 msgid "HTTP Method"
-msgstr "Methode"
+msgstr "HTTP Methode"
 
 #: privacyidea/static/components/directives/views/directive.policyconditions.html:10
 msgid "Handle Missing Data"
@@ -3169,6 +3164,7 @@ msgstr ""
 #: privacyidea/static/components/config/views/config.policies.details.html:358
 msgid "Please select a Scope in the top section first to configure actions."
 msgstr ""
+"Zuerst Scope im oberen Abschnitt auswählen, um Aktionen zu konfigurieren."
 
 #: privacyidea/static/components/login/views/login.html:49
 msgid "Please sign in"
@@ -3287,9 +3283,8 @@ msgid "PrivacyIDEA Attribute"
 msgstr "privacyIDEA Attribut"
 
 #: privacyidea/static/components/config/views/config.smtp.edit.html:127
-#, fuzzy
 msgid "Private Key"
-msgstr "Preshared Key"
+msgstr "Privater Schlüssel"
 
 #: privacyidea/static/components/token/views/token.import.html:136
 msgid "Progress"
@@ -3421,6 +3416,8 @@ msgid ""
 "store them under the\n"
 "                            privacyIDEA attribute <code>groups</code>."
 msgstr ""
+"Benutzergruppen über das Attribut <code>memberOf</code> empfangen und unter "
+"dem privacyIDEA-Attribut <code>groups</code> speichern."
 
 #: privacyidea/static/components/token/views/token.challenges.html:56
 msgid "Received"
@@ -3693,11 +3690,11 @@ msgstr "Suche starten"
 
 #: privacyidea/static/components/config/views/config.smtp.edit.html:116
 msgid "S/MIME"
-msgstr ""
+msgstr "S/MIME"
 
 #: privacyidea/static/components/config/views/config.smtp.edit.html:155
 msgid "S/MIME signing"
-msgstr ""
+msgstr "S/MIME Signatur"
 
 #: privacyidea/static/components/config/views/config.token.sms.html:13
 msgid "SMS Gateway configuration"
@@ -3872,9 +3869,8 @@ msgstr "Geltungsbereich"
 #: privacyidea/static/components/directives/views/directive.filter.table.html:17
 #: privacyidea/static/components/token/views/token.list.html:102
 #: privacyidea/static/components/token/views/token.list.html:103
-#, fuzzy
 msgid "Search"
-msgstr "Suchfilter"
+msgstr "Suche"
 
 #: privacyidea/static/components/config/views/config.mresolvers.ldap.html:185
 #: privacyidea/static/components/config/views/config.resolvers.ldap.html:298
@@ -3888,7 +3884,7 @@ msgstr "Suchfilter für Benutzergruppen"
 #: privacyidea/static/components/token/controllers/tokenControllers.js:94
 msgid ""
 "Searching for a user in all realms is not possible, using default realm."
-msgstr ""
+msgstr "Suche über alle Realms nicht möglich. Standard-Realm wird verwendet."
 
 #: privacyidea/static/components/token/views/token.getserial.html:89
 msgid "Searching token..."
@@ -4177,7 +4173,6 @@ msgid ""
 msgstr "Spezielle Fehlerbehandlung"
 
 #: privacyidea/static/components/config/views/config.resolvers.http.advanced.html:305
-#, fuzzy
 msgid ""
 "Specify the path to the private key file of the servers certificate. If you "
 "use\n"
@@ -4832,15 +4827,16 @@ msgid ""
 "validate.html\" target=\"_blank\">\n"
 "        validate API</a> but can also be handled by the\n"
 "    <a href=\"https://privacyidea.readthedocs.io/en/latest/modules/lib/"
-"tokentypes/yubikey.html#privacyidea.lib.tokens.yubikeytoken."
-"YubikeyTokenClass.api_endpoint\" target=\"_blank\">\n"
+"tokentypes/"
+"yubikey.html#privacyidea.lib.tokens.yubikeytoken.YubikeyTokenClass.api_endpoint\" "
+"target=\"_blank\">\n"
 "        Yubico Validation Protocol</a>."
 msgstr ""
 "Die Authentifizierung kann von der normalen privacyIDEA <a href=\"http://"
 "privacyidea.readthedocs.org/en/latest/modules/api/validate.html\" "
 "target=\"_blank\">validate API</a> aber auch vom <a href=\"http://"
-"privacyidea.readthedocs.org/en/latest/modules/lib/tokentypes/yubikey."
-"html#privacyidea.lib.tokens.yubikeytoken.YubikeyTokenClass.api_endpoint\" "
+"privacyidea.readthedocs.org/en/latest/modules/lib/tokentypes/"
+"yubikey.html#privacyidea.lib.tokens.yubikeytoken.YubikeyTokenClass.api_endpoint\" "
 "target=\"_blank\">Yubico Validation Protokoll</a> durchgeführt werden."
 
 #: privacyidea/static/components/config/views/config.token.yubico.html:8
@@ -4913,7 +4909,7 @@ msgstr ""
 
 #: privacyidea/static/components/token/controllers/containerControllers.js:915
 msgid "The following tokens failed to delete:"
-msgstr ""
+msgstr "Die folgenden Token könnten nicht gelöscht werden:"
 
 #: privacyidea/static/components/token/views/token.containercreate.html:192
 msgid ""
@@ -4959,7 +4955,6 @@ msgstr ""
 "gespeichert werden (Schlüssel des Attribut-Mappings)."
 
 #: privacyidea/static/components/config/views/config.resolvers.http.advanced.html:107
-#, fuzzy
 msgid ""
 "The left column defines the user attributes used in privacyIDEA and the "
 "right column the equivalent\n"
@@ -5146,8 +5141,9 @@ msgid ""
 "        <a ui-sref=\"token.details({tokenSerial:lostResult.serial})\">\n"
 "        {{ lostResult.serial }}</a>."
 msgstr ""
-"Die Seriennummer des neuen Tokens ist <a ui-sref=\"token."
-"details({tokenSerial:lostResult.serial})\">{{ lostResult.serial }}</a>."
+"Die Seriennummer des neuen Tokens ist <a ui-"
+"sref=\"token.details({tokenSerial:lostResult.serial})"
+"\">{{ lostResult.serial }}</a>."
 
 #: privacyidea/static/components/token/views/token.enroll.hotp.html:24
 #: privacyidea/static/components/token/views/token.enroll.totp.html:24
@@ -5232,8 +5228,8 @@ msgstr ""
 #: privacyidea/static/components/token/views/token.details.html:607
 msgid ""
 "The token is currently assigned to container\n"
-"    <a ui-sref=\"token.containerdetails({containerSerial: "
-"containerSerial})\" ng-hide=\"!checkRight('container_list')\">\n"
+"    <a ui-sref=\"token.containerdetails({containerSerial: containerSerial})"
+"\" ng-hide=\"!checkRight('container_list')\">\n"
 "        {{ containerSerial }}\n"
 "    </a>\n"
 "    <span ng-hide=\"checkRight('container_list')\">{{ containerSerial }}</"
@@ -5241,8 +5237,8 @@ msgid ""
 "    ."
 msgstr ""
 "Der Token ist aktuell in dem Container\n"
-"    <a ui-sref=\"token.containerdetails({containerSerial: "
-"containerSerial})\" ng-hide=\"!checkRight('container_list')\">\n"
+"    <a ui-sref=\"token.containerdetails({containerSerial: containerSerial})"
+"\" ng-hide=\"!checkRight('container_list')\">\n"
 "        {{ containerSerial }}\n"
 "    </a>\n"
 "    <span ng-hide=\"checkRight('container_list')\">{{ containerSerial }}</"
@@ -5276,30 +5272,30 @@ msgstr "Der Token wurde erfolgreich als verloren markiert."
 #: privacyidea/static/components/token/views/token.enroll.html:179
 msgid ""
 "The token was successfully enrolled with serial number\n"
-"            <a ui-sref=\"token.details({tokenSerial:enrolledToken."
-"serial})\">\n"
+"            <a ui-sref=\"token.details({tokenSerial:enrolledToken.serial})"
+"\">\n"
 "                {{ enrolledToken.serial }}</a>\n"
 "            for user\n"
-"            <a ui-sref=\"user.details({username:newUser.user, realmname:"
-"newUser.realm})\">{{ newUser.user }}</a> in realm\n"
+"            <a ui-sref=\"user.details({username:newUser.user, "
+"realmname:newUser.realm})\">{{ newUser.user }}</a> in realm\n"
 "            {{ newUser.realm }}."
 msgstr ""
-"Der Token mit der Seriennummer <a ui-sref=\"token.details({tokenSerial:"
-"enrolledToken.serial})\">{{ enrolledToken.serial }}</a> wurde erfolgreich "
-"für den Benutzer\n"
-"<a ui-sref=\"user.details({username:newUser.user, realmname:newUser."
-"realm})\">{{ newUser.user }}</a> in Realm {{ newUser.realm }} ausgerollt."
+"Der Token mit der Seriennummer <a ui-"
+"sref=\"token.details({tokenSerial:enrolledToken.serial})"
+"\">{{ enrolledToken.serial }}</a> wurde erfolgreich für den Benutzer\n"
+"<a ui-sref=\"user.details({username:newUser.user, realmname:newUser.realm})"
+"\">{{ newUser.user }}</a> in Realm {{ newUser.realm }} ausgerollt."
 
 #: privacyidea/static/components/token/views/token.enroll.html:188
 msgid ""
 "The token was successfully enrolled with serial number\n"
-"            <a ui-sref=\"token.details({tokenSerial:enrolledToken."
-"serial})\">\n"
+"            <a ui-sref=\"token.details({tokenSerial:enrolledToken.serial})"
+"\">\n"
 "                {{ enrolledToken.serial }}</a>."
 msgstr ""
-"Der Token mit der Seriennummer  <a ui-sref=\"token.details({tokenSerial:"
-"enrolledToken.serial})\">{{ enrolledToken.serial }}</a>  wurde erfolgreich "
-"ausgerollt."
+"Der Token mit der Seriennummer  <a ui-"
+"sref=\"token.details({tokenSerial:enrolledToken.serial})"
+"\">{{ enrolledToken.serial }}</a>  wurde erfolgreich ausgerollt."
 
 #: privacyidea/static/components/config/views/config.token.webauthn.html:32
 msgid "The trust_anchor_dir must be an absolute path."
@@ -5672,8 +5668,8 @@ msgid ""
 "To define service IDs go to <a ui-sref=\"config.serviceid\">Service ID "
 "config</a>"
 msgstr ""
-"Um eine Dienste-Kennzeichnung zu erstellen gehen Sie zu <a ui-sref=\"config."
-"serviceid\">Dienste-Kennzeichnungen Konfiguration</a>"
+"Um eine Dienste-Kennzeichnung zu erstellen gehen Sie zu <a ui-"
+"sref=\"config.serviceid\">Dienste-Kennzeichnungen Konfiguration</a>"
 
 #: privacyidea/static/components/token/views/token.enroll.radius.html:9
 msgid ""
@@ -5682,24 +5678,24 @@ msgid ""
 "    <a ui-sref=\"config.tokens({tokentype:'radius'})\">RADIUS Token Config</"
 "a>."
 msgstr ""
-"Um RADIUS Token leichter auszurollen, können Sie die    <a ui-sref=\"config."
-"tokens({tokentype:'radius'})\">RADIUS Token Konfiguration</a> setzen."
+"Um RADIUS Token leichter auszurollen, können Sie die    <a ui-"
+"sref=\"config.tokens({tokentype:'radius'})\">RADIUS Token Konfiguration</a> "
+"setzen."
 
 #: privacyidea/static/components/directives/views/directive.filter.table.html:7
 #: privacyidea/static/components/directives/views/directive.filter.table.html:8
 msgid "Toggle filter"
-msgstr ""
+msgstr "Filter ein-/ausblenden"
 
 #: privacyidea/static/components/token/views/token.list.html:117
 #: privacyidea/static/components/token/views/token.list.html:118
 msgid "Toggle realm filter"
-msgstr ""
+msgstr "Realm-Filter ein-/ausblenden"
 
 #: privacyidea/static/components/token/views/token.list.html:85
 #: privacyidea/static/components/token/views/token.list.html:86
-#, fuzzy
 msgid "Toggle user filter"
-msgstr "Benutzerfilter"
+msgstr "Benutzerfilter ein/ausschalten"
 
 #: privacyidea/static/components/token/views/token.html:114
 msgid "Token Applications"
@@ -5860,9 +5856,8 @@ msgid "Type a password"
 msgstr "Geben Sie ein Passwort ein"
 
 #: privacyidea/static/components/directives/views/directive.assignuser.html:34
-#, fuzzy
 msgid "Type username and press Enter"
-msgstr "Der Benutzername auf dem Remote-Server"
+msgstr "Benutzernamen eingeben, dann Enter drücken"
 
 #: privacyidea/static/components/config/views/config.token.u2f.html:1
 msgid "U2F Token settings"
@@ -5946,7 +5941,6 @@ msgstr "SSL verwenden"
 
 #: privacyidea/static/components/config/views/config.mresolvers.ldap.html:48
 #: privacyidea/static/components/config/views/config.resolvers.ldap.html:62
-#, fuzzy
 msgid "Use STARTTLS on a plain LDAP connection, usually on port 389."
 msgstr "STARTTLS mit einer LDAP-Verbindung auf Port 389 benutzen."
 
@@ -5984,9 +5978,8 @@ msgid ""
 msgstr "Benutzer Cache - Gültigkeit in Sekunden"
 
 #: privacyidea/static/components/config/views/config.resolvers.http.advanced.html:120
-#, fuzzy
 msgid "User Groups"
-msgstr "Benutzer"
+msgstr "Benutzergruppen"
 
 #: privacyidea/static/components/token/views/token.containerdetails.html:386
 #: privacyidea/static/components/token/views/token.details.html:568
@@ -6020,6 +6013,8 @@ msgid ""
 "privacyIDEA attribute\n"
 "                            <code>groups</code>."
 msgstr ""
+"Abruf der Benutzergruppen erfolgt über eine separate Anfrage; Speicherung im "
+"privacyIDEA-Attribut <code>groups</code>."
 
 #: privacyidea/static/components/user/controllers/userControllers.js:248
 msgid "User updated successfully."
@@ -6056,7 +6051,6 @@ msgid "Username"
 msgstr "Benutzer"
 
 #: privacyidea/static/components/config/views/config.policies.details.html:254
-#, fuzzy
 msgid "Username case-insensitive"
 msgstr "Groß-/Kleinschreibung bei Benutzernamen ignorieren."
 
@@ -6213,9 +6207,8 @@ msgid "You are not allowed to enroll this token type! It will be skipped!"
 msgstr "Sie dürfen diesen Token Typ nicht ausrollen! Aktion wird übersprungen!"
 
 #: privacyidea/static/components/token/controllers/containerControllers.js:918
-#, fuzzy
 msgid "You are not authorized to delete the following tokens:"
-msgstr "Der Container beinhaltet die folgenden Offline-Token:"
+msgstr "Keine Berechtigung zum Löschen der folgenden Token:"
 
 #: privacyidea/static/components/login/controllers/loginControllers.js:591
 msgid ""
@@ -6263,8 +6256,8 @@ msgid ""
 msgstr ""
 "Sie haben keine editierbaren Resolver definiert. Daher können Sie in keine "
 "Benutzer-Quelle schreiben. \n"
-"Wenn Sie Benutzer hinzufügen wollen, müssen Sie einen <a ui-sref=\"config."
-"resolvers.list\">editierbaren Resolver definieren</a> \n"
+"Wenn Sie Benutzer hinzufügen wollen, müssen Sie einen <a ui-"
+"sref=\"config.resolvers.list\">editierbaren Resolver definieren</a> \n"
 "(bpsw. SQLResolver) und die Checkbox \"Benutzerquelle editierbar\" anhaken."
 
 #: privacyidea/static/components/token/views/token.enrolled.registration.html:16
@@ -6379,8 +6372,8 @@ msgid ""
 msgstr ""
 "Ihre Subskription ist nicht mehr gültig. Entweder haben Sie die Anzahl der "
 "erlaubten Token überschritten oder Ihre Subskription ist abgelaufen. Bitte "
-"überprüfen Sie, ob Sie Ihre <a ui-sref=\"component."
-"subscriptions\">Subskription</a> erneuern müssen."
+"überprüfen Sie, ob Sie Ihre <a ui-"
+"sref=\"component.subscriptions\">Subskription</a> erneuern müssen."
 
 #: privacyidea/static/components/login/views/pinchange.html:5
 msgid ""
@@ -6585,7 +6578,7 @@ msgstr "Richtlinien"
 
 #: privacyidea/static/components/token/views/token.list.html:92
 msgid "press enter to search"
-msgstr ""
+msgstr "Enter zum Suchen drücken"
 
 #: privacyidea/static/components/config/views/config.periodictasks.details.html:75
 #: privacyidea/static/components/config/views/config.periodictasks.list.html:11
@@ -6798,7 +6791,7 @@ msgstr "Es wurden {{ auditdata.count }} Einträge gefunden."
 
 #: privacyidea/static/components/token/views/token.list.html:124
 msgid "— all —"
-msgstr ""
+msgstr "— alle —"
 
 #~ msgid "Choose a realm..."
 #~ msgstr "Realm auswählen..."
@@ -7167,8 +7160,9 @@ msgstr ""
 #~ "werden.</p>\n"
 #~ "<p>Mittels Richtlinien kann der Administrator das Verhalten von "
 #~ "privacyIDEA bestimmen.\n"
-#~ "Mehr zu Richtlinie erfahren Sie in der <a href=\"http://privacyidea."
-#~ "readthedocs.io/en/latest/policies/index.html\" target=\"policy\">Online\n"
+#~ "Mehr zu Richtlinie erfahren Sie in der <a href=\"http://"
+#~ "privacyidea.readthedocs.io/en/latest/policies/index.html\" "
+#~ "target=\"policy\">Online\n"
 #~ "Dokumentation</a>.</p>"
 
 #~ msgid ""

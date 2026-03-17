@@ -24,6 +24,7 @@ import {
 } from "./_token-api-payload.mapper";
 import { Injectable } from "@angular/core";
 import { TokenDetails } from "../../services/token/token.service";
+import { parseBooleanValue } from "../../utils/parse-boolean-value";
 
 // Interface for Application Specific Password enrollment data
 export interface ApplspecEnrollmentData extends TokenEnrollmentData {
@@ -40,8 +41,10 @@ export interface ApplspecEnrollmentPayload extends TokenEnrollmentPayload {
 }
 
 @Injectable({ providedIn: "root" })
-export class ApplspecApiPayloadMapper extends BaseApiPayloadMapper implements TokenApiPayloadMapper<ApplspecEnrollmentData> {
-
+export class ApplspecApiPayloadMapper
+  extends BaseApiPayloadMapper
+  implements TokenApiPayloadMapper<ApplspecEnrollmentData>
+{
   override toApiPayload(data: ApplspecEnrollmentData): ApplspecEnrollmentPayload {
     const payload: ApplspecEnrollmentPayload = {
       ...super.toApiPayload(data),
@@ -52,15 +55,21 @@ export class ApplspecApiPayloadMapper extends BaseApiPayloadMapper implements To
 
     if (data.onlyAddToRealm) {
       payload.realm = data.realm;
-      payload.user = null;
+      delete payload.user;
     }
 
     return payload;
   }
 
-  override fromApiPayload(payload: any): ApplspecEnrollmentData {
-    // Placeholder: Implement transformation from API payload. We will replace this later.
-    return payload as ApplspecEnrollmentData;
+  override fromApiPayload(payload: ApplspecEnrollmentPayload): ApplspecEnrollmentData {
+    const baseData = super.fromApiPayload(payload);
+    return {
+      ...baseData,
+      type: "applspec",
+      ...(payload.genkey !== undefined && { generateOnServer: parseBooleanValue(payload.genkey) }),
+      otpKey: payload.otpkey ?? undefined,
+      serviceId: payload.service_id ?? undefined
+    };
   }
 
   override fromTokenDetailsToEnrollmentData(details: TokenDetails): ApplspecEnrollmentData {

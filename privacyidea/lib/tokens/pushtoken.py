@@ -628,7 +628,7 @@ class PushTokenClass(TokenClass):
 
             # enforce App pin
             if params.get(PolicyAction.FORCE_APP_PIN):
-                extra_data.update({'force_app_pin': True})
+                extra_data.update({'pin': True})
             if params.get(PolicyAction.APP_FORCE_UNLOCK):
                 extra_data.update({'app_force_unlock': params.get(PolicyAction.APP_FORCE_UNLOCK)})
 

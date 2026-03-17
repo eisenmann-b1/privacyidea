@@ -1,7 +1,7 @@
 @use "styles";
 @use "table";
 
-.token-get-serial {
+.find-token-serial {
   @include table.table-container-styles;
 
   max-height: var(--max-height);

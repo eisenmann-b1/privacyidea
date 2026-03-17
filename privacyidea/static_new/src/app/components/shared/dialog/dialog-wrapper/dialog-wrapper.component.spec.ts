@@ -106,9 +106,6 @@ describe("DialogWrapperComponent", () => {
     ]);
     fixture.detectChanges();
     const buttons = nativeElement.querySelectorAll(".pi-dialog-footer button");
-    // buttons[0] is Cancel (showCancelButton is true by default in beforeEach)
-    // buttons[1] is action 1
-    // buttons[2] is action 2
     expect(buttons[0].hasAttribute("cdkfocusinitial")).toBe(false);
     expect(buttons[1].hasAttribute("cdkfocusinitial")).toBe(false);
     expect(buttons[2].hasAttribute("cdkfocusinitial")).toBe(true);

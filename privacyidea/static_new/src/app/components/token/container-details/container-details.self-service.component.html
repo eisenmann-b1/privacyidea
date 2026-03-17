@@ -73,7 +73,7 @@
                 @case ("realms") {
                   <div
                     class="details-scrollable-container"
-                    [ngClass]="{ 'details-list': element.value.length > 2 }">
+                    [ngClass]="{ 'height-77': element.value.length > 2 }">
                     @for (realm of element.value; track realm; let idx = $index) {
                       <mat-list-item class="height-auto pad-0">
                         <span class="font-14">• {{ realm }}</span>

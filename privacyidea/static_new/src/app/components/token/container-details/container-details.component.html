@@ -95,7 +95,7 @@
                     </mat-form-field>
                   } @else {
                     <div
-                      [ngClass]="{ 'details-list': element.value.length > 2 }"
+                      [ngClass]="{ 'height-77': element.value.length > 2 }"
                       class="details-scrollable-container">
                       @for (realm of element.value; track realm; let idx = $index) {
                         <mat-list-item class="height-auto pad-0">

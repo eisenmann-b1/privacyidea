@@ -32,13 +32,6 @@
         (filterChange)="onFilterUpdate($event)">
       </app-policy-filter>
     }
-    <mat-paginator
-      (page)="onPageEvent($event)"
-      [length]="totalLength()"
-      [pageIndex]="pageIndex()"
-      [pageSizeOptions]="pageSizeOptions()"
-      [pageSize]="pageSize()"
-      showFirstLastButtons />
   </div>
 
   <app-policies-table-actions [policySelection]="selectedPolicies()" />
@@ -130,7 +123,7 @@
                   </div>
                 }
                 @case ("scope") {
-                  {{ policy.scope?.toLocaleUpperCase() }}
+                  {{ policy.scope?.toLocaleLowerCase() }}
                 }
                 @case ("description") {
                   {{ policy.description }}

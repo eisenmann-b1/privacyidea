@@ -17,6 +17,13 @@
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <div class="policy-action-item">
+  <button
+    mat-icon-button
+    class="delete-icon-button"
+    (click)="removeAction(); $event.stopPropagation()">
+    <mat-icon>delete</mat-icon>
+  </button>
+
   <span class="detail-label">{{ action().name }}</span>
 
   <div class="detail-input">
@@ -81,11 +88,4 @@
   </div>
 
   <span class="detail-description">{{ actionDetail()?.desc }}</span>
-
-  <button
-    mat-icon-button
-    class="delete-icon-button"
-    (click)="removeAction(); $event.stopPropagation()">
-    <mat-icon>delete</mat-icon>
-  </button>
 </div>

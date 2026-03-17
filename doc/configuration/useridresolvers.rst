@@ -549,14 +549,16 @@ are configured. Below that, you can set up the user store API endpoint for each 
             * mobile
             * email
 
-    * **Groups**: Enable this option to perform a separate request to retrieve the user's groups. They are available in
-      the user info with the key ``groups``. Further parameters to configure:
+    * **Groups**: Enable this option to perform a separate request to retrieve the user's groups. Parameters to
+      configure:
 
-            * User Store Attribute: The groups attribute from the user store to be used as identifier for the group,
-              e.g. "name" or "id".
-            * HTTP Method: The HTTP method to use for the request to retrieve the groups (GET, POST, PUT, PATCH,
+            * *privacyIDEA User Groups Key*: The key to store the groups in the user info (attribute mapping key).
+              By default, this is ``groups``.
+            * *User Store Group Attribute*: The groups attribute from the user store to be used as identifier for the group,
+              e.g. ``name`` or ``id``.
+            * *HTTP Method*: The HTTP method to use for the request to retrieve the groups (GET, POST, PUT, PATCH,
               DELETE).
-            * Endpoint: The endpoint of the user store API to retrieve the groups of the user. It will be
+            * *Endpoint*: The endpoint of the user store API to retrieve the groups of the user. It will be
               concatenated with the base URL except if a full URL starting with ``http`` is specified. Possible tags:
               ``{userid}``
 
@@ -691,9 +693,10 @@ settings are described.
       detailed configurations. By default, this is ``https://graph.microsoft.com/v1.0``.
     * **Attribute Mapping**: The mapping between privacyIDEA user attributes and the ones used by Entra ID are already
       all prefilled. If you do not need all of them, you can remove them.
-    * **Groups**: Receive the group memberships when getting the user information and store it under the key ``groups``.
-      Optionally, you can define a group attribute which should be stored in the user info. By default, this is
-      ``displayName``.
+    * **Groups**: Receive the group memberships when getting the user information.
+      Optionally, you can define the *privacyIDEA user groups key* to store the groups in the user info. By default,
+      this is ``groups``. You can also define the *user store group attribute* to specify which Entra ID attribute
+      should be used as an identifier for the group. By default, this is ``displayName``.
     * **Edit user store**: By default, editing the users in Entra ID is not enabled. If you want to enable this option,
       you need to ensure that the required write permissions are granted to the privacyIDEA server in Entra ID.
     * **Verify TLS**: By default, the TLS certificate of the Entra ID server is verified. Usually, there is no need to

@@ -17,6 +17,7 @@
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <div
+  #scrollContainer
   appScrollToTop
   aria-label="Token Enrollment"
   class="token-enrollment-container"
@@ -150,7 +151,7 @@
           (additionalFormFieldsChange)="updateAdditionalFormFields($event)"
           (enrollmentArgsGetterChange)="updateEnrollmentArgsGetter($event)"
           (reopenDialogChange)="updateReopenDialog($event)"
-          [wizard]="wizard" />
+          (onEnrollmentResponseChange)="updateOnEnrollmentResponse($event)" />
       }
       @case ("question") {
         <app-enroll-question
@@ -188,17 +189,17 @@
         <app-enroll-webauthn
           (additionalFormFieldsChange)="updateAdditionalFormFields($event)"
           (enrollmentArgsGetterChange)="updateEnrollmentArgsGetter($event)"
-          [wizard]="wizard" />
+          (onEnrollmentResponseChange)="updateOnEnrollmentResponse($event)" />
       }
       @case ("passkey") {
         <app-enroll-passkey
           (additionalFormFieldsChange)="updateAdditionalFormFields($event)"
           (enrollmentArgsGetterChange)="updateEnrollmentArgsGetter($event)"
           (reopenDialogChange)="updateReopenDialog($event)"
-          [wizard]="wizard" />
+          (onEnrollmentResponseChange)="updateOnEnrollmentResponse($event)" />
       }
     }
-    @if (authService.requireDescription().includes(tokenType().key)) {
+    @if (descriptionRequired()) {
       <mat-form-field class="input-width-l">
         <mat-label>Description</mat-label>
         <textarea
@@ -207,6 +208,15 @@
           matInput
           placeholder="Enter description"
           rows="3"></textarea>
+        @if (descriptionControl.hasError("required")) {
+          <mat-error i18n>
+            Description is <strong>required</strong>.
+          </mat-error>
+        } @else if (descriptionControl.hasError("maxlength")) {
+          <mat-error i18n>
+            Description cannot exceed <strong>80 characters</strong>.
+          </mat-error>
+        }
       </mat-form-field>
     }
   </form>

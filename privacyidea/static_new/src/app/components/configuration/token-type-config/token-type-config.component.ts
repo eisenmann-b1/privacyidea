@@ -16,8 +16,17 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Component, computed, effect, inject, signal, untracked } from "@angular/core";
-import { toSignal } from "@angular/core/rxjs-interop";
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  OnInit,
+  signal,
+  untracked
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatButtonModule } from "@angular/material/button";
@@ -30,7 +39,6 @@ import { NotificationService, NotificationServiceInterface } from "../../../serv
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../../../environments/environment";
 import { forkJoin, lastValueFrom } from "rxjs";
-import { ActivatedRoute } from "@angular/router";
 import { PiResponse } from "../../../app.component";
 import { HotpConfigComponent } from "./token-types/hotp-config/hotp-config.component";
 import { TotpConfigComponent } from "./token-types/totp-config/totp-config.component";
@@ -45,6 +53,8 @@ import { QuestionnaireConfigComponent } from "./token-types/questionnaire-config
 import { YubicoConfigComponent } from "./token-types/yubico-config/yubico-config.component";
 import { YubikeyConfigComponent } from "./token-types/yubikey-config/yubikey-config.component";
 import { DaypasswordConfigComponent } from "./token-types/daypassword-config/daypassword-config.component";
+import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
+import { ActivatedRoute } from "@angular/router";
 
 @Component({
   selector: "app-token-type-config",
@@ -71,7 +81,7 @@ import { DaypasswordConfigComponent } from "./token-types/daypassword-config/day
   templateUrl: "./token-type-config.component.html",
   styleUrl: "./token-type-config.component.scss"
 })
-export class TokenTypeConfigComponent {
+export class TokenTypeConfigComponent implements OnInit, AfterViewInit {
   readonly systemService: SystemServiceInterface = inject(SystemService);
   readonly smsGatewayService: SmsGatewayServiceInterface = inject(SmsGatewayService);
   readonly smtpService: SmtpServiceInterface = inject(SmtpService);
@@ -79,7 +89,7 @@ export class TokenTypeConfigComponent {
   readonly notificationService: NotificationServiceInterface = inject(NotificationService);
   private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);
-
+  private destroyRef = inject(DestroyRef);
   queryParams = toSignal(this.route.queryParams);
   expandEmail = computed(() => this.queryParams()?.["expanded"] === "email");
 
@@ -101,6 +111,8 @@ export class TokenTypeConfigComponent {
     const steps = this.systemConfigInit()?.totpSteps ?? [30, 60];
     return (Array.isArray(steps) ? steps : [steps]).map((s: any) => String(s));
   });
+
+  expandedPanel: string | null = null;
 
   constructor() {
     effect(() => {
@@ -132,6 +144,27 @@ export class TokenTypeConfigComponent {
 
   get yubikeyApiIds() {
     return Object.keys(this.formData()).filter(k => k.startsWith("yubikey.apiid."));
+  }
+
+  ngOnInit() {
+    // allow opening a specific panel via URL fragment, e.g. /configuration/token-types#yubico
+    this.route.fragment
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(fragment => {
+        if (fragment) {
+          this.expandedPanel = fragment;
+        }
+      });
+  }
+
+  ngAfterViewInit() {
+    if (this.expandedPanel) {
+      // scroll to the initially referenced panel
+      const panel = document.getElementById(this.expandedPanel);
+      if (panel) {
+        panel.scrollIntoView({ behavior: "smooth" });
+      }
+    }
   }
 
   addQuestion(text: string) {

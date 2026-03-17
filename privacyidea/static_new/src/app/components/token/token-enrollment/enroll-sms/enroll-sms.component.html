@@ -17,12 +17,21 @@
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <div class="flex-column">
-  @if (!defaultSMSGatewayIsSet()) {
+  @if (!defaultSMSGatewayIsSet() && authService.role() === "admin") {
     <span
-      class="inline-hint"
-      i18n>
- For SMS tokens to work properly you need to set the <a href="#">SMS Token Config</a>!
- </span>
+      i18n
+      class="inline-hint">
+      To ease the enrollment you can set default values in the
+      <a
+        role="button"
+        tabindex="0"
+        aria-label="Go to SMS token configuration"
+        i18n-aria-label
+        (click)="goToSmsConfig()"
+        (keydown)="onSmsConfigKeydown($event)">
+          SMS Token Configuration
+        </a>!
+    </span>
   }
   <mat-checkbox
     [formControl]="readNumberDynamicallyControl"

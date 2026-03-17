@@ -16,8 +16,16 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Component, computed, effect, EventEmitter, inject, input, Input, OnInit, Output } from "@angular/core";
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
+import { Component, computed, effect, EventEmitter, inject, input, Input, OnInit, Output, signal } from "@angular/core";
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidatorFn,
+  Validators
+} from "@angular/forms";
 import { MatCheckbox } from "@angular/material/checkbox";
 import { MatOption } from "@angular/material/core";
 import { MatError, MatFormField, MatHint, MatLabel } from "@angular/material/form-field";
@@ -35,6 +43,8 @@ import { SystemService, SystemServiceInterface } from "../../../../services/syst
 import { TokenService, TokenServiceInterface } from "../../../../services/token/token.service";
 import { AuthService, AuthServiceInterface } from "../../../../services/auth/auth.service";
 import { SmsGatewayService, SmsGatewayServiceInterface } from "../../../../services/sms-gateway/sms-gateway.service";
+import { ROUTE_PATHS } from "../../../../route_paths";
+import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
 
 export interface SmsEnrollmentOptions extends TokenEnrollmentData {
   type: "sms";
@@ -42,6 +52,25 @@ export interface SmsEnrollmentOptions extends TokenEnrollmentData {
   phoneNumber?: string;
   readNumberDynamically: boolean;
 }
+
+const phoneNumberValidator: ValidatorFn = (control: AbstractControl) => {
+  const value = control.value;
+  const parent = control.parent;
+
+  if (parent) {
+    const isDynamic = parent.get("readNumberDynamically")?.value;
+    if (isDynamic) {
+      return null;
+    }
+  }
+
+  if (!value) {
+    return { required: true };
+  }
+
+  const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+  return phoneRegex.test(value) ? null : { invalidPhoneNumber: true };
+};
 
 @Component({
   selector: "app-enroll-sms",
@@ -66,6 +95,7 @@ export class EnrollSmsComponent implements OnInit {
   protected readonly systemService: SystemServiceInterface = inject(SystemService);
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   protected readonly authService: AuthServiceInterface = inject(AuthService);
+  protected readonly contentService: ContentServiceInterface = inject(ContentService);
   protected readonly smsGatewayService: SmsGatewayServiceInterface = inject(SmsGatewayService);
 
   enrollmentData = input<SmsEnrollmentData>();
@@ -81,7 +111,7 @@ export class EnrollSmsComponent implements OnInit {
   >();
 
   smsGatewayControl = new FormControl<string>("", { nonNullable: true, validators: [Validators.required] });
-  phoneNumberControl = new FormControl<string>("");
+  phoneNumberControl = new FormControl<string>("", [phoneNumberValidator]);
   readNumberDynamicallyControl = new FormControl<boolean>(false, {
     nonNullable: true,
     validators: [Validators.required]
@@ -94,6 +124,7 @@ export class EnrollSmsComponent implements OnInit {
   });
 
   smsGatewayOptions = computed(() => {
+    // Find the first right that starts with "sms_gateways="
     const right = this.authService.rights().find((r) => r.startsWith("sms_gateways="));
     const defaultId = this.systemService.systemConfigResource.value()?.result?.value?.["sms.identifier"];
     let gateways: string[] = [];
@@ -123,36 +154,6 @@ export class EnrollSmsComponent implements OnInit {
   });
 
   disabled = input<boolean>(false);
-  enrollmentArgsGetter = (
-    basicOptions: TokenEnrollmentData
-  ): {
-    data: SmsEnrollmentData;
-    mapper: TokenApiPayloadMapper<SmsEnrollmentData>;
-  } | null => {
-    if (
-      this.smsGatewayControl.invalid ||
-      (!this.readNumberDynamicallyControl.value && this.phoneNumberControl.invalid)
-    ) {
-      this.smsForm.markAllAsTouched();
-      return null;
-    }
-
-    const enrollmentData: SmsEnrollmentOptions = {
-      ...basicOptions,
-      type: "sms",
-      smsGateway: this.smsGatewayControl.value ?? "",
-      readNumberDynamically: !!this.readNumberDynamicallyControl.value
-    };
-
-    if (!enrollmentData.readNumberDynamically) {
-      enrollmentData.phoneNumber = this.phoneNumberControl.value ?? "";
-    }
-
-    return {
-      data: enrollmentData,
-      mapper: this.enrollmentMapper
-    };
-  };
 
   constructor() {
     effect(() => (this.disabled() ? this.smsForm.disable({ emitEvent: false }) : this._enableFormControls()));
@@ -176,16 +177,20 @@ export class EnrollSmsComponent implements OnInit {
       readNumberDynamically: this.readNumberDynamicallyControl
     });
     this.enrollmentArgsGetterChange.emit(this.enrollmentArgsGetter);
-
+    this.readNumberDynamicallyControl.valueChanges.subscribe(() => {
+      this.phoneNumberControl.updateValueAndValidity();
+    });
     this._applyPolicies();
   }
 
   private _setInitialFormValues() {
     const data = this.enrollmentData();
     if (data) {
-      this.smsGatewayControl.setValue(data.smsGateway ?? "", { emitEvent: false });
-      this.readNumberDynamicallyControl.setValue(data.readNumberDynamically ?? false, { emitEvent: false });
-      this.phoneNumberControl.setValue(data.phoneNumber ?? "", { emitEvent: false });
+      this.smsGatewayControl.setValue(this.enrollmentData()?.smsGateway ?? "", { emitEvent: false });
+      this.readNumberDynamicallyControl.setValue(this.enrollmentData()?.readNumberDynamically ?? false, {
+        emitEvent: false
+      });
+      this.phoneNumberControl.setValue(this.enrollmentData()?.phoneNumber ?? "", { emitEvent: false });
 
       this._updatePhoneNumberControlState(this.readNumberDynamicallyControl.value);
     }
@@ -209,8 +214,41 @@ export class EnrollSmsComponent implements OnInit {
     this.phoneNumberControl.updateValueAndValidity();
   }
 
+  enrollmentArgsGetter = (
+    basicOptions: TokenEnrollmentData
+  ): {
+    data: SmsEnrollmentData;
+    mapper: TokenApiPayloadMapper<SmsEnrollmentData>;
+  } | null => {
+    const enrollmentData: SmsEnrollmentOptions = {
+      ...basicOptions,
+      type: "sms",
+      smsGateway: this.smsGatewayControl.value ?? "",
+      readNumberDynamically: !!this.readNumberDynamicallyControl.value
+    };
+
+    if (!enrollmentData.readNumberDynamically) {
+      enrollmentData.phoneNumber = this.phoneNumberControl.value ?? "";
+    }
+
+    return {
+      data: enrollmentData,
+      mapper: this.enrollmentMapper
+    };
+  };
+
   private _enableFormControls(): void {
     this.smsForm.enable({ emitEvent: false });
     this._updatePhoneNumberControlState(this.readNumberDynamicallyControl.value);
+  }
+
+  goToSmsConfig() {
+    this.contentService.router.navigate([ROUTE_PATHS.CONFIGURATION_TOKENTYPES], { fragment: 'sms' });
+  }
+
+  onSmsConfigKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      this.goToSmsConfig();
+    }
   }
 }

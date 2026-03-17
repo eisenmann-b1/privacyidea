@@ -21,7 +21,7 @@ from privacyidea.lib.containers.container_info import PI_INTERNAL, TokenContaine
 from privacyidea.lib.containers.container_states import ContainerStates
 from privacyidea.lib.containers.smartphone import SmartphoneOptions
 from privacyidea.lib.crypto import generate_keypair_ecc, decrypt_aes
-from privacyidea.lib.error import ERROR
+from privacyidea.lib.error import Error
 from privacyidea.lib.machine import attach_token
 from privacyidea.lib.policies.actions import PolicyAction
 from privacyidea.lib.policies.conditions import ConditionSection, ConditionHandleMissingData
@@ -97,7 +97,7 @@ class APIContainerTest(MyApiTestCase):
                        action=f"{PolicyAction.HIDE_SPECIFIC_ERROR_MESSAGE}=true")
             try:
                 return self.request_assert_error(status_code, url, data, auth_token,
-                                                 method=method, error_code=ERROR.CONTAINER,
+                                                 method=method, error_code=Error.CONTAINER,
                                                  error_message=UNSPECIFIC_ERROR_MESSAGES[url])
             finally:
                 delete_policy("hide_specific_error_message")
@@ -4337,7 +4337,7 @@ class APIContainerSynchronization(APIContainerTest):
                        "user": "hans"}
         result = self.request_assert_success("/token/init", hotp_params, self.at, "POST")
         initial_enroll_url = result["detail"]["googleurl"]["value"]
-        self.assertIn("force_app_pin=True", initial_enroll_url)
+        self.assertIn("pin=True", initial_enroll_url)
         self.assertIn("app_force_unlock=pin", initial_enroll_url)
         self.assertIn(f"issuer={self.realm1}", initial_enroll_url)
         self.assertIn("hans", initial_enroll_url)
@@ -4381,7 +4381,7 @@ class APIContainerSynchronization(APIContainerTest):
                 hotp_enroll_url = token
                 break
         self.assertNotEqual(initial_enroll_url, hotp_enroll_url)
-        self.assertIn("force_app_pin=True", hotp_enroll_url)
+        self.assertIn("pin=True", hotp_enroll_url)
         self.assertIn("app_force_unlock=pin", hotp_enroll_url)
         self.assertIn(f"issuer={self.realm1}", hotp_enroll_url)
         self.assertIn("hans", hotp_enroll_url)

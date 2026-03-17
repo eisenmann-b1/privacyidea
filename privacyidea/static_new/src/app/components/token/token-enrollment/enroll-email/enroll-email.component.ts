@@ -31,8 +31,9 @@ import {
 } from "../../../../mappers/token-api-payload/email-token-api-payload.mapper";
 import { SystemService, SystemServiceInterface } from "../../../../services/system/system.service";
 import { TokenService, TokenServiceInterface } from "../../../../services/token/token.service";
-import { Router } from "@angular/router";
 import { ROUTE_PATHS } from "../../../../route_paths";
+import { AuthService, AuthServiceInterface } from "../../../../services/auth/auth.service";
+import { Router } from "@angular/router";
 
 export interface EmailEnrollmentOptions extends TokenEnrollmentData {
   type: "email";
@@ -48,12 +49,15 @@ export interface EmailEnrollmentOptions extends TokenEnrollmentData {
   styleUrl: "./enroll-email.component.scss"
 })
 export class EnrollEmailComponent implements OnInit {
+  protected readonly enrollmentMapper: EmailApiPayloadMapper = inject(EmailApiPayloadMapper);
   protected readonly systemService: SystemServiceInterface = inject(SystemService);
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);
-  protected readonly enrollmentMapper: EmailApiPayloadMapper = inject(EmailApiPayloadMapper);
+  protected readonly authService: AuthServiceInterface = inject(AuthService);
   protected readonly ROUTE_PATHS = ROUTE_PATHS;
   private router = inject(Router);
+
   enrollmentData = input<EmailEnrollmentData>();
+
   @Output() additionalFormFieldsChange = new EventEmitter<{
     [key: string]: FormControl<any>;
   }>();
@@ -63,40 +67,22 @@ export class EnrollEmailComponent implements OnInit {
       mapper: TokenApiPayloadMapper<EmailEnrollmentData>;
     } | null
   >();
+
   disabled = input<boolean>(false);
+
   emailAddressControl = new FormControl<string>("");
+
   readEmailDynamicallyControl = new FormControl<boolean>(false);
+
   emailForm = new FormGroup({
     emailAddress: this.emailAddressControl,
     readEmailDynamically: this.readEmailDynamicallyControl
   });
+
   defaultSmtpIsSet = computed(() => {
     const cfg = this.systemService.systemConfigResource.value()?.result?.value;
     return !!cfg?.["email.identifier"];
   });
-  enrollmentArgsGetter = (
-    basicOptions: TokenEnrollmentData
-  ): {
-    data: EmailEnrollmentData;
-    mapper: TokenApiPayloadMapper<EmailEnrollmentData>;
-  } | null => {
-    if (!this.readEmailDynamicallyControl.value && this.emailAddressControl.invalid) {
-      this.emailForm.markAllAsTouched();
-      return null;
-    }
-    const enrollmentData: EmailEnrollmentOptions = {
-      ...basicOptions,
-      type: "email",
-      readEmailDynamically: !!this.readEmailDynamicallyControl.value
-    };
-    if (!enrollmentData.readEmailDynamically) {
-      enrollmentData.emailAddress = this.emailAddressControl.value ?? "";
-    }
-    return {
-      data: enrollmentData,
-      mapper: this.enrollmentMapper
-    };
-  };
 
   constructor() {
     effect(() =>
@@ -122,15 +108,45 @@ export class EnrollEmailComponent implements OnInit {
     });
   }
 
-  protected onEmailTokenConfig() {
-    this.router.navigate([ROUTE_PATHS.CONFIGURATION_TOKENTYPES], { queryParams: { expanded: "email" } });
-    return false;
-  }
-
   private _setInitialFormValues() {
     if (!!this.enrollmentData()) {
       this.emailAddressControl.setValue(this.enrollmentData()?.emailAddress ?? "");
       this.readEmailDynamicallyControl.setValue(this.enrollmentData()?.readEmailDynamically ?? false);
+    }
+  }
+
+  enrollmentArgsGetter = (
+    basicOptions: TokenEnrollmentData
+  ): {
+    data: EmailEnrollmentData;
+    mapper: TokenApiPayloadMapper<EmailEnrollmentData>;
+  } | null => {
+    if (!this.readEmailDynamicallyControl.value && this.emailAddressControl.invalid) {
+      this.emailForm.markAllAsTouched();
+      return null;
+    }
+    const enrollmentData: EmailEnrollmentOptions = {
+      ...basicOptions,
+      type: "email",
+      readEmailDynamically: !!this.readEmailDynamicallyControl.value
+    };
+    if (!enrollmentData.readEmailDynamically) {
+      enrollmentData.emailAddress = this.emailAddressControl.value ?? "";
+    }
+    return {
+      data: enrollmentData,
+      mapper: this.enrollmentMapper
+    };
+  };
+
+  onEmailTokenConfig() {
+    this.router.navigate([ROUTE_PATHS.CONFIGURATION_TOKENTYPES], { queryParams: { expanded: "email" } });
+    return false;
+  }
+
+  onEmailConfigKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      this.onEmailTokenConfig();
     }
   }
 }

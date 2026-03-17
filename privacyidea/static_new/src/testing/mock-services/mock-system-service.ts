@@ -16,51 +16,18 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { computed, signal, Signal, WritableSignal } from "@angular/core";
+import { computed, linkedSignal, Signal, WritableSignal } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { HttpResourceRef } from "@angular/common/http";
 import { PiNode, SystemServiceInterface } from "../../app/services/system/system.service";
 import { CaConnectors } from "../../app/services/ca-connector/ca-connector.service";
 import { MockHttpResourceRef, MockPiResponse } from "./mock-utils";
 
-/**
- * function createMockHttpResource(result: any = []) {
- *   // Use a writable signal to store the value
- *   const valueSignal = signal({ result: { value: result } });
- *   return {
- *     value: () => valueSignal(),
- *     reload: jest.fn(),
- *     // Optionally allow tests to update the value
- *     setValue: (newResult: any) => valueSignal.set({ result: { value: newResult } })
- *   };
- * }
- *
- * export class MockSystemService implements SystemServiceInterface {
- *   nodes = signal<PiNode[]>([
- *     { name: "Node 1", uuid: "node-1" },
- *     { name: "Node 2", uuid: "node-2" }
- *   ]);
- *   systemConfig = signal({});
- *   nodesResource: any = {
- *     value: jest.fn().mockReturnValue({ result: { value: [] } }),
- *     reload: jest.fn()
- *   };
- *   radiusServerResource: any = {
- *     value: jest.fn().mockReturnValue({ result: { value: [] } }),
- *     reload: jest.fn()
- *   };
- *   systemConfigResource: any = {
- *     value: jest.fn().mockReturnValue({ result: { value: [] } }),
- *     reload: jest.fn()
- *   };
- * }
- * **/
-
 export class MockSystemService implements SystemServiceInterface {
   systemConfigResource: HttpResourceRef<any>;
   radiusServerResource: HttpResourceRef<any>;
   nodesResource: HttpResourceRef<any>;
-  systemConfig: Signal<any>;
+  systemConfig: WritableSignal<any>;
   systemConfigInit: Signal<any>;
   nodes: Signal<PiNode[]>;
 
@@ -96,7 +63,7 @@ export class MockSystemService implements SystemServiceInterface {
         { name: "Node 2", uuid: "node-2" }
       ])
     );
-    this.systemConfig = computed(() => {
+    this.systemConfig = linkedSignal(() => {
       return this.systemConfigResource.value()?.result?.value ?? {};
     });
     this.systemConfigInit = computed(() => {
@@ -108,10 +75,11 @@ export class MockSystemService implements SystemServiceInterface {
   }
 
   caConnectorResource?: HttpResourceRef<any> | undefined;
-    caConnectors?: WritableSignal<CaConnectors> | undefined;
-    getDocumentation(): Observable<string> {
-        throw new Error("Method not implemented.");
-    }
+  caConnectors?: WritableSignal<CaConnectors> | undefined;
+
+  getDocumentation(): Observable<string> {
+    throw new Error("Method not implemented.");
+  }
 
   saveSystemConfig(config: any) {
     return of(MockPiResponse.fromValue({ status: true }));

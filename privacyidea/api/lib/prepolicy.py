@@ -63,6 +63,7 @@ Wrapping the functions in a decorator class enables easy modular testing.
 The functions of this module are tested in tests/test_api_lib_policy.py
 """
 
+from flask_babel import _
 import functools
 import importlib
 import logging
@@ -80,7 +81,6 @@ from privacyidea.api.lib.policyhelper import (get_init_tokenlabel_parameters,
                                               UserAttributes,
                                               get_container_user_attributes)
 from privacyidea.api.lib.utils import getParam, attestation_certificate_allowed, is_fqdn, get_optional
-from privacyidea.lib import _
 from privacyidea.lib.auth import ROLE
 from privacyidea.lib.clientapplication import save_clientapplication
 from privacyidea.lib.config import get_token_class
@@ -763,24 +763,40 @@ def verify_enrollment(request=None, action=None):
     :return:
     """
     serial = getParam(request.all_data, "serial", optional)
+    # Early exit: no serial provided
+    if not serial:
+        return
+
+    # Lookup the token
+    token_list = get_tokens(serial=serial)
+    if len(token_list) != 1:
+        log.debug(
+            "Found {0!s} tokens with serial {1!s}. Expected 1. Enrollment can not be verified."
+            .format(len(token_list), serial)
+        )
+        return
+
+    token = token_list[0]
+    # Early exit: token not in verify_pending state
+    if token.rollout_state != RolloutState.VERIFY_PENDING:
+        return
+
+    # Check if verify parameter is present
     verify = getParam(request.all_data, "verify", optional)
-    if verify and serial:
-        # Only now, we check if we need to verify
-        tokenobj_list = get_tokens(serial=serial)
-        if len(tokenobj_list) == 1:
-            tokenobj = tokenobj_list[0]
-            if tokenobj.rollout_state == RolloutState.VERIFY_PENDING:
-                log.debug("Verifying the token enrollment for token {0!s}.".format(serial))
-                r = tokenobj.verify_enrollment(verify)
-                log.info("Result of enrollment verification for token {0!s}: {1!s}".format(serial, r))
-                if r:
-                    # TODO: we need to add the tokentype here or the second init_token() call fails
-                    request.all_data.update(type=tokenobj.get_tokentype())
-                    tokenobj.token.rollout_state = RolloutState.ENROLLED
-                    tokenobj.token.save() # todo evaluate
-                else:
-                    from privacyidea.lib.error import ParameterError
-                    raise ParameterError("Verification of the new token failed.")
+    if not verify:
+        raise ParameterError("Token is in verify_pending state but 'verify' parameter is missing.")
+
+    # Verify the token enrollment
+    log.debug("Verifying the token enrollment for token {0!s}.".format(serial))
+    r = token.verify_enrollment(verify)
+    log.info("Result of enrollment verification for token {0!s}: {1!s}".format(serial, r))
+    if r:
+        # TODO: we need to add the tokentype here or the second init_token() call fails
+        request.all_data.update(type=token.get_tokentype())
+        token.token.rollout_state = RolloutState.ENROLLED
+        token.token.save()  # todo evaluate
+    else:
+        raise ParameterError("Verification of the new token failed.")
 
 
 def check_max_token_user(request=None, action=None, token_type=None):
@@ -2604,7 +2620,8 @@ def require_description(request=None, action=None):
         # only if no token exists, yet, we need to check the description
         if not token and not request.all_data.get("description"):
             log.error(f"Missing description for {type_value} token.")
-            raise PolicyError(_(f"Description required for {type_value} token."))
+            raise PolicyError(
+                _("Description required for {type_value} token.").format(type_value=type_value))
 
 
 def require_description_on_edit(request=None, action=None):
@@ -2639,7 +2656,11 @@ def require_description_on_edit(request=None, action=None):
         description = request.all_data.get("description", "").strip()
         if not description:
             log.error(f"Missing description for {type_value} token.")
-            raise PolicyError(_(f"Description required for {type_value} token."))
+            raise PolicyError(
+                _("Description required for {type_value} token.").format(
+                    type_value=type_value
+                )
+            )
 
 
 def jwt_validity(request, action):

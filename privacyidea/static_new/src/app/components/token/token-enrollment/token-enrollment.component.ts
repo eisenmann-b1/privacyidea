@@ -330,7 +330,7 @@ export class TokenEnrollmentComponent implements AfterViewInit, OnDestroy {
     source: this.tokenService.selectedTokenType,
     computation: () => null
   });
-  canReopenEnrollmentDialog = computed(() => !!this.reopenDialog() || !!this._lastTokenEnrollmentLastStepDialogData());
+  canReopenEnrollmentDialog = computed(() => !!this.reopenDialog() || !!this.enrolledDialogData());
 
   isUserRequired = computed(() =>
     ["tiqr", "webauthn", "passkey", "certificate"].includes(this.tokenService.selectedTokenType()?.key ?? "")
@@ -386,17 +386,12 @@ export class TokenEnrollmentComponent implements AfterViewInit, OnDestroy {
       );
     }
   });
+
   protected wizard = false;
 
   constructor() {
     effect(() => {
-      const isRequired = this.descriptionRequired();
-      const currentValidators = [Validators.maxLength(80)];
-      if (isRequired) {
-        currentValidators.push(Validators.required);
-      }
-      this.descriptionControl.setValidators(currentValidators);
-      this.descriptionControl.updateValueAndValidity();
+      this.setDescriptionValidators();
     });
   }
 
@@ -428,6 +423,16 @@ export class TokenEnrollmentComponent implements AfterViewInit, OnDestroy {
 
   updateOnEnrollmentResponse(event: OnEnrollmentResponseFn) {
     this.onEnrollmentResponse.set(event);
+  }
+
+  setDescriptionValidators(): void {
+    const isRequired = this.descriptionRequired();
+    const currentValidators = [Validators.maxLength(80)];
+    if (isRequired) {
+      currentValidators.push(Validators.required);
+    }
+    this.descriptionControl.setValidators(currentValidators);
+    this.descriptionControl.updateValueAndValidity();
   }
 
   ngOnInit(): void {
@@ -502,10 +507,7 @@ export class TokenEnrollmentComponent implements AfterViewInit, OnDestroy {
       return;
     }
     if (this.enrolledDialogData()) {
-      this.dialogService.openDialog({
-        component: TokenEnrollmentLastStepDialogComponent,
-        data: this.enrolledDialogData()
-      });
+      this.handleCompleteEnrollment(this.enrolledDialogData()?.response || null);
     }
   }
 

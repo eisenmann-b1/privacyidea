@@ -139,14 +139,14 @@ export class EnrollEmailComponent implements OnInit {
     };
   };
 
-  onEmailTokenConfig() {
+  goToEmailConfig() {
     this.router.navigate([ROUTE_PATHS.CONFIGURATION_TOKENTYPES], { queryParams: { expanded: "email" } });
     return false;
   }
 
   onEmailConfigKeydown(event: KeyboardEvent) {
     if (event.key === 'Enter' || event.key === ' ') {
-      this.onEmailTokenConfig();
+      this.goToEmailConfig();
     }
   }
 }

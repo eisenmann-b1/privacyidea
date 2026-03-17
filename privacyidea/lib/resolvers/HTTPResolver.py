@@ -17,22 +17,21 @@
 # SPDX-FileCopyrightText: 2025 Jelina Unger <jelina.unger@netknights.it>
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import copy
+import json
+import logging
 import re
 import time
-import copy
 from dataclasses import dataclass
 from enum import Enum
 from typing import Union, Optional
+from urllib.parse import urlencode
 
+import requests
+from pydash import get
 from requests import Response, HTTPError
 
 from .UserIdResolver import UserIdResolver
-import requests
-import logging
-import json
-from urllib.parse import urlencode
-from pydash import get
-
 from ..error import ParameterError, ResolverError
 from ..log import log_with
 from ..utils import is_true
@@ -214,7 +213,6 @@ class RequestConfig:
 
 
 class HTTPResolver(UserIdResolver):
-
     fields = {
         "endpoint": 1,
         "method": 1,
@@ -657,7 +655,8 @@ class HTTPResolver(UserIdResolver):
             self.attribute_mapping_user_store_to_pi = {store_key: pi_key for pi_key, store_key in
                                                        self.attribute_mapping_pi_to_user_store.items()}
         self.config_get_user_groups = self.config.get(CONFIG_GET_USER_GROUPS, self.config_get_user_groups)
-        self.pi_user_groups_key = self.config_get_user_groups.get(PI_USER_GROUPS_KEY, self.pi_user_groups_key)
+        self.pi_user_groups_key = self.config_get_user_groups.get(PI_USER_GROUPS_KEY,
+                                                                  self.pi_user_groups_key) or self.pi_user_groups_key
         self.authorization_config = config.get(CONFIG_AUTHORIZATION, self.authorization_config)
         if self.authorization_config:
             self.username = config.get(USERNAME)

@@ -345,6 +345,12 @@ class HTTPResolverTestCase(MyTestCase):
         self.assertDictEqual(groups_config, resolver.config_get_user_groups)
         self.assertEqual("groups", resolver.pi_user_groups_key)  # default groups pi key
 
+        # Passing empty string as groups key replaces it with default value
+        config[CONFIG_GET_USER_GROUPS][PI_USER_GROUPS_KEY] = ""
+        resolver.loadConfig(config)
+        self.assertDictEqual(groups_config, resolver.config_get_user_groups)
+        self.assertEqual("groups", resolver.pi_user_groups_key)
+
     def test_04_load_advanced_config_fails(self):
         config = {BASE_URL: "https://example.com/api",
                   ATTRIBUTE_MAPPING: {"username": "login", "userid": "id"},

@@ -137,6 +137,7 @@ export class HttpResolverComponent {
   attributeMappingControl = new FormControl<Record<string, string>>({}, { nonNullable: true });
   userGroupsControl = new FormGroup({
     active: new FormControl<boolean>(false, { nonNullable: true }),
+    pi_user_groups_key: new FormControl<string>("groups"),
     user_groups_attribute: new FormControl<string>(""),
     method: new FormControl<string>("GET"),
     endpoint: new FormControl<string>("")

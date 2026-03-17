@@ -120,18 +120,28 @@ SPDX-License-Identifier: AGPL-3.0-or-later
         <label for="headers" class="col-sm-3 control-label text-right" translate>User Groups</label>
         <div class="col-sm-9">
             <div class="row">
-                <div class="gap-8 col-sm-1">
+                <div class="gap-8 col-sm-2">
                     <input type="checkbox" ng-model="groups_config.active">
                 </div>
-                <div ng-class="params.type === 'entraidresolver' ? 'col-sm-11' : 'col-sm-2'">
+                <div class="col-sm-5">
+                    <input type="text" id="group_attribute" class="form-control"
+                           ng-model="groups_config.pi_user_groups_key"
+                           placeholder="" ng-disabled="!groups_config.active">
+                    <p class="help-block">
+                        <span translate>privacyIDEA User Groups Key</span>
+                    </p>
+                </div>
+                <div class="col-sm-5">
                     <input type="text" id="group_attribute" class="form-control"
                            ng-model="groups_config.user_groups_attribute"
                            placeholder="" ng-disabled="!groups_config.active">
                     <p class="help-block">
-                        <span ng-show="params.type !== 'entraidresolver'" translate>User Store Attribute</span>
+                        <span ng-show="params.type !== 'entraidresolver'" translate>User Store Group Attribute</span>
                         <span ng-show="params.type === 'entraidresolver'" translate>Group Attribute in EntraID</span>
                     </p>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-sm-2" ng-show="params.type !== 'entraidresolver'">
                     <select name="method" ng-model="groups_config.method" class="form-control"
                             ng-disabled="!groups_config.active">
@@ -142,7 +152,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                         <span translate>HTTP Method</span>
                     </p>
                 </div>
-                <div class="col-sm-7" ng-show="params.type !== 'entraidresolver'">
+                <div class="col-sm-10" ng-show="params.type !== 'entraidresolver'">
                     <input type="text" id="endpoint" class="form-control" ng-model="groups_config.endpoint"
                            placeholder="" ng-disabled="!groups_config.active">
                     <p class="help-block">
@@ -155,12 +165,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 <div class="col-sm-12">
                     <p class="help-block">
                         <span ng-show="params.type !== 'entraidresolver'" translate>
-                            User groups are received in a separate request and stored under the privacyIDEA attribute
-                            <code>groups</code>.
+                            User groups are received in a separate request.
                         </span>
                         <span ng-show="params.type === 'entraidresolver'" translate>
-                            Receive the users groups via the <code>memberOf</code> user attribute and store them under the
-                            privacyIDEA attribute <code>groups</code>.
+                            Receive the users groups via the <code>memberOf</code> user attribute.
                         </span>
                     </p>
                 </div>

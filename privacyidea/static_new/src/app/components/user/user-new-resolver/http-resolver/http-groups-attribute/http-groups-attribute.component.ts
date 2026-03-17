@@ -62,7 +62,7 @@ export class HttpGroupsAttributeComponent implements OnInit, OnDestroy {
       this.activeSubscription?.unsubscribe();
       const activeControl = this.userGroupsControl.get("active");
       if (activeControl) {
-        const controls = ["user_groups_attribute", "method", "endpoint"];
+        const controls = ["pi_user_groups_key", "user_groups_attribute", "method", "endpoint"];
 
         const updateControls = (active: boolean) => {
           this.activeSignal.set(active);

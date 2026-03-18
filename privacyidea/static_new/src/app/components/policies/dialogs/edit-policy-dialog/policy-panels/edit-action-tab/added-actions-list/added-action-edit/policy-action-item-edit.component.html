@@ -20,6 +20,8 @@
   <button
     mat-icon-button
     class="delete-icon-button"
+    aria-label="Remove action"
+    i18n-aria-label
     (click)="removeAction(); $event.stopPropagation()">
     <mat-icon>delete</mat-icon>
   </button>

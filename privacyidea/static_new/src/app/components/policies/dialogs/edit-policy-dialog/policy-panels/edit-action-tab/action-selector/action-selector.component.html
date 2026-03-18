@@ -57,6 +57,7 @@
           clearableInput
           type="text"
           placeholder="Search actions..."
+          i18n-placeholder
           [ngModel]="actionFilter()"
           (ngModelChange)="actionFilter.set($event)"
           class="search-input" />

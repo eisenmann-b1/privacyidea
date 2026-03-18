@@ -20,56 +20,57 @@
 <div
   [formGroup]="userGroupsControl"
   class="flex-column margin-top-16">
-  <div class="flex-row gap-16 ali-center margin-bottom-16">
-    <mat-slide-toggle
-      [formControlName]="'active'"
-      [matTooltip]="slideToggleTooltipSignal()"
-      class="margin-bottom-16"></mat-slide-toggle>
-
-    <div class="flex-row gap-16">
-      <mat-form-field
-        class="input-width-l">
-        <mat-label i18n>privacyIDEA User Groups Key</mat-label>
-        <input
-          formControlName="pi_user_groups_key"
-          matInput />
-        <mat-hint i18n>Key to store the groups of the user in privacyIDEA.</mat-hint>
-      </mat-form-field>
-
-      <mat-form-field
-        class="input-width-l">
-        @if (resolverType === "entraidresolver") {
-          <mat-label i18n>Group Identifier</mat-label>
-        } @else {
-          <mat-label i18n>User Store Attribute</mat-label>
-        }
-        <input
-          formControlName="user_groups_attribute"
-          matInput />
-        @if (resolverType === "entraidresolver") {
-          <mat-hint i18n>Group identifier from EntraID mapped to the users group list.</mat-hint>
-        } @else {
-          <mat-hint i18n>Key of the group's name in the user store response.</mat-hint>
-        }
-      </mat-form-field>
+  <div class="flex-row gap-16 margin-bottom-32">
+    <div class="flex just-center ali-center toggle-width">
+      <mat-slide-toggle
+        [formControlName]="'active'"
+        [matTooltip]="slideToggleTooltipSignal()" />
     </div>
 
-    @if (resolverType !== "entraidresolver") {
-      <mat-form-field class="input-width-s">
-        <mat-label i18n>Method</mat-label>
-        <mat-select
-          formControlName="method">
-          <mat-option value="POST">POST</mat-option>
-          <mat-option value="GET">GET</mat-option>
-          <mat-option value="PUT">PUT</mat-option>
-          <mat-option value="PATCH">PATCH</mat-option>
-          <mat-option value="DELETE">DELETE</mat-option>
-        </mat-select>
-        <mat-hint i18n>HTTP method for the groups request.</mat-hint>
-      </mat-form-field>
+    <mat-form-field class="input-width-s">
+      <mat-label i18n>Method</mat-label>
+      <mat-select
+        formControlName="method">
+        <mat-option value="POST">POST</mat-option>
+        <mat-option value="GET">GET</mat-option>
+        <mat-option value="PUT">PUT</mat-option>
+        <mat-option value="PATCH">PATCH</mat-option>
+        <mat-option value="DELETE">DELETE</mat-option>
+      </mat-select>
+      <mat-hint i18n>HTTP method for the groups request.</mat-hint>
+    </mat-form-field>
 
+    <mat-form-field
+      class="input-width-l">
+      <mat-label i18n>privacyIDEA User Groups Key</mat-label>
+      <input
+        formControlName="pi_user_groups_key"
+        matInput />
+      <mat-hint i18n>Key to store the groups of the user in privacyIDEA.</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field
+      class="input-width-l">
+      @if (resolverType === "entraidresolver") {
+        <mat-label i18n>Group Identifier</mat-label>
+      } @else {
+        <mat-label i18n>User Store Attribute</mat-label>
+      }
+      <input
+        formControlName="user_groups_attribute"
+        matInput />
+      @if (resolverType === "entraidresolver") {
+        <mat-hint i18n>Group identifier from EntraID mapped to the users group list.</mat-hint>
+      } @else {
+        <mat-hint i18n>Key of the group's name in the user store response.</mat-hint>
+      }
+    </mat-form-field>
+  </div>
+
+  @if (resolverType !== "entraidresolver") {
+    <div class="flex-row gap-16 margin-bottom-16">
       <mat-form-field
-        class="input-width-l">
+        class="input-width-xl">
         <mat-label i18n>Endpoint</mat-label>
         <input
           formControlName="endpoint"
@@ -82,8 +83,8 @@
           }
         </mat-hint>
       </mat-form-field>
-    }
-  </div>
+    </div>
+  }
 </div>
 
 @if (resolverType === "entraidresolver") {

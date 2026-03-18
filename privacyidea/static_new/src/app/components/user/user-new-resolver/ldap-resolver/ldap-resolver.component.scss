@@ -5,17 +5,9 @@
   display: block;
 }
 
-.type-section {
-  padding: 0 16px 0 16px;
-  border: 1px solid var(--pi-border-color, #dcdcdc);
-  border-radius: var(--border-radius);
-  background: var(--mat-sys-surface-container-low);
-}
-
 .hint {
   font-size: var(--mat-sys-body-small-size);
   color: var(--mat-sys-primary);
-  max-width: 208px;
   margin-left: 16px;
   margin-bottom: 16px;
 }

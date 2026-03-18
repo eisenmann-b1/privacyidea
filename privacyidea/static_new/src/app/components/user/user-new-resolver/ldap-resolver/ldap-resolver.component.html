@@ -17,50 +17,63 @@
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <div class="margin-bottom-16">
-  <div class="type-section margin-bottom-16">
+  <div class="margin-left-16 margin-bottom-16">
     <h4
       class="margin-bottom-16"
       i18n>Connection Details
     </h4>
     <div class="flex-column">
-      <div class="flex-row just-space-between">
-        <mat-form-field class="input-width-l">
-          <mat-label i18n>Server URI</mat-label>
-          <app-clearable-input
-            (onClick)="ldapUriControl.setValue('')"
-            [showClearButton]="!!ldapUriControl.value">
-            <input
-              [formControl]="ldapUriControl"
-              matInput
-              placeholder="ldap://privacyidea.server1, ldap://privacyidea.server2"
-              required />
-          </app-clearable-input>
-          @if (ldapUriControl.hasError('required') && ldapUriControl.touched) {
-            <mat-error i18n>Server URI is <strong>required</strong>.</mat-error>
-          }
-        </mat-form-field>
+      <mat-form-field class="input-width-s">
+        <mat-label i18n>Scope</mat-label>
+        <mat-select [formControl]="scopeControl">
+          <mat-option
+            i18n
+            value="SUBTREE">SUBTREE
+          </mat-option>
+          <mat-option
+            i18n
+            value="BASE">BASE
+          </mat-option>
+          <mat-option
+            i18n
+            value="LEVEL">LEVEL
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
 
-        <mat-form-field class="input-width-s">
-          <mat-label i18n>Scope</mat-label>
-          <mat-select [formControl]="scopeControl">
-            <mat-option
-              i18n
-              value="SUBTREE">SUBTREE
-            </mat-option>
-            <mat-option
-              i18n
-              value="BASE">BASE
-            </mat-option>
-            <mat-option
-              i18n
-              value="LEVEL">LEVEL
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
+      <mat-form-field class="input-width-xl">
+        <mat-label i18n>Base DN</mat-label>
+        <app-clearable-input
+          (onClick)="ldapBaseControl.setValue('')"
+          [showClearButton]="!!ldapBaseControl.value">
+          <input
+            [formControl]="ldapBaseControl"
+            matInput
+            required />
+        </app-clearable-input>
+        @if (ldapBaseControl.hasError('required') && ldapBaseControl.touched) {
+          <mat-error i18n>Base DN is <strong>required</strong>.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="input-width-xl">
+        <mat-label i18n>Server URI</mat-label>
+        <app-clearable-input
+          (onClick)="ldapUriControl.setValue('')"
+          [showClearButton]="!!ldapUriControl.value">
+          <input
+            [formControl]="ldapUriControl"
+            matInput
+            placeholder="ldap://privacyidea.server1, ldap://privacyidea.server2"
+            required />
+        </app-clearable-input>
+        @if (ldapUriControl.hasError('required') && ldapUriControl.touched) {
+          <mat-error i18n>Server URI is <strong>required</strong>.</mat-error>
+        }
+      </mat-form-field>
 
       @if (ldapUriControl.value.startsWith("ldap:")) {
-        <div class="flex-row just-space-between">
+        <div class="flex-row gap-16">
           <mat-checkbox
             [formControl]="startTlsControl"
             class="checkbox-inline"
@@ -92,7 +105,7 @@
           </mat-form-field>
         </div>
 
-        <div class="flex-row just-space-between">
+        <div class="flex-row gap-16">
           <mat-checkbox
             [formControl]="tlsVerifyControl"
             class="checkbox-inline"
@@ -118,28 +131,10 @@
           </mat-form-field>
         </div>
       }
-
-      <div class="grid-row-full">
-        <div class="spacer"></div>
-        <mat-form-field class="input-width-l">
-          <mat-label i18n>Base DN</mat-label>
-          <app-clearable-input
-            (onClick)="ldapBaseControl.setValue('')"
-            [showClearButton]="!!ldapBaseControl.value">
-            <input
-              [formControl]="ldapBaseControl"
-              matInput
-              required />
-          </app-clearable-input>
-          @if (ldapBaseControl.hasError('required') && ldapBaseControl.touched) {
-            <mat-error i18n>Base DN is <strong>required</strong>.</mat-error>
-          }
-        </mat-form-field>
-      </div>
     </div>
   </div>
 
-  <div class="type-section">
+  <div class="margin-left-16">
     <h4
       class="margin-bottom-16"
       i18n>
@@ -147,8 +142,8 @@
     </h4>
 
     <div class="flex-column">
-      <div class="flex-row just-space-between">
-        <mat-form-field class="input-width-m">
+      <div class="flex-row gap-16">
+        <mat-form-field class="input-width-l">
           <mat-label i18n>Bind Type</mat-label>
           <mat-select [formControl]="authTypeControl">
             <mat-option
@@ -191,7 +186,7 @@
       </div>
 
       @if (authTypeControl.value !== "anonymous") {
-        <mat-form-field class="input-width-l">
+        <mat-form-field class="input-width-xl">
           <mat-label i18n>Bind DN</mat-label>
           <app-clearable-input
             (onClick)="bindDnControl.setValue('')"
@@ -208,24 +203,30 @@
 </div>
 
 <div class="margin-bottom-16">
-  <div class="type-section">
+  <div class="margin-left-16">
     <h4 i18n>Settings</h4>
 
-    <div class="flex-column">
+    <div class="flex-column gap-16">
       <div class="flex-row gap-16">
         <mat-form-field class="input-width-s">
-          <mat-label i18n>Timeout (seconds)</mat-label>
+          <mat-label i18n>Timeout</mat-label>
           <input
             [formControl]="timeoutControl"
             matInput
             type="number" />
+          <mat-hint i18n>
+            In seconds.
+          </mat-hint>
         </mat-form-field>
         <mat-form-field class="input-width-s">
-          <mat-label i18n>Cache Timeout (seconds)</mat-label>
+          <mat-label i18n>Cache Timeout</mat-label>
           <input
             [formControl]="cacheTimeoutControl"
             matInput
             type="number" />
+          <mat-hint i18n>
+            In seconds.
+          </mat-hint>
         </mat-form-field>
 
         <mat-form-field class="input-width-s">
@@ -246,36 +247,40 @@
             type="number" />
         </mat-form-field>
 
-        <mat-form-field class="input-width-m">
-          <mat-label i18n>Server Pool Skip Timeout (seconds)</mat-label>
+        <mat-form-field class="input-width-s">
+          <mat-label i18n>Server Pool Skip Timeout</mat-label>
           <input
             [formControl]="serverPoolSkipControl"
             matInput
             type="number" />
+          <mat-hint i18n>
+            In seconds.
+          </mat-hint>
         </mat-form-field>
-
-        <div class="flex-column">
-          <mat-checkbox
-            [formControl]="serverPoolPersistentControl"
-            i18n>
-            Per-Process Server Pool
-          </mat-checkbox>
-          <span class="hint">This setting activates an LDAP server pool which persists between requests.</span>
-        </div>
-      </div>
-
-      <div class="flex-column">
-        <mat-checkbox
-          [formControl]="editableControl"
-          i18n>
-          Edit User Store
-        </mat-checkbox>
-        <span class="hint">The user data in this database can be modified from within privacyIDEA.</span>
       </div>
     </div>
+
+    <div class="flex-column">
+      <mat-checkbox
+        [formControl]="serverPoolPersistentControl"
+        i18n>
+        Per-Process Server Pool
+      </mat-checkbox>
+      <span class="hint">This setting activates an LDAP server pool which persists between requests.</span>
+    </div>
+
+    <div class="flex-column">
+      <mat-checkbox
+        [formControl]="editableControl"
+        i18n>
+        Edit User Store
+      </mat-checkbox>
+      <span class="hint">The user data in this database can be modified from within privacyIDEA.</span>
+    </div>
+
     @if (editableControl.value) {
       <div class="flex-column">
-        <mat-form-field class="input-width-l">
+        <mat-form-field class="input-width-xl">
           <mat-label i18n> Object Classes of a New Created User Object</mat-label>
           <app-clearable-input
             (onClick)="objectClassesControl.setValue('')"
@@ -286,7 +291,7 @@
           </app-clearable-input>
         </mat-form-field>
 
-        <mat-form-field class="input-width-l">
+        <mat-form-field class="input-width-xl">
           <mat-label i18n> DN of a New Created User Object</mat-label>
           <app-clearable-input
             (onClick)="dnTemplateControl.setValue('')"
@@ -322,11 +327,11 @@
     </div>
   }
 
-  <div class="type-section">
+  <div class="margin-left-16">
     <h4 i18n>Attributes & Mapping</h4>
 
     <div class="flex-column">
-      <div class="flex-row just-space-between">
+      <div class="flex-row gap-16">
         <mat-form-field class="input-width-l">
           <mat-label i18n>Loginname Attribute</mat-label>
           <app-clearable-input
@@ -404,7 +409,7 @@
       </mat-checkbox>
 
       @if (recursiveGroupSearchControl.value) {
-        <mat-form-field class="input-width-xl">
+        <mat-form-field class="input-width-xl margin-bottom-32">
           <mat-label i18n>
             Base DN of User Groups
           </mat-label>
@@ -422,7 +427,7 @@
           </app-clearable-input>
         </mat-form-field>
 
-        <mat-form-field class="input-width-xl">
+        <mat-form-field class="input-width-xl margin-bottom-16">
           <mat-label i18n>
             Search Filter for User Groups
           </mat-label>
@@ -440,11 +445,11 @@
           </app-clearable-input>
         </mat-form-field>
 
-        <div class="flex-row just-space-between margin-bottom-32">
+        <div class="flex-row gap-16 margin-bottom-32">
           <mat-form-field class="input-width-l">
             <mat-label i18n>Group Name Attribute</mat-label>
             <mat-hint>
-              The group attribute defining the group's name, which should be stored in the user info.
+              Group attribute defining the group's name, which should be stored in the user info.
             </mat-hint>
             <app-clearable-input
               (onClick)="groupNameAttributeControl.setValue('')"
@@ -473,7 +478,7 @@
         </div>
       }
 
-      <div class="flex-row just-space-between margin-bottom-16">
+      <div class="flex-column margin-bottom-16">
         <mat-checkbox
           [formControl]="noReferralsControl"
           i18n>

@@ -17,10 +17,10 @@
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <div class="type-sections-container">
-  <div class="type-section">
+  <div class="margin-left-16">
     <h4 i18n>Database Connection</h4>
     <div class="flex-column">
-      <div class="flex-row gap-16">
+      <div class="flex-row gap-16 margin-bottom-16">
         <mat-form-field class="input-width-l">
           <mat-label i18n>Driver</mat-label>
           <app-clearable-input
@@ -78,8 +78,8 @@
     </div>
   </div>
 
-  <div class="type-section">
-    <h3 i18n>Authentication & Params</h3>
+  <div class="margin-left-16">
+    <h4 i18n>Authentication & Params</h4>
     <div class="flex-column">
       <div class="flex-row gap-16">
         <mat-form-field class="input-width-l">
@@ -108,14 +108,14 @@
         </mat-form-field>
       </div>
 
-      <div class="flex-column margin-bottom-16">
+      <div class="flex-column">
         <mat-checkbox
           [formControl]="editableControl"
           i18n>
           Edit user store
         </mat-checkbox>
         <span
-          class="hint"
+          class="hint margin-bottom-16"
           i18n>
           The user data in this database can be modified from within privacyIDEA.
         </span>
@@ -176,7 +176,7 @@
     i18n>
     Presets:
   </h4>
-  <div class="preset-buttons-container margin-bottom-16">
+  <div class="preset-buttons-container margin-bottom-16 margin-left-16">
     <div class="preset-buttons">
       @for (preset of sqlPresets; track preset.name) {
         <button
@@ -192,10 +192,10 @@
 }
 
 <div class="type-sections-container">
-  <div class="type-section">
-    <h3 i18n>Table, Mapping, Pool & Editable</h3>
+  <div class="margin-left-16">
+    <h4 i18n>Table, Mapping, Pool & Editable</h4>
     <div class="flex-column">
-      <div class="flex-row just-space-between">
+      <div class="flex-row gap-16 margin-bottom-16">
         <mat-form-field class="input-width-l">
           <mat-label i18n>Table</mat-label>
           <app-clearable-input
@@ -226,7 +226,7 @@
         </mat-form-field>
       </div>
 
-      <mat-form-field class="input-width-xl">
+      <mat-form-field class="input-width-xl margin-bottom-16">
         <mat-label i18n>Mapping</mat-label>
         <textarea
           [formControl]="mapControl"
@@ -238,7 +238,7 @@
         }
       </mat-form-field>
 
-      <div class="flex-row just-space-between">
+      <div class="flex-row gap-16">
         <mat-form-field class="input-width-l">
           <mat-label i18n>Connection Parameters</mat-label>
           <app-clearable-input

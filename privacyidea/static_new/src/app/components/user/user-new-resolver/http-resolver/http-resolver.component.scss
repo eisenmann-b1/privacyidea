@@ -5,18 +5,11 @@
   display: block;
 }
 
-.type-section {
-  padding: 0 16px 0 16px;
-  border: 1px solid var(--pi-border-color, #dcdcdc);
-  border-radius: var(--border-radius);
-  background: var(--mat-sys-surface-container-low);
-}
-
 .mapping-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 24px 0 16px 0;
+  margin: 32px 0 16px 0;
 }
 
 @include table.base-table-structure(".mapping-table");
@@ -53,7 +46,7 @@
 .auth-description {
   margin: 0 0 12px 0;
   opacity: 0.8;
-  max-width: 914px;
+  max-width: 616px;
 }
 
 .hint {

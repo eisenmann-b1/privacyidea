@@ -119,14 +119,27 @@ myApp.controller("tokenController", ['TokenFactory', 'ConfigFactory', '$scope',
 
         // single token function
         $scope.reset = function (serial) {
-            TokenFactory.reset(serial, $scope.get);
+            TokenFactory.reset(serial,function () {
+                /* We need to call the get function with the live_search parameter,
+                to ensure an update, even in case of search_on_enter
+                */
+                $scope.get(false);
+            });
         };
         $scope.disable = function (serial) {
-            TokenFactory.disable(serial, $scope.get);
-        };
+            TokenFactory.disable(serial, function () {
+                /* We need to call the get function with the live_search parameter,
+                to ensure an update, even in case of search_on_enter
+                */
+                $scope.get(false);
+        })};
         $scope.enable = function (serial) {
-            TokenFactory.enable(serial, $scope.get);
-        };
+            TokenFactory.enable(serial, function () {
+                /* We need to call the get function with the live_search parameter,
+                to ensure an update, even in case of search_on_enter
+                */
+                $scope.get(false);
+        })};
 
         // go to the list view by default
         if ($location.path() === "/token") {

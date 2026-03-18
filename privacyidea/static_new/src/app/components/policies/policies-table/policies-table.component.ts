@@ -83,6 +83,8 @@ export class PoliciesTableComponent {
 
   readonly columnKeys = computed(() => ["select", ...Object.keys(this.columns)]);
 
+  readonly skeletonRowCount = 10;
+
   readonly sort = signal<Sort>({ active: "priority", direction: "asc" });
   readonly filter = signal<FilterValueGeneric<PolicyDetail>>(
     new FilterValueGeneric({ availableFilters: policyFilterOptions })
@@ -90,7 +92,8 @@ export class PoliciesTableComponent {
 
   readonly emptyResource = linkedSignal({
     source: () => this.policyService.allPolicies(),
-    computation: () => Array.from({ length: 10 }, () => ({ name: "" }) as PolicyDetail)
+    computation: () =>
+      Array.from({ length: this.skeletonRowCount }, () => ({ name: "" }) as PolicyDetail)
   });
 
   readonly policiesListFiltered = computed(() => {

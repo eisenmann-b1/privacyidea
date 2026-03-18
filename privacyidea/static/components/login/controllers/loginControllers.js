@@ -157,6 +157,23 @@ angular.module("privacyideaApp")
                     };
                 });
 
+            // When transitioning to the login state (e.g. after a 4305 JWT expiry redirect),
+            // reset the login form so the realm dropdown is populated with the correct values.
+            $transitions.onSuccess({to: 'login'}, function () {
+                $scope.login = {
+                    username: $scope.remoteUser || "",
+                    password: "",
+                    realm: $scope.piRealms[0] || ""
+                };
+            });
+            $transitions.onSuccess({to: 'initial_login'}, function () {
+                $scope.login = {
+                    username: $scope.remoteUser || "",
+                    password: "",
+                    realm: $scope.piRealms[0] || ""
+                };
+            });
+
             $scope.$on('IdleStart', function () {
                 //debug: console.log("start idle");
             });

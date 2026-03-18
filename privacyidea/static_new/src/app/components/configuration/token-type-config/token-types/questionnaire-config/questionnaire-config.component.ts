@@ -25,9 +25,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatDivider } from "@angular/material/list";
-
-export const QUESTION_NUMBER_OF_ANSWERS = "question.num_answers";
-export const QUESTION_CONFIG_PREFIX = "question.question.";
+import { QUESTION_NUMBER_OF_ANSWERS } from "../../../../../constants/token.constants";
 
 @Component({
   selector: "app-questionnaire-config",

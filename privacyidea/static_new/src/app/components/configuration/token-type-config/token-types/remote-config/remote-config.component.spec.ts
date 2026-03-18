@@ -17,13 +17,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import {
-  REMOTE_SERVER,
-  REMOTE_VERIFY_SSL,
-  RemoteConfigComponent
-} from "@components/configuration/token-type-config/token-types/remote-config/remote-config.component";
+import { RemoteConfigComponent } from "@components/configuration/token-type-config/token-types/remote-config/remote-config.component";
 import { provideRouter } from "@angular/router";
 import { provideAnimations } from "@angular/platform-browser/animations";
+import { REMOTE_SERVER, REMOTE_VERIFY_SSL } from "../../../../../constants/token.constants";
 
 describe("RemoteConfigComponent", () => {
   let fixture: ComponentFixture<RemoteConfigComponent>;

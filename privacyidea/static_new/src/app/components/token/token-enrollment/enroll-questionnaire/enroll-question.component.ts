@@ -54,10 +54,7 @@ import { Subscription } from "rxjs";
 import { ROUTE_PATHS } from "../../../../route_paths";
 import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
 import { AuthService, AuthServiceInterface } from "../../../../services/auth/auth.service";
-import {
-  QUESTION_CONFIG_PREFIX,
-  QUESTION_NUMBER_OF_ANSWERS
-} from "@components/configuration/token-type-config/token-types/questionnaire-config/questionnaire-config.component";
+import { QUESTION_CONFIG_PREFIX, QUESTION_NUMBER_OF_ANSWERS } from "../../../../constants/token.constants";
 
 export interface QuestionEnrollmentOptions extends TokenEnrollmentData {
   type: "question";

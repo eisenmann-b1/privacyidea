@@ -22,14 +22,15 @@ import { FormsModule } from "@angular/forms";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
-
-export const TIQR_REG_SERVER = "tiqr.regServer";
-export const TIQR_AUTH_SERVER = "tiqr.authServer";
-export const TIQR_SERVICE_DISPLAYNAME = "tiqr.serviceDisplayname";
-export const TIQR_SERVICE_IDENTIFIER = "tiqr.serviceIdentifier";
-export const TIQR_LOGO_URL = "tiqr.logoUrl";
-export const TIQR_INFO_URL = "tiqr.infoUrl";
-export const TIQR_OCRASUITE = "tiqr.ocrasuite";
+import {
+  TIQR_AUTH_SERVER,
+  TIQR_INFO_URL,
+  TIQR_LOGO_URL,
+  TIQR_OCRASUITE,
+  TIQR_REG_SERVER,
+  TIQR_SERVICE_DISPLAYNAME,
+  TIQR_SERVICE_IDENTIFIER
+} from "../../../../../constants/token.constants";
 
 @Component({
   selector: "app-tiqr-config",

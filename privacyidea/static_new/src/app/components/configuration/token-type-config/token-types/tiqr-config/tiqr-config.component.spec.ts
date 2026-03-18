@@ -17,18 +17,15 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import {
-  TIQR_AUTH_SERVER,
-  TIQR_INFO_URL,
-  TIQR_LOGO_URL,
-  TIQR_OCRASUITE,
-  TIQR_REG_SERVER,
-  TIQR_SERVICE_DISPLAYNAME,
-  TIQR_SERVICE_IDENTIFIER,
-  TiqrConfigComponent
-} from "@components/configuration/token-type-config/token-types/tiqr-config/tiqr-config.component";
+import { TiqrConfigComponent } from "@components/configuration/token-type-config/token-types/tiqr-config/tiqr-config.component";
 import { provideRouter } from "@angular/router";
 import { provideAnimations } from "@angular/platform-browser/animations";
+import {
+  TIQR_AUTH_SERVER, TIQR_INFO_URL, TIQR_LOGO_URL, TIQR_OCRASUITE,
+  TIQR_REG_SERVER,
+  TIQR_SERVICE_DISPLAYNAME,
+  TIQR_SERVICE_IDENTIFIER
+} from "../../../../../constants/token.constants";
 
 describe("TiqrConfigComponent", () => {
   let fixture: ComponentFixture<TiqrConfigComponent>;

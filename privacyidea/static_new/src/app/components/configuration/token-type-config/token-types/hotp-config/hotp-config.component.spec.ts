@@ -19,7 +19,7 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { HotpConfigComponent } from "./hotp-config.component";
 import { provideRouter } from "@angular/router";
-import { HOTP_HASHLIB } from "@components/token/token-enrollment/enroll-hotp/enroll-hotp.component";
+import { HOTP_HASHLIB } from "../../../../../constants/token.constants";
 
 const mockHashLibs = ["sha1", "sha256", "sha512"];
 

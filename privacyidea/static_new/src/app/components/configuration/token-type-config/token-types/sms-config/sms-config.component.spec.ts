@@ -17,13 +17,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import {
-  SMS_GATEWAY,
-  SMS_PROVIDER_TIMEOUT,
-  SmsConfigComponent
-} from "@components/configuration/token-type-config/token-types/sms-config/sms-config.component";
+import { SmsConfigComponent } from "@components/configuration/token-type-config/token-types/sms-config/sms-config.component";
 import { provideRouter } from "@angular/router";
 import { provideAnimations } from "@angular/platform-browser/animations";
+import { SMS_GATEWAY, SMS_PROVIDER_TIMEOUT } from "../../../../../constants/token.constants";
 
 const mockSmsGateways = ["gateway1", "gateway2", "gateway3"];
 

@@ -22,8 +22,7 @@ import { FormsModule } from "@angular/forms";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
-
-export const WEBAUTHN_TRUST_ANCHOR_DIR = "webauthn.trust_anchor_dir";
+import { WEBAUTHN_TRUST_ANCHOR_DIR } from "../../../../../constants/token.constants";
 
 @Component({
   selector: "app-webauthn-config",

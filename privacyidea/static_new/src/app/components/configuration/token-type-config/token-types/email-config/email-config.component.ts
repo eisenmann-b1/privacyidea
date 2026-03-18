@@ -26,9 +26,7 @@ import { MatSelectModule } from "@angular/material/select";
 import { RouterLink } from "@angular/router";
 import { ROUTE_PATHS } from "../../../../../route_paths";
 import { ClearButtonComponent } from "@components/shared/clear-button/clear-button.component";
-
-export const EMAIL_SMTP_SERVER_KEY = "email.identifier";
-export const EMAIL_VALIDITY_TIME_KEY = "email.validtime";
+import { EMAIL_SMTP_SERVER_KEY, EMAIL_VALIDITY_TIME_KEY } from "../../../../../constants/token.constants";
 
 @Component({
   selector: "app-email-config",

@@ -18,7 +18,7 @@
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { DaypasswordConfigComponent } from "./daypassword-config.component";
-import { DAYPASSWORD_HASHLIB } from "@components/token/token-enrollment/enroll-daypassword/enroll-daypassword.component";
+import { DAYPASSWORD_HASHLIB } from "../../../../../constants/token.constants";
 
 const mockHashLibs = ["sha1", "sha256", "sha512"];
 

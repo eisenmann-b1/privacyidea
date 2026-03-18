@@ -24,9 +24,7 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { parseBooleanValue } from "../../../../../utils/parse-boolean-value";
-
-export const REMOTE_SERVER = "remote.server";
-export const REMOTE_VERIFY_SSL = "remote.verify_ssl_certificate";
+import { REMOTE_SERVER, REMOTE_VERIFY_SSL } from "../../../../../constants/token.constants";
 
 @Component({
   selector: "app-remote-config",

@@ -22,10 +22,7 @@ import { FormsModule } from "@angular/forms";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
-
-export const YUBICO_ID = "yubico.id";
-export const YUBICO_SECRET = "yubico.secret";
-export const YUBICO_URL = "yubico.url";
+import { YUBICO_ID, YUBICO_SECRET, YUBICO_URL } from "../../../../../constants/token.constants";
 
 @Component({
   selector: "app-yubico-config",

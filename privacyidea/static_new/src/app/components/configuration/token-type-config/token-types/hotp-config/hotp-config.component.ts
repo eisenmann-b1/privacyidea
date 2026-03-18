@@ -23,7 +23,7 @@ import { MatExpansionModule } from "@angular/material/expansion";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatSelectModule } from "@angular/material/select";
 import { ClearButtonComponent } from "@components/shared/clear-button/clear-button.component";
-import { HOTP_HASHLIB } from "@components/token/token-enrollment/enroll-hotp/enroll-hotp.component";
+import { HOTP_HASHLIB, HOTP_OTP_LENGTH } from "../../../../../constants/token.constants";
 
 @Component({
   selector: "app-hotp-config",
@@ -54,4 +54,5 @@ export class HotpConfigComponent {
   }
 
   protected readonly HOTP_HASHLIB = HOTP_HASHLIB;
+  protected readonly HOTP_OTP_LENGTH = HOTP_OTP_LENGTH;
 }

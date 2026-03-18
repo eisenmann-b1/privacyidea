@@ -17,14 +17,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import {
-  YUBICO_ID,
-  YUBICO_SECRET,
-  YUBICO_URL,
-  YubicoConfigComponent
-} from "@components/configuration/token-type-config/token-types/yubico-config/yubico-config.component";
+import { YubicoConfigComponent } from "@components/configuration/token-type-config/token-types/yubico-config/yubico-config.component";
 import { provideRouter } from "@angular/router";
 import { provideAnimations } from "@angular/platform-browser/animations";
+import { YUBICO_ID, YUBICO_SECRET, YUBICO_URL } from "../../../../../constants/token.constants";
 
 describe("YubicoConfigComponent", () => {
   let fixture: ComponentFixture<YubicoConfigComponent>;

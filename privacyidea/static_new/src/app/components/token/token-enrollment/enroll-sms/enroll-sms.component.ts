@@ -44,6 +44,7 @@ import { TokenService, TokenServiceInterface } from "../../../../services/token/
 import { AuthService, AuthServiceInterface } from "../../../../services/auth/auth.service";
 import { ROUTE_PATHS } from "../../../../route_paths";
 import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
+import { SMS_GATEWAY } from "../../../../constants/token.constants";
 
 export interface SmsEnrollmentOptions extends TokenEnrollmentData {
   type: "sms";
@@ -132,7 +133,7 @@ export class EnrollSmsComponent implements OnInit {
 
   defaultSMSGatewayIsSet = computed(() => {
     const cfg = this.systemService.systemConfigResource.value()?.result?.value;
-    return !!cfg?.["sms.identifier"];
+    return !!cfg?.[SMS_GATEWAY];
   });
 
   disabled = input<boolean>(false);
@@ -140,7 +141,7 @@ export class EnrollSmsComponent implements OnInit {
   constructor() {
     effect(() => (this.disabled() ? this.smsForm.disable({ emitEvent: false }) : this._enableFormControls()));
     effect(() => {
-      const id = this.systemService.systemConfigResource.value()?.result?.value?.["sms.identifier"];
+      const id = this.systemService.systemConfigResource.value()?.result?.value?.[SMS_GATEWAY];
       if (id && this.smsGatewayControl.pristine) {
         this.smsGatewayControl.setValue(id);
       }

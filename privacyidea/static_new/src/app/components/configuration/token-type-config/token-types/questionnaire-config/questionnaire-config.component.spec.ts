@@ -17,12 +17,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import {
-  QUESTION_NUMBER_OF_ANSWERS,
-  QuestionnaireConfigComponent
-} from "@components/configuration/token-type-config/token-types/questionnaire-config/questionnaire-config.component";
+import { QuestionnaireConfigComponent } from "@components/configuration/token-type-config/token-types/questionnaire-config/questionnaire-config.component";
 import { provideRouter } from "@angular/router";
 import { provideAnimations } from "@angular/platform-browser/animations";
+import { QUESTION_NUMBER_OF_ANSWERS } from "../../../../../constants/token.constants";
 
 const mockQuestionKeys = ["question.question.1", "question.question.2", "question.question.3"];
 

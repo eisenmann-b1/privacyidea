@@ -25,8 +25,7 @@ import { MatSelectModule } from "@angular/material/select";
 import { RouterLink } from "@angular/router";
 import { ROUTE_PATHS } from "../../../../../route_paths";
 import { ClearButtonComponent } from "@components/shared/clear-button/clear-button.component";
-
-export const RADIUS_SERVER = "radius.identifier";
+import { RADIUS_SERVER } from "../../../../../constants/token.constants";
 
 @Component({
   selector: "app-radius-config",

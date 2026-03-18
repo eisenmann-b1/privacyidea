@@ -17,11 +17,9 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import {
-  EMAIL_SMTP_SERVER_KEY,
-  EmailConfigComponent
-} from "@components/configuration/token-type-config/token-types/email-config/email-config.component";
-import { provideRouter, Router } from "@angular/router";
+import { EmailConfigComponent } from "@components/configuration/token-type-config/token-types/email-config/email-config.component";
+import { provideRouter } from "@angular/router";
+import { EMAIL_SMTP_SERVER_KEY } from "../../../../../constants/token.constants";
 
 const mockSmtpServers = ["server1", "server2", "server3"];
 

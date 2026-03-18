@@ -27,7 +27,7 @@ import { ClearButtonComponent } from "@components/shared/clear-button/clear-butt
 import {
   DAYPASSWORD_HASHLIB,
   DAYPASSWORD_TIME_STEP
-} from "@components/token/token-enrollment/enroll-daypassword/enroll-daypassword.component";
+} from "../../../../../constants/token.constants";
 
 @Component({
   selector: "app-daypassword-config",

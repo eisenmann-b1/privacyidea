@@ -26,9 +26,7 @@ import { MatSelectModule } from "@angular/material/select";
 import { RouterLink } from "@angular/router";
 import { ROUTE_PATHS } from "../../../../../route_paths";
 import { ClearButtonComponent } from "@components/shared/clear-button/clear-button.component";
-
-export const SMS_GATEWAY = "sms.identifier";
-export const SMS_PROVIDER_TIMEOUT = "sms.providerTimeout";
+import { SMS_GATEWAY, SMS_PROVIDER_TIMEOUT } from "../../../../../constants/token.constants";
 
 @Component({
   selector: "app-sms-config",

@@ -48,8 +48,9 @@ $description-width: 18rem;
   }
 
   #{$filter-class} {
-    width: 100%;
+    max-width: 932px;
     min-width: 300px;
+    width: 100%;
   }
 
   #{$scroll-container} {

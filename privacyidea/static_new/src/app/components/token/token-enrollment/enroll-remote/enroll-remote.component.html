@@ -17,9 +17,13 @@
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <div class="flex-column">
-  <mat-checkbox [formControl]="checkPinLocallyControl"> Check the PIN locally</mat-checkbox>
+  <mat-checkbox
+    [formControl]="checkPinLocallyControl"
+    class="margin-bottom-16">
+    Check the PIN locally
+  </mat-checkbox>
   <div class="flex-row gap-16">
-    <mat-form-field class="input-width-l">
+    <mat-form-field class="input-width-l margin-bottom-16">
       <mat-label i18n>Remote Server</mat-label>
       <mat-select
         [errorStateMatcher]="remoteErrorStateMatcher"
@@ -46,7 +50,7 @@
       <mat-error i18n>Remote Serial is <strong>required</strong></mat-error>
     </mat-form-field>
   </div>
-  <div class="otp-inputs-container">
+  <div class="flex-row gap-16">
     <mat-form-field class="input-width-l">
       <mat-label i18n>Remote User</mat-label>
       <input

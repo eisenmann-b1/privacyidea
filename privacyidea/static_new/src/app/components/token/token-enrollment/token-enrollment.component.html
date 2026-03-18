@@ -52,11 +52,11 @@
         <div class="enroll-button-container">
           <button
             [disabled]="formGroupSignal().invalid || !tokenService.selectedTokenType()"
-            class="action-button-primary button-width-s margin-left-auto"
+            class="action-button-primary button-width-m margin-left-auto"
             mat-stroked-button
             type="submit">
             <mat-icon>add_moderator</mat-icon>
-            Enroll
+            Enroll Token
           </button>
           <button
             (click)="reopenEnrollmentDialog()"
@@ -212,7 +212,7 @@
         }
       }
       <mat-form-field
-        class="input-width-xl margin-top-16 description-form">
+        class="input-width-xl margin-top-16">
         <mat-label>Description</mat-label>
         <textarea
           [formControl]="descriptionControl"
@@ -332,7 +332,7 @@
                 </mat-select>
               </mat-form-field>
             </div>
-            <div class="flex-row gap-16">
+            <div class="flex-row gap-16 margin-top-16">
               <mat-form-field class="date-picker input-width-l">
                 <mat-label i18n>Validity End Date</mat-label>
                 <input

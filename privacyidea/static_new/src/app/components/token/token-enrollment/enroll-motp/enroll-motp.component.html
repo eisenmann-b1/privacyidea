@@ -24,7 +24,7 @@
       i18n>
       Generate the OTP key on the server and show a QR code to scan.
     </mat-checkbox>
-    <div class="otp-inputs-container">
+    <div class="flex-row gap-16">
       @if (!this.authService.checkForceServerGenerateOTPKey("motp")) {
         <mat-form-field class="input-width-l">
           <mat-label i18n>OTP Key</mat-label>

@@ -20,6 +20,7 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { HotpConfigComponent } from "./hotp-config.component";
 import { provideRouter } from "@angular/router";
 import { HOTP_HASHLIB } from "../../../../../constants/token.constants";
+import { provideAnimations } from "@angular/platform-browser/animations";
 
 const mockHashLibs = ["sha1", "sha256", "sha512"];
 
@@ -30,7 +31,7 @@ describe("HotpConfigComponent", () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HotpConfigComponent],
-      providers: [provideRouter([])]
+      providers: [provideRouter([]), provideAnimations()]
     }).compileComponents();
     fixture = TestBed.createComponent(HotpConfigComponent);
     fixture.componentRef.setInput("formData", {});

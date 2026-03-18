@@ -20,6 +20,7 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { EmailConfigComponent } from "@components/configuration/token-type-config/token-types/email-config/email-config.component";
 import { provideRouter } from "@angular/router";
 import { EMAIL_SMTP_SERVER_KEY } from "../../../../../constants/token.constants";
+import { provideAnimations } from "@angular/platform-browser/animations";
 
 const mockSmtpServers = ["server1", "server2", "server3"];
 
@@ -30,7 +31,7 @@ describe("EmailConfigComponent", () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [EmailConfigComponent],
-      providers: [provideRouter([])]
+      providers: [provideRouter([]), provideAnimations()]
     }).compileComponents();
     fixture = TestBed.createComponent(EmailConfigComponent);
     fixture.componentRef.setInput("formData", {});

@@ -19,6 +19,7 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { DaypasswordConfigComponent } from "./daypassword-config.component";
 import { DAYPASSWORD_HASHLIB } from "../../../../../constants/token.constants";
+import { provideAnimations } from "@angular/platform-browser/animations";
 
 const mockHashLibs = ["sha1", "sha256", "sha512"];
 
@@ -28,7 +29,8 @@ describe("DaypasswordConfigComponent", () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DaypasswordConfigComponent]
+      imports: [DaypasswordConfigComponent],
+      providers: [provideAnimations()]
     }).compileComponents();
     fixture = TestBed.createComponent(DaypasswordConfigComponent);
     fixture.componentRef.setInput("formData", {});

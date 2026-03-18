@@ -16,12 +16,14 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Component, input } from "@angular/core";
+import { Component, input, output } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
+
+export const WEBAUTHN_TRUST_ANCHOR_DIR = "webauthn.trust_anchor_dir";
 
 @Component({
   selector: "app-webauthn-config",
@@ -37,5 +39,13 @@ import { MatInputModule } from "@angular/material/input";
   styleUrl: "./webauthn-config.component.scss"
 })
 export class WebauthnConfigComponent {
+  protected readonly WEBAUTHN_TRUST_ANCHOR_DIR = WEBAUTHN_TRUST_ANCHOR_DIR;
+
   formData = input.required<Record<string, any>>();
+  formDataChange = output<Record<string, any>>();
+
+  updateFormData(fieldName: string, value: any): void {
+    const newValue = { ...this.formData(), [fieldName]: value };
+    this.formDataChange.emit(newValue);
+  }
 }

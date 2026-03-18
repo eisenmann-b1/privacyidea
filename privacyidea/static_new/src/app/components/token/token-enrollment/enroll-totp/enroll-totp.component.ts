@@ -38,10 +38,10 @@ import {
   NotificationServiceInterface
 } from "../../../../services/notification/notification.service";
 import { SystemService, SystemServiceInterface } from "../../../../services/system/system.service";
-
-export const TOTP_HASHLIB = "totp.hashlib";
-export const TOTP_OTP_LENGTH = "totp.otplen";
-export const TOTP_TIME_STEP = "totp.timestep";
+import {
+  TOTP_HASHLIB, TOTP_OTP_LENGTH,
+  TOTP_TIME_STEP
+} from "@components/configuration/token-type-config/token-types/totp-config/totp-config.component";
 
 export interface TotpEnrollmentOptions extends TokenEnrollmentData {
   type: "totp";

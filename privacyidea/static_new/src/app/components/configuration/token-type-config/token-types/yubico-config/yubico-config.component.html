@@ -37,7 +37,8 @@
       appearance="fill">
       <mat-label i18n>API Client ID</mat-label>
       <input
-        [(ngModel)]="formData()['yubico.id']"
+        [ngModel]="formData()[YUBICO_ID]"
+        (ngModelChange)="updateFormData(YUBICO_ID, $event)"
         matInput
         placeholder="The client ID"
         required>
@@ -47,7 +48,8 @@
       appearance="fill">
       <mat-label i18n>API Key</mat-label>
       <input
-        [(ngModel)]="formData()['yubico.secret']"
+        [ngModel]="formData()[YUBICO_SECRET]"
+        (ngModelChange)="updateFormData(YUBICO_SECRET, $event)"
         matInput
         placeholder="API Key"
         required>
@@ -57,7 +59,8 @@
       appearance="fill">
       <mat-label i18n>Yubico URL</mat-label>
       <input
-        [(ngModel)]="formData()['yubico.url']"
+        [ngModel]="formData()[YUBICO_URL]"
+        (ngModelChange)="updateFormData(YUBICO_URL, $event)"
         matInput
         placeholder="https://api.yubico.com/wsapi/2.0/verify"
         required

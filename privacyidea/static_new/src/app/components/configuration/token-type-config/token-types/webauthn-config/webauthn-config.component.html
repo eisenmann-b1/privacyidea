@@ -30,7 +30,8 @@
       appearance="fill">
       <mat-label i18n>trust_anchor_dir</mat-label>
       <input
-        [(ngModel)]="formData()['webauthn.trust_anchor_dir']"
+        [ngModel]="formData()[WEBAUTHN_TRUST_ANCHOR_DIR]"
+        (ngModelChange)="updateFormData(WEBAUTHN_TRUST_ANCHOR_DIR, $event)"
         matInput
         placeholder="/etc/privacyidea/trusted_attestation_roots">
       <mat-hint i18n>The path to the directory containing the trust anchors.</mat-hint>
@@ -47,13 +48,13 @@
       set this, if webauthn_authenticator_attestation_level is set to "trusted" by a policy for any user.
     </p>
 
-    @if (formData()['webauthn.trust_anchor_dir'] && !formData()['webauthn.trust_anchor_dir'].startsWith('/')) {
+    @if (formData()[WEBAUTHN_TRUST_ANCHOR_DIR] && !formData()[WEBAUTHN_TRUST_ANCHOR_DIR].startsWith('/')) {
       <div
         class="alert alert-warning"
         i18n>The trust_anchor_dir must be an absolute path.
       </div>
     }
-    @if (formData()['webauthn.trust_anchor_dir'] && formData()['webauthn.trust_anchor_dir'].endsWith('/')) {
+    @if (formData()[WEBAUTHN_TRUST_ANCHOR_DIR] && formData()[WEBAUTHN_TRUST_ANCHOR_DIR].endsWith('/')) {
       <div
         class="alert alert-warning"
         i18n>The trust_anchor_dir must not end with a "/".

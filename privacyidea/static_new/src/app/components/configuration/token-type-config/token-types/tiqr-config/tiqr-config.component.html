@@ -30,7 +30,8 @@
       class="margin-bottom-16">
       <mat-label i18n>TiQR Registration Server</mat-label>
       <input
-        [(ngModel)]="formData()['tiqr.regServer']"
+        [ngModel]="formData()[TIQR_REG_SERVER]"
+        (ngModelChange)="updateFormData(TIQR_REG_SERVER, $event)"
         matInput
         placeholder="http://pi.server/ttype/tiqr"
         required
@@ -45,7 +46,8 @@
       class="margin-bottom-16">
       <mat-label i18n>TiQR Authentication Server</mat-label>
       <input
-        [(ngModel)]="formData()['tiqr.authServer']"
+        [ngModel]="formData()[TIQR_AUTH_SERVER]"
+        (ngModelChange)="updateFormData(TIQR_AUTH_SERVER, $event)"
         matInput
         type="url">
       <mat-hint i18n>The Authentication Server is this privacyIDEA server. Note that the privacyIDEA server needs to be
@@ -58,7 +60,8 @@
       class="margin-bottom-16">
       <mat-label i18n>TiQR Service Displayname</mat-label>
       <input
-        [(ngModel)]="formData()['tiqr.serviceDisplayname']"
+        [ngModel]="formData()[TIQR_SERVICE_DISPLAYNAME]"
+        (ngModelChange)="updateFormData(TIQR_SERVICE_DISPLAYNAME, $event)"
         matInput>
       <mat-hint i18n>This is the display name of your service in the TiQR app.</mat-hint>
     </mat-form-field>
@@ -68,7 +71,8 @@
       class="margin-bottom-16">
       <mat-label i18n>TiQR Service Identifier</mat-label>
       <input
-        [(ngModel)]="formData()['tiqr.serviceIdentifier']"
+        [ngModel]="formData()[TIQR_SERVICE_IDENTIFIER]"
+        (ngModelChange)="updateFormData(TIQR_SERVICE_IDENTIFIER, $event)"
         matInput>
       <mat-hint i18n>This is the service identifier that will be passed to the TiQR app. This should contain a reverse
                      FQDN (defaults to org.privacyidea).
@@ -80,7 +84,8 @@
       class="margin-bottom-16">
       <mat-label i18n>TiQR Logo URL</mat-label>
       <input
-        [(ngModel)]="formData()['tiqr.logoUrl']"
+        [ngModel]="formData()[TIQR_LOGO_URL]"
+        (ngModelChange)="updateFormData(TIQR_LOGO_URL, $event)"
         matInput
         placeholder="https://pi.server/static/css/privacyIDEA1.png"
         required
@@ -93,7 +98,8 @@
       class="margin-bottom-16">
       <mat-label i18n>TiQR Info URL</mat-label>
       <input
-        [(ngModel)]="formData()['tiqr.infoUrl']"
+        [ngModel]="formData()[TIQR_INFO_URL]"
+        (ngModelChange)="updateFormData(TIQR_INFO_URL, $event)"
         matInput
         placeholder="https://www.privacyidea.org"
         required
@@ -106,7 +112,8 @@
       class="margin-bottom-16">
       <mat-label i18n>OCRA Suite</mat-label>
       <input
-        [(ngModel)]="formData()['tiqr.ocrasuite']"
+        [ngModel]="formData()[TIQR_OCRASUITE]"
+        (ngModelChange)="updateFormData(TIQR_OCRASUITE, $event)"
         matInput>
       <mat-hint i18n>This is the OCRA suite used by the TiQR App. The default OCRA suite is OCRA-1:HOTP-SHA1-6:QN10. For
                      more details see the

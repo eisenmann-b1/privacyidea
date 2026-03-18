@@ -103,15 +103,17 @@ describe("TokenTypeConfigComponent", () => {
     expect(saveSpy).not.toHaveBeenCalled();
   });
 
-  it("should call deleteSystemConfig and reload on deleteSystemEntry", () => {
+  it("should call deleteSystemConfig but not reload on deleteSystemEntry", () => {
     const systemService = TestBed.inject(SystemService);
     const deleteSpy = jest.spyOn(systemService as any, "deleteSystemConfig");
     const reloadSpy = jest.spyOn((systemService as any).systemConfigResource, "reload");
 
-    component.deleteSystemEntry("question.question.14");
+    const entryToDelete = "yubikey.apiid.123";
+    component.deleteSystemEntry(entryToDelete);
 
-    expect(deleteSpy).toHaveBeenCalledWith("question.question.14");
-    expect(reloadSpy).toHaveBeenCalled();
+    expect(deleteSpy).toHaveBeenCalledWith(entryToDelete);
+    expect(reloadSpy).not.toHaveBeenCalled();
+    expect(component.formData()).not.toHaveProperty(entryToDelete);
   });
 
   it("should update formData on onCheckboxChange", () => {

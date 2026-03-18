@@ -26,6 +26,9 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatDivider } from "@angular/material/list";
 
+export const QUESTION_NUMBER_OF_ANSWERS = "question.num_answers";
+export const QUESTION_CONFIG_PREFIX = "question.question.";
+
 @Component({
   selector: "app-questionnaire-config",
   standalone: true,
@@ -43,14 +46,22 @@ import { MatDivider } from "@angular/material/list";
   styleUrl: "./questionnaire-config.component.scss"
 })
 export class QuestionnaireConfigComponent {
+  protected readonly QUESTION_NUMBER_OF_ANSWERS = QUESTION_NUMBER_OF_ANSWERS;
+
   formData = input.required<Record<string, any>>();
   questionKeys = input.required<string[]>();
   expanded = input<boolean>(false);
 
+  formDataChange = output<Record<string, any>>();
   onAddQuestion = output<string>();
   onDeleteEntry = output<string>();
 
   newQuestionText = signal("");
+
+  updateFormData(fieldName: string, value: any): void {
+    const newValue = { ...this.formData(), [fieldName]: value };
+    this.formDataChange.emit(newValue);
+  }
 
   addQuestion() {
     if (this.newQuestionText()) {

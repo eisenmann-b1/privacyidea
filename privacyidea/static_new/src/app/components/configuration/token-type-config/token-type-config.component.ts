@@ -16,7 +16,17 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Component, computed, effect, inject, signal, untracked, AfterViewInit, OnInit } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  OnInit,
+  signal,
+  untracked
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatButtonModule } from "@angular/material/button";
@@ -44,8 +54,7 @@ import { YubicoConfigComponent } from "./token-types/yubico-config/yubico-config
 import { YubikeyConfigComponent } from "./token-types/yubikey-config/yubikey-config.component";
 import { DaypasswordConfigComponent } from "./token-types/daypassword-config/daypassword-config.component";
 import { ActivatedRoute } from "@angular/router";
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
   selector: "app-token-type-config",
@@ -130,12 +139,12 @@ export class TokenTypeConfigComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     // allow opening a specific panel via URL fragment, e.g. /configuration/token-types#yubico
     this.route.fragment
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(fragment => {
-      if (fragment) {
-        this.expandedPanel = fragment;
-      }
-    });
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(fragment => {
+        if (fragment) {
+          this.expandedPanel = fragment;
+        }
+      });
   }
 
   ngAfterViewInit() {
@@ -143,7 +152,7 @@ export class TokenTypeConfigComponent implements OnInit, AfterViewInit {
       // scroll to the initially referenced panel
       const panel = document.getElementById(this.expandedPanel);
       if (panel) {
-        panel.scrollIntoView({ behavior: 'smooth' });
+        panel.scrollIntoView({ behavior: "smooth" });
       }
     }
   }
@@ -194,7 +203,12 @@ export class TokenTypeConfigComponent implements OnInit, AfterViewInit {
       next: (response) => {
         if (response?.result?.status) {
           this.notificationService.openSnackBar($localize`System entry deleted.`);
-          this.systemService.systemConfigResource.reload();
+          // Update entries in the formData but not reload the whole config to prevent losing unsaved changes
+          this.formData.update(f => {
+            const next = { ...f } as Record<string, any>;
+            delete next[key];
+            return next;
+          });
         } else {
           this.notificationService.openSnackBar($localize`Failed to delete system entry.`);
         }

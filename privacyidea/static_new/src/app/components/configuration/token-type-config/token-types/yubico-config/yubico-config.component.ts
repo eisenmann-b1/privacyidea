@@ -16,12 +16,16 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Component, input } from "@angular/core";
+import { Component, input, output } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
+
+export const YUBICO_ID = "yubico.id";
+export const YUBICO_SECRET = "yubico.secret";
+export const YUBICO_URL = "yubico.url";
 
 @Component({
   selector: "app-yubico-config",
@@ -37,6 +41,16 @@ import { MatInputModule } from "@angular/material/input";
   styleUrl: "./yubico-config.component.scss"
 })
 export class YubicoConfigComponent {
+  protected readonly YUBICO_ID = YUBICO_ID;
+  protected readonly YUBICO_SECRET = YUBICO_SECRET;
+  protected readonly YUBICO_URL = YUBICO_URL;
+
   formData = input.required<Record<string, any>>();
+  formDataChange = output<Record<string, any>>();
   expanded = input<boolean>(false);
+
+  updateFormData(fieldName: string, value: any): void {
+    const newValue = { ...this.formData(), [fieldName]: value };
+    this.formDataChange.emit(newValue);
+  }
 }

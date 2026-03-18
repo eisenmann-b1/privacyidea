@@ -16,12 +16,20 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Component, input } from "@angular/core";
+import { Component, input, output } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
+
+export const TIQR_REG_SERVER = "tiqr.regServer";
+export const TIQR_AUTH_SERVER = "tiqr.authServer";
+export const TIQR_SERVICE_DISPLAYNAME = "tiqr.serviceDisplayname";
+export const TIQR_SERVICE_IDENTIFIER = "tiqr.serviceIdentifier";
+export const TIQR_LOGO_URL = "tiqr.logoUrl";
+export const TIQR_INFO_URL = "tiqr.infoUrl";
+export const TIQR_OCRASUITE = "tiqr.ocrasuite";
 
 @Component({
   selector: "app-tiqr-config",
@@ -37,5 +45,19 @@ import { MatInputModule } from "@angular/material/input";
   styleUrl: "./tiqr-config.component.scss"
 })
 export class TiqrConfigComponent {
+  protected readonly TIQR_REG_SERVER = TIQR_REG_SERVER;
+  protected readonly TIQR_AUTH_SERVER = TIQR_AUTH_SERVER;
+  protected readonly TIQR_SERVICE_DISPLAYNAME = TIQR_SERVICE_DISPLAYNAME;
+  protected readonly TIQR_SERVICE_IDENTIFIER = TIQR_SERVICE_IDENTIFIER;
+  protected readonly TIQR_LOGO_URL = TIQR_LOGO_URL;
+  protected readonly TIQR_INFO_URL = TIQR_INFO_URL;
+  protected readonly TIQR_OCRASUITE = TIQR_OCRASUITE;
+
   formData = input.required<Record<string, any>>();
+  formDataChange = output<Record<string, any>>();
+
+  updateFormData(fieldName: string, value: any): void {
+    const newValue = { ...this.formData(), [fieldName]: value };
+    this.formDataChange.emit(newValue);
+  }
 }

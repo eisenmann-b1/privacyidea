@@ -28,7 +28,7 @@
     class="smtp-form">
     <mat-form-field
       appearance="fill"
-      class="input-width-l margin-bottom-16">
+      class="input-width-l margin-bottom-32">
       <mat-label i18n>Identifier</mat-label>
       <app-clearable-input
         (onClick)="smtpForm.get('identifier')?.setValue('')"
@@ -46,7 +46,7 @@
       }
     </mat-form-field>
 
-    <div class="flex-row gap-16">
+    <div class="flex-row gap-16 margin-bottom-16">
       <mat-form-field
         appearance="fill"
         class="input-width-l">
@@ -78,18 +78,7 @@
       </mat-form-field>
     </div>
 
-    <div class="flex-row just-space-between">
-      <mat-form-field
-        appearance="fill"
-        class="input-width-s">
-        <mat-label i18n>Timeout</mat-label>
-        <input
-          formControlName="timeout"
-          matInput
-          placeholder="10"
-          type="number" />
-      </mat-form-field>
-
+    <div class="flex-row gap-16 margin-bottom-16">
       <mat-form-field
         appearance="fill"
         class="input-width-l">
@@ -113,9 +102,20 @@
           </mat-error>
         }
       </mat-form-field>
+
+      <mat-form-field
+        appearance="fill"
+        class="input-width-s">
+        <mat-label i18n>Timeout</mat-label>
+        <input
+          formControlName="timeout"
+          matInput
+          placeholder="10"
+          type="number" />
+      </mat-form-field>
     </div>
 
-    <div class="flex-row just-space-between">
+    <div class="flex-row gap-16">
       <mat-form-field
         appearance="fill"
         class="input-width-l margin-bottom-16">
@@ -185,7 +185,7 @@
       <input
         class="hidden-input"
         type="password" />
-      <div class="flex-row just-space-between">
+      <div class="flex-row gap-16">
         <mat-form-field
           appearance="fill"
           class="input-width-l">

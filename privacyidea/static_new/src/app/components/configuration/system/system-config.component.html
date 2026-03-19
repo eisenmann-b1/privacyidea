@@ -74,13 +74,14 @@
         </div>
 
         <mat-form-field
-          class="margin-left-auto input-width-l">
-          <mat-label i18n>Clear Failcounter After (Minutes)</mat-label>
+          class="margin-left-auto input-width-s">
+          <mat-label i18n>Clear Failcounter After</mat-label>
           <input
             [(ngModel)]="params.failcounter_clear_timeout"
             matInput
             name="failcounter_clear_timeout"
             placeholder="0" />
+          <mat-hint i18n>In minutes.</mat-hint>
         </mat-form-field>
       </div>
 
@@ -127,14 +128,15 @@
         </div>
 
         <mat-form-field
-          class="margin-left-auto input-width-m">
-          <mat-label i18n>Auto Resync Timeout</mat-label>
+          class="margin-left-auto input-width-s">
+          <mat-label i18n>Auto Resync</mat-label>
           <input
             [(ngModel)]="params.AutoResyncTimeout"
             [disabled]="!params.AutoResync"
             matInput
             name="AutoResyncTimeout"
             placeholder="300" />
+          <mat-hint i18n>Timeout in seconds.</mat-hint>
         </mat-form-field>
       </div>
 
@@ -142,12 +144,15 @@
         <div class="flex-row just-space-between ali-center">
           <mat-form-field
             class="input-width-l">
-            <mat-label i18n>User Cache Expiration (Seconds)</mat-label>
+            <mat-label i18n>User Cache Expiration</mat-label>
             <input
               [(ngModel)]="params.UserCacheExpiration"
               matInput
               name="UserCacheExpiration"
               placeholder="0" />
+            <mat-hint i18n>
+              In seconds.
+            </mat-hint>
           </mat-form-field>
 
           <button
@@ -232,7 +237,7 @@
             </mat-form-field>
           </div>
 
-          <div class="flex-row just-space-between">
+          <div class="flex-row gap-16">
             <mat-form-field class="input-width-s">
               <mat-label i18n>Sync Window</mat-label>
               <input

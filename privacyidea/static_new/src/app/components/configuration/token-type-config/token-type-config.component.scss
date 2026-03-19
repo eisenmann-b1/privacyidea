@@ -12,11 +12,13 @@
 
   ::ng-deep {
     .panel-content {
-      padding: 0;
-
       display: flex;
       flex-direction: column;
       align-items: flex-start;
+
+      p {
+        max-width: 816px;
+      }
 
       p,
       h3,
@@ -25,7 +27,6 @@
       table,
       .table,
       .flex-row {
-        max-width: 800px;
         width: 100%;
       }
 

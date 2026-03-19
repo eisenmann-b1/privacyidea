@@ -183,6 +183,7 @@
                 @for (token of element.tokens; track token) {
                   <div class="token-item">
                     <a (click)="contentService.tokenSelected(token.serial)"> {{ token.serial }}</a>
+                    <app-copy-button [copyText]="token.serial"></app-copy-button>
                     [{{ token.tokentype }}]
                   </div>
                 }

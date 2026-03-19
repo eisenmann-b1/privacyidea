@@ -112,7 +112,6 @@
         align-items: center;
         display: flex;
         flex-direction: row;
-        gap: var(--half-global-gap);
       }
     }
 
@@ -160,6 +159,9 @@
   .active-icon {
     color: var(--mat-sys-primary-base);
     opacity: 1;
+  }
+  .clickable-icon {
+    cursor: pointer;
   }
 
   mat-checkbox {

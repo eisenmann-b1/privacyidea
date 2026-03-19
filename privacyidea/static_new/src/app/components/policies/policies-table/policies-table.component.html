@@ -109,7 +109,7 @@
                     @if (authService.actionAllowed("policywrite")) {
                       <a
                         (click)="$event.stopPropagation(); editPolicy(policy)"
-                        class="flex ali-center">
+                        class="flex ali-center bold">
                         {{ policy.name }}
                       </a>
                       <app-copy-button [copyText]="policy.name" />
@@ -135,6 +135,7 @@
                 @case ("active") {
                   <div class="flex just-center">
                     <mat-icon
+                      class="clickable-icon"
                       (click)="$event.stopPropagation(); togglePolicyActive(policy)"
                       [class.active-icon]="policy.active"
                       [class.inactive-icon]="!policy.active"

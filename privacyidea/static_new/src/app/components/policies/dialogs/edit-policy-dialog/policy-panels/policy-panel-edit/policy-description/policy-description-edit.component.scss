@@ -1,15 +1,10 @@
 @use "inputs";
 
 .action-description-container {
-  background-color: var(--mat-sys-surface-container-low);
-  border-radius: var(--border-radius);
-  box-shadow: var(--mat-sys-level2);
-  color: var(--mat-sys-on-surface);
   display: flex;
-  flex-direction: row;
-  gap: var(--global-gap);
+  flex-direction: column;
+  gap: var(--half-global-gap);
   min-width: 0;
-  padding: var(--three-quarters-global-padding);
 
   .description-header {
     font-size: 1.17em;
@@ -19,10 +14,13 @@
 
   .description-textarea {
     @include inputs.action-tab-input;
+
+    &:focus-visible,
+    &:focus-within {
+      outline: 2px solid var(--pi-focus-color, #005ea5);
+      outline-offset: 2px;
+    }
   }
 
-  &:focus-within {
-    outline: 2px solid var(--mat-sys-primary-base);
-    outline-offset: -2px;
-  }
 }
+

@@ -31,13 +31,6 @@
         [unfilteredPolicies]="policyService.allPolicies()"
         class="policies-table-filter"></app-policy-filter>
     }
-    <mat-paginator
-      (page)="onPageEvent($event)"
-      [length]="totalLength()"
-      [pageIndex]="pageIndex()"
-      [pageSizeOptions]="pageSizeOptions()"
-      [pageSize]="pageSize()"
-      showFirstLastButtons />
   </div>
 
   <app-policies-table-actions [policySelection]="selectedPolicies()" />
@@ -127,7 +120,7 @@
                   </div>
                 }
                 @case ("scope") {
-                  {{ policy.scope?.toLocaleUpperCase() }}
+                  {{ policy.scope?.toLowerCase() }}
                 }
                 @case ("description") {
                   {{ policy.description }}

@@ -22,16 +22,14 @@
   aria-label="Policy Table"
   class="policies-table-layout"
   i18n-aria-label>
-  <div class="filter-paginator-container">
-    @if (authService.actionAllowed("policyread")) {
-      <app-policy-filter
-        #filterComponent
-        (filterChange)="onFilterUpdate($event)"
-        [initialFilter]="filter()"
-        [unfilteredPolicies]="policyService.allPolicies()"
-        class="policies-table-filter"></app-policy-filter>
-    }
-  </div>
+  @if (authService.actionAllowed("policyread")) {
+    <app-policy-filter
+      #filterComponent
+      (filterChange)="onFilterUpdate($event)"
+      [initialFilter]="filter()"
+      [unfilteredPolicies]="policyService.allPolicies()"
+      class="policies-table-filter"></app-policy-filter>
+  }
 
   <app-policies-table-actions [policySelection]="selectedPolicies()" />
 
@@ -109,11 +107,12 @@
                 @case ("name") {
                   <div class="name-wrapper">
                     @if (authService.actionAllowed("policywrite")) {
-                      <div
+                      <a
                         (click)="$event.stopPropagation(); editPolicy(policy)"
-                        class="text-link-button">
+                        class="flex ali-center">
                         {{ policy.name }}
-                      </div>
+                      </a>
+                      <app-copy-button [copyText]="policy.name" />
                     } @else {
                       {{ policy.name }}
                     }
@@ -138,8 +137,9 @@
                     <mat-icon
                       (click)="$event.stopPropagation(); togglePolicyActive(policy)"
                       [class.active-icon]="policy.active"
-                      [class.inactive-icon]="!policy.active">
-                      [matTooltip]="policy.active ? 'Deactivate policy' : 'Activate policy'" check_circle
+                      [class.inactive-icon]="!policy.active"
+                      [matTooltip]="policy.active ? 'Deactivate policy' : 'Activate policy'">
+                      check_circle
                     </mat-icon>
                   </div>
                 }

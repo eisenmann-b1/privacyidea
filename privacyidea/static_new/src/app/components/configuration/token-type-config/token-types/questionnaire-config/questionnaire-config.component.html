@@ -35,10 +35,15 @@
         <mat-label i18n>Number of Answers</mat-label>
         <input
           [(ngModel)]="formData()['question.num_answers']"
+          #numAnswersInput="ngModel"
+          [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="5"
           required
           type="number">
+        @if (numAnswersInput.errors?.['required']) {
+          <mat-error i18n>Number of Answers is <strong>required</strong></mat-error>
+        }
       </mat-form-field>
 
       <span

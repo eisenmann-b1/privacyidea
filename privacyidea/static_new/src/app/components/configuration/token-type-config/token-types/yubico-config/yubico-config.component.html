@@ -40,9 +40,14 @@
         <mat-label i18n>API Key</mat-label>
         <input
           [(ngModel)]="formData()['yubico.secret']"
+          #apiKeyInput="ngModel"
+          [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="API Key"
           required>
+        @if (apiKeyInput.errors?.['required']) {
+          <mat-error i18n>API Key is <strong>required</strong></mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field
@@ -51,9 +56,14 @@
         <mat-label i18n>API Client ID</mat-label>
         <input
           [(ngModel)]="formData()['yubico.id']"
+          #clientIdInput="ngModel"
+          [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="The client ID"
           required>
+        @if (clientIdInput.errors?.['required']) {
+          <mat-error i18n>API Client ID is <strong>required</strong></mat-error>
+        }
       </mat-form-field>
     </div>
 
@@ -64,10 +74,15 @@
         <mat-label i18n>Yubico URL</mat-label>
         <input
           [(ngModel)]="formData()['yubico.url']"
+          #urlInput="ngModel"
+          [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="https://api.yubico.com/wsapi/2.0/verify"
           required
           type="url">
+        @if (urlInput.errors?.['required']) {
+          <mat-error i18n>Yubico URL is <strong>required</strong></mat-error>
+        }
       </mat-form-field>
     </div>
   </div>

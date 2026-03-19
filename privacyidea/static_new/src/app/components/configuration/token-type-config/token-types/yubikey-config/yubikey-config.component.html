@@ -74,9 +74,14 @@
         <input
           (ngModelChange)="newYubikeyApiId.set($event)"
           [ngModel]="newYubikeyApiId()"
+          #apiIdInput="ngModel"
+          [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="Client ID"
           required>
+        @if (apiIdInput.errors?.['required']) {
+          <mat-error i18n>Client ID is <strong>required</strong></mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field
@@ -86,9 +91,14 @@
         <input
           (ngModelChange)="newYubikeyApiKey.set($event)"
           [ngModel]="newYubikeyApiKey()"
+          #apiKeyInput="ngModel"
+          [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="API Key"
           required>
+        @if (apiKeyInput.errors?.['required']) {
+          <mat-error i18n>API Key is <strong>required</strong></mat-error>
+        }
       </mat-form-field>
 
       <button

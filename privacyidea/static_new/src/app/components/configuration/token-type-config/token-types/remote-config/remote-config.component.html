@@ -37,9 +37,14 @@
         <mat-label i18n>Default Remote Server</mat-label>
         <input
           [(ngModel)]="formData()['remote.server']"
+          #remoteServerInput="ngModel"
+          [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="https://your.other.privacyidea.server"
           required>
+        @if (remoteServerInput.errors?.['required']) {
+          <mat-error i18n>Default Remote Server is <strong>required</strong></mat-error>
+        }
       </mat-form-field>
     </div>
   </div>

@@ -40,12 +40,13 @@
         <input
           formControlName="identifier"
           matInput
-          placeholder="myRadiusServer" />
+          placeholder="myRadiusServer"
+          required />
       </app-clearable-input>
       <mat-hint i18n>The unique identifying name of the RADIUS server definition.</mat-hint>
       @if (radiusForm.get('identifier')?.hasError('required')) {
         <mat-error
-          i18n>Identifier is required
+          i18n>Identifier is <strong>required</strong>
         </mat-error>
       }
     </mat-form-field>
@@ -61,11 +62,12 @@
           <input
             formControlName="server"
             matInput
-            placeholder="1.2.3.4" />
+            placeholder="1.2.3.4"
+            required />
         </app-clearable-input>
         @if (radiusForm.get('server')?.hasError('required')) {
           <mat-error
-            i18n>Server is required
+            i18n>Server is <strong>required</strong>
           </mat-error>
         }
       </mat-form-field>
@@ -93,11 +95,12 @@
           <input
             formControlName="secret"
             matInput
-            type="password" />
+            type="password"
+            required />
         </app-clearable-input>
         @if (radiusForm.get('secret')?.hasError('required')) {
           <mat-error
-            i18n>Secret is required
+            i18n>Secret is <strong>required</strong>
           </mat-error>
         }
       </mat-form-field>

@@ -45,6 +45,9 @@
             placeholder="MyConnector1"
             required />
         </app-clearable-input>
+        @if (caConnectorForm.get('connectorname')?.hasError('required')) {
+          <mat-error i18n>Connector Name is <strong>required</strong></mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field
@@ -63,6 +66,9 @@
             value="microsoft">Microsoft
           </mat-option>
         </mat-select>
+        @if (caConnectorForm.get('type')?.hasError('required')) {
+          <mat-error i18n>Type is <strong>required</strong></mat-error>
+        }
       </mat-form-field>
     </div>
 
@@ -81,8 +87,11 @@
               formControlName="cacert"
               matInput
               placeholder="/etc/cacert.pem"
-              required />
+              [required]="caConnectorForm.get('type')?.value === 'local'" />
           </app-clearable-input>
+          @if (caConnectorForm.get('cacert')?.hasError('required')) {
+            <mat-error i18n>CA Certificate is <strong>required</strong></mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field
@@ -96,8 +105,11 @@
               formControlName="cakey"
               matInput
               placeholder="/etc/cakey.pem"
-              required />
+              [required]="caConnectorForm.get('type')?.value === 'local'" />
           </app-clearable-input>
+          @if (caConnectorForm.get('cakey')?.hasError('required')) {
+            <mat-error i18n>CA Key is <strong>required</strong></mat-error>
+          }
         </mat-form-field>
       </div>
       <div class="flex-row gap-16 margin-bottom-16">
@@ -113,8 +125,11 @@
               formControlName="openssl.cnf"
               matInput
               placeholder="/etc/openssl.cnf"
-              required />
+              [required]="caConnectorForm.get('type')?.value === 'local'" />
           </app-clearable-input>
+          @if (caConnectorForm.get('openssl.cnf')?.hasError('required')) {
+            <mat-error i18n>OpenSSL Config File is <strong>required</strong></mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field
@@ -236,8 +251,11 @@
               formControlName="hostname"
               matInput
               placeholder="example.net"
-              required />
+              [required]="caConnectorForm.get('type')?.value === 'microsoft'" />
           </app-clearable-input>
+          @if (caConnectorForm.get('hostname')?.hasError('required')) {
+            <mat-error i18n>Hostname is <strong>required</strong></mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field
@@ -248,8 +266,11 @@
             formControlName="port"
             matInput
             placeholder="1234"
-            required
+            [required]="caConnectorForm.get('type')?.value === 'microsoft'"
             type="number" />
+          @if (caConnectorForm.get('port')?.hasError('required')) {
+            <mat-error i18n>Port is <strong>required</strong></mat-error>
+          }
         </mat-form-field>
       </div>
 
@@ -335,11 +356,14 @@
             <mat-label i18n>Domain CA</mat-label>
             <mat-select
               formControlName="ca"
-              required>
+              [required]="caConnectorForm.get('type')?.value === 'microsoft' && availableCas().length > 0">
               @for (ca of availableCas(); track ca) {
                 <mat-option [value]="ca">{{ ca }}</mat-option>
               }
             </mat-select>
+            @if (caConnectorForm.get('ca')?.hasError('required')) {
+              <mat-error i18n>Domain CA is <strong>required</strong></mat-error>
+            }
           </mat-form-field>
         }
 

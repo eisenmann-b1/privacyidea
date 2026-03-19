@@ -33,10 +33,15 @@
         <mat-label i18n>TiQR Registration Server</mat-label>
         <input
           [(ngModel)]="formData()['tiqr.regServer']"
+          #regServerInput="ngModel"
+          [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="http://pi.server/ttype/tiqr"
           required
           type="url">
+        @if (regServerInput.errors?.['required']) {
+          <mat-error i18n>TiQR Registration Server is <strong>required</strong></mat-error>
+        }
         <mat-hint i18n>The Registration Server is this privacyIDEA server.
           <br>
                        Note that the privacyIDEA server needs to be accessible from the users smartphone.
@@ -95,10 +100,15 @@
         <mat-label i18n>TiQR Logo URL</mat-label>
         <input
           [(ngModel)]="formData()['tiqr.logoUrl']"
+          #logoUrlInput="ngModel"
+          [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="https://pi.server/static/css/privacyIDEA1.png"
           required
           type="url">
+        @if (logoUrlInput.errors?.['required']) {
+          <mat-error i18n>TiQR Logo URL is <strong>required</strong></mat-error>
+        }
         <mat-hint i18n>The URL that contains the logo of the service.
           <br>
         </mat-hint>
@@ -128,10 +138,15 @@
         <mat-label i18n>TiQR Info URL</mat-label>
         <input
           [(ngModel)]="formData()['tiqr.infoUrl']"
+          #infoUrlInput="ngModel"
+          [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="https://www.privacyidea.org"
           required
           type="url">
+        @if (infoUrlInput.errors?.['required']) {
+          <mat-error i18n>TiQR Info URL is <strong>required</strong></mat-error>
+        }
         <mat-hint i18n>The website of the identity provider</mat-hint>
       </mat-form-field>
     </div>

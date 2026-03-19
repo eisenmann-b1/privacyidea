@@ -143,14 +143,14 @@
                 }
                 @default {
                   @if (element.isEditing() && isNumberElement(element.keyMap.key)) {
-                    <mat-form-field class="width-18rem">
+                    <mat-form-field>
                       <input
                         type="number"
                         matInput
                         [(ngModel)]="element.value" />
                     </mat-form-field>
                   } @else if (element.isEditing()) {
-                    <mat-form-field class="width-18rem">
+                    <mat-form-field>
                       <textarea
                         matInput
                         rows="1"

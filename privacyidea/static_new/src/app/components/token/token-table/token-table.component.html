@@ -106,7 +106,6 @@
             <td
               *matCellDef="let tokenDetails"
               [ngClass]="{
-                'width-18rem': column.key === 'description',
                 'table-checkbox': column.key === 'select'
               }"
               attr.aria-label="{{ column.label }} Cell"

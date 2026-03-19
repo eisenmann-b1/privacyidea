@@ -20,9 +20,9 @@
   class="margin-8 external-service-dialog-title"
   i18n>
   @if (isEditMode) {
-     Edit SMS Gateway
+    Edit SMS Gateway
   } @else {
-     Create SMS Gateway
+    Create SMS Gateway
   }
 </h3>
 
@@ -91,9 +91,11 @@
       class="parameters-form">
       @for (param of parameterEntries(); track param.key) {
         <mat-form-field
-          appearance="fill"
           [class.input-width-l]="param.key !== 'REGEXP' && param.value.type !== 'text'"
           [class.input-width-xl]="param.key === 'REGEXP' || param.value.type === 'text'"
+          [class.margin-bottom-64]="param.key === 'PROXY' && providermoduleSignal()
+            === 'privacyidea.lib.smsprovider.HttpSMSProvider.HttpSMSProvider'"
+          appearance="fill"
           class="margin-bottom-16">
           <mat-label>{{ param.key }}</mat-label>
 
@@ -112,9 +114,9 @@
           @if (!param.value.values && param.value.type === 'text') {
             <textarea
               [formControlName]="param.key"
+              [required]="param.value.required"
               matInput
-              rows="2"
-              [required]="param.value.required"></textarea>
+              rows="2"></textarea>
           }
 
           @if (!param.value.values && param.value.type !== 'text') {
@@ -123,8 +125,8 @@
               [showClearButton]="!!parametersForm.get(param.key)?.value">
               <input
                 [formControlName]="param.key"
-                matInput
-                [required]="param.value.required" />
+                [required]="param.value.required"
+                matInput />
             </app-clearable-input>
           }
 

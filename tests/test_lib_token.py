@@ -407,12 +407,12 @@ class TokenTestCase(MyTestCase):
                                   "otpkey": "1234567890123456"})
         self.assertEqual(tokenobject.token.rollout_state, RolloutState.ENROLLED)
         # Manually set a different rollout_state
-        tokenobject.token.rollout_state = "this_will_not_be_overwritten"
+        tokenobject.token.rollout_state = "fix"
         tokenobject.save()
         # Re-init the same token (update) – rollout_state must stay "clientwait"
         tokenobject = init_token({"serial": "NEW004", "type": "hotp",
                                   "otpkey": "1234567890123456"})
-        self.assertEqual(tokenobject.token.rollout_state, "this_will_not_be_overwritten")
+        self.assertEqual(tokenobject.token.rollout_state, "fix")
         remove_token("NEW004")
 
     def test_16_remove_token(self):

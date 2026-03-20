@@ -213,7 +213,7 @@
       }
       <mat-form-field
         class="input-width-xl margin-top-16">
-        <mat-label>Description</mat-label>
+        <mat-label i18n>Description</mat-label>
         <textarea
           [formControl]="descriptionControl"
           [maxlength]="80"
@@ -224,7 +224,7 @@
       <div class="gap-16">
         @if (authService.actionAllowed("userlist")) {
           <div class="width-100">
-            <h4>Assign Token to User</h4>
+            <h4 i18n>Assign Token to a User</h4>
             <app-user-assignment
               [required]="isUserRequired()"
               [selectedUserRealmControl]="selectedUserRealmControl"
@@ -239,7 +239,7 @@
       <div class="flex-row gap-16">
         @if (tokenService.selectedTokenType().key !== "passkey" && authService.actionAllowed("enrollpin")) {
           <div class="flex-column">
-            <h4>Set PIN</h4>
+            <h4 i18n>Set PIN</h4>
             <input
               style="display: none"
               type="text" />
@@ -255,7 +255,7 @@
                   matInput />
               </mat-form-field>
               <mat-form-field class="input-width-l">
-                <mat-label>Repeat PIN</mat-label>
+                <mat-label i18n>Repeat PIN</mat-label>
                 <input
                   [formControl]="repeatPinControl"
                   [type]="'password'"
@@ -264,14 +264,14 @@
             </div>
             @if (formGroupSignal().hasError("pinMismatch") &&
             (formGroupSignal().get("setPin")?.touched || formGroupSignal().get("repeatPin")?.touched)) {
-              <mat-error class="pin-error">PINs do not match.</mat-error>
+              <mat-error class="pin-error" i18n>PINs do not match.</mat-error>
             }
           </div>
         }
 
         @if (authService.actionAllowed("container_list")) {
           <div class="flex-column">
-            <h4>Add Token to a Container</h4>
+            <h4 i18n>Add Token to a Container</h4>
             <mat-form-field class="input-width-l">
               <app-clearable-input
                 (onClick)="selectedContainerControl.setValue('')"

@@ -2,12 +2,11 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 import base64
 import json
-import mock
 from dataclasses import dataclass
 from datetime import datetime, timezone, timedelta
-
 from typing import Optional
 
+import mock
 import passlib
 from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PublicKey
 
@@ -6181,7 +6180,7 @@ class APIContainerTemplate(APIContainerTest):
             if token.get_type() == "hotp":
                 self.assertEqual("clientwait", token.rollout_state)
             else:
-                self.assertEqual("", token.rollout_state)
+                self.assertEqual("enrolled", token.rollout_state)
 
         # cleanup
         [token.delete_token() for token in tokens]

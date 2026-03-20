@@ -6308,15 +6308,12 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
 
     def test_20e_verify_enrollment_not_in_verify_pending_state(self):
         """Test verify_enrollment prepolicy with token not in verify_pending state - should exit early"""
-        from privacyidea.lib.tokenclass import RolloutState
 
         serial = "HOTP_NOT_VERIFY_PENDING"
         tok = init_token({"serial": serial,
                           "type": "hotp",
                           "otpkey": "31323334353637383940"})
-        # Token that are enrolled directly without verify or 2step have the empty enrollment state
-        # TODO should be unified
-        self.assertEqual(tok.token.rollout_state, "")
+        self.assertEqual(tok.token.rollout_state, "enrolled")
 
         builder = EnvironBuilder(method='POST', data={}, headers={})
         env = builder.get_environ()
@@ -6329,7 +6326,7 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
 
         # Token should still be empty (unchanged)
         tok = get_tokens(serial=serial)[0]
-        self.assertEqual(tok.token.rollout_state, "")
+        self.assertEqual(tok.token.rollout_state, "enrolled")
         remove_token(serial)
 
     def test_20f_verify_enrollment_success(self):

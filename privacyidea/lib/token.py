@@ -107,7 +107,7 @@ from privacyidea.lib.policydecorators import (libpolicy,
                                               reset_all_user_tokens, force_challenge_response)
 from privacyidea.lib.realm import realm_is_defined, get_realms
 from privacyidea.lib.resolver import get_resolver_object
-from privacyidea.lib.tokenclass import DATE_FORMAT, Tokenkind, TokenClass
+from privacyidea.lib.tokenclass import DATE_FORMAT, Tokenkind, TokenClass, RolloutState
 from privacyidea.lib.user import User
 from privacyidea.lib.utils import (is_true, BASE58, hexlify_and_unicode, check_serial_valid, create_tag_dict,
                                    redacted_phone_number, redacted_email)
@@ -294,8 +294,6 @@ def _create_token_query(tokentype=None, token_type_list=None, realm=None, assign
 
     if serial_list:
         sql_query = sql_query.where(Token.serial.in_(serial_list))
-
-
 
     # Filtering by user object
     if user and not user.is_empty():
@@ -1390,6 +1388,10 @@ def init_token(param: dict, user: User = None, tokenrealms: list[str] = None, to
 
     # Creation Date
     token.add_tokeninfo("creation_date", datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"))
+
+    # If the token has no rollout_state, we set it to "enrolled"
+    if not token.rollout_state:
+        token.token.rollout_state = RolloutState.ENROLLED
 
     # Safe the token object to make sure all changes are persisted in the db
     token.save()

@@ -357,6 +357,7 @@ class TokenTestCase(MyTestCase):
                                            realm=self.realm1))
         self.assertTrue(tokenobject.token.tokentype == "hotp",
                         tokenobject.token)
+        self.assertEqual(tokenobject.token.rollout_state, RolloutState.ENROLLED)
         # Now there is one more token in the database
         count = get_tokens(count=True)
         self.assertTrue(count == 5, count)
@@ -398,6 +399,21 @@ class TokenTestCase(MyTestCase):
                                  tokenrealms=[self.realm1])
         self.assertTrue(self.realm1 in tokenobject.token.get_realms(),
                         tokenobject.token.get_realms())
+
+        # Check that an existing rollout_state is not overridden by init_token.
+        # If a token already has a rollout_state (e.g. "clientwait"), it should
+        # not be reset to "enrolled" when init_token is called again.
+        tokenobject = init_token({"serial": "NEW004", "type": "hotp",
+                                  "otpkey": "1234567890123456"})
+        self.assertEqual(tokenobject.token.rollout_state, RolloutState.ENROLLED)
+        # Manually set a different rollout_state
+        tokenobject.token.rollout_state = "this_will_not_be_overwritten"
+        tokenobject.save()
+        # Re-init the same token (update) – rollout_state must stay "clientwait"
+        tokenobject = init_token({"serial": "NEW004", "type": "hotp",
+                                  "otpkey": "1234567890123456"})
+        self.assertEqual(tokenobject.token.rollout_state, "this_will_not_be_overwritten")
+        remove_token("NEW004")
 
     def test_16_remove_token(self):
         self.assertRaises(ParameterError, remove_token)
@@ -460,7 +476,7 @@ class TokenTestCase(MyTestCase):
             self.assertEqual(token.get_realms(), ['realm1'], token.get_realms())
             mock_log.assert_called_with(f'The realms ({self.realm1}) of assigned users cannot be removed from the '
                                         f'token {serial}.')
-            
+
         # Deleting the token also deletes the token realm relationship
         token_id = token.token.id
         token.delete_token()
@@ -2709,6 +2725,7 @@ class TokenGroupTestCase(MyTestCase):
         delete_tokengroup('g1')
         delete_tokengroup('g2')
         delete_tokengroup('g3')
+
 
 class ExportAndReencryptTestCase(MyTestCase):
 

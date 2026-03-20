@@ -83,8 +83,27 @@ describe("NewServiceIdComponent", () => {
       servicename: "test",
       description: "desc"
     });
-    await component.save();
+
+    const success = await component.save();
+
+    expect(success).toBe(true);
     expect(serviceIdServiceMock.postServiceId).toHaveBeenCalled();
     expect(dialogRefMock.close).toHaveBeenCalledWith(true);
+  });
+
+  it("should keep dialog open if save fails", async () => {
+    component.serviceIdForm.patchValue({
+      servicename: "test",
+      description: "desc"
+    });
+    serviceIdServiceMock.postServiceId = jest.fn().mockRejectedValue(new Error("Save failed"));
+    // Clear any previous calls to close from setup
+    dialogRefMock.close.mockClear();
+
+    const success = await component.save();
+
+    expect(success).toBe(false);
+    expect(serviceIdServiceMock.postServiceId).toHaveBeenCalled();
+    expect(dialogRefMock.close).not.toHaveBeenCalled();
   });
 });

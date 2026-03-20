@@ -98,8 +98,28 @@ describe("NewSmsGatewayComponent", () => {
       providermodule: "mod1"
     });
     component.smsForm.get("options")?.patchValue({ p1: "val1" });
-    await component.save();
+
+    const success = await component.save();
+
+    expect(success).toBe(true);
     expect(smsGatewayServiceMock.postSmsGateway).toHaveBeenCalled();
     expect(dialogRefMock.close).toHaveBeenCalledWith(true);
+  });
+
+  it("Save should handle error", async () => {
+    component.smsForm.patchValue({
+      name: "test",
+      providermodule: "mod1"
+    });
+    component.smsForm.get("options")?.patchValue({ p1: "val1" });
+    smsGatewayServiceMock.postSmsGateway = jest.fn().mockRejectedValue(new Error("Save failed"));
+    // Clear any previous calls to close from setup
+    dialogRefMock.close.mockClear();
+
+    const success = await component.save();
+
+    expect(success).toBe(false);
+    expect(smsGatewayServiceMock.postSmsGateway).toHaveBeenCalled();
+    expect(dialogRefMock.close).not.toHaveBeenCalled();
   });
 });

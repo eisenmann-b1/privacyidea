@@ -121,9 +121,31 @@ describe("NewSmtpServerComponent", () => {
         sender: "test@test.com",
         timeout: 5
       });
-      await component.save();
+
+      const success = await component.save();
+
+      expect(success).toBe(true);
       expect(smtpServiceMock.postSmtpServer).toHaveBeenCalled();
       expect(dialogRefMock.close).toHaveBeenCalledWith(true);
+    });
+
+    it("Save should handle error", async () => {
+      component.smtpForm.patchValue({
+        identifier: "test",
+        server: "smtp.test.com",
+        port: 25,
+        sender: "test@test.com",
+        timeout: 5
+      });
+      smtpServiceMock.postSmtpServer.mockRejectedValue(new Error("Save failed"));
+      // Clear any previous calls to close from setup
+      dialogRefMock.close.mockClear();
+
+      const success = await component.save();
+
+      expect(success).toBe(false);
+      expect(smtpServiceMock.postSmtpServer).toHaveBeenCalled();
+      expect(dialogRefMock.close).not.toHaveBeenCalled();
     });
 
     it("should not call smtpService.postSmtpServer if the form is invalid", async () => {

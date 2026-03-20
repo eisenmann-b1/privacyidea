@@ -172,6 +172,7 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
 
     this.pendingChangesService.registerHasChanges(() => this.hasChanges);
     this.pendingChangesService.registerSave(() => this.onSave());
+    this.pendingChangesService.registerValidChanges(() => this.canSave);
 
     effect(() => {
       if (!this.contentService.routeUrl().startsWith(ROUTE_PATHS.USERS)) {
@@ -287,7 +288,7 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.resolverService.selectedResolverName.set("");
-    this.pendingChangesService.unregisterHasChanges();
+    this.pendingChangesService.clearAllRegistrations();
     if (this.observer) {
       this.observer.disconnect();
     }
@@ -322,19 +323,19 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  onSave(): Promise<void> | void {
+  async onSave(): Promise<boolean> {
     const name = this.resolverName.trim();
     if (!name) {
       this.notificationService.openSnackBar($localize`Please enter a resolver name.`);
-      return;
+      return false;
     }
     if (!this.resolverType) {
       this.notificationService.openSnackBar($localize`Please select a resolver type.`);
-      return;
+      return false;
     }
     if (!this.isAdditionalFieldsValid) {
       this.notificationService.openSnackBar($localize`Please fill in all required fields.`);
-      return;
+      return false;
     }
 
     const payload: any = {
@@ -349,7 +350,7 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
 
     this.isSaving.set(true);
 
-    return new Promise<void>((resolve) => {
+    return new Promise<boolean>((resolve) => {
       this.resolverService
         .postResolver(name, payload)
         .subscribe({
@@ -367,20 +368,22 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
                 this.formData = {};
                 this.router.navigateByUrl(ROUTE_PATHS.USERS_RESOLVERS);
               }
+              resolve(true);
             } else {
               const message =
                 res.detail?.description || res.result?.error?.message || $localize`Unknown error occurred.`;
               this.notificationService.openSnackBar($localize`Failed to save resolver. ${message}`);
+              resolve(false);
             }
           },
           error: (err: HttpErrorResponse) => {
             const message = err.error?.result?.error?.message || err.message;
             this.notificationService.openSnackBar($localize`Failed to save resolver. ${message}`);
+            resolve(false);
           }
         })
         .add(() => {
           setTimeout(() => this.isSaving.set(false));
-          resolve();
         });
     });
   }
@@ -410,11 +413,11 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
           if (result === true) {
             if (!this.canSave) return;
             Promise.resolve(this.pendingChangesService.save()).then(() => {
-              this.pendingChangesService.unregisterHasChanges();
+              this.pendingChangesService.clearAllRegistrations();
               this.closeCurrent();
             });
           } else if (result === false) {
-            this.pendingChangesService.unregisterHasChanges();
+            this.pendingChangesService.clearAllRegistrations();
             this.closeCurrent();
           }
         });

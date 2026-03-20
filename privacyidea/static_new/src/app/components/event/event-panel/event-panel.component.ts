@@ -144,6 +144,8 @@ export class EventPanelComponent implements AfterViewInit, OnDestroy {
     }
 
     this.pendingChangesService.registerHasChanges(() => this.hasChanges());
+    this.pendingChangesService.registerSave(this.saveEvent.bind(this));
+    this.pendingChangesService.registerValidChanges(this.canSave.bind(this));
 
     // Close the dialog when navigating away from the events route
     // However, changing the route is disabled via the pendingChangesGuard when there are unsaved changes. This effect
@@ -182,7 +184,7 @@ export class EventPanelComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.pendingChangesService.unregisterHasChanges();
+    this.pendingChangesService.clearAllRegistrations();
     if (this.observer) {
       this.observer.disconnect();
     }
@@ -302,24 +304,32 @@ export class EventPanelComponent implements AfterViewInit, OnDestroy {
     return eventParams;
   }
 
-  saveEvent(): void {
-    let eventParams = this.getSaveParameters();
-    if (this.isNewEvent()) {
-      // new event handler do not yet have an ID
-      delete eventParams["id"];
-    }
-    this.eventService.saveEventHandler(eventParams).subscribe({
-      next: (response) => {
-        if (response?.result?.value !== undefined) {
-          this.eventService.allEventsResource.reload();
-          this.dialogRef?.close();
-          if (this.isNewEvent()) {
-            this.notificationService.openSnackBar("Event handler created successfully.");
-          } else {
-            this.notificationService.openSnackBar("Event handler updated successfully.");
-          }
-        }
+  saveEvent(): Promise<boolean> {
+    return new Promise((resolve) => {
+      let eventParams = this.getSaveParameters();
+      if (this.isNewEvent()) {
+        // new event handler do not yet have an ID
+        delete eventParams["id"];
       }
+      this.eventService.saveEventHandler(eventParams).subscribe({
+        next: (response) => {
+          if (response?.result?.value !== undefined) {
+            this.eventService.allEventsResource.reload();
+            this.dialogRef?.close();
+            if (this.isNewEvent()) {
+              this.notificationService.openSnackBar("Event handler created successfully.");
+            } else {
+              this.notificationService.openSnackBar("Event handler updated successfully.");
+            }
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        },
+        error: () => {
+          resolve(false);
+        }
+      });
     });
   }
 

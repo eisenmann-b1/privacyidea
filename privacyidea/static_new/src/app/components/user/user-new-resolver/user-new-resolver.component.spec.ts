@@ -285,8 +285,9 @@ describe("UserNewResolverComponent", () => {
     const notificationService = TestBed.inject(NotificationService) as unknown as MockNotificationService;
     const dialogRef = TestBed.inject(MatDialogRef);
 
-    component.onSave();
+    const success = await component.onSave();
 
+    expect(success).toBe(true);
     expect(notificationService.openSnackBar).toHaveBeenCalledWith(expect.stringContaining("created"));
     expect(dialogRef.close).toHaveBeenCalledWith(true);
   });
@@ -313,8 +314,9 @@ describe("UserNewResolverComponent", () => {
     const notificationService = TestBed.inject(NotificationService) as unknown as MockNotificationService;
     const dialogRef = TestBed.inject(MatDialogRef);
 
-    component.onSave();
+    const success = await component.onSave();
 
+    expect(success).toBe(true);
     expect(notificationService.openSnackBar).toHaveBeenCalledWith(expect.stringContaining("updated"));
     expect(dialogRef.close).toHaveBeenCalledWith(true);
   });
@@ -332,8 +334,9 @@ describe("UserNewResolverComponent", () => {
     } as any);
     const notificationService = TestBed.inject(NotificationService) as unknown as MockNotificationService;
 
-    component.onSave();
+    const success = await component.onSave();
 
+    expect(success).toBe(false);
     expect(notificationService.openSnackBar).toHaveBeenCalledWith(expect.stringContaining("Detailed error"));
   });
 
@@ -341,18 +344,21 @@ describe("UserNewResolverComponent", () => {
     const notificationService = TestBed.inject(NotificationService) as unknown as MockNotificationService;
 
     component.resolverName = "";
-    component.onSave();
+    let success = await component.onSave();
+    expect(success).toBe(false);
     expect(notificationService.openSnackBar).toHaveBeenCalledWith(expect.stringContaining("enter a resolver name"));
 
     component.resolverName = "res";
     component.resolverType = "" as any;
-    component.onSave();
+    success = await component.onSave();
+    expect(success).toBe(false);
     expect(notificationService.openSnackBar).toHaveBeenCalledWith(expect.stringContaining("select a resolver type"));
 
     component.resolverType = "passwdresolver";
     await detectChangesStable();
     component.passwdResolver()?.filenameControl.setValue("");
-    component.onSave();
+    success = await component.onSave();
+    expect(success).toBe(false);
     expect(notificationService.openSnackBar).toHaveBeenCalledWith(
       expect.stringContaining("fill in all required fields")
     );

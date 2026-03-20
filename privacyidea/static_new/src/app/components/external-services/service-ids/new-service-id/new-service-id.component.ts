@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { Component, effect, inject, OnDestroy, OnInit } from "@angular/core";
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import {
   ServiceId,
@@ -35,7 +35,7 @@ import { Router } from "@angular/router";
 import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
 import { PendingChangesService } from "../../../../services/pending-changes/pending-changes.service";
 import { SaveAndExitDialogComponent } from "../../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
-import { DialogServiceInterface, DialogService } from "../../../../services/dialog/dialog.service";
+import { DialogService, DialogServiceInterface } from "../../../../services/dialog/dialog.service";
 
 @Component({
   selector: "app-new-service-id",
@@ -80,6 +80,7 @@ export class NewServiceIdComponent implements OnInit, OnDestroy {
 
     this.pendingChangesService.registerHasChanges(() => this.hasChanges);
     this.pendingChangesService.registerSave(() => this.save());
+    this.pendingChangesService.registerValidChanges(() => this.canSave);
 
     effect(() => {
       if (!this.contentService.routeUrl().startsWith(ROUTE_PATHS.EXTERNAL_SERVICES_SERVICE_IDS)) {
@@ -109,17 +110,23 @@ export class NewServiceIdComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.pendingChangesService.unregisterHasChanges();
+    this.pendingChangesService.clearAllRegistrations();
   }
 
-  save(): Promise<void> | void {
-    if (this.serviceIdForm.valid) {
-      const serviceId: ServiceId = {
-        ...this.serviceIdForm.getRawValue()
-      };
-      return this.serviceIdService.postServiceId(serviceId).then(() => {
-        this.dialogRef.close(true);
-      });
+  async save(): Promise<boolean> {
+    if (this.serviceIdForm.invalid) {
+      return false;
+    }
+    const serviceId: ServiceId = {
+      ...this.serviceIdForm.getRawValue()
+    };
+
+    try {
+      await this.serviceIdService.postServiceId(serviceId);
+      this.dialogRef.close(true);
+      return true;
+    } catch (error) {
+      return false;
     }
   }
 
@@ -136,12 +143,12 @@ export class NewServiceIdComponent implements OnInit, OnDestroy {
         .afterClosed()
         .subscribe((result) => {
           if (result === "discard") {
-            this.pendingChangesService.unregisterHasChanges();
+            this.pendingChangesService.clearAllRegistrations();
             this.closeCurrent();
           } else if (result === "save-exit") {
             if (!this.canSave) return;
             Promise.resolve(this.pendingChangesService.save()).then(() => {
-              this.pendingChangesService.unregisterHasChanges();
+              this.pendingChangesService.clearAllRegistrations();
               this.closeCurrent();
             });
           }

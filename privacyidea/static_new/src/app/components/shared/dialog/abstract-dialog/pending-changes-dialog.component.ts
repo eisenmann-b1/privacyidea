@@ -27,8 +27,7 @@ import { PendingChangesService } from "src/app/services/pending-changes/pending-
 @Directive()
 export abstract class PendingChangesDialogComponent<D = any, R = any>
   extends AbstractDialogComponent<D, R>
-  implements OnInit, OnDestroy
-{
+  implements OnInit, OnDestroy {
   protected readonly dialogService: DialogServiceInterface = inject(DialogService);
   protected readonly pendingChangesService: PendingChangesService = inject(PendingChangesService);
   private readonly destroyRef = inject(DestroyRef);
@@ -38,6 +37,8 @@ export abstract class PendingChangesDialogComponent<D = any, R = any>
 
   ngOnInit(): void {
     this.pendingChangesService.registerHasChanges(this.isDirty);
+    this.pendingChangesService.registerValidChanges(this.canSave);
+    this.pendingChangesService.registerSave(this.onSave.bind(this));
     this.dialogRef.disableClose = true;
     this.dialogRef
       .backdropClick()
@@ -45,10 +46,15 @@ export abstract class PendingChangesDialogComponent<D = any, R = any>
       .subscribe(() => {
         this.handleCloseAttempt();
       });
+    this.dialogRef.keydownEvents().subscribe((event) => {
+      if (event.key === "Escape") {
+        this.handleCloseAttempt();
+      }
+    });
   }
 
   ngOnDestroy(): void {
-    this.pendingChangesService.unregisterHasChanges();
+    this.pendingChangesService.clearAllRegistrations();
   }
 
   abstract onSave(): Promise<boolean>;
@@ -58,7 +64,6 @@ export abstract class PendingChangesDialogComponent<D = any, R = any>
       this.dialogRef.close();
       return;
     }
-
     const result = await this.dialogService.openDialogAsync({
       component: SaveAndExitDialogComponent,
       data: {
@@ -70,8 +75,8 @@ export abstract class PendingChangesDialogComponent<D = any, R = any>
     if (result === "discard") {
       this.dialogRef.close();
     } else if (result === "save-exit") {
-      const saveResult = await this.onSave();
-      if (saveResult === true) {
+      const saveSuccessful = await this.onSave();
+      if (saveSuccessful) {
         this.dialogRef.close();
       }
     }

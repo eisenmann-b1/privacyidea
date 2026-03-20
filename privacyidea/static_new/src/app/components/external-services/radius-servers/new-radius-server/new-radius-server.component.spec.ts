@@ -87,9 +87,32 @@ describe("NewRadiusServerComponent", () => {
       timeout: 5,
       retries: 3
     });
-    await component.save();
+
+    const success = await component.save();
+
+    expect(success).toBe(true);
     expect(radiusServiceMock.postRadiusServer).toHaveBeenCalled();
     expect(dialogRefMock.close).toHaveBeenCalledWith(true);
+  });
+
+  it("should handle error on save", async () => {
+    component.radiusForm.patchValue({
+      identifier: "test",
+      server: "1.2.3.4",
+      secret: "secret",
+      port: 1812,
+      timeout: 5,
+      retries: 3
+    });
+    radiusServiceMock.postRadiusServer.mockRejectedValue(new Error("Save failed"));
+    // Clear any previous calls to close from setup
+    dialogRefMock.close.mockClear();
+
+    const success = await component.save();
+
+    expect(success).toBe(false);
+    expect(radiusServiceMock.postRadiusServer).toHaveBeenCalled();
+    expect(dialogRefMock.close).not.toHaveBeenCalled();
   });
 
   it("should call test when form is valid", async () => {

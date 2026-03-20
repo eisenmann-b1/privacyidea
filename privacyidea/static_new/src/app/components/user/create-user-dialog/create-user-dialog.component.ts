@@ -72,17 +72,23 @@ export class CreateUserDialogComponent extends PendingChangesDialogComponent<Cre
     resolver: this.resolverControl
   });
 
-  canSave = signal(this.inputGroup.invalid);
-  isDirty = signal(false);
+  canSave = signal(this.inputGroup.valid);
+  inputGroupPristine = signal(this.inputGroup.pristine);
+  isDirty = computed(() => {
+    if (!this.inputGroupPristine()) {
+      return true;
+    }
+    return this.editUserDataIsEmpty();
+  });
 
   constructor() {
     super();
     this.inputGroup.statusChanges.subscribe(() => {
-      this.canSave.set(this.inputGroup.invalid);
-      this.isDirty.set(!this.inputGroup.pristine);
+      this.canSave.set(this.inputGroup.valid);
+      this.inputGroupPristine.set(this.inputGroup.pristine);
     });
     this.inputGroup.valueChanges.subscribe(() => {
-      this.isDirty.set(!this.inputGroup.pristine);
+      this.inputGroupPristine.set(this.inputGroup.pristine);
     });
 
     // Select initial resolver
@@ -116,6 +122,10 @@ export class CreateUserDialogComponent extends PendingChangesDialogComponent<Cre
 
   editedUserData: WritableSignal<EditUserData> = linkedSignal(() => {
     return { username: "" };
+  });
+
+  editUserDataIsEmpty = computed(() => {
+    return Object.values(this.editedUserData()).some(value => value === "" || value === undefined);
   });
 
   correspondingRealms: Signal<string[]> = computed(() => {

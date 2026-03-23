@@ -33,7 +33,8 @@
           [showClearButton]="tokenService.tokenFilter().isNotEmpty">
           <input
             #filterHTMLInputElement
-            (input)="tokenService.handleFilterInput($event)"
+            (input)="onFilterInput($event)"
+            (keyup.enter)="tokenService.handleFilterInput($event)"
             [value]="tokenService.tokenFilter().filterString"
             aria-label="Filter Input"
             i18n-aria-label

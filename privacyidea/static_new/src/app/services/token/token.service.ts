@@ -77,7 +77,7 @@ export type TokenTypeKey =
   | "webauthn"
   | "passkey";
 
-const apiFilter = ["serial", "type", "active", "description", "rollout_state", "tokenrealm", "container_serial"];
+const apiFilter = ["serial", "type", "active", "user", "realm", "description", "rollout_state", "tokenrealm", "container_serial"];
 
 const advancedApiFilter = ["infokey & infovalue", "userid", "resolver", "assigned"];
 
@@ -89,6 +89,7 @@ const apiFilterKeyMap: Record<string, string> = {
   rollout_state: "rollout_state",
   username: "user",
   realms: "tokenrealm",
+  user_realm: "realm",
   container_serial: "container_serial"
 };
 
@@ -328,7 +329,7 @@ export class TokenService implements TokenServiceInterface {
   filterParams = computed<Record<string, string>>(() => {
     const allowed = [...this.apiFilter, ...this.advancedApiFilter, ...this.hiddenApiFilter, "infokey", "infovalue"];
 
-    const plainKeys = new Set(["user", "infokey", "infovalue", "active", "assigned", "container_serial"]);
+    const plainKeys = new Set(["user", "infokey", "infovalue", "active", "assigned", "container_serial", "realm"]);
 
     const entries = [
       ...Array.from(this.tokenFilter().filterMap.entries()),

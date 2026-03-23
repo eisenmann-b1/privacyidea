@@ -208,6 +208,14 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
     this.pageIndex.set(event.pageIndex);
   }
 
+  onFilterInput($event: Event) {
+    const input = $event.target as HTMLInputElement;
+    const value = input.value.toLowerCase();
+    if (!value.includes("user:") && !value.includes("realm:")) {
+      this.tokenService.handleFilterInput($event);
+    }
+  }
+
   toggleFilter(filterKeyword: string): void {
     let newValue;
     if (filterKeyword === "active") {

@@ -16,15 +16,19 @@
 
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
-<h3
-  class="margin-8 external-service-dialog-title"
-  i18n>
-  @if (isEditMode) {
+@if (isEditMode) {
+  <h3
+    class="margin-8 external-service-dialog-title"
+    i18n>
     Edit RADIUS Server
-  } @else {
+  </h3>
+} @else {
+  <h3
+    class="margin-8 external-service-dialog-title"
+    i18n>
     Create RADIUS Server
-  }
-</h3>
+  </h3>
+}
 
 <mat-dialog-content class="radius-dialog-content">
   <form
@@ -95,8 +99,8 @@
           <input
             formControlName="secret"
             matInput
-            type="password"
-            required />
+            required
+            type="password" />
         </app-clearable-input>
         @if (radiusForm.get('secret')?.hasError('required')) {
           <mat-error

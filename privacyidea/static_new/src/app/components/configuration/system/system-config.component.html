@@ -75,13 +75,13 @@
 
         <mat-form-field
           class="margin-left-auto input-width-s">
-          <mat-label i18n>Clear Failcounter After</mat-label>
+          <mat-label i18n>Clear Failcounter</mat-label>
           <input
             [(ngModel)]="params.failcounter_clear_timeout"
             matInput
             name="failcounter_clear_timeout"
             placeholder="0" />
-          <mat-hint i18n>In minutes.</mat-hint>
+          <mat-hint i18n>Time in minutes.</mat-hint>
         </mat-form-field>
       </div>
 
@@ -151,7 +151,7 @@
               name="UserCacheExpiration"
               placeholder="0" />
             <mat-hint i18n>
-              In seconds.
+              Time in seconds.
             </mat-hint>
           </mat-form-field>
 
@@ -247,13 +247,14 @@
                 placeholder="1000" />
             </mat-form-field>
 
-            <mat-form-field class="input-width-m">
-              <mat-label i18n>Challenge Validity Time</mat-label>
+            <mat-form-field class="input-width-s">
+              <mat-label i18n>Challenge Validity</mat-label>
               <input
                 [(ngModel)]="params.DefaultChallengeValidityTime"
                 matInput
                 name="DefaultChallengeValidityTime"
                 placeholder="120" />
+              <mat-hint i18n>Time in seconds.</mat-hint>
             </mat-form-field>
           </div>
         </div>

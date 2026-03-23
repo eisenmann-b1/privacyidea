@@ -16,15 +16,19 @@
 
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
-<h3
-  class="margin-8 external-service-dialog-title"
-  i18n>
-  @if (isEditMode) {
+@if (isEditMode) {
+  <h3
+    class="margin-8 external-service-dialog-title"
+    i18n>
     Edit CA Connector
-  } @else {
+  </h3>
+} @else {
+  <h3
+    class="margin-8 external-service-dialog-title"
+    i18n>
     Create CA Connector
-  }
-</h3>
+  </h3>
+}
 
 <mat-dialog-content class="ca-connector-dialog-content">
   <form

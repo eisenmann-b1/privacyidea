@@ -16,11 +16,19 @@
 
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
-<h3
-  class="margin-8 external-service-dialog-title"
-  i18n>
-  {{ isEditMode ? 'Edit SMTP Server' : 'Create SMTP Server' }}
-</h3>
+@if (isEditMode) {
+  <h3
+    class="margin-8 external-service-dialog-title"
+    i18n>
+    Edit SMTP Server
+  </h3>
+} @else {
+  <h3
+    class="margin-8 external-service-dialog-title"
+    i18n>
+    Create SMTP Server
+  </h3>
+}
 
 <mat-dialog-content class="smtp-dialog-content">
   <form

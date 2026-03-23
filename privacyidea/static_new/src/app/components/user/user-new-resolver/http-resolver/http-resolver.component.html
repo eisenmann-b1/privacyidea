@@ -45,7 +45,7 @@
 
   @if (!isAdvanced && basicSettings()) {
     <div class="flex-column">
-      <div class="flex-row gap-16">
+      <div class="flex-row gap-16 margin-bottom-16">
         <mat-form-field class="input-width-xl">
           <mat-label i18n>Endpoint (URL)</mat-label>
           <app-clearable-input
@@ -76,7 +76,7 @@
         </mat-form-field>
       </div>
 
-      <mat-form-field class="input-width-xl">
+      <mat-form-field class="input-width-xl margin-bottom-16">
         <mat-label i18n>Request Mapping (JSON Format)</mat-label>
         <textarea
           [formControl]="requestMappingControl"
@@ -88,7 +88,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field class="input-width-xl">
+      <mat-form-field class="input-width-xl margin-bottom-16">
         <mat-label i18n>Headers (JSON Format)</mat-label>
         <textarea
           [formControl]="headersControl"
@@ -100,7 +100,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field class="input-width-xl">
+      <mat-form-field class="input-width-xl margin-bottom-16">
         <mat-label i18n>Response Mapping (JSON Format)</mat-label>
         <textarea
           [formControl]="responseMappingControl"
@@ -120,8 +120,8 @@
       Special Error Handling
     </mat-checkbox>
 
-    @if (editableControl.value) {
-      <mat-form-field class="auth-wide input-width-xl">
+    @if (editable()) {
+      <mat-form-field class="auth-wide input-width-xl margin-bottom-16">
         <mat-label i18n>Response contains (JSON Format)</mat-label>
         <textarea
           [formControl]="errorResponseControl"
@@ -319,8 +319,8 @@
         <mat-hint i18n>If no custom headers are defined this header is used for all endpoints.</mat-hint>
       </mat-form-field>
 
-      <div class="flex-row gap-16 margin-top-16">
-        <div class="flex-column">
+      <div class="flex-row gap-16 margin-top-16 margin-bottom-16">
+        <div class="flex-column input-width-l">
           <mat-checkbox
             [formControl]="editableControl"
             i18n>
@@ -332,33 +332,6 @@
         </div>
 
         <div class="flex-column">
-          <mat-checkbox
-            [formControl]="verifyTlsControl"
-            i18n>
-            Verify TLS certificate of the server.
-          </mat-checkbox>
-        </div>
-      </div>
-
-      <div class="flex-row gap-16">
-        @if (verifyTlsControl.value) {
-          <mat-form-field class="input-width-l">
-            <mat-label i18n>CA Certificate</mat-label>
-            <mat-hint i18n>
-              The file containing the CA certificate which signed the TLS certificate of the server.
-            </mat-hint>
-            <app-clearable-input
-              (onClick)="tlsCaPathControl.setValue('')"
-              [showClearButton]="!!tlsCaPathControl.value">
-              <input
-                [formControl]="tlsCaPathControl"
-                matInput
-                placeholder="/etc/privacyidea/ldap-ca.crt" />
-            </app-clearable-input>
-          </mat-form-field>
-        }
-
-        <div class="flex-column">
           <mat-form-field class="input-width-s">
             <mat-label i18n>Timeout</mat-label>
             <input
@@ -367,9 +340,35 @@
               placeholder="60" />
           </mat-form-field>
           <span
-            class="hint"
-            i18n>Time in seconds privacyIDEA tries to reach the user store server.</span>
+            class="hint margin-top--16"
+            i18n>Time in seconds privacyIDEA tries <br> to reach the user store server.</span>
         </div>
+      </div>
+
+      <div class="flex-row gap-16 margin-bottom-16">
+        <mat-checkbox
+          class="input-width-l"
+          [formControl]="verifyTlsControl"
+          i18n>
+          Verify TLS certificate of the server.
+        </mat-checkbox>
+
+        <mat-form-field
+          class="input-width-l">
+          <mat-label i18n>CA Certificate</mat-label>
+          <mat-hint i18n>
+            The file containing the CA certificate which signed the TLS certificate of the server.
+          </mat-hint>
+          <app-clearable-input
+            (onClick)="tlsCaPathControl.setValue('')"
+            [disabled]="!verifyTls()"
+            [showClearButton]="!!tlsCaPathControl.value">
+            <input
+              [formControl]="tlsCaPathControl"
+              matInput
+              placeholder="/etc/privacyidea/ldap-ca.crt" />
+          </app-clearable-input>
+        </mat-form-field>
       </div>
     </div>
 
@@ -446,7 +445,7 @@
                     </mat-select>
                   </mat-form-field>
 
-                  @if (clientCredentialTypeControl.value === 'secret') {
+                  @if (clientCredentialType() === 'secret') {
                     <mat-form-field class="input-width-l">
                       <mat-label i18n>Client Secret</mat-label>
                       <app-clearable-input
@@ -464,7 +463,7 @@
                     </mat-form-field>
                   }
                 </div>
-                @if (clientCredentialTypeControl.value === 'certificate') {
+                @if (clientCredentialType() === 'certificate') {
                   <p
                     class="auth-description"
                     i18n>
@@ -561,7 +560,7 @@
           </div>
         </mat-expansion-panel>
 
-        @if (clientCredentialTypeControl.value !== 'certificate') {
+        @if (clientCredentialType() !== 'certificate') {
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title i18n>Check User Password</mat-panel-title>
@@ -619,7 +618,7 @@
           </div>
         </mat-expansion-panel>
 
-        @if (editableControl.value) {
+        @if (editable()) {
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title i18n>Create User</mat-panel-title>

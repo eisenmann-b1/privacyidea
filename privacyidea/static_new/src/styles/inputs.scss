@@ -1,6 +1,6 @@
 @use "theme";
 
-$input-outline: theme.$focus-outline;
+$input-focus-outline: theme.$focus-outline;
 
 .input {
   height: 40px;
@@ -9,7 +9,7 @@ $input-outline: theme.$focus-outline;
   outline: none;
 
   &:focus {
-    outline: $focus-outline;
+    outline: $input-focus-outline;
   }
 }
 

@@ -14,13 +14,13 @@
     @include inputs.action-tab-input;
 
     &:focus-visible {
-      outline: inputs.$focus-outline;
+      outline: inputs.$input-focus-outline;
       outline-offset: 2px;
     }
   }
 
   &:focus-within {
-    outline: inputs.$focus-outline;
+    outline: inputs.$input-focus-outline;
     outline-offset: 2px;
   }
 }

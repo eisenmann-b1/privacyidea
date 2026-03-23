@@ -80,7 +80,7 @@
   }
 
   &:focus-visible {
-    outline: buttons.$focus-outline;
+    outline: buttons.$button-focus-outline;
     outline-offset: 1px;
   }
 }

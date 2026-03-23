@@ -29,6 +29,7 @@ describe("HttpGroupsAttributeComponent", () => {
   beforeEach(async () => {
     userGroupsControl = new FormGroup({
       active: new FormControl(false),
+      pi_user_groups_key: new FormControl("groups"),
       user_groups_attribute: new FormControl(""),
       method: new FormControl("GET"),
       endpoint: new FormControl("")
@@ -53,6 +54,7 @@ describe("HttpGroupsAttributeComponent", () => {
 
   it("should enable controls when active is true", () => {
     // Check previous state due to initial values
+    expect(userGroupsControl.get("pi_user_groups_key")!.enabled).toBe(false);
     expect(userGroupsControl.get("user_groups_attribute")!.enabled).toBe(false);
     expect(userGroupsControl.get("method")!.enabled).toBe(false);
     expect(userGroupsControl.get("endpoint")!.enabled).toBe(false);
@@ -60,6 +62,7 @@ describe("HttpGroupsAttributeComponent", () => {
     // Change value to true
     userGroupsControl.get("active")!.setValue(true);
     fixture.detectChanges();
+    expect(userGroupsControl.get("pi_user_groups_key")!.enabled).toBe(true);
     expect(userGroupsControl.get("user_groups_attribute")!.enabled).toBe(true);
     expect(userGroupsControl.get("method")!.enabled).toBe(true);
     expect(userGroupsControl.get("endpoint")!.enabled).toBe(true);
@@ -68,6 +71,7 @@ describe("HttpGroupsAttributeComponent", () => {
   it("should disable controls when active is false", async () => {
     component.userGroupsControl.get("active")!.setValue(false, { emitEvent: true });
     fixture.detectChanges();
+    expect(userGroupsControl.get("pi_user_groups_key")!.disabled).toBe(true);
     expect(component.userGroupsControl.get("user_groups_attribute")!.disabled).toBe(true);
     expect(component.userGroupsControl.get("method")!.disabled).toBe(true);
     expect(component.userGroupsControl.get("endpoint")!.disabled).toBe(true);

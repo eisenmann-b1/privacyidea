@@ -73,12 +73,11 @@ export class MockPolicyService implements PolicyServiceInterface {
   policyHasConditions = jest.fn().mockReturnValue(true);
   policyHasAdminConditions = jest.fn().mockReturnValue(true);
   policyHasUserConditions = jest.fn().mockReturnValue(true);
-  policyHasEnviromentConditions = jest.fn().mockReturnValue(true);
+  policyHasEnvironmentConditions = jest.fn().mockReturnValue(true);
   policyHasAdditionalConditions = jest.fn().mockReturnValue(true);
   policyHasActions = jest.fn().mockReturnValue(true);
-  savePolicyEdits = jest.fn().mockReturnValue(undefined);
   isPolicyEdited = jest.fn().mockReturnValue(true);
   togglePolicyActive = jest.fn().mockReturnValue(undefined);
-  savePolicyEdits = jest.fn().mockReturnValue(undefined);
-  allPoliciesRecource = new MockHttpResourceRef(undefined);
+  allPoliciesResource = new MockHttpResourceRef(undefined);
+  policyActionResource = new MockHttpResourceRef(undefined);
 }

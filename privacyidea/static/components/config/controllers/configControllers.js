@@ -1298,7 +1298,13 @@ myApp.controller("HTTPResolverController", ["$scope", "ConfigFactory", "$state",
         };
 
         $scope.methods = {"get": "GET", "post": "POST", "put": "PUT", "patch": "PATCH", "delete": "DELETE"};
-        $scope.groups_config = {active: false, method: "get", endpoint: "", user_groups_attribute: ""};
+        $scope.groups_config = {
+            active: false,
+            method: "get",
+            endpoint: "",
+            user_groups_attribute: "",
+            pi_user_groups_key: "groups"
+        };
 
         $scope.typeMapping = {
             "httpresolver": "HTTP Resolver",

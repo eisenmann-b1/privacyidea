@@ -53,8 +53,8 @@ import { QuestionnaireConfigComponent } from "./token-types/questionnaire-config
 import { YubicoConfigComponent } from "./token-types/yubico-config/yubico-config.component";
 import { YubikeyConfigComponent } from "./token-types/yubikey-config/yubikey-config.component";
 import { DaypasswordConfigComponent } from "./token-types/daypassword-config/daypassword-config.component";
+import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { ActivatedRoute } from "@angular/router";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
   selector: "app-token-type-config",
@@ -88,8 +88,10 @@ export class TokenTypeConfigComponent implements OnInit, AfterViewInit {
   readonly authService: AuthServiceInterface = inject(AuthService);
   readonly notificationService: NotificationServiceInterface = inject(NotificationService);
   private readonly http = inject(HttpClient);
-  private route = inject(ActivatedRoute);
+  private readonly route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
+  queryParams = toSignal(this.route.queryParams);
+  expandEmail = computed(() => this.queryParams()?.["expanded"] === "email");
 
   formData = signal<Record<string, any>>({});
   nextQuestion = signal(0);
@@ -136,6 +138,14 @@ export class TokenTypeConfigComponent implements OnInit, AfterViewInit {
     });
   }
 
+  get questionKeys() {
+    return Object.keys(this.formData()).filter(k => k.startsWith("question.question."));
+  }
+
+  get yubikeyApiIds() {
+    return Object.keys(this.formData()).filter(k => k.startsWith("yubikey.apiid."));
+  }
+
   ngOnInit() {
     // allow opening a specific panel via URL fragment, e.g. /configuration/token-types#yubico
     this.route.fragment
@@ -155,14 +165,6 @@ export class TokenTypeConfigComponent implements OnInit, AfterViewInit {
         panel.scrollIntoView({ behavior: "smooth" });
       }
     }
-  }
-
-  get questionKeys() {
-    return Object.keys(this.formData()).filter(k => k.startsWith("question.question."));
-  }
-
-  get yubikeyApiIds() {
-    return Object.keys(this.formData()).filter(k => k.startsWith("yubikey.apiid."));
   }
 
   addQuestion(text: string) {

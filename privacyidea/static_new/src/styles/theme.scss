@@ -1,5 +1,7 @@
 @use "@angular/material" as mat;
 
+$focus-outline: 2px solid var(--mat-sys-primary-light);
+
 html {
   &.system {
     --mint-bg: light-dark(#e9f5e0, #243328);

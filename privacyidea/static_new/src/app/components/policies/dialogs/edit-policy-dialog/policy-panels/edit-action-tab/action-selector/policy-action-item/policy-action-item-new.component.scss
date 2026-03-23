@@ -80,7 +80,7 @@
   }
 
   &:focus-visible {
-    outline: 1px solid var(--mat-sys-primary-light);
+    outline: buttons.$focus-outline;
     outline-offset: 1px;
   }
 }

@@ -1,4 +1,5 @@
 @use "@angular/material" as mat;
+@use "theme";
 
 $button-height: 40px;
 $button-width: 240px;
@@ -11,6 +12,7 @@ $keyword-font-size: 18px;
 $button-border-radius: var(--border-radius);
 $profile-bg: var(--background-yellow);
 $profile-hover-bg: var(--background-yellow-inset);
+$input-outline: theme.$focus-outline;
 
 $grad-surface: linear-gradient(145deg, var(--mat-sys-surface-container), var(--mat-sys-surface-container-low));
 $grad-surface-hover: linear-gradient(

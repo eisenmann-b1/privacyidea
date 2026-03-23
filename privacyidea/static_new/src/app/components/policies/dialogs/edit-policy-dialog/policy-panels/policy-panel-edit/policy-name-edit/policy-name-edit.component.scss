@@ -17,10 +17,8 @@
     @include inputs.action-tab-input;
 
     &:focus-visible {
-      outline: 2px solid var(--pi-focus-outline-color, #2684ff);
+      outline: inputs.$focus-outline;
       outline-offset: 2px;
     }
   }
-
 }
-

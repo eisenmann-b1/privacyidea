@@ -22,7 +22,7 @@
   </mat-expansion-panel-header>
   <div class="panel-content expansion-well">
     <p i18n>The E-Mail token is a challenge response token that sends the OTP value to the given email address, when the
-            correct OTP PIN was presented by the user.<br>
+            correct OTP PIN was presented by the user.
     </p>
 
     <div class="flex-row gap-16 ali-center margin-bottom-16">
@@ -41,7 +41,7 @@
         </mat-select>
         <mat-hint i18n>Select a predefined
           <a
-            [routerLink]=[ROUTE_PATHS.EXTERNAL_SERVICES_SMTP]><strong>SMTP server configuration</strong>.<br>
+            [routerLink]=[ROUTE_PATHS.EXTERNAL_SERVICES_SMTP]><strong>SMTP server configuration</strong>.
           </a>
         </mat-hint>
       </mat-form-field>
@@ -54,7 +54,7 @@
           [(ngModel)]="formData()['email.validtime']"
           matInput
           type="number">
-        <mat-hint i18n>The time in seconds for which the sent OTP value is valid for authentication.<br></mat-hint>
+        <mat-hint i18n>The time in seconds for which the sent OTP value is valid for authentication.</mat-hint>
       </mat-form-field>
     </div>
   </div>

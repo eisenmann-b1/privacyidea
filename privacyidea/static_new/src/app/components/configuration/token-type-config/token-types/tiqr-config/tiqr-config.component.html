@@ -23,7 +23,6 @@
   <div class="panel-content expansion-well">
     <p i18n>The TiQR Token is an OCRA based Smartphone Token, that can be used to authenticate by just scanning a QR
             code.
-      <br>
     </p>
 
     <div class="flex-column margin-bottom-32">
@@ -32,8 +31,8 @@
         class="input-width-xl">
         <mat-label i18n>TiQR Registration Server</mat-label>
         <input
-          [(ngModel)]="formData()['tiqr.regServer']"
           #regServerInput="ngModel"
+          [(ngModel)]="formData()['tiqr.regServer']"
           [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="http://pi.server/ttype/tiqr"
@@ -73,9 +72,7 @@
         <input
           [(ngModel)]="formData()['tiqr.serviceDisplayname']"
           matInput>
-        <mat-hint i18n>This is the display name of your service in the TiQR app.
-          <br>
-        </mat-hint>
+        <mat-hint i18n>This is the display name of your service in the TiQR app.</mat-hint>
       </mat-form-field>
     </div>
 
@@ -99,8 +96,8 @@
         class="input-width-xl">
         <mat-label i18n>TiQR Logo URL</mat-label>
         <input
-          [(ngModel)]="formData()['tiqr.logoUrl']"
           #logoUrlInput="ngModel"
+          [(ngModel)]="formData()['tiqr.logoUrl']"
           [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="https://pi.server/static/css/privacyIDEA1.png"
@@ -109,9 +106,7 @@
         @if (logoUrlInput.errors?.['required']) {
           <mat-error i18n>TiQR Logo URL is <strong>required</strong></mat-error>
         }
-        <mat-hint i18n>The URL that contains the logo of the service.
-          <br>
-        </mat-hint>
+        <mat-hint i18n>The URL that contains the logo of the service.</mat-hint>
       </mat-form-field>
     </div>
 
@@ -137,8 +132,8 @@
         class="input-width-xl">
         <mat-label i18n>TiQR Info URL</mat-label>
         <input
-          [(ngModel)]="formData()['tiqr.infoUrl']"
           #infoUrlInput="ngModel"
+          [(ngModel)]="formData()['tiqr.infoUrl']"
           [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="https://www.privacyidea.org"

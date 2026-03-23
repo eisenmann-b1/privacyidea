@@ -15,11 +15,10 @@
   outline: none;
 
   &:focus {
-    outline: inputs.$focus-outline;
+    outline: inputs.$input-focus-outline;
   }
 }
 
 .motp-description-form {
   width: 66%;
 }
-

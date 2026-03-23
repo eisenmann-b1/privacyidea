@@ -1,4 +1,6 @@
-$focus-outline: 3px solid var(--mat-sys-primary-light);
+@use "theme";
+
+$input-focus-outline: theme.$focus-outline;
 
 .input {
   height: 40px;
@@ -7,7 +9,7 @@ $focus-outline: 3px solid var(--mat-sys-primary-light);
   outline: none;
 
   &:focus {
-    outline: $focus-outline;
+    outline: $input-focus-outline;
   }
 }
 
@@ -43,6 +45,7 @@ $focus-outline: 3px solid var(--mat-sys-primary-light);
   border-bottom: 1px solid var(--mat-sys-outline-variant);
   border-radius: 0;
   box-sizing: border-box;
+  font-family: inherit;
   font-size: 1rem;
   resize: vertical;
   width: 100%;

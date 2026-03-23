@@ -32,20 +32,13 @@
         (filterChange)="onFilterUpdate($event)">
       </app-policy-filter>
     }
-    <mat-paginator
-      (page)="onPageEvent($event)"
-      [length]="totalLength()"
-      [pageIndex]="pageIndex()"
-      [pageSizeOptions]="pageSizeOptions()"
-      [pageSize]="pageSize()"
-      showFirstLastButtons />
   </div>
 
   <app-policies-table-actions [policySelection]="selectedPolicies()" />
 
   <table
     mat-table
-    [dataSource]="pagedPolicies()"
+    [dataSource]="sortedFilteredPolicies()"
     class="policies-table"
     matSort
     matSortActive="priority"
@@ -130,7 +123,7 @@
                   </div>
                 }
                 @case ("scope") {
-                  {{ policy.scope?.toLocaleUpperCase() }}
+                  {{ policy.scope?.toLowerCase() }}
                 }
                 @case ("description") {
                   {{ policy.description }}

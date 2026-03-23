@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: translations@privacyidea.org\n"
-"PO-Revision-Date: 2026-03-18 15:13+0000\n"
+"PO-Revision-Date: 2026-03-24 07:00+0000\n"
 "Last-Translator: Tomasss <tomasss1024+weblate.org-privacyidea@gmail.com>\n"
 "Language-Team: Slovak <https://hosted.weblate.org/projects/privacyidea/"
 "privacyidea-webui/sk/>\n"
@@ -1144,7 +1144,7 @@ msgstr ""
 
 #: privacyidea/static/components/user/views/user.details.html:70
 msgid "Custom attributes for user {{ username }}"
-msgstr ""
+msgstr "Vlastné atribúty pre používateľa {{ username }}"
 
 #: privacyidea/static/components/config/views/config.resolvers.ldap.html:267
 msgid "DN of a new created user object"
@@ -2865,7 +2865,7 @@ msgstr ""
 #: privacyidea/static/components/directives/views/directive.assignuser.html:63
 #: privacyidea/static/components/token/views/token.enroll.html:65
 msgid "PIN/Password"
-msgstr ""
+msgstr "PIN/Heslo"
 
 #: privacyidea/static/components/token/views/token.details.html:207
 msgid "PKCS12"
@@ -2916,7 +2916,7 @@ msgstr ""
 #: privacyidea/static/components/token/views/token.import.html:75
 #: privacyidea/static/components/user/views/user.password.html:50
 msgid "Password"
-msgstr ""
+msgstr "Heslo"
 
 #: privacyidea/static/components/config/views/config.resolvers.sql.html:105
 msgid "Password Hash for editable users"
@@ -2933,7 +2933,7 @@ msgstr ""
 
 #: privacyidea/static/components/user/controllers/userControllers.js:95
 msgid "Password set successfully."
-msgstr ""
+msgstr "Heslo bolo úspešne nastavené."
 
 #: privacyidea/static/components/token/views/token.enroll.sshkey.html:14
 msgid "Paste the ssh PUBLIC key"
@@ -3379,7 +3379,7 @@ msgstr ""
 #: privacyidea/static/components/directives/views/directive.assignuser.html:73
 #: privacyidea/static/components/token/views/token.enroll.html:73
 msgid "Repeat PIN or password"
-msgstr ""
+msgstr "Zopakujte PIN alebo heslo"
 
 #: privacyidea/static/components/login/views/pinchange.html:20
 msgid "Repeat new PIN"
@@ -3389,7 +3389,7 @@ msgstr ""
 #: privacyidea/static/components/token/views/token.enroll.motp.html:45
 #: privacyidea/static/components/user/views/user.password.html:60
 msgid "Repeat password"
-msgstr ""
+msgstr "Zopakujte heslo"
 
 #: privacyidea/static/components/config/views/config.resolvers.http.basic.html:38
 msgid ""
@@ -3425,7 +3425,7 @@ msgstr "Resetovať počítadlo zlyhaní"
 #: privacyidea/static/components/recovery/views/recovery.html:14
 #: privacyidea/static/components/recovery/views/recovery.reset.html:23
 msgid "Reset Password"
-msgstr ""
+msgstr "Reset hesla"
 
 #: privacyidea/static/components/token/views/token.details.html:107
 msgid "Reset fail counter"
@@ -3433,7 +3433,7 @@ msgstr "Vynulovať počítadlo zlyhaní"
 
 #: privacyidea/static/components/recovery/views/recovery.reset.html:5
 msgid "Reset your Password"
-msgstr ""
+msgstr "Obnoviť heslo"
 
 #: privacyidea/static/components/config/views/config.policies.list.html:25
 #: privacyidea/static/components/token/views/token.containerdetails.html:381
@@ -3941,7 +3941,7 @@ msgstr ""
 
 #: privacyidea/static/components/token/views/token.details.html:486
 msgid "Show password"
-msgstr ""
+msgstr "Zobraziť heslo"
 
 #: privacyidea/static/components/config/views/config.policies.details.html:369
 msgid "Show selected actions only"
@@ -4710,7 +4710,7 @@ msgstr ""
 
 #: privacyidea/static/components/token/views/token.lost.html:48
 msgid "The password can not be shown again, later!"
-msgstr ""
+msgstr "Heslo sa už neskôr nemôže zobraziť!"
 
 #: privacyidea/static/components/token/views/token.enrolled.certificate.html:45
 msgid ""
@@ -5445,17 +5445,17 @@ msgstr ""
 #: privacyidea/static/components/directives/views/directive.assignuser.html:68
 #: privacyidea/static/components/token/views/token.enroll.html:69
 msgid "Type a PIN or password"
-msgstr ""
+msgstr "Zadajte PIN kód alebo heslo"
 
 #: privacyidea/static/components/recovery/views/recovery.reset.html:14
 #: privacyidea/static/components/token/views/token.enroll.motp.html:41
 #: privacyidea/static/components/user/views/user.password.html:55
 msgid "Type a password"
-msgstr ""
+msgstr "Zadajte heslo"
 
 #: privacyidea/static/components/directives/views/directive.assignuser.html:34
 msgid "Type username and press Enter"
-msgstr ""
+msgstr "Zadajte používateľské meno a stlačte Enter"
 
 #: privacyidea/static/components/config/views/config.token.u2f.html:1
 msgid "U2F Token settings"
@@ -5643,11 +5643,11 @@ msgstr ""
 #: privacyidea/static/components/token/views/token.details.html:538
 #: privacyidea/static/components/user/views/user.password.html:6
 msgid "Username"
-msgstr ""
+msgstr "Používateľské meno"
 
 #: privacyidea/static/components/config/views/config.policies.details.html:254
 msgid "Username case-insensitive"
-msgstr ""
+msgstr "Používateľské meno nerozlišuje veľké a malé písmená"
 
 #: privacyidea/static/components/components/views/component.subscriptions.html:30
 #: privacyidea/static/components/config/views/config.html:62
@@ -5784,6 +5784,8 @@ msgid ""
 "You are logged in as {{ loggedInUser.username }}\n"
 "                            @  {{ loggedInUser.realm }}."
 msgstr ""
+"Prihlásený ako {{ loggedInUser.username }}\n"
+"                            @  {{ loggedInUser.realm }}."
 
 #: privacyidea/static/components/directives/views/directive.containertemplate.details.html:64
 msgid "You are not allowed to enroll this token type! It will be skipped!"
@@ -5874,7 +5876,7 @@ msgstr ""
 
 #: privacyidea/static/components/token/views/token.details.html:525
 msgid "You will be logged in as: {{ loggedinUsername }}"
-msgstr ""
+msgstr "Budete prihlásení ako: {{ loggedinUsername }}"
 
 #: privacyidea/static/templates/menu.html:171
 msgid "You will be logged out in {{ myCountdown }} second(s)."
@@ -5890,7 +5892,7 @@ msgstr ""
 
 #: privacyidea/static/components/token/views/token.enrolled.applspec.html:8
 msgid "Your Password:"
-msgstr ""
+msgstr "Vaše heslo:"
 
 #: privacyidea/static/components/token/views/token.enrolled.certificate.html:4
 msgid ""
@@ -6122,11 +6124,11 @@ msgstr "offline: Použite token HOTP na offline prihlásenie do notebookov."
 #. Translation in dynamic user creation
 #: privacyidea/static/components/user/controllers/userControllers.js:39
 msgid "password"
-msgstr ""
+msgstr "heslo"
 
 #: privacyidea/static/components/token/views/token.enroll.daypassword.html:36
 msgid "password length"
-msgstr ""
+msgstr "dĺžka hesla"
 
 #: privacyidea/static/components/user/views/user.list.html:39
 msgid "phone"
@@ -6237,7 +6239,7 @@ msgstr "sériové číslo, kľúč, typ, dĺžka, oneskorenie"
 
 #: privacyidea/static/components/user/views/user.password.html:68
 msgid "set password"
-msgstr ""
+msgstr "nastaviť heslo"
 
 #: privacyidea/static/components/audit/views/audit.log.html:148
 msgid "sig_check"
@@ -6253,7 +6255,7 @@ msgstr "začnite písať sériové číslo tokenu."
 
 #: privacyidea/static/components/directives/views/directive.assignuser.html:20
 msgid "start typing a username"
-msgstr ""
+msgstr "začnite písať používateľské meno"
 
 #: privacyidea/static/components/audit/views/audit.log.html:27
 msgid "startdate"
@@ -6338,7 +6340,7 @@ msgstr ""
 
 #: privacyidea/static/components/user/views/user.list.html:15
 msgid "username"
-msgstr ""
+msgstr "používateľské meno"
 
 #: privacyidea/static/components/audit/views/audit.log.html:18
 msgid "{{ auditdata.count }} entries found."

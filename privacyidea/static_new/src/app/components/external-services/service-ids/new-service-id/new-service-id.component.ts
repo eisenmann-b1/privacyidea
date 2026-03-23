@@ -36,10 +36,14 @@ import { ContentService, ContentServiceInterface } from "../../../../services/co
 import { PendingChangesService } from "../../../../services/pending-changes/pending-changes.service";
 import { SaveAndExitDialogComponent } from "../../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
 import { DialogService, DialogServiceInterface } from "../../../../services/dialog/dialog.service";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
 
 @Component({
   selector: "app-new-service-id",
   standalone: true,
+  host: {
+    class: NAVIGATION_ACCESSIBLE_DIALOG_CLASS
+  },
   imports: [
     CommonModule,
     ReactiveFormsModule,

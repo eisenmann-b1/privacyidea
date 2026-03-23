@@ -60,10 +60,14 @@ import { PendingChangesService } from "../../../services/pending-changes/pending
 import { ClearableInputComponent } from "../../shared/clearable-input/clearable-input.component";
 import { DialogService, DialogServiceInterface } from "../../../services/dialog/dialog.service";
 import { SimpleConfirmationDialogComponent } from "../../shared/dialog/confirmation-dialog/confirmation-dialog.component";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
 
 @Component({
   selector: "app-user-new-resolver",
   standalone: true,
+  host: {
+    class: NAVIGATION_ACCESSIBLE_DIALOG_CLASS
+  },
   imports: [
     FormsModule,
     MatFormField,
@@ -174,8 +178,9 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
     this.pendingChangesService.registerSave(() => this.onSave());
     this.pendingChangesService.registerValidChanges(() => this.canSave);
 
+    // Ensure dialog is closed on different route
     effect(() => {
-      if (!this.contentService.routeUrl().startsWith(ROUTE_PATHS.USERS)) {
+      if (this.contentService.routeUrl() !== ROUTE_PATHS.USERS_RESOLVERS) {
         this.dialogRef?.close(true);
       }
     });

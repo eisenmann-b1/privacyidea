@@ -25,9 +25,14 @@ import { UserDetailsEditComponent } from "@components/user/user-details-edit/use
 import { PendingChangesDialogComponent } from "@components/shared/dialog/abstract-dialog/pending-changes-dialog.component";
 import { ROUTE_PATHS } from "../../../route_paths";
 import { ContentService } from "../../../services/content/content.service";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
 
 @Component({
   selector: "app-edit-user-dialog",
+  standalone: true,
+  host: {
+    class: NAVIGATION_ACCESSIBLE_DIALOG_CLASS
+  },
   imports: [
     DialogWrapperComponent,
     UserDetailsEditComponent

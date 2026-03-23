@@ -38,10 +38,14 @@ import { ContentService, ContentServiceInterface } from "../../../../services/co
 import { PendingChangesService } from "../../../../services/pending-changes/pending-changes.service";
 import { MatSelectModule } from "@angular/material/select";
 import { DialogService, DialogServiceInterface } from "../../../../services/dialog/dialog.service";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
 
 @Component({
   selector: "app-ca-connector-edit-dialog",
   standalone: true,
+  host: {
+    class: NAVIGATION_ACCESSIBLE_DIALOG_CLASS
+  },
   imports: [
     CommonModule,
     ReactiveFormsModule,

@@ -35,10 +35,14 @@ import { PendingChangesService } from "../../../../services/pending-changes/pend
 import { AuthService, AuthServiceInterface } from "../../../../services/auth/auth.service";
 import { SaveAndExitDialogComponent } from "../../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
 import { DialogService, DialogServiceInterface } from "../../../../services/dialog/dialog.service";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
 
 @Component({
   selector: "app-new-radius-server",
   standalone: true,
+  host: {
+    class: NAVIGATION_ACCESSIBLE_DIALOG_CLASS
+  },
   imports: [
     CommonModule,
     ReactiveFormsModule,

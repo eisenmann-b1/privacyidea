@@ -39,10 +39,14 @@ import {
   PrivacyideaServerService,
   PrivacyideaServerServiceInterface
 } from "src/app/services/privacyidea-server/privacyidea-server.service";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
 
 @Component({
   selector: "app-privacyidea-edit-dialog",
   standalone: true,
+  host: {
+    class: NAVIGATION_ACCESSIBLE_DIALOG_CLASS
+  },
   imports: [
     CommonModule,
     ReactiveFormsModule,

@@ -33,10 +33,14 @@ import {
 import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
 import { ROUTE_PATHS } from "../../../../route_paths";
 import { SaveAndExitDialogComponent } from "@components/shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
 
 @Component({
   selector: "app-edit-policy-dialog",
   standalone: true,
+  host: {
+    class: NAVIGATION_ACCESSIBLE_DIALOG_CLASS
+  },
   imports: [DialogWrapperComponent, CommonModule, ReactiveFormsModule, PolicyPanelEditComponent],
   templateUrl: "./edit-policy-dialog.component.html",
   styleUrl: "./edit-policy-dialog.component.scss"

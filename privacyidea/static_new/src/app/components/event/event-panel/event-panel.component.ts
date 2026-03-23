@@ -58,6 +58,7 @@ import { MatTooltip } from "@angular/material/tooltip";
 import { CopyButtonComponent } from "../../shared/copy-button/copy-button.component";
 import { DialogService, DialogServiceInterface } from "../../../services/dialog/dialog.service";
 import { SaveAndExitDialogComponent } from "../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
 
 export type eventTab = "events" | "action" | "conditions";
 
@@ -93,6 +94,9 @@ export type eventTab = "events" | "action" | "conditions";
     CopyButtonComponent
   ],
   standalone: true,
+  host: {
+    class: NAVIGATION_ACCESSIBLE_DIALOG_CLASS
+  },
   templateUrl: "./event-panel.component.html",
   styleUrl: "./event-panel.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush

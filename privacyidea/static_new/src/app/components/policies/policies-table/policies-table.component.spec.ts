@@ -90,7 +90,7 @@ describe("PoliciesTableComponent", () => {
 
     const rows = fixture.debugElement.queryAll(By.css("tr[mat-row]"));
 
-    expect(rows.length).toBe(10);
+    expect(rows.length).toBe(component.skeletonRowCount);
     expect(rows[0].classes["skeleton-row"]).toBeTruthy();
   });
 
@@ -110,7 +110,7 @@ describe("PoliciesTableComponent", () => {
     expect(component.pagedPolicies().length).toBe(3);
   });
 
-  it("should only select displayed rows on the current page when masterToggle is called", () => {
+  it("should select all displayed rows when masterToggle is called", () => {
     fixture.detectChanges();
 
     component.masterToggle();
@@ -152,7 +152,7 @@ describe("PoliciesTableComponent", () => {
     expect(noDataRow.nativeElement.textContent).toContain($localize`No data matching the filter.`);
   });
 
-  it("should toggle filter keys and reset pageIndex when clicking header filter buttons", () => {
+  it("should toggle filter keys when clicking header filter buttons", () => {
     const filterButton = fixture.debugElement.query(By.css(".col-name .filter-button"));
 
     filterButton.nativeElement.click();

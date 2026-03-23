@@ -110,7 +110,7 @@ describe("PoliciesTableComponent", () => {
     expect(component.pagedPolicies().length).toBe(3);
   });
 
-  it("should only select displayed rows on the current page when masterToggle is called", () => {
+  it("should select all displayed rows when masterToggle is called", () => {
     fixture.detectChanges();
 
     component.masterToggle();

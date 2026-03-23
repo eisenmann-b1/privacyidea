@@ -260,11 +260,11 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
     this.filterInput?.nativeElement.focus();
   }
 
-  onRealmSelected(keyword: string, realm: string): void {
+  onItemSelected(keyword: string, value: string): void {
     const currentFilter = this.tokenService.tokenFilter();
     let newValue;
-    if (realm) {
-      newValue = currentFilter.addEntry(keyword, realm);
+    if (value) {
+      newValue = currentFilter.addEntry(keyword, value);
     } else {
       newValue = currentFilter.removeKey(keyword);
     }

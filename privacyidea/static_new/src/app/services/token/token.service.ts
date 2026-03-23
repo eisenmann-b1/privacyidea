@@ -329,7 +329,7 @@ export class TokenService implements TokenServiceInterface {
   filterParams = computed<Record<string, string>>(() => {
     const allowed = [...this.apiFilter, ...this.advancedApiFilter, ...this.hiddenApiFilter, "infokey", "infovalue"];
 
-    const plainKeys = new Set(["user", "infokey", "infovalue", "active", "assigned", "container_serial", "realm", "tokenrealm"]);
+    const plainKeys = new Set(["user", "infokey", "infovalue", "active", "assigned", "container_serial", "realm", "tokenrealm", "type"]);
 
     const entries = [
       ...Array.from(this.tokenFilter().filterMap.entries()),
@@ -463,9 +463,12 @@ export class TokenService implements TokenServiceInterface {
   tokenTypesResource = httpResource<PiResponse<{}>>(() => {
     // Only load token types on routes with a tokentype list or selection.
     const onAllowedRoute =
+      this.contentService.onTokens() ||
       this.contentService.onTokensEnrollment() ||
       this.contentService.onTokensGetSerial() ||
-      this.contentService.onTokensContainersCreate();
+      this.contentService.onTokensContainersCreate() ||
+      this.contentService.onTokensContainersDetails() ||
+      this.contentService.onUserDetails();
 
     if (!onAllowedRoute) {
       return undefined;

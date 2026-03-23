@@ -64,7 +64,9 @@
       <mat-icon> filter_list</mat-icon>
       More Filter
     </button>
-    <mat-menu #advancedFilterMenu="matMenu">
+    <mat-menu
+      #advancedFilterMenu="matMenu"
+      class="token-table-filter-menu">
       @for (keyword of advancedApiFilter; track keyword) {
         <button
           (click)="onAdvancedFilterClick(keyword)"

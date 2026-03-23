@@ -187,7 +187,7 @@ class KeycloakResolver(HTTPResolver):
         :return: List of dictionaries containing pi conform user attributes
         """
 
-        request_params = config.request_mapping if config.request_mapping else {}
+        request_params = config.request_mapping or {}
         request_params.update(self._get_search_params(search_dict))
         if search_dict:
             request_params["exact"] = str(not self._is_wildcard_search(search_dict)).lower()

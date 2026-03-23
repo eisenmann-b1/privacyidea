@@ -276,14 +276,12 @@ class SmsTokenClass(HotpTokenClass):
         if not verify:
             if getParam(param, "dynamic_phone", optional):
                 self.add_tokeninfo("dynamic_phone", True)
-                if self.get_tokeninfo("phone"):
-                    self.delete_tokeninfo("phone")
+                self.delete_tokeninfo("phone")
             else:
                 # specific - phone
                 phone = getParam(param, "phone", required)
                 self.add_tokeninfo("phone", phone)
-                if self.get_tokeninfo("dynamic_phone"):
-                    self.delete_tokeninfo("dynamic_phone")
+                self.delete_tokeninfo("dynamic_phone")
 
             # in case of the sms token, only the server must know the otpkey
             # thus if none is provided, we let create one (in the TokenClass)

@@ -228,15 +228,13 @@ class EmailTokenClass(HotpTokenClass):
         if not verify:
             if getParam(param, "dynamic_email", optional=True):
                 self.add_tokeninfo("dynamic_email", True)
-                if self.get_tokeninfo(self.EMAIL_ADDRESS_KEY):
-                    self.delete_tokeninfo(self.EMAIL_ADDRESS_KEY)
+                self.delete_tokeninfo(self.EMAIL_ADDRESS_KEY)
             else:
                 # specific - e-mail
                 self._email_address = getParam(param,
                                                self.EMAIL_ADDRESS_KEY,
                                                optional=False)
-                if self.get_tokeninfo("dynamic_email"):
-                    self.delete_tokeninfo("dynamic_email")
+                self.delete_tokeninfo("dynamic_email")
 
             # in case of the e-mail token, only the server must know the otpkey
             # thus if none is provided, we let create one (in the TokenClass)

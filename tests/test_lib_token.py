@@ -401,18 +401,18 @@ class TokenTestCase(MyTestCase):
                         tokenobject.token.get_realms())
 
         # Check that an existing rollout_state is not overridden by init_token.
-        # If a token already has a rollout_state (e.g. "clientwait"), it should
-        # not be reset to "enrolled" when init_token is called again.
+        # If a token already has a rollout_state (dummy rollout state "special"),
+        # it should not be reset to "enrolled" when init_token is called again.
         tokenobject = init_token({"serial": "NEW004", "type": "hotp",
                                   "otpkey": "1234567890123456"})
         self.assertEqual(tokenobject.token.rollout_state, RolloutState.ENROLLED)
         # Manually set a different rollout_state
-        tokenobject.token.rollout_state = "fix"
+        tokenobject.token.rollout_state = "special"
         tokenobject.save()
-        # Re-init the same token (update) – rollout_state must stay "clientwait"
+        # Re-init the same token (update) – rollout_state must stay "special"
         tokenobject = init_token({"serial": "NEW004", "type": "hotp",
                                   "otpkey": "1234567890123456"})
-        self.assertEqual(tokenobject.token.rollout_state, "fix")
+        self.assertEqual(tokenobject.token.rollout_state, "special")
         remove_token("NEW004")
 
     def test_16_remove_token(self):

@@ -389,7 +389,7 @@ class U2fTokenClass(TokenClass):
             response_detail["u2fRegisterRequest"] = register_request
             self.add_tokeninfo("appId", app_id)
 
-        elif self.token.rollout_state == "enrolled":
+        elif self.token.rollout_state in (RolloutState.ENROLLED, ""):
             # This is the second step of the init request, the clientwait rollout state has been reset
             response_detail["u2fRegisterResponse"] = {"subject": self.token.description}
 

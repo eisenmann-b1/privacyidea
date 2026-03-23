@@ -19,6 +19,7 @@
 import {
   AfterViewInit,
   Component,
+  computed,
   ElementRef,
   inject,
   linkedSignal,
@@ -97,23 +98,19 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
   readonly columnKeys: string[] = columnKeysMap.map((column) => column.key);
   readonly apiFilterKeyMap = this.tokenService.apiFilterKeyMap;
   readonly advancedApiFilter = this.tokenService.advancedApiFilter;
-
+  private observer!: IntersectionObserver;
+  private basePageSizeOptions = [...this.tableUtilsService.pageSizeOptions()];
   @ViewChild("filterHTMLInputElement", { static: false })
   filterInput!: ElementRef<HTMLInputElement>;
-
   @ViewChild("scrollContainer") scrollContainer!: ElementRef<HTMLElement>;
   @ViewChild("stickyHeader") stickyHeader!: ElementRef<HTMLElement>;
   @ViewChild("stickySentinel") stickySentinel!: ElementRef<HTMLElement>;
-  private observer!: IntersectionObserver;
-
   tokenSelection = this.tokenService.tokenSelection;
-
   tokenResource = this.tokenService.tokenResource;
   tokenFilter = this.tokenService.tokenFilter;
   pageSize = this.tokenService.pageSize;
   pageIndex = this.tokenService.pageIndex;
   sort = this.tokenService.sort;
-
   emptyResource = linkedSignal({
     source: this.pageSize,
     computation: (pageSize: number) =>
@@ -125,7 +122,6 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
         return emptyRow;
       })
   });
-
   tokenDataSource: WritableSignal<MatTableDataSource<TokenDetails>> = linkedSignal({
     source: this.tokenResource.value,
     computation: (tokenResource, previous) => {
@@ -135,7 +131,6 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
       return previous?.value ?? new MatTableDataSource(this.emptyResource());
     }
   });
-
   totalLength: WritableSignal<number> = linkedSignal({
     source: this.tokenResource.value,
     computation: (tokenResource, previous) => {
@@ -145,8 +140,13 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
       return previous?.value ?? 0;
     }
   });
-
-  pageSizeOptions = this.tableUtilsService.pageSizeOptions;
+  pageSizeOptions = computed(() => {
+    if (!this.basePageSizeOptions.includes(this.pageSize())) {
+      this.basePageSizeOptions.push(this.pageSize());
+      this.basePageSizeOptions.sort((a, b) => a - b);
+    }
+    return this.basePageSizeOptions;
+  });
 
   isAllSelected() {
     return this.tokenSelection().length === this.tokenDataSource().data.length;

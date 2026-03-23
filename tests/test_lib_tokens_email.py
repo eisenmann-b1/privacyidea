@@ -597,3 +597,40 @@ class EmailTokenTestCase(MyTestCase):
 
         # Clean up
         remove_token(emailtoken.token.serial)
+
+    def test_26_update_dynamic_email_replaces_static_email(self):
+        """
+        Test that updating a token with dynamic_email removes the static email
+        address and vice versa.
+        """
+        # 1. Create a token with a static email address
+        db_token = Token("PIEM_DYN_TEST1", tokentype="email")
+        db_token.save()
+        token = EmailTokenClass(db_token)
+        token.update({"email": "static@example.com"})
+        token.save()
+
+        # Verify the static email is set and dynamic_email is not
+        self.assertEqual(token.get_tokeninfo("email"), "static@example.com")
+        self.assertIsNone(token.get_tokeninfo("dynamic_email"))
+
+        # Now update the token to use dynamic_email
+        token.update({"dynamic_email": True})
+        token.save()
+
+        # Verify that the static email address has been removed
+        # and dynamic_email is set
+        self.assertTrue(is_true(token.get_tokeninfo("dynamic_email")))
+        self.assertIsNone(token.get_tokeninfo("email"))
+
+        # 2. Now update back to a static email address
+        token.update({"email": "new_static@example.com"})
+        token.save()
+
+        # Verify that dynamic_email has been removed
+        # and the static email address is set
+        self.assertEqual(token.get_tokeninfo("email"), "new_static@example.com")
+        self.assertIsNone(token.get_tokeninfo("dynamic_email"))
+
+        # Clean up
+        remove_token("PIEM_DYN_TEST1")

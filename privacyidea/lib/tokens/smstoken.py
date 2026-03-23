@@ -58,9 +58,9 @@ from privacyidea.lib.config import get_from_config
 from privacyidea.lib.crypto import safe_compare
 from privacyidea.lib.decorators import check_token_locked
 from privacyidea.lib.log import log_with
+from privacyidea.lib.policies.actions import PolicyAction
 from privacyidea.lib.policy import (SCOPE, GROUP, comma_escape_text,
                                     Match, get_action_values_from_options)
-from privacyidea.lib.policies.actions import PolicyAction
 from privacyidea.lib.smsprovider.SMSProvider import (get_sms_provider_class,
                                                      create_sms_instance,
                                                      get_smsgateway)
@@ -276,10 +276,14 @@ class SmsTokenClass(HotpTokenClass):
         if not verify:
             if getParam(param, "dynamic_phone", optional):
                 self.add_tokeninfo("dynamic_phone", True)
+                if self.get_tokeninfo("phone"):
+                    self.delete_tokeninfo("phone")
             else:
                 # specific - phone
                 phone = getParam(param, "phone", required)
                 self.add_tokeninfo("phone", phone)
+                if self.get_tokeninfo("dynamic_phone"):
+                    self.delete_tokeninfo("dynamic_phone")
 
             # in case of the sms token, only the server must know the otpkey
             # thus if none is provided, we let create one (in the TokenClass)

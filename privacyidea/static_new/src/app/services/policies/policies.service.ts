@@ -24,6 +24,7 @@ import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
+import { NotificationService, NotificationServiceInterface } from "../notification/notification.service";
 
 export type ActionType = "bool" | "int" | "str" | "text";
 export type PolicyActionDetail<T extends string | number = string | number> = {
@@ -170,7 +171,7 @@ export interface PolicyServiceInterface {
   readonly allPolicyScopes: Signal<string[]>;
   readonly policyActionsByGroup: Signal<PolicyActionGroups>;
   readonly allPolicies: Signal<PolicyDetail[]>;
-  allPoliciesRecource: HttpResourceRef<PiResponse<PolicyDetail[], unknown> | undefined>;
+  allPoliciesResource: HttpResourceRef<PiResponse<PolicyDetail[], unknown> | undefined>;
 
   getEmptyPolicy(): PolicyDetail;
 
@@ -204,7 +205,7 @@ export interface PolicyServiceInterface {
 
   actionValueIsValid(action: PolicyActionDetail, value: string | number): boolean;
 
-  saveNewPolicy(newPolicy: PolicyDetail): Promise<void>;
+  saveNewPolicy(newPolicy: PolicyDetail): Promise<boolean>;
 
   policyHasConditions(policy: PolicyDetail): boolean;
 
@@ -222,7 +223,7 @@ export interface PolicyServiceInterface {
 
   togglePolicyActive(policy: PolicyDetail): void;
 
-  savePolicyEdits(originalPolicyName: string, updatedPolicy: PolicyDetail): void;
+  savePolicyEdits(originalPolicyName: string, updatedPolicy: PolicyDetail): Promise<boolean>;
 }
 
 @Injectable({
@@ -230,6 +231,7 @@ export interface PolicyServiceInterface {
 })
 export class PolicyService implements PolicyServiceInterface {
   private readonly contentService: ContentServiceInterface = inject(ContentService);
+  private readonly notificationService: NotificationServiceInterface = inject(NotificationService);
   readonly policyBaseUrl = environment.proxyUrl + "/policy/";
   private readonly http: HttpClient = inject(HttpClient);
   private readonly authService: AuthServiceInterface = inject(AuthService);
@@ -253,7 +255,7 @@ export class PolicyService implements PolicyServiceInterface {
     //   return this.filteredPolicyActionGroups(this.alreadyAddedActionNames(), this.actionFilter());
     // });
 
-  _allPolicies = computed(() => this.allPoliciesRecource.value()?.result?.value ?? []);
+  _allPolicies = computed(() => this.allPoliciesResource.value()?.result?.value ?? []);
 
   getEmptyPolicy(): PolicyDetail {
     return {
@@ -444,7 +446,7 @@ export class PolicyService implements PolicyServiceInterface {
     );
     // Reload policies to ensure state is correct
     if (result && !result.result?.error) {
-      this.allPoliciesRecource.reload();
+      this.allPoliciesResource.reload();
     } else {
       // Rollback optimistic update
       this.allPolicies.set(allPolicies);
@@ -537,21 +539,25 @@ export class PolicyService implements PolicyServiceInterface {
     return false;
   }
 
-  saveNewPolicy(newPolicy: PolicyDetail): Promise<void> {
-    const allPoliciesCopy = this.allPolicies();
-    allPoliciesCopy.push({ ...newPolicy });
-    this.allPolicies.set(allPoliciesCopy);
-
-    const promise = this.createPolicy(newPolicy)
-      .then((_) => {
-        this.allPoliciesRecource.reload();
+  async saveNewPolicy(newPolicy: PolicyDetail): Promise<boolean> {
+    return this.createPolicy(newPolicy)
+      .then((response) => {
+        this.allPoliciesResource.reload();
+        if (response && response.result?.status) {
+          this.notificationService.openSnackBar($localize`Policy created successfully.`);
+          return true;
+        } else {
+          const error = response.result?.error?.message || "";
+          this.notificationService.openSnackBar($localize`Creating policy failed: ${error}`);
+          return false;
+        }
       })
       .catch((error) => {
         console.error("Error creating policy: ", error);
-        return Promise.reject();
+        const errorMessage = error.error?.result?.error?.message || "";
+        this.notificationService.openSnackBar($localize`Creating policy failed: ${errorMessage}`);
+        return false;
       });
-
-    return promise;
   }
 
   policyHasConditions(policy: PolicyDetail): boolean {
@@ -619,12 +625,11 @@ export class PolicyService implements PolicyServiceInterface {
     });
     // Reload policies to ensure state is correct (in case other properties changed)
     action.then(() => {
-      this.allPoliciesRecource.reload();
+      this.allPoliciesResource.reload();
     });
   }
 
-  async savePolicyEdits(originalPolicyName: string, updatedPolicy: PolicyDetail): Promise<void> {
-    console.log("Saving policy edits for", originalPolicyName, "with updates", updatedPolicy);
+  async savePolicyEdits(originalPolicyName: string, updatedPolicy: PolicyDetail): Promise<boolean> {
     let lastStableState = [...this.allPolicies()];
     const headers = this.authService.getHeaders();
     const hasNameChange = updatedPolicy.name && updatedPolicy.name !== originalPolicyName;
@@ -644,13 +649,19 @@ export class PolicyService implements PolicyServiceInterface {
         );
       }
 
-      this.allPoliciesRecource.reload();
-    } catch (err) {
+      this.allPoliciesResource.reload();
+      this.notificationService.openSnackBar($localize`Policy updated successfully`);
+      return true;
+    } catch (error: any) {
       this.allPolicies.set(lastStableState);
+      let errorMessage = error?.error?.result?.error?.message || "";
+      errorMessage = errorMessage ? `: ${errorMessage}` : "";
+      this.notificationService.openSnackBar($localize`Saving policy failed` + errorMessage);
+      return false;
     }
   }
 
-  readonly allPoliciesRecource = httpResource<PiResponse<PolicyDetail[]>>(() => {
+  readonly allPoliciesResource = httpResource<PiResponse<PolicyDetail[]>>(() => {
     // Only load policies if the action is allowed.
     if (!this.authService.actionAllowed("policyread")) {
       return undefined;

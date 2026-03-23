@@ -17,15 +17,22 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 
-import { Component, computed, inject, signal } from "@angular/core";
+import { Component, computed, effect, inject, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ReactiveFormsModule } from "@angular/forms";
 import { DialogWrapperComponent } from "../../../shared/dialog/dialog-wrapper/dialog-wrapper.component";
 import { AbstractDialogComponent } from "../../../shared/dialog/abstract-dialog/abstract-dialog.component";
-import { PolicyService, PolicyDetail, PolicyServiceInterface } from "../../../../services/policies/policies.service";
+import { PolicyDetail, PolicyService, PolicyServiceInterface } from "../../../../services/policies/policies.service";
 import { DialogAction } from "../../../../models/dialog";
 import { PolicyPanelEditComponent } from "./policy-panels/policy-panel-edit/policy-panel-edit.component";
-import { DialogServiceInterface, DialogService } from "src/app/services/dialog/dialog.service";
+import { DialogService, DialogServiceInterface } from "src/app/services/dialog/dialog.service";
+import {
+  PendingChangesService,
+  PendingChangesServiceInterface
+} from "../../../../services/pending-changes/pending-changes.service";
+import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
+import { ROUTE_PATHS } from "../../../../route_paths";
+import { SaveAndExitDialogComponent } from "@components/shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
 
 @Component({
   selector: "app-edit-policy-dialog",
@@ -40,20 +47,53 @@ export class EditPolicyDialogComponent extends AbstractDialogComponent<
 > {
   private readonly policyService: PolicyServiceInterface = inject(PolicyService);
   readonly dialogService: DialogServiceInterface = inject(DialogService);
+  readonly pendingChangesService: PendingChangesServiceInterface = inject(PendingChangesService);
+  readonly contentService: ContentServiceInterface = inject(ContentService);
 
   readonly policy = signal<PolicyDetail>(this.data.policyDetail);
   readonly policyEdits = signal<Partial<PolicyDetail>>({});
   readonly editedPolicy = computed(() => ({ ...this.policy(), ...this.policyEdits() }));
   readonly isPolicyEdited = computed(() => Object.keys(this.policyEdits()).length > 0);
+  readonly mode = this.data.mode;
 
   readonly actions = computed<DialogAction<"submit" | null>[]>(() => [
     {
-      label: this.data.mode === "create" ? $localize`Create Policy` : $localize`Save Changes`,
+      label: this.mode === "create" ? $localize`Create Policy` : $localize`Save Changes`,
       value: "submit",
       type: "confirm",
       disabled: !this.canSave()
     }
   ]);
+
+  constructor() {
+    super();
+
+    // Avoid closing the dialog with pending changes (when clicking next to the dialog or pressing ESC)
+    if (this.dialogRef) {
+      this.dialogRef.disableClose = true;
+      this.dialogRef.backdropClick().subscribe(() => {
+        this.close();
+      });
+      this.dialogRef.keydownEvents().subscribe((event) => {
+        if (event.key === "Escape") {
+          this.close();
+        }
+      });
+    }
+
+    this.pendingChangesService.registerHasChanges(() => this.isPolicyEdited());
+    this.pendingChangesService.registerSave(this.savePolicy.bind(this));
+    this.pendingChangesService.registerValidChanges(this.canSave.bind(this));
+
+    // Close the dialog when navigating away from the events route
+    // However, changing the route is disabled via the pendingChangesGuard when there are unsaved changes. This effect
+    // will only be triggered when there are no unsaved changes or when the user confirmed discarding them.
+    effect(() => {
+      if (!this.contentService.routeUrl().startsWith(ROUTE_PATHS.POLICIES)) {
+        super.close();
+      }
+    });
+  }
 
   addPolicyEdit(edits: Partial<PolicyDetail>): void {
     this.policyEdits.set({ ...this.policyEdits(), ...edits });
@@ -65,25 +105,40 @@ export class EditPolicyDialogComponent extends AbstractDialogComponent<
 
   onAction(value: "submit" | null): void {
     if (value !== "submit") return;
-    this.dialogRef.close(this.policyEdits());
+    this.savePolicy();
   }
 
-  protected override close(dialogResult?: Partial<PolicyDetail> | null): void {
+  protected override close(): void {
     if (!this.isPolicyEdited()) {
-      super.close(dialogResult);
+      super.close();
       return;
     }
 
-    this.dialogService
-      .confirm({
-        title: $localize`Discard Changes?`,
-        message: $localize`You have unsaved changes. Are you sure you want to discard them?`,
-        confirmButtonText: $localize`Discard Changes`
-      })
-      .then((confirmed) => {
-        if (confirmed) {
-          super.close(dialogResult);
-        }
-      });
+    this.dialogService.openDialog({
+      component: SaveAndExitDialogComponent,
+      data: {
+        allowSaveExit: true,
+        saveExitDisabled: !this.canSave()
+      }
+    }).afterClosed().subscribe((result) => {
+      if (result === "save-exit") {
+        this.savePolicy();
+      } else if (result === "discard") {
+        super.close();
+      }
+    });
+  }
+
+  async savePolicy() {
+    let success = false;
+    if (this.mode === "create") {
+      success = await this.policyService.saveNewPolicy({ ...this.policy(), ...this.policyEdits() });
+    } else {
+      success = await this.policyService.savePolicyEdits(this.policy().name, { ...this.policy(), ...this.policyEdits() });
+    }
+    if (success) {
+      super.close();
+    }
+    return success;
   }
 }

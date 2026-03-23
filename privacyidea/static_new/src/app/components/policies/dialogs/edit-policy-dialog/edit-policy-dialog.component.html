@@ -21,6 +21,7 @@
   class="dialog-content"
   [title]="data.mode === 'create' ? 'Create Policy' : 'Edit Policy'"
   (close)="close()"
+  [showCancelButton]="true"
   [actions]="actions()"
   (onAction)="onAction($event)">
   <app-policy-panel-edit

@@ -31,10 +31,13 @@ import {
 import { ContentService, ContentServiceInterface } from "../../../services/content/content.service";
 import { DialogService, DialogServiceInterface } from "../../../services/dialog/dialog.service";
 import { MatPaginatorModule, PageEvent } from "@angular/material/paginator";
+import { MatMenuModule } from "@angular/material/menu";
+import { MatDividerModule } from "@angular/material/divider";
 import { MatSortModule, Sort } from "@angular/material/sort";
 import { MatTableDataSource, MatTableModule } from "@angular/material/table";
 import { TableUtilsService, TableUtilsServiceInterface } from "../../../services/table-utils/table-utils.service";
 import { TokenDetails, TokenService, TokenServiceInterface } from "../../../services/token/token.service";
+import { RealmService, RealmServiceInterface } from "../../../services/realm/realm.service";
 
 import { ClearableInputComponent } from "../../shared/clearable-input/clearable-input.component";
 import { CopyButtonComponent } from "../../shared/copy-button/copy-button.component";
@@ -81,7 +84,9 @@ const columnKeysMap = [
     ClearableInputComponent,
     CopyButtonComponent,
     TokenTableActionsComponent,
-    MatIconButton
+    MatIconButton,
+    MatMenuModule,
+    MatDividerModule
   ],
   templateUrl: "./token-table.component.html",
   styleUrl: "./token-table.component.scss"
@@ -92,6 +97,7 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
   protected readonly contentService: ContentServiceInterface = inject(ContentService);
   protected readonly dialogService: DialogServiceInterface = inject(DialogService);
   protected readonly authService: AuthServiceInterface = inject(AuthService);
+  protected readonly realmService: RealmServiceInterface = inject(RealmService);
   protected readonly renderer: Renderer2 = inject(Renderer2);
 
   readonly columnKeysMap = columnKeysMap;
@@ -251,6 +257,18 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
 
   onKeywordClick(filterKeyword: string): void {
     this.toggleFilter(filterKeyword);
+    this.filterInput?.nativeElement.focus();
+  }
+
+  onRealmSelected(keyword: string, realm: string): void {
+    const currentFilter = this.tokenService.tokenFilter();
+    let newValue;
+    if (realm) {
+      newValue = currentFilter.addEntry(keyword, realm);
+    } else {
+      newValue = currentFilter.removeKey(keyword);
+    }
+    this.tokenService.tokenFilter.set(newValue);
     this.filterInput?.nativeElement.focus();
   }
 

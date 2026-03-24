@@ -34,6 +34,7 @@ import { AuthService, AuthServiceInterface } from "src/app/services/auth/auth.se
 import { ContentService, ContentServiceInterface } from "src/app/services/content/content.service";
 import { DialogService, DialogServiceInterface } from "src/app/services/dialog/dialog.service";
 import { PendingChangesService } from "src/app/services/pending-changes/pending-changes.service";
+import { ClearableInputComponent } from "../../../shared/clearable-input/clearable-input.component";
 import {
   PrivacyideaServer,
   PrivacyideaServerService,
@@ -56,7 +57,8 @@ import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global
     MatCheckboxModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    ClearableInputComponent
   ],
   templateUrl: "./new-privacyidea-server.component.html",
   styleUrl: "./new-privacyidea-server.component.scss"

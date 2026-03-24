@@ -19,8 +19,8 @@
 import { Signal, signal, WritableSignal } from "@angular/core";
 import {
   PolicyActionDetail,
-  PolicyDetail,
   PolicyActionGroups,
+  PolicyDetail,
   PolicyServiceInterface,
   ScopedPolicyActions
 } from "../../app/services/policies/policies.service";
@@ -72,11 +72,12 @@ export class MockPolicyService implements PolicyServiceInterface {
   policyHasConditions = jest.fn().mockReturnValue(true);
   policyHasAdminConditions = jest.fn().mockReturnValue(true);
   policyHasUserConditions = jest.fn().mockReturnValue(true);
-  policyHasEnviromentConditions = jest.fn().mockReturnValue(true);
+  policyHasEnvironmentConditions = jest.fn().mockReturnValue(true);
   policyHasAdditionalConditions = jest.fn().mockReturnValue(true);
   policyHasActions = jest.fn().mockReturnValue(true);
   savePolicyEdits = jest.fn().mockResolvedValue(true);
   isPolicyEdited = jest.fn().mockReturnValue(true);
   togglePolicyActive = jest.fn().mockReturnValue(undefined);
   allPoliciesResource = new MockHttpResourceRef(undefined);
+  policyActionResource = new MockHttpResourceRef(undefined);
 }

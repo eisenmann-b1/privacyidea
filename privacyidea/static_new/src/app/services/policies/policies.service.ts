@@ -159,9 +159,9 @@ export interface HandleMissingDataOption {
 }
 
 export const HANDLE_MISSING_DATA_OPTIONS: HandleMissingDataOption[] = [
-  { key: "raise_error", label: "Raise error" },
-  { key: "condition_is_false", label: "Condition is false" },
-  { key: "condition_is_true", label: "Condition is true" }
+  { key: "raise_error", label: $localize`Raise error` },
+  { key: "condition_is_false", label: $localize`Condition is false` },
+  { key: "condition_is_true", label: $localize`Condition is true` }
 ];
 
 export interface PolicyServiceInterface {
@@ -172,6 +172,7 @@ export interface PolicyServiceInterface {
   readonly policyActionsByGroup: Signal<PolicyActionGroups>;
   readonly allPolicies: Signal<PolicyDetail[]>;
   allPoliciesResource: HttpResourceRef<PiResponse<PolicyDetail[], unknown> | undefined>;
+  policyActionResource: HttpResourceRef<PiResponse<ScopedPolicyActions> | undefined>;
 
   getEmptyPolicy(): PolicyDetail;
 
@@ -213,7 +214,7 @@ export interface PolicyServiceInterface {
 
   policyHasUserConditions(policy: PolicyDetail): boolean;
 
-  policyHasEnviromentConditions(policy: PolicyDetail): boolean;
+  policyHasEnvironmentConditions(policy: PolicyDetail): boolean;
 
   policyHasAdditionalConditions(policy: PolicyDetail): boolean;
 
@@ -471,7 +472,6 @@ export class PolicyService implements PolicyServiceInterface {
 
   getActionNamesOf(scope?: string, group?: string): string[] {
     const actions = this.policyActions();
-    console.log("getActionNamesOf", scope, group);
     if (!actions) return [];
     if (scope) {
       if (group) {
@@ -563,7 +563,7 @@ export class PolicyService implements PolicyServiceInterface {
   policyHasConditions(policy: PolicyDetail): boolean {
     if (this.policyHasAdminConditions(policy)) return true;
     if (this.policyHasUserConditions(policy)) return true;
-    if (this.policyHasEnviromentConditions(policy)) return true;
+    if (this.policyHasEnvironmentConditions(policy)) return true;
     if (this.policyHasAdditionalConditions(policy)) return true;
     return false;
   }
@@ -581,7 +581,7 @@ export class PolicyService implements PolicyServiceInterface {
     return false;
   }
 
-  policyHasEnviromentConditions(policy: PolicyDetail): boolean {
+  policyHasEnvironmentConditions(policy: PolicyDetail): boolean {
     if (policy?.pinode && policy.pinode.length > 0) return true;
     if (policy?.time && policy.time.length > 0) return true;
     if (policy?.client && policy.client.length > 0) return true;

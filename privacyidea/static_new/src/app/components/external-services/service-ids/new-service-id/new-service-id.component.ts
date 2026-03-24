@@ -35,7 +35,8 @@ import { Router } from "@angular/router";
 import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
 import { PendingChangesService } from "../../../../services/pending-changes/pending-changes.service";
 import { SaveAndExitDialogComponent } from "../../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
-import { DialogService, DialogServiceInterface } from "../../../../services/dialog/dialog.service";
+import { DialogServiceInterface, DialogService } from "../../../../services/dialog/dialog.service";
+import { ClearableInputComponent } from "../../../shared/clearable-input/clearable-input.component";
 import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
 
 @Component({
@@ -51,7 +52,8 @@ import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    ClearableInputComponent
   ],
   templateUrl: "./new-service-id.component.html",
   styleUrl: "./new-service-id.component.scss"

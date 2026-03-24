@@ -70,7 +70,7 @@ export class SmsGatewayService implements SmsGatewayServiceInterface {
   private readonly http: HttpClient = inject(HttpClient);
 
   readonly smsGatewayResource = httpResource<PiResponse<SmsGateway[]>>(() => {
-    if (!this.contentService.onExternalSms()) {
+    if (!this.contentService.onExternalSms() && !this.contentService.onConfigurationTokenTypes()) {
       return undefined;
     }
     return {

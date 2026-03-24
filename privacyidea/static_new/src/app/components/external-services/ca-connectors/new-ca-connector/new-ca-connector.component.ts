@@ -37,7 +37,8 @@ import { Router } from "@angular/router";
 import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
 import { PendingChangesService } from "../../../../services/pending-changes/pending-changes.service";
 import { MatSelectModule } from "@angular/material/select";
-import { DialogService, DialogServiceInterface } from "../../../../services/dialog/dialog.service";
+import { DialogServiceInterface, DialogService } from "../../../../services/dialog/dialog.service";
+import { ClearableInputComponent } from "../../../shared/clearable-input/clearable-input.component";
 import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
 
 @Component({
@@ -56,7 +57,8 @@ import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatSelectModule
+    MatSelectModule,
+    ClearableInputComponent
   ],
   templateUrl: "./new-ca-connector.component.html",
   styleUrl: "./new-ca-connector.component.scss"

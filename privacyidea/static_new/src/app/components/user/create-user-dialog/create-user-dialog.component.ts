@@ -24,7 +24,7 @@ import { DialogAction } from "../../../models/dialog";
 import { DialogWrapperComponent } from "@components/shared/dialog/dialog-wrapper/dialog-wrapper.component";
 import { UserDetailsEditComponent } from "@components/user/user-details-edit/user-details-edit.component";
 import { NotificationService } from "../../../services/notification/notification.service";
-import { MatFormField, MatHint, MatLabel } from "@angular/material/form-field";
+import { MatFormField, MatHint, MatLabel, MatError } from "@angular/material/form-field";
 import { MatOption, MatSelect } from "@angular/material/select";
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { RealmService } from "../../../services/realm/realm.service";
@@ -55,6 +55,7 @@ export interface CreateUserDialogData {
     MatSelect,
     FormsModule,
     MatHint,
+    MatError,
     MatInput,
     ReactiveFormsModule
   ],

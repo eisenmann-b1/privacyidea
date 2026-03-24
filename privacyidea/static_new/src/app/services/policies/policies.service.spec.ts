@@ -84,7 +84,7 @@ describe("PolicyService", () => {
     it("should detect environment conditions", () => {
       const policy = service.getEmptyPolicy();
       policy.client = ["127.0.0.1"];
-      expect(service.policyHasEnviromentConditions(policy)).toBeTruthy();
+      expect(service.policyHasEnvironmentConditions(policy)).toBeTruthy();
     });
     it("should detect additional conditions", () => {
       const policy = service.getEmptyPolicy();

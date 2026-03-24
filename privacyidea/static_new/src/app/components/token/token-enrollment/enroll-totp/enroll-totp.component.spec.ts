@@ -18,7 +18,7 @@
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { EnrollTotpComponent, TOTP_HASHLIB, TOTP_OTP_LENGTH, TOTP_TIME_STEP } from "./enroll-totp.component";
+import { EnrollTotpComponent } from "./enroll-totp.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { provideHttpClient } from "@angular/common/http";
 import { provideHttpClientTesting } from "@angular/common/http/testing";
@@ -26,7 +26,7 @@ import { AuthService } from "../../../../services/auth/auth.service";
 import { MockAuthService } from "../../../../../testing/mock-services/mock-auth-service";
 import { MockSystemService } from "../../../../../testing/mock-services";
 import { SystemService } from "../../../../services/system/system.service";
-import { HOTP_HASHLIB } from "@components/token/token-enrollment/enroll-hotp/enroll-hotp.component";
+import { HOTP_HASHLIB, TOTP_HASHLIB, TOTP_OTP_LENGTH, TOTP_TIME_STEP } from "../../../../constants/token.constants";
 
 describe("EnrollTotpComponent", () => {
   let component: EnrollTotpComponent;

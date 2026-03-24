@@ -35,6 +35,7 @@ import { PendingChangesService } from "../../../../services/pending-changes/pend
 import { AuthService, AuthServiceInterface } from "../../../../services/auth/auth.service";
 import { SaveAndExitDialogComponent } from "../../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
 import { DialogService, DialogServiceInterface } from "../../../../services/dialog/dialog.service";
+import { ClearableInputComponent } from "../../../shared/clearable-input/clearable-input.component";
 import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
 
 @Component({
@@ -52,7 +53,8 @@ import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global
     MatCheckboxModule,
     MatButtonModule,
     MatIconModule,
-    MatTooltip
+    MatTooltip,
+    ClearableInputComponent
   ],
   templateUrl: "./new-radius-server.component.html",
   styleUrl: "./new-radius-server.component.scss"

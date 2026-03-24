@@ -72,6 +72,28 @@ describe("EnrollDaypasswordComponent", () => {
     expect(component.timeStepControl.disabled).toBe(false);
   });
 
+  it("Default values are also set correctly if config contains empty strings", () => {
+    const mockConfig = {
+      [DAYPASSWORD_HASHLIB]: "",
+      [DAYPASSWORD_TIME_STEP]: ""
+    };
+    systemService.systemConfig.set(mockConfig);
+    fixture = TestBed.createComponent(EnrollDaypasswordComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    expect(component.generateOnServerControl.value).toBe(true);
+    expect(component.generateOnServerControl.disabled).toBe(false);
+    expect(component.otpKeyFormControl.value).toEqual("");
+    expect(component.otpKeyFormControl.disabled).toBe(true);
+    expect(component.otpLengthControl.value).toBe(6);
+    expect(component.otpLengthControl.disabled).toBe(false);
+    expect(component.hashAlgorithmControl.value).toBe("sha1");
+    expect(component.hashAlgorithmControl.disabled).toBe(false);
+    expect(component.timeStepControl.value).toBe("24h");
+    expect(component.timeStepControl.disabled).toBe(false);
+  });
+
   it("Default values from system config are used", () => {
     const mockConfig = {
       [TOTP_HASHLIB]: "sha256",

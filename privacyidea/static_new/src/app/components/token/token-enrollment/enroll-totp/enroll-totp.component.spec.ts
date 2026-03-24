@@ -67,6 +67,28 @@ describe("EnrollTotpComponent", () => {
     expect(component.timeStepControl.disabled).toBe(false);
   });
 
+  it("Default values are also set correctly if config contains empty strings", () => {
+    const mockConfig = {
+      [TOTP_HASHLIB]: "",
+      [TOTP_TIME_STEP]: ""
+    };
+    systemService.systemConfig.set(mockConfig);
+    fixture = TestBed.createComponent(EnrollTotpComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    expect(component.generateOnServerFormControl.value).toBe(true);
+    expect(component.generateOnServerFormControl.disabled).toBe(false);
+    expect(component.otpKeyFormControl.value).toEqual("");
+    expect(component.otpKeyFormControl.disabled).toBe(true);
+    expect(component.otpLengthFormControl.value).toBe(6);
+    expect(component.otpLengthFormControl.disabled).toBe(false);
+    expect(component.hashAlgorithmControl.value).toBe("sha1");
+    expect(component.hashAlgorithmControl.disabled).toBe(false);
+    expect(component.timeStepControl.value).toBe(30);
+    expect(component.timeStepControl.disabled).toBe(false);
+  });
+
   it("Default values from system config are used", () => {
     const mockConfig = {
       [TOTP_HASHLIB]: "sha256",

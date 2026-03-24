@@ -95,7 +95,7 @@ export class EnrollHotpComponent implements OnInit {
   generateOnServerFormControl = new FormControl<boolean>(true, [Validators.required]);
   otpLengthFormControl = new FormControl<number>(6, [Validators.required]);
   otpKeyFormControl = new FormControl<string>({ value: "", disabled: true });
-  defaultHashlib = computed(() => this.systemService.systemConfig()[HOTP_HASHLIB] ?? "sha1");
+  defaultHashlib = computed(() => this.systemService.systemConfig()[HOTP_HASHLIB] || "sha1");
   hashAlgorithmFormControl = new FormControl<string>(this.defaultHashlib(), [Validators.required]);
 
   constructor() {

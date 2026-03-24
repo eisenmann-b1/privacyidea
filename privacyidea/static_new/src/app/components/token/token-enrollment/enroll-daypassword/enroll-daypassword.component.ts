@@ -35,10 +35,11 @@ import {
   NotificationServiceInterface
 } from "../../../../services/notification/notification.service";
 import { SystemService, SystemServiceInterface } from "../../../../services/system/system.service";
-
-export const DAYPASSWORD_HASHLIB = "daypassword.hashlib";
-export const DAYPASSWORD_OTP_LENGTH = "daypassword.otplen";
-export const DAYPASSWORD_TIME_STEP = "daypassword.timeStep";
+import {
+  DAYPASSWORD_HASHLIB,
+  DAYPASSWORD_OTP_LENGTH,
+  DAYPASSWORD_TIME_STEP
+} from "../../../../constants/token.constants";
 
 export interface DaypasswordEnrollmentOptions extends TokenEnrollmentData {
   type: "daypassword";

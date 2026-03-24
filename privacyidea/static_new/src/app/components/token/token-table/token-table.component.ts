@@ -25,7 +25,6 @@ import {
   linkedSignal,
   OnDestroy,
   Renderer2,
-  signal,
   ViewChild,
   WritableSignal
 } from "@angular/core";
@@ -146,19 +145,25 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
       })
   });
   tokenDataSource: WritableSignal<MatTableDataSource<TokenDetails>> = linkedSignal({
-    source: this.tokenResource.value,
-    computation: (tokenResource, previous) => {
-      if (tokenResource && tokenResource.result?.value) {
-        return new MatTableDataSource(tokenResource.result?.value.tokens);
+    source: () => ({ value: this.tokenResource.value(), error: this.tokenResource.error() }),
+    computation: (src, previous) => {
+      if (src.error) {
+        return new MatTableDataSource<TokenDetails>([]);
+      }
+      if (src.value && src.value.result?.value) {
+        return new MatTableDataSource(src.value.result.value.tokens);
       }
       return previous?.value ?? new MatTableDataSource(this.emptyResource());
     }
   });
   totalLength: WritableSignal<number> = linkedSignal({
-    source: this.tokenResource.value,
-    computation: (tokenResource, previous) => {
-      if (tokenResource && tokenResource.result?.value) {
-        return tokenResource.result?.value.count;
+    source: () => ({ value: this.tokenResource.value(), error: this.tokenResource.error() }),
+    computation: (src, previous) => {
+      if (src.error) {
+        return 0;
+      }
+      if (src.value && src.value.result?.value) {
+        return src.value.result.value.count;
       }
       return previous?.value ?? 0;
     }

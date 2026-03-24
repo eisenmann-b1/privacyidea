@@ -25,6 +25,7 @@ import {
   linkedSignal,
   OnDestroy,
   Renderer2,
+  signal,
   ViewChild,
   WritableSignal
 } from "@angular/core";
@@ -117,6 +118,22 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
   pageSize = this.tokenService.pageSize;
   pageIndex = this.tokenService.pageIndex;
   sort = this.tokenService.sort;
+
+  protected readonly filterInputValue = linkedSignal({
+    source: () => this.tokenService.tokenFilter().filterString,
+    computation: (v) => v
+  });
+
+  protected readonly showFilterHint = computed(() => {
+    const current = this.filterInputValue().trim().toLowerCase();
+    const applied = this.tokenService.tokenFilter().filterString.trim().toLowerCase();
+
+    if (current !== applied) {
+      return current.includes("user:") || current.includes("realm:") || current.includes("tokenrealm:");
+    }
+    return false;
+  });
+
   emptyResource = linkedSignal({
     source: this.pageSize,
     computation: (pageSize: number) =>
@@ -216,8 +233,9 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
 
   onFilterInput($event: Event) {
     const input = $event.target as HTMLInputElement;
+    this.filterInputValue.set(input.value);
     const value = input.value.toLowerCase();
-    if (!value.includes("user:") && !value.includes("realm:")) {
+    if (!value.includes("user:") && !value.includes("realm:") && !value.includes("tokenrealm:")) {
       this.tokenService.handleFilterInput($event);
     }
   }

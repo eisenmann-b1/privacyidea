@@ -43,6 +43,9 @@
             matInput
             placeholder="Example query: 'type: hotp userid: 1000'" />
         </app-clearable-input>
+        @if (showFilterHint()) {
+          <mat-hint i18n>Press enter to apply the filter</mat-hint>
+        }
       </mat-form-field>
       <mat-paginator
         (page)="onPageEvent($event)"

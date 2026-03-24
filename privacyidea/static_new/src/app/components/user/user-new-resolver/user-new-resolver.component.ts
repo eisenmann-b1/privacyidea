@@ -144,6 +144,7 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
   isTesting = signal(false);
   testUsername = "";
   testUserId = "";
+  initialRoute = this.contentService.routeUrl();
 
   constructor() {
     const dialogResolver = this.data?.resolver;
@@ -181,7 +182,7 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
 
     // Ensure dialog is closed on different route
     effect(() => {
-      if (this.contentService.routeUrl() !== ROUTE_PATHS.USERS_RESOLVERS) {
+      if (this.contentService.routeUrl() !== this.initialRoute) {
         this.dialogRef?.close(true);
       }
     });

@@ -19,7 +19,7 @@
 import {
   AfterViewInit,
   Component,
-  computed,
+  computed, DestroyRef,
   effect,
   ElementRef,
   inject,
@@ -105,6 +105,7 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
   protected readonly renderer: Renderer2 = inject(Renderer2);
   public readonly dialogRef = inject(MatDialogRef<UserNewResolverComponent>, { optional: true });
   public readonly data = inject(MAT_DIALOG_DATA, { optional: true });
+  private readonly destroyRef = inject(DestroyRef);
 
   private observer!: IntersectionObserver;
   private editInitialized = false;
@@ -164,10 +165,10 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
 
     if (this.dialogRef) {
       this.dialogRef.disableClose = true;
-      this.dialogRef.backdropClick().subscribe(() => {
+      this.dialogRef.backdropClick().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
         this.onCancel();
       });
-      this.dialogRef.keydownEvents().subscribe((event) => {
+      this.dialogRef.keydownEvents().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => {
         if (event.key === "Escape") {
           this.onCancel();
         }

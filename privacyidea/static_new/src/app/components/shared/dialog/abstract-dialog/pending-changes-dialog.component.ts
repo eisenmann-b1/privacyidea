@@ -46,11 +46,14 @@ export abstract class PendingChangesDialogComponent<D = any, R = any>
       .subscribe(() => {
         this.handleCloseAttempt();
       });
-    this.dialogRef.keydownEvents().subscribe((event) => {
-      if (event.key === "Escape") {
-        this.handleCloseAttempt();
-      }
-    });
+    this.dialogRef
+      .keydownEvents()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((event) => {
+        if (event.key === "Escape") {
+          this.handleCloseAttempt();
+        }
+      });
   }
 
   ngOnDestroy(): void {

@@ -21,7 +21,7 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
-  computed,
+  computed, DestroyRef,
   effect,
   ElementRef,
   inject,
@@ -59,6 +59,7 @@ import { CopyButtonComponent } from "../../shared/copy-button/copy-button.compon
 import { DialogService, DialogServiceInterface } from "../../../services/dialog/dialog.service";
 import { SaveAndExitDialogComponent } from "../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
 import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 export type eventTab = "events" | "action" | "conditions";
 
@@ -111,6 +112,7 @@ export class EventPanelComponent implements AfterViewInit, OnDestroy {
   protected readonly renderer: Renderer2 = inject(Renderer2);
   private readonly contentService = inject(ContentService);
   public readonly dialogRef = inject(MatDialogRef<EventPanelComponent>, { optional: true });
+  private readonly destroyRef = inject(DestroyRef);
 
   private observer!: IntersectionObserver;
 
@@ -137,10 +139,10 @@ export class EventPanelComponent implements AfterViewInit, OnDestroy {
     // Avoid closing the dialog with pending changes (when clicking next to the dialog or pressing ESC)
     if (this.dialogRef) {
       this.dialogRef.disableClose = true;
-      this.dialogRef.backdropClick().subscribe(() => {
+      this.dialogRef.backdropClick().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
         this.cancelEdit();
       });
-      this.dialogRef.keydownEvents().subscribe((event) => {
+      this.dialogRef.keydownEvents().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => {
         if (event.key === "Escape") {
           this.cancelEdit();
         }

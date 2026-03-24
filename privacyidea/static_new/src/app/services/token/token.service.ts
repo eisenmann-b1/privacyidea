@@ -331,7 +331,7 @@ export class TokenService implements TokenServiceInterface {
   filterParams = computed<Record<string, string>>(() => {
     const allowed = [...this.apiFilter, ...this.advancedApiFilter, ...this.hiddenApiFilter, "infokey", "infovalue"];
 
-    const plainKeys = new Set(["user", "infokey", "infovalue", "active", "assigned", "container_serial", "realm", "tokenrealm"]);
+    const plainKeys = new Set(["user", "infokey", "infovalue", "active", "assigned", "container_serial", "realm"]);
 
     const entries = [
       ...Array.from(this.tokenFilter().filterMap.entries()),

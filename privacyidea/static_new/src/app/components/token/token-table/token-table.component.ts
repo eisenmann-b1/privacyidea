@@ -33,6 +33,7 @@ import { DialogService, DialogServiceInterface } from "../../../services/dialog/
 import { MatPaginatorModule, PageEvent } from "@angular/material/paginator";
 import { MatMenuModule } from "@angular/material/menu";
 import { MatDividerModule } from "@angular/material/divider";
+import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatSortModule, Sort } from "@angular/material/sort";
 import { MatTableDataSource, MatTableModule } from "@angular/material/table";
 import { TableUtilsService, TableUtilsServiceInterface } from "../../../services/table-utils/table-utils.service";
@@ -86,7 +87,8 @@ const columnKeysMap = [
     TokenTableActionsComponent,
     MatIconButton,
     MatMenuModule,
-    MatDividerModule
+    MatDividerModule,
+    MatTooltipModule
   ],
   templateUrl: "./token-table.component.html",
   styleUrl: "./token-table.component.scss"
@@ -128,7 +130,9 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
     const applied = this.tokenService.tokenFilter().filterString.trim().toLowerCase();
 
     if (current !== applied) {
-      return current.includes("user:") || current.includes("realm:") || current.includes("tokenrealm:");
+      const hasUser = /(^|\s)user:/.test(current);
+      const hasRealm = /(^|\s)realm:/.test(current);
+      return hasUser || hasRealm;
     }
     return false;
   });
@@ -240,7 +244,9 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
     const input = $event.target as HTMLInputElement;
     this.filterInputValue.set(input.value);
     const value = input.value.toLowerCase();
-    if (!value.includes("user:") && !value.includes("realm:") && !value.includes("tokenrealm:")) {
+    const hasUser = /(^|\s)user:/.test(value);
+    const hasRealm = /(^|\s)realm:/.test(value);
+    if (!hasUser && !hasRealm) {
       this.tokenService.handleFilterInput($event);
     }
   }

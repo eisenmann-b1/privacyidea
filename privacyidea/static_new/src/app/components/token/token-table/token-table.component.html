@@ -92,7 +92,9 @@
                           [matMenuTriggerFor]="realmMenu"
                           [matMenuTriggerData]="{ keyword: apiFilterKeyMap[column.key] }"
                           class="filter-button"
-                          mat-icon-button>
+                          i18n-matTooltip
+                          mat-icon-button
+                          matTooltip="Filter by {{ column.label }}">
                           <mat-icon class="keyword-button-icon margin-left-0">
                             filter_list
                           </mat-icon>
@@ -102,7 +104,9 @@
                           [matMenuTriggerFor]="typeMenu"
                           [matMenuTriggerData]="{ keyword: apiFilterKeyMap[column.key] }"
                           class="filter-button"
-                          mat-icon-button>
+                          i18n-matTooltip
+                          mat-icon-button
+                          matTooltip="Filter by {{ column.label }}">
                           <mat-icon class="keyword-button-icon margin-left-0">
                             filter_list
                           </mat-icon>
@@ -111,7 +115,9 @@
                         <button
                           (click)="onKeywordClick(apiFilterKeyMap[column.key])"
                           class="filter-button"
-                          mat-icon-button>
+                          i18n-matTooltip
+                          mat-icon-button
+                          matTooltip="Filter by {{ column.label }}">
                           <mat-icon class="keyword-button-icon margin-left-0">
                             {{ getFilterIconName(apiFilterKeyMap[column.key]) }}
                           </mat-icon>
@@ -121,7 +127,9 @@
                     <button
                       (click)="tableUtilsService.onSortButtonClick(column.key, sort)"
                       class="sort-button"
+                      i18n-matTooltip
                       mat-icon-button
+                      matTooltip="Sort by {{ column.label }}"
                       type="button">
                       <mat-icon>{{ tableUtilsService.getSortIcon(column.key, sort()) }}</mat-icon>
                     </button>

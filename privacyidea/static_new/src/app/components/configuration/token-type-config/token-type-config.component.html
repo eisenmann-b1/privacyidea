@@ -77,7 +77,7 @@
       [expanded]="expandedPanel === 'yubico'"></app-yubico-config>
     <app-yubikey-config
       (onDeleteEntry)="deleteSystemEntry($event)"
-      (onYubikeyCreateNewKey)="yubikeyCreateNewKey($event)"
+      (onYubikeyCreateNewKey)="yubikeyAddNewKey($event)"
       [formData]="formData()"
       [yubikeyApiIds]="yubikeyApiIds"></app-yubikey-config>
     <app-daypassword-config

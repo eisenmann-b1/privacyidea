@@ -44,6 +44,7 @@ import { NotificationService, NotificationServiceInterface } from "../notificati
 import { tokenTypes } from "../../utils/token.utils";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
+import { RealmService, RealmServiceInterface } from "../realm/realm.service";
 import { StringUtils } from "../../utils/string.utils";
 import { DialogService, DialogServiceInterface } from "../dialog/dialog.service";
 import { SimpleConfirmationDialogComponent } from "../../components/shared/dialog/confirmation-dialog/confirmation-dialog.component";
@@ -317,6 +318,7 @@ export class TokenService implements TokenServiceInterface {
   private readonly notificationService: NotificationServiceInterface = inject(NotificationService);
   private readonly contentService: ContentServiceInterface = inject(ContentService);
   private readonly dialogService: DialogServiceInterface = inject(DialogService);
+  private readonly realmService: RealmServiceInterface = inject(RealmService);
 
   readonly hiddenApiFilter = hiddenApiFilter;
   readonly apiFilterKeyMap = apiFilterKeyMap;
@@ -442,7 +444,15 @@ export class TokenService implements TokenServiceInterface {
 
   handleFilterInput($event: Event): void {
     const input = $event.target as HTMLInputElement;
-    const newFilter = this.tokenFilter().copyWith({ value: input.value.trim() });
+    let newFilter = this.tokenFilter().copyWith({ value: input.value.trim() });
+
+    if (newFilter.hasKey("user") && !newFilter.hasKey("realm")) {
+      const defaultRealm = this.realmService.defaultRealm();
+      if (defaultRealm) {
+        newFilter = newFilter.addEntry("realm", defaultRealm);
+      }
+    }
+
     this.tokenFilter.set(newFilter);
   }
 

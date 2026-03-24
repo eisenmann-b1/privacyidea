@@ -253,6 +253,14 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
         currentValue: this.tokenService.tokenFilter()
       });
     }
+
+    if (filterKeyword === "user" && newValue.hasKey("user") && !newValue.hasKey("realm")) {
+      const defaultRealm = this.realmService.defaultRealm();
+      if (defaultRealm) {
+        newValue = newValue.addEntry("realm", defaultRealm);
+      }
+    }
+
     this.tokenService.tokenFilter.set(newValue);
   }
 

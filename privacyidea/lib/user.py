@@ -834,7 +834,7 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
             if not resolver:
                 continue
             log.debug("With this search dictionary: %r", search_dict)
-            requested_pi_user_attributes = list({"resolver", "editable"}.intersection(requested_attributes))
+            requested_pi_user_attributes = list({"resolver", "editable"}.intersection(requested_attributes or []))
             requested_user_store_attributes = list(set(requested_attributes or []) - set(requested_pi_user_attributes))
             user_list = resolver.getUserList(search_dict, requested_user_store_attributes)
             # Add resolvername to the list

@@ -847,7 +847,8 @@ class HTTPResolver(UserIdResolver):
         Maps the attributes from the user store to the attributes used in privacyidea.
 
         :param user: Dictionary containing user attributes from the user store
-        :param attributes: List of attributes to be included in the returned dictionary. If None, all attributes are included.
+        :param attributes: List of attributes to be included in the returned dictionary. If None or an empty list, all
+            attributes are included.
         :return: Dictionary containing user attributes mapped to privacyidea
         """
         pi_user = {}

@@ -37,9 +37,7 @@ import {
   NotificationServiceInterface
 } from "../../../../services/notification/notification.service";
 import { SystemService, SystemServiceInterface } from "../../../../services/system/system.service";
-
-export const HOTP_HASHLIB = "hotp.hashlib";
-export const HOTP_OTP_LENGTH = "hotp.otplen";
+import { HOTP_HASHLIB, HOTP_OTP_LENGTH } from "../../../../constants/token.constants";
 
 export interface HotpEnrollmentOptions extends TokenEnrollmentData {
   type: "hotp";

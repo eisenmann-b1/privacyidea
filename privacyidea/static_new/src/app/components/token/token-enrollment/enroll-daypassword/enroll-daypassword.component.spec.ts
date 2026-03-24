@@ -18,12 +18,7 @@
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import {
-  DAYPASSWORD_HASHLIB,
-  DAYPASSWORD_OTP_LENGTH,
-  DAYPASSWORD_TIME_STEP,
-  EnrollDaypasswordComponent
-} from "./enroll-daypassword.component";
+import { EnrollDaypasswordComponent } from "./enroll-daypassword.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { provideHttpClient } from "@angular/common/http";
 import { provideHttpClientTesting } from "@angular/common/http/testing";
@@ -31,7 +26,12 @@ import { MockSystemService } from "../../../../../testing/mock-services";
 import { SystemService } from "../../../../services/system/system.service";
 import { MockAuthService } from "../../../../../testing/mock-services/mock-auth-service";
 import { AuthService } from "../../../../services/auth/auth.service";
-import { TOTP_HASHLIB, TOTP_TIME_STEP } from "@components/token/token-enrollment/enroll-totp/enroll-totp.component";
+import {
+  DAYPASSWORD_HASHLIB, DAYPASSWORD_OTP_LENGTH,
+  DAYPASSWORD_TIME_STEP,
+  TOTP_HASHLIB,
+  TOTP_TIME_STEP
+} from "../../../../constants/token.constants";
 
 describe("EnrollDaypasswordComponent", () => {
   let component: EnrollDaypasswordComponent;

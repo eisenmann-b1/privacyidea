@@ -220,7 +220,7 @@ describe("PolicyService", () => {
       expect(notificationService.openSnackBar).toHaveBeenCalledWith(
         expect.stringContaining(`Creating policy failed: ${errorMessage}`)
       );
-      expect(reloadSpy).not.toHaveBeenCalled();
+      expect(reloadSpy).toHaveBeenCalled();
     });
 
     it("should handle errors without expected error structure", async () => {

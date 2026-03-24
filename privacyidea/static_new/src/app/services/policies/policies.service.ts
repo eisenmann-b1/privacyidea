@@ -556,6 +556,7 @@ export class PolicyService implements PolicyServiceInterface {
         console.error("Error creating policy: ", error);
         const errorMessage = error.error?.result?.error?.message || "";
         this.notificationService.openSnackBar($localize`Creating policy failed: ${errorMessage}`);
+        this.allPoliciesResource.reload();
         return false;
       });
   }

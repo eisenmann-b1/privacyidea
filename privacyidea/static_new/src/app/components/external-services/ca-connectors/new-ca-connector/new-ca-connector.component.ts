@@ -39,7 +39,7 @@ import { PendingChangesService } from "../../../../services/pending-changes/pend
 import { MatSelectModule } from "@angular/material/select";
 import { DialogServiceInterface, DialogService } from "../../../../services/dialog/dialog.service";
 import { ClearableInputComponent } from "../../../shared/clearable-input/clearable-input.component";
-import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "../../../../constants/global.constants";
 
 @Component({
   selector: "app-ca-connector-edit-dialog",

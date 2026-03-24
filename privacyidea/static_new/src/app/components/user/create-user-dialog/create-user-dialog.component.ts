@@ -33,7 +33,7 @@ import { toSignal } from "@angular/core/rxjs-interop";
 import { ROUTE_PATHS } from "../../../route_paths";
 import { ContentService } from "../../../services/content/content.service";
 import { PendingChangesDialogComponent } from "@components/shared/dialog/abstract-dialog/pending-changes-dialog.component";
-import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "../../../constants/global.constants";
 
 export interface CreateUserDialogData {
   resolver?: string;

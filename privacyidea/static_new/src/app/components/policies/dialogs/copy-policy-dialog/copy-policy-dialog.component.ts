@@ -34,7 +34,7 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { map } from "rxjs";
-import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "../../../../constants/global.constants";
 
 export function mustBeDifferentValidator(originalValue: string | null): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {

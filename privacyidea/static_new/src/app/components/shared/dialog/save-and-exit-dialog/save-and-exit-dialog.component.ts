@@ -2,7 +2,7 @@ import { Component, computed } from "@angular/core";
 import { DialogWrapperComponent } from "../dialog-wrapper/dialog-wrapper.component";
 import { AbstractDialogComponent } from "../abstract-dialog/abstract-dialog.component";
 import { DialogAction } from "../../../../models/dialog";
-import { NAVIGATION_BLOCKING_DIALOG_CLASS } from "@components/constants/global.constants";
+import { NAVIGATION_BLOCKING_DIALOG_CLASS } from "../../../../constants/global.constants";
 
 export interface SaveAndExitDialogData {
   title?: string;

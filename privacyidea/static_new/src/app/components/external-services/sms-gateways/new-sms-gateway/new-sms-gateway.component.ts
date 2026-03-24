@@ -41,7 +41,7 @@ import { ROUTE_PATHS } from "../../../../route_paths";
 import { SaveAndExitDialogComponent } from "../../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
 import { DialogService, DialogServiceInterface } from "../../../../services/dialog/dialog.service";
 import { ClearableInputComponent } from "../../../shared/clearable-input/clearable-input.component";
-import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "../../../../constants/global.constants";
 
 type KeyValueRow = { key: string; value: string };
 

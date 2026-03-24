@@ -60,7 +60,7 @@ import { PendingChangesService } from "../../../services/pending-changes/pending
 import { ClearableInputComponent } from "../../shared/clearable-input/clearable-input.component";
 import { DialogService, DialogServiceInterface } from "../../../services/dialog/dialog.service";
 import { SaveAndExitDialogComponent } from "../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
-import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "../../../constants/global.constants";
 
 @Component({
   selector: "app-user-new-resolver",

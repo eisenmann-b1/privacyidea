@@ -26,8 +26,7 @@ import { DialogAction } from "../../../../models/dialog";
 import { PolicyPanelEditComponent } from "./policy-panels/policy-panel-edit/policy-panel-edit.component";
 import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
 import { ROUTE_PATHS } from "../../../../route_paths";
-import { SaveAndExitDialogComponent } from "@components/shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
-import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "../../../../constants/global.constants";
 import { PendingChangesDialogComponent } from "@components/shared/dialog/abstract-dialog/pending-changes-dialog.component";
 
 @Component({

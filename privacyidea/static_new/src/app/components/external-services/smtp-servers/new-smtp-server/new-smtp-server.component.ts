@@ -36,7 +36,7 @@ import { DialogService, DialogServiceInterface } from "../../../../services/dial
 import { SaveAndExitDialogComponent } from "../../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
 import { ClearableInputComponent } from "../../../shared/clearable-input/clearable-input.component";
 import { MatDivider } from "@angular/material/list";
-import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "../../../../constants/global.constants";
 
 @Component({
   selector: "app-smtp-edit-dialog",

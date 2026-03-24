@@ -361,15 +361,15 @@ export class TokenService implements TokenServiceInterface {
     effect(() => {
       if (this.tokenResource.error()) {
         const tokensResourceError = this.tokenResource.error() as HttpErrorResponse;
-        console.error("Failed to get token data.", tokensResourceError.message);
-        this.notificationService.openSnackBar(tokensResourceError.message);
+        console.error("Failed to get token data.", tokensResourceError.error.result.error.message);
+        this.notificationService.openSnackBar(tokensResourceError.error.result.error.message);
       }
     });
     effect(() => {
       if (this.tokenTypesResource.error()) {
         const tokenTypesResourceError = this.tokenTypesResource.error() as HttpErrorResponse;
-        console.error("Failed to get token type data.", tokenTypesResourceError.message);
-        this.notificationService.openSnackBar(tokenTypesResourceError.message);
+        console.error("Failed to get token type data.", tokenTypesResourceError.error.result.error.message);
+        this.notificationService.openSnackBar(tokenTypesResourceError.error.result.error.message);
       }
     });
   }

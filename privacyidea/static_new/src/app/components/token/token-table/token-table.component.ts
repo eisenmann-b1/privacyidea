@@ -283,7 +283,20 @@ export class TokenTableComponent implements AfterViewInit, OnDestroy {
 
   onKeywordClick(filterKeyword: string): void {
     this.toggleFilter(filterKeyword);
-    this.filterInput?.nativeElement.focus();
+    const inputElement = this.filterInput?.nativeElement;
+    if (inputElement) {
+      inputElement.focus();
+      if (filterKeyword === "user" && this.tokenService.tokenFilter().hasKey("user")) {
+        setTimeout(() => {
+          const filterString = inputElement.value;
+          const userIndex = filterString.indexOf("user:");
+          if (userIndex !== -1) {
+            const focusIndex = userIndex + "user: ".length;
+            inputElement.setSelectionRange(focusIndex, focusIndex);
+          }
+        });
+      }
+    }
   }
 
   onItemSelected(keyword: string, value: string): void {

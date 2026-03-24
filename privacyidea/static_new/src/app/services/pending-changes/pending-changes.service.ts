@@ -16,15 +16,20 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Injectable, signal, WritableSignal } from "@angular/core";
+import { Injectable, signal } from "@angular/core";
 
 export interface PendingChangesServiceInterface {
   hasChanges: boolean;
   validChanges: boolean;
+
   registerHasChanges(fn: () => boolean): void;
+
   clearAllRegistrations(): void;
+
   registerSave(fn: () => Promise<boolean> | boolean): void;
+
   save(): Promise<boolean> | boolean;
+
   registerValidChanges(fn: () => boolean): void;
 }
 

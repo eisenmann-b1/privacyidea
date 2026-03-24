@@ -167,4 +167,14 @@ describe("CreateUserDialogComponent", () => {
     expect(component.correspondingRealms()).toContain("realmA");
     expect(component.correspondingRealms()).not.toContain("realmB");
   });
+
+  it("editUserDataIsEmpty should be true when it is completely empty only", () => {
+    expect(component.editUserDataIsEmpty()).toBe(true);
+
+    component.editedUserData.set({username: "test", email: ""})
+    expect(component.editUserDataIsEmpty()).toBe(false);
+
+    component.editedUserData.set({username: "", email: ""})
+    expect(component.editUserDataIsEmpty()).toBe(true);
+  })
 });

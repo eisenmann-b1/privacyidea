@@ -61,7 +61,7 @@ import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global
   templateUrl: "./new-privacyidea-server.component.html",
   styleUrl: "./new-privacyidea-server.component.scss"
 })
-export class  NewPrivacyideaServerComponent implements OnInit, OnDestroy {
+export class NewPrivacyideaServerComponent implements OnInit, OnDestroy {
   private readonly formBuilder = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<NewPrivacyideaServerComponent>);
   protected readonly data = inject<PrivacyideaServer | null>(MAT_DIALOG_DATA);

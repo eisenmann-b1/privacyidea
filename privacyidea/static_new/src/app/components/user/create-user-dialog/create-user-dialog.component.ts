@@ -80,10 +80,7 @@ export class CreateUserDialogComponent extends PendingChangesDialogComponent<Cre
   canSave = signal(this.inputGroup.valid);
   inputGroupPristine = signal(this.inputGroup.pristine);
   isDirty = computed(() => {
-    if (!this.inputGroupPristine()) {
-      return true;
-    }
-    return this.editUserDataIsEmpty();
+    return !this.inputGroupPristine() || !this.editUserDataIsEmpty();
   });
 
   constructor() {
@@ -121,7 +118,7 @@ export class CreateUserDialogComponent extends PendingChangesDialogComponent<Cre
       type: "confirm",
       label: $localize`Create`,
       value: true,
-      disabled: this.canSave()
+      disabled: !this.canSave()
     }] as DialogAction<boolean>[];
   });
 
@@ -130,7 +127,7 @@ export class CreateUserDialogComponent extends PendingChangesDialogComponent<Cre
   });
 
   editUserDataIsEmpty = computed(() => {
-    return Object.values(this.editedUserData()).some(value => value === "" || value === undefined);
+    return Object.values(this.editedUserData()).every(value => value === "" || value === undefined);
   });
 
   correspondingRealms: Signal<string[]> = computed(() => {

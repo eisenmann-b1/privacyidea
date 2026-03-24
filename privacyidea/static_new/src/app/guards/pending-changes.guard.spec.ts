@@ -47,23 +47,26 @@ describe("pendingChangesGuard", () => {
     dialogService = TestBed.inject(DialogService) as unknown as MockDialogService;
   });
 
-  it("should return true if there are no pending changes", async () => {
-    pendingChangesService.registerHasChanges(jest.fn(() => false));
+  it("should return true if there are no pending changes", (done) => {
     const result = TestBed.runInInjectionContext(() =>
       pendingChangesGuard(undefined, mockRoute, mockState, mockNextState)
     );
-    expect(isObservable(result));
+    expect(isObservable(result)).toBe(true);
     if (isObservable(result)) {
-      result.subscribe(res => {
-        expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
-        expect(pendingChangesService.save).not.toHaveBeenCalled();
-        expect(res).toBe(true);
+      result.subscribe({
+        next: res => {
+          expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
+          expect(pendingChangesService.save).not.toHaveBeenCalled();
+          expect(res).toBe(true);
+          done();
+        },
+        error: err => done.fail(err)
       });
     }
   });
 
-  it("should return true and unregister changes if user discards", async () => {
-    pendingChangesService.registerHasChanges(jest.fn(() => true));
+  it("should return true and unregister changes if user discards", (done) => {
+    pendingChangesService.hasChangesMockValue = true;
 
     // mock dialog discard is selected
     dialogService.openDialog = jest.fn(() => ({
@@ -74,19 +77,23 @@ describe("pendingChangesGuard", () => {
       pendingChangesGuard(undefined, mockRoute, mockState, mockNextState)
     );
 
-    expect(isObservable(result));
+    expect(isObservable(result)).toBe(true);
     if (isObservable(result)) {
-      result.subscribe(res => {
-        expect(pendingChangesService.clearAllRegistrations).toHaveBeenCalled();
-        expect(pendingChangesService.save).not.toHaveBeenCalled();
-        expect(res).toBe(true);
+      result.subscribe({
+        next: res => {
+          expect(pendingChangesService.clearAllRegistrations).toHaveBeenCalled();
+          expect(pendingChangesService.save).not.toHaveBeenCalled();
+          expect(res).toBe(true);
+          done();
+        },
+        error: err => done.fail(err)
       });
     }
   });
 
-  it("should call save, unregister changes, and return true on save-exit success", async () => {
+  it("should call save, unregister changes, and return true on save-exit success", (done) => {
     const saveFn = jest.fn().mockResolvedValue(true);
-    pendingChangesService.registerHasChanges(jest.fn(() => true));
+    pendingChangesService.hasChangesMockValue = true;
     pendingChangesService.registerSave(saveFn);
 
     // mock dialog save-exit is selected
@@ -98,20 +105,23 @@ describe("pendingChangesGuard", () => {
       pendingChangesGuard(undefined, mockRoute, mockState, mockNextState)
     );
 
-    expect(isObservable(result));
+    expect(isObservable(result)).toBe(true);
     if (isObservable(result)) {
-      result.subscribe(res => {
-        expect(pendingChangesService.clearAllRegistrations).toHaveBeenCalled();
-        expect(pendingChangesService.save).toHaveBeenCalled();
-        expect(res).toBe(true);
+      result.subscribe({
+        next: res => {
+          expect(pendingChangesService.clearAllRegistrations).toHaveBeenCalled();
+          expect(pendingChangesService.save).toHaveBeenCalled();
+          expect(res).toBe(true);
+          done();
+        },
+        error: err => done.fail(err)
       });
     }
   });
 
-  it("should handle failed save", async () => {
-    const saveFn = jest.fn().mockResolvedValue(false);
-    pendingChangesService.registerSave(saveFn);
-    pendingChangesService.registerHasChanges(jest.fn(() => true));
+  it("should handle failed save", (done) => {
+    pendingChangesService.save = jest.fn().mockResolvedValue(false);
+    pendingChangesService.hasChangesMockValue = true;
 
     // mock dialog save-exit is selected
     dialogService.openDialog = jest.fn(() => ({
@@ -122,34 +132,44 @@ describe("pendingChangesGuard", () => {
       pendingChangesGuard(undefined, mockRoute, mockState, mockNextState)
     );
 
-    expect(isObservable(result));
+    expect(isObservable(result)).toBe(true);
     if (isObservable(result)) {
-      result.subscribe(res => {
-        expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
-        expect(pendingChangesService.save).toHaveBeenCalled();
-        expect(res).toBe(false);
+      result.subscribe({
+        next: res => {
+          expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
+          expect(pendingChangesService.save).toHaveBeenCalled();
+          expect(res).toBe(false);
+          done();
+        },
+        error: err => done.fail(err)
       });
     }
   });
 
-  it("should return false if user cancels dialog", async () => {
-    pendingChangesService.registerHasChanges(jest.fn(() => true));
+  it("should return false if user cancels dialog", (done) => {
+    pendingChangesService.hasChangesMockValue = true;
 
-    // mock dialog save-exit is selected
+    // mock dialog cancel is selected
     dialogService.openDialog = jest.fn(() => ({
-      afterClosed: () => of("cancel")
+      afterClosed: () => {
+        return of("cancel");
+      }
     }));
 
     const result = TestBed.runInInjectionContext(() =>
       pendingChangesGuard(undefined, mockRoute, mockState, mockNextState)
     );
 
-    expect(isObservable(result));
+    expect(isObservable(result)).toBe(true);
     if (isObservable(result)) {
-      result.subscribe(res => {
-        expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
-        expect(pendingChangesService.save).not.toHaveBeenCalled();
-        expect(res).toBe(true);
+      result.subscribe({
+        next: res => {
+          expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
+          expect(pendingChangesService.save).not.toHaveBeenCalled();
+          expect(res).toBe(false);
+          done();
+        },
+        error: err => done.fail(err)
       });
     }
   });

@@ -19,8 +19,12 @@
 import { PendingChangesServiceInterface } from "../../app/services/pending-changes/pending-changes.service";
 
 export class MockPendingChangesService implements PendingChangesServiceInterface {
-  hasChanges = false;
-  validChanges = true;
+  hasChangesMockValue = false;
+  validChangesMockValue = true;
+
+  get hasChanges() {return this.hasChangesMockValue;};
+
+  get validChanges() {return this.validChangesMockValue;};
 
   registerHasChanges = jest.fn();
   clearAllRegistrations = jest.fn();

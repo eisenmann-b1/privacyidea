@@ -63,9 +63,8 @@ describe("YubikeyConfigComponent", () => {
     jest.spyOn(component.onYubikeyCreateNewKey, "emit");
     const newId = "newClientId";
     component.newYubikeyApiId.set(newId);
-    component.newYubikeyApiKey.set("newApiKey");
     component.createNewKey();
-    expect(component.onYubikeyCreateNewKey.emit).toHaveBeenCalledWith(newId);
+    expect(component.onYubikeyCreateNewKey.emit).toHaveBeenCalledWith({apiId: newId, apiKey: "", generateKey: true});
   });
 
   it("should clear newYubikeyApiId and newYubikeyApiKey after creating a new key", () => {

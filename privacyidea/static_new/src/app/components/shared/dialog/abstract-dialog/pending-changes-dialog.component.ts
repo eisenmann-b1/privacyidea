@@ -84,4 +84,8 @@ export abstract class PendingChangesDialogComponent<D = any, R = any>
       }
     }
   }
+
+  override close(dialogResult?: R | undefined): void {
+    this.handleCloseAttempt();
+  }
 }

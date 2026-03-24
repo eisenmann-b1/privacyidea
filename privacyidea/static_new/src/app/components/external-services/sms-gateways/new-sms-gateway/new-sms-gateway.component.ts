@@ -287,7 +287,9 @@ export class NewSmsGatewayComponent implements OnInit, OnDestroy {
             this.pendingChangesService.clearAllRegistrations();
             this.closeCurrent();
           } else if (result === "save-exit") {
-            Promise.resolve(this.pendingChangesService.save()).then(() => {
+            if (!this.canSave) return;
+            Promise.resolve(this.pendingChangesService.save()).then((success) => {
+              if (!success) return;
               this.pendingChangesService.clearAllRegistrations();
               this.closeCurrent();
             });

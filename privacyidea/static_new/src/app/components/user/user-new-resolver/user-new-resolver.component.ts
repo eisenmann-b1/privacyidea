@@ -418,7 +418,8 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
         .subscribe((result) => {
           if (result === "save-exit") {
             if (!this.canSave) return;
-            Promise.resolve(this.pendingChangesService.save()).then(() => {
+            Promise.resolve(this.pendingChangesService.save()).then((success) => {
+              if (!success) return;
               this.pendingChangesService.clearAllRegistrations();
               this.closeCurrent();
             });

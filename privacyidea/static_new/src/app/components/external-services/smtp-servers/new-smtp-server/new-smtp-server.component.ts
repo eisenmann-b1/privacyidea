@@ -183,7 +183,8 @@ export class NewSmtpServerComponent implements OnInit, OnDestroy {
             this.closeCurrent();
           } else if (result === "save-exit") {
             if (!this.canSave) return;
-            await this.pendingChangesService.save();
+            const success = await this.pendingChangesService.save();
+            if (!success) return;
             this.pendingChangesService.clearAllRegistrations();
             this.closeCurrent();
           }

@@ -87,27 +87,6 @@ export class EditPolicyDialogComponent extends PendingChangesDialogComponent<
     this.onSave();
   }
 
-  protected override close(): void {
-    if (!this.isPolicyEdited()) {
-      super.close();
-      return;
-    }
-
-    this.dialogService.openDialog({
-      component: SaveAndExitDialogComponent,
-      data: {
-        allowSaveExit: true,
-        saveExitDisabled: !this.canSave()
-      }
-    }).afterClosed().subscribe((result) => {
-      if (result === "save-exit") {
-        this.onSave();
-      } else if (result === "discard") {
-        super.close();
-      }
-    });
-  }
-
   async onSave() {
     let success = false;
     if (this.mode === "create") {

@@ -129,48 +129,10 @@ describe("EditPolicyDialogComponent", () => {
     expect(saveSpy).not.toHaveBeenCalled();
   });
 
-  it("close opens dialog if there are unsaved changes and save on save-exit", () => {
-    component.addPolicyEdit({ description: "Edited Description" });
-    dialogService.openDialog.mockReturnValue({
-      afterClosed: () => of("save-exit")
-    });
-    const saveSpy = jest.spyOn(component, "onSave").mockResolvedValue(true);
-
-    component["close"]();
-
-    expect(dialogService.openDialog).toHaveBeenCalled();
-    expect(saveSpy).toHaveBeenCalled();
-  });
-
-  it("close opens dialog if there are unsaved changes and closes dialog on discard", () => {
-    component.addPolicyEdit({ description: "Edited Description" });
-    dialogService.openDialog.mockReturnValue({
-      afterClosed: () => of("discard")
-    });
-    const saveSpy = jest.spyOn(component, "onSave").mockResolvedValue(true);
-
-    component["close"]();
-
-    expect(dialogService.openDialog).toHaveBeenCalled();
-    expect(saveSpy).not.toHaveBeenCalled();
-  });
-
   it("savePolicy calls savePolicyEdits in edit mode", async () => {
     const spy = jest.spyOn(policyService, "savePolicyEdits").mockResolvedValue(true);
     await component.onSave();
     expect(spy).toHaveBeenCalledWith("TestPolicy", expect.any(Object));
-  });
-
-  it("calls close on backdrop click", () => {
-    const closeSpy = jest.spyOn(component as any, "close");
-    mockDialogRef._backdropClick.next({});
-    expect(closeSpy).toHaveBeenCalled();
-  });
-
-  it("calls close on escape key", () => {
-    const closeSpy = jest.spyOn(component as any, "close");
-    mockDialogRef._keydownEvents.next({ key: "Escape" });
-    expect(closeSpy).toHaveBeenCalled();
   });
 });
 

@@ -109,19 +109,19 @@ describe("EditPolicyDialogComponent", () => {
   });
 
   it("onAction does not call savePolicy if value is not submit", () => {
-    const spy = jest.spyOn(component, "savePolicy");
+    const spy = jest.spyOn(component, "onSave");
     component.onAction(null);
     expect(spy).not.toHaveBeenCalled();
   });
 
   it("onAction calls savePolicy if value is submit", () => {
-    const spy = jest.spyOn(component, "savePolicy");
+    const spy = jest.spyOn(component, "onSave");
     component.onAction("submit");
     expect(spy).toHaveBeenCalled();
   });
 
   it("close does not opens discard dialog if there are no changes", () => {
-    const saveSpy = jest.spyOn(component, "savePolicy").mockResolvedValue(true);
+    const saveSpy = jest.spyOn(component, "onSave").mockResolvedValue(true);
 
     component["close"]();
 
@@ -134,7 +134,7 @@ describe("EditPolicyDialogComponent", () => {
     dialogService.openDialog.mockReturnValue({
       afterClosed: () => of("save-exit")
     });
-    const saveSpy = jest.spyOn(component, "savePolicy").mockResolvedValue(true);
+    const saveSpy = jest.spyOn(component, "onSave").mockResolvedValue(true);
 
     component["close"]();
 
@@ -147,7 +147,7 @@ describe("EditPolicyDialogComponent", () => {
     dialogService.openDialog.mockReturnValue({
       afterClosed: () => of("discard")
     });
-    const saveSpy = jest.spyOn(component, "savePolicy").mockResolvedValue(true);
+    const saveSpy = jest.spyOn(component, "onSave").mockResolvedValue(true);
 
     component["close"]();
 
@@ -157,7 +157,7 @@ describe("EditPolicyDialogComponent", () => {
 
   it("savePolicy calls savePolicyEdits in edit mode", async () => {
     const spy = jest.spyOn(policyService, "savePolicyEdits").mockResolvedValue(true);
-    await component.savePolicy();
+    await component.onSave();
     expect(spy).toHaveBeenCalledWith("TestPolicy", expect.any(Object));
   });
 
@@ -207,7 +207,7 @@ describe("Create Policy in EditPolicyDialogComponent", () => {
 
   it("savePolicy calls saveNewPolicy in create mode", async () => {
     const spy = jest.spyOn(policyService, "saveNewPolicy").mockResolvedValue(true);
-    await component.savePolicy();
+    await component.onSave();
     expect(spy).toHaveBeenCalled();
   });
 });

@@ -21,19 +21,14 @@ import { Component, computed, effect, inject, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ReactiveFormsModule } from "@angular/forms";
 import { DialogWrapperComponent } from "../../../shared/dialog/dialog-wrapper/dialog-wrapper.component";
-import { AbstractDialogComponent } from "../../../shared/dialog/abstract-dialog/abstract-dialog.component";
 import { PolicyDetail, PolicyService, PolicyServiceInterface } from "../../../../services/policies/policies.service";
 import { DialogAction } from "../../../../models/dialog";
 import { PolicyPanelEditComponent } from "./policy-panels/policy-panel-edit/policy-panel-edit.component";
-import { DialogService, DialogServiceInterface } from "src/app/services/dialog/dialog.service";
-import {
-  PendingChangesService,
-  PendingChangesServiceInterface
-} from "../../../../services/pending-changes/pending-changes.service";
 import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
 import { ROUTE_PATHS } from "../../../../route_paths";
 import { SaveAndExitDialogComponent } from "@components/shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
 import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global.constants";
+import { PendingChangesDialogComponent } from "@components/shared/dialog/abstract-dialog/pending-changes-dialog.component";
 
 @Component({
   selector: "app-edit-policy-dialog",
@@ -45,19 +40,18 @@ import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "@components/constants/global
   templateUrl: "./edit-policy-dialog.component.html",
   styleUrl: "./edit-policy-dialog.component.scss"
 })
-export class EditPolicyDialogComponent extends AbstractDialogComponent<
+export class EditPolicyDialogComponent extends PendingChangesDialogComponent<
   { policyDetail: PolicyDetail; mode: "edit" | "create" },
   Partial<PolicyDetail> | null
 > {
   private readonly policyService: PolicyServiceInterface = inject(PolicyService);
-  readonly dialogService: DialogServiceInterface = inject(DialogService);
-  readonly pendingChangesService: PendingChangesServiceInterface = inject(PendingChangesService);
   readonly contentService: ContentServiceInterface = inject(ContentService);
 
   readonly policy = signal<PolicyDetail>(this.data.policyDetail);
   readonly policyEdits = signal<Partial<PolicyDetail>>({});
   readonly editedPolicy = computed(() => ({ ...this.policy(), ...this.policyEdits() }));
   readonly isPolicyEdited = computed(() => Object.keys(this.policyEdits()).length > 0);
+  readonly isDirty = this.isPolicyEdited;
   readonly mode = this.data.mode;
 
   readonly actions = computed<DialogAction<"submit" | null>[]>(() => [
@@ -71,23 +65,6 @@ export class EditPolicyDialogComponent extends AbstractDialogComponent<
 
   constructor() {
     super();
-
-    // Avoid closing the dialog with pending changes (when clicking next to the dialog or pressing ESC)
-    if (this.dialogRef) {
-      this.dialogRef.disableClose = true;
-      this.dialogRef.backdropClick().subscribe(() => {
-        this.close();
-      });
-      this.dialogRef.keydownEvents().subscribe((event) => {
-        if (event.key === "Escape") {
-          this.close();
-        }
-      });
-    }
-
-    this.pendingChangesService.registerHasChanges(() => this.isPolicyEdited());
-    this.pendingChangesService.registerSave(this.savePolicy.bind(this));
-    this.pendingChangesService.registerValidChanges(this.canSave.bind(this));
 
     // Close the dialog when navigating away from the events route
     // However, changing the route is disabled via the pendingChangesGuard when there are unsaved changes. This effect
@@ -103,13 +80,11 @@ export class EditPolicyDialogComponent extends AbstractDialogComponent<
     this.policyEdits.set({ ...this.policyEdits(), ...edits });
   }
 
-  canSave(): boolean {
-    return this.isPolicyEdited() && !!this.editedPolicy().name?.trim();
-  }
+  canSave = computed(() => this.isPolicyEdited() && !!this.editedPolicy().name?.trim());
 
   onAction(value: "submit" | null): void {
     if (value !== "submit") return;
-    this.savePolicy();
+    this.onSave();
   }
 
   protected override close(): void {
@@ -126,14 +101,14 @@ export class EditPolicyDialogComponent extends AbstractDialogComponent<
       }
     }).afterClosed().subscribe((result) => {
       if (result === "save-exit") {
-        this.savePolicy();
+        this.onSave();
       } else if (result === "discard") {
         super.close();
       }
     });
   }
 
-  async savePolicy() {
+  async onSave() {
     let success = false;
     if (this.mode === "create") {
       success = await this.policyService.saveNewPolicy({ ...this.policy(), ...this.policyEdits() });

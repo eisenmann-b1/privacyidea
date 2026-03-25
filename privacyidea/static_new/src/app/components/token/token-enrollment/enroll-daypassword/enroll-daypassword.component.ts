@@ -94,9 +94,9 @@ export class EnrollDaypasswordComponent implements OnInit {
   disabled = input<boolean>(false);
 
   otpKeyFormControl = new FormControl<string>({ value: "", disabled: true });
-  defaultHashlib = computed(() => this.systemService.systemConfig()[DAYPASSWORD_HASHLIB] ?? "sha1");
+  defaultHashlib = computed(() => this.systemService.systemConfig()[DAYPASSWORD_HASHLIB] || "sha1");
   hashAlgorithmControl = new FormControl<string>(this.defaultHashlib(), [Validators.required]);
-  defaultTimeStep = computed(() => this.systemService.systemConfig()[DAYPASSWORD_TIME_STEP] ?? "24h");
+  defaultTimeStep = computed(() => this.systemService.systemConfig()[DAYPASSWORD_TIME_STEP] || "24h");
   timeStepControl = new FormControl<string>(this.defaultTimeStep(), [Validators.required]);
   generateOnServerControl = new FormControl(true);
   otpLengthControl = new FormControl<number>(6, [Validators.required]);

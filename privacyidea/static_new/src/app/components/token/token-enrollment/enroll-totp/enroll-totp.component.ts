@@ -97,7 +97,7 @@ export class EnrollTotpComponent implements OnInit {
   generateOnServerFormControl = new FormControl<boolean>(true, [Validators.required]);
   otpLengthFormControl = new FormControl<number>(6, [Validators.required]);
   otpKeyFormControl = new FormControl<string>({ value: "", disabled: true });
-  defaultHashlib = computed(() => this.systemService.systemConfig()[TOTP_HASHLIB] ?? "sha1");
+  defaultHashlib = computed(() => this.systemService.systemConfig()[TOTP_HASHLIB] || "sha1");
   hashAlgorithmControl = new FormControl<string>(this.defaultHashlib(), [Validators.required]);
   defaultTimeStep = computed(() => {
     let timeStep = 30;

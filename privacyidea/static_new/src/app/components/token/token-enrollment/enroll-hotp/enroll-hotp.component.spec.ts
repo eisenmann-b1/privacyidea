@@ -88,6 +88,25 @@ describe("EnrollHotpComponent", () => {
     expect(component.hashAlgorithmFormControl.disabled).toBe(false);
   });
 
+  it("Default values are also set correctly if config contains empty strings", () => {
+    createAndInit();
+    const mockConfig = { [HOTP_HASHLIB]: "" };
+    systemService.systemConfig.set(mockConfig);
+
+    fixture = TestBed.createComponent(EnrollHotpComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    expect(component.generateOnServerFormControl.value).toBe(true);
+    expect(component.generateOnServerFormControl.disabled).toBe(false);
+    expect(component.otpKeyFormControl.value).toEqual("");
+    expect(component.otpKeyFormControl.disabled).toBe(true);
+    expect(component.otpLengthFormControl.value).toBe(6);
+    expect(component.otpLengthFormControl.disabled).toBe(false);
+    expect(component.hashAlgorithmFormControl.value).toBe("sha1");
+    expect(component.hashAlgorithmFormControl.disabled).toBe(false);
+  });
+
   it("Default values from system config are used", () => {
     createAndInit();
     const mockConfig = {

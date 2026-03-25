@@ -275,7 +275,7 @@ export class ContainerCreateComponent {
     this.containerService
       .registerContainer({
         container_serial: serial,
-        passphrase_user: false,
+        passphrase_user: this.registrationConfigComponent?.userStorePassphrase() || false,
         passphrase_response: this.registrationConfigComponent?.passphraseResponse() || "",
         passphrase_prompt: this.registrationConfigComponent?.passphrasePrompt() || ""
       })

@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { NgClass } from "@angular/common";
-import { Component } from "@angular/core";
+import { Component, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { MatButton, MatIconButton } from "@angular/material/button";
 import { MatCheckbox } from "@angular/material/checkbox";
@@ -66,4 +66,5 @@ import {ClearButtonComponent} from "../../shared/clear-button/clear-button.compo
   styleUrl: "./container-create.component.scss"
 })
 export class ContainerCreateSelfServiceComponent extends ContainerCreateComponent {
+  override userSelected = signal(true);
 }

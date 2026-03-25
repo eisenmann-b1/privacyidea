@@ -38,6 +38,7 @@ body {
 }
 
 :root {
+  --overlay-margin: 297px;
   --blur: 4px;
   --border-radius: 4px;
   --light-distance: -4px;
@@ -111,6 +112,10 @@ body {
   --mat-tab-header-inactive-ripple-color: white;
   --mat-select-focused-arrow-color: var(--mat-sys-primary-light);
   --mdc-outlined-text-field-focus-outline-color: var(--mat-sys-primary-light);
+}
+
+body.selfservice-layout {
+  --overlay-margin: 256px;
 }
 
 .shadow {
@@ -646,23 +651,23 @@ body {
   }
 
   .cdk-overlay-container {
-    margin-left: 297px;
-    width: calc(100% - 297px);
+    margin-left: var(--overlay-margin);
+    width: calc(100% - var(--overlay-margin));
 
     .mat-mdc-select-panel {
-      margin-left: -297px;
+      margin-left: calc(-1 * var(--overlay-margin));
     }
 
     .mat-mdc-autocomplete-panel {
-      margin-left: -297px;
+      margin-left: calc(-1 * var(--overlay-margin));
     }
 
     .mat-mdc-menu-panel {
-      margin-left: -297px;
+      margin-left: calc(-1 * var(--overlay-margin));
     }
 
     .mat-mdc-tooltip {
-      margin-left: -340px;
+      margin-left: calc(-1 * (var(--overlay-margin) + 43px));
     }
 
     &:has(.welcome-dialog-panel),
@@ -674,7 +679,7 @@ body {
       .mat-mdc-autocomplete-panel,
       .mat-mdc-menu-panel,
       .mat-mdc-tooltip {
-        margin-left: 0;
+        margin-left: 0 !important;
       }
     }
   }

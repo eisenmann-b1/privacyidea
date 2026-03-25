@@ -251,9 +251,8 @@ $button-low-contrast-variant: linear-gradient(
 .enroll-button-container {
   display: flex;
   flex-direction: row;
-  justify-content: left;
+  justify-content: center;
   gap: var(--global-gap);
-  flex: 1;
 }
 
 .enroll-button-spacer {

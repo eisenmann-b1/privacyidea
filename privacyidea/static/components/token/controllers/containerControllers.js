@@ -112,6 +112,10 @@ myApp.controller("containerCreateController", ['$scope', '$http', '$q', 'Contain
         }
         $scope.passphrase = {"user": false, "prompt": "", "response": ""};
 
+        $scope.$watch('newUser.user', function(newUser) {
+            $scope.selectedUsers = newUser ? [newUser] : [];
+        });
+
         $scope.allowedTokenTypes = {
             list: [],
             displayPhrase: "All",

@@ -64,12 +64,14 @@ export class TokenEnrollmentLastStepDialogWizardComponent extends TokenEnrollmen
     {
       type: "auxiliary",
       label: "Create Container",
-      value: "create_container"
+      value: "create_container",
+      className: "button-width-m"
     },
     {
       type: "auxiliary",
       label: "Logout",
-      value: "logout"
+      value: "logout",
+      primary: true,
     }
   ];
 

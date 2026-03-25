@@ -21,7 +21,7 @@
   aria-label="Container Table"
   class="container-table-container"
   i18n-aria-label>
-  <div class="filter-paginator-container-selfservice">
+  <div class="filter-paginator-container">
     <h3 class="selfservice-paginator-label"> Your Containers </h3>
     <mat-paginator
       (page)="onPageEvent($event)"
@@ -31,7 +31,7 @@
       [pageSize]="pageSize()"
       showFirstLastButtons />
   </div>
-  <div class="self-service-table-container">
+  <div class="table-container">
     <table
       [dataSource]="containerDataSource()"
       aria-label="Container Data Table"

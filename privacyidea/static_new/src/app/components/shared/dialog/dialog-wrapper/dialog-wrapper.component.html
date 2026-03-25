@@ -36,8 +36,9 @@
             [class.action-button-delete-secondary]="action.type === 'destruct' && !action.primary"
             [class.action-button-primary]="action.primary && action.type !== 'destruct'"
             [class.action-button-secondary]="!action.primary"
+            [class.button-width-s]="!action.className"
             [disabled]="action.disabled"
-            class="button-width-s"
+            [ngClass]="action.className || ''"
             mat-stroked-button>
             @if (action.icon) {
               <mat-icon>{{ action.icon }}</mat-icon>

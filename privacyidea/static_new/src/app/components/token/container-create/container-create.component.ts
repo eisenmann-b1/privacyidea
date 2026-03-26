@@ -184,7 +184,8 @@ export class ContainerCreateComponent {
           this.registrationDialog.closeAll();
           this.containerService.stopPolling();
 
-          if (container?.type === "smartphone" && this.authService.actionAllowed("container_wizard_registration")) {
+          if (container?.type === "smartphone" && this.authService.actionAllowed("container_wizard_registration")
+            && this.authService.actionAllowed("container_register")) {
             let registrationCompletedDialogComponent: any = ContainerRegistrationCompletedDialogComponent;
             if (this.wizard) {
               registrationCompletedDialogComponent = ContainerRegistrationCompletedDialogWizardComponent;
@@ -304,6 +305,10 @@ export class ContainerCreateComponent {
       });
   }
 
+  clearTemplateSelection() {
+    this.selectedTemplate.set("");
+  }
+
   private openRegistrationDialog(response: PiResponse<ContainerRegisterData>) {
     this.dialogData.set({
       response: response,
@@ -317,9 +322,5 @@ export class ContainerCreateComponent {
     this.registrationDialog.open(dialogComponent, {
       data: this.dialogData
     });
-  }
-
-  clearTemplateSelection() {
-    this.selectedTemplate.set("");
   }
 }

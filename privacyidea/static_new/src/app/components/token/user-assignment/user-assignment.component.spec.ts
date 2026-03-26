@@ -67,14 +67,19 @@ describe("UserAssignmentComponent", () => {
   });
 
   it("should enable/disable userFilterCtrl on onlyAddToRealm checkbox change", () => {
+    userServiceMock.selectedUserRealm.set("realm1");
+    fixture.detectChanges();
     const userCtrl = component.userFilterCtrl;
     component.onOnlyAddToRealmChange({ checked: true });
+    fixture.detectChanges();
     expect(userCtrl.disabled).toBe(true);
     component.onOnlyAddToRealmChange({ checked: false });
+    fixture.detectChanges();
     expect(userCtrl.enabled).toBe(true);
   });
 
   it("should enable/disable userFilterCtrl when checkbox is clicked", () => {
+    userServiceMock.selectedUserRealm.set("realm1");
     fixture.detectChanges();
     const userCtrl = component.userFilterCtrl;
     // Find the checkbox element
@@ -122,11 +127,24 @@ describe("UserAssignmentComponent", () => {
     const userCtrl = component.userFilterCtrl;
     realmCtrl.setValue("");
     component.onSelectedRealmChange(realmCtrl.value);
+    fixture.detectChanges();
     expect(userCtrl.value).toBe("");
     expect(userCtrl.disabled).toBe(true);
     realmCtrl.setValue("realm1");
     component.onSelectedRealmChange(realmCtrl.value);
+    fixture.detectChanges();
     expect(userCtrl.enabled).toBe(true);
+  });
+
+  it("should be disabled initially if no realm is selected", () => {
+    // We recreate the component to ensure clean initialization.
+    fixture = TestBed.createComponent(UserAssignmentComponent);
+    component = fixture.componentInstance;
+    userServiceMock.selectedUserRealm.set("");
+    fixture.detectChanges();
+
+    const userCtrl = component.userFilterCtrl;
+    expect(userCtrl.disabled).toBe(true);
   });
 
   it("should set onlyAddToRealm to false when user selected", () => {

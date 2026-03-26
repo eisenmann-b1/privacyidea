@@ -68,7 +68,7 @@ export class UserAssignmentComponent {
   readonly internalUserFilterControl = new FormControl<string | UserData | null>(
     {
       value: this.userService.selectionFilter(),
-      disabled: false
+      disabled: !this.userService.selectedUserRealm()
     },
     { nonNullable: true }
   );
@@ -85,20 +85,10 @@ export class UserAssignmentComponent {
 
   onOnlyAddToRealmChange(event: any) {
     this.onlyAddToRealm.set(event.checked);
-    if (this.onlyAddToRealm()) {
-      this.userFilterCtrl.disable({ emitEvent: false });
-    } else {
-      this.userFilterCtrl.enable({ emitEvent: false });
-    }
   }
 
   onSelectedRealmChange(realm: string) {
     this.userFilterCtrl.reset("", { emitEvent: false });
-    if (!realm) {
-      this.userFilterCtrl.disable({ emitEvent: false });
-    } else {
-      this.userFilterCtrl.enable({ emitEvent: false });
-    }
     this.userService.selectedUserRealm.set(realm);
   }
 
@@ -109,9 +99,25 @@ export class UserAssignmentComponent {
         this.userFilterCtrl.setValue(users[0]);
       }
     });
+
+    effect(() => {
+      const realm = this.userService.selectedUserRealm();
+      const onlyAddToRealm = this.onlyAddToRealm();
+      if (!realm || onlyAddToRealm) {
+        this.userFilterCtrl.disable({ emitEvent: false });
+      } else {
+        this.userFilterCtrl.enable({ emitEvent: false });
+      }
+    });
   }
 
   ngOnInit(): void {
+    this.userService.selectedUserRealm.set(this.selectedUserRealmCtrl.value);
+    this.selectedUserRealmCtrl.valueChanges.subscribe((value) => {
+      this.userFilterCtrl.reset("", { emitEvent: false });
+      this.userService.selectedUserRealm.set(value);
+    });
+
     this.userFilterCtrl.valueChanges.subscribe((value) => {
       this.userService.selectionFilter.set(value ?? "");
       if (value) {

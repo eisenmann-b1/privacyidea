@@ -59,9 +59,8 @@ export class EditPolicyDialogComponent extends PendingChangesDialogComponent<
       value: "submit",
       type: "confirm",
       primary: true,
-
       disabled: !this.canSave(),
-      className: "button-width-m",
+      className: "button-width-s",
     }
   ]);
 

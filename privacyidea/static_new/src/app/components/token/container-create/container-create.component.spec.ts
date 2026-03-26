@@ -151,6 +151,7 @@ describe("ContainerCreateComponent", () => {
     containerServiceMock = TestBed.inject(ContainerService) as unknown as MockContainerService;
     userSvc = TestBed.inject(UserService) as unknown as MockUserService;
     authService = TestBed.inject(AuthService) as unknown as MockAuthService;
+    authService.actionAllowed.mockReturnValue(true);
     contentService = TestBed.inject(ContentService) as unknown as MockContentService;
 
     jest
@@ -324,6 +325,28 @@ describe("ContainerCreateComponent", () => {
     expect(removeClass).toHaveBeenCalledWith((component as any).stickyHeader.nativeElement, "is-sticky");
   });
 
+  it("smartphone without register policy does not open registration dialog", () => {
+    wizardFixture.destroy();
+    selfFixture.destroy();
+    authService.actionAllowed.mockImplementation((action: string) => action !== "container_register");
+
+    const dialog = TestBed.inject(MatDialog);
+    const registerSpy = jest.spyOn(dialog, "open");
+    const stopPollingSpy = jest.spyOn(containerServiceMock, "stopPolling");
+
+    jest.spyOn(containerServiceMock.containerDetailResource, "value").mockReturnValue({
+      result: { value: { containers: [{ type: "smartphone", info: { registration_state: "registered" } }] } }
+    } as any);
+
+    containerServiceMock.containerSerial.set("CONT-NO-REG");
+
+    fixture.detectChanges();
+    TestBed.flushEffects();
+
+    expect(stopPollingSpy).toHaveBeenCalled();
+    expect(registerSpy).not.toHaveBeenCalled();
+  });
+
   describe("wizard", () => {
     it("show loaded templates if not empty", async () => {
       authService.authData.set({
@@ -434,6 +457,34 @@ describe("ContainerCreateComponent", () => {
       } as any);
 
       containerServiceMock.containerSerial.set("CONT-GENERIC");
+
+      wizardFixture.detectChanges();
+      TestBed.flushEffects();
+
+      expect(openSpy).toHaveBeenCalled();
+      expect(openSpy.mock.calls[0][0]).toBe(ContainerCreatedDialogWizardComponent);
+    });
+
+    it("smartphone without register policy in wizard opens create dialog", () => {
+      authService.actionAllowed.mockImplementation((action: string) => action !== "container_register");
+      authService.authData.set({
+        ...authService.authData()!,
+        container_wizard: {
+          enabled: true,
+          type: "smartphone",
+          registration: false,
+          template: null
+        }
+      });
+      wizardFixture = TestBed.createComponent(ContainerCreateWizardComponent);
+      const dialog = TestBed.inject(MatDialog);
+      const openSpy = jest.spyOn(dialog, "open");
+
+      jest.spyOn(containerServiceMock.containerDetailResource, "value").mockReturnValue({
+        result: { value: { containers: [{ type: "smartphone", info: { registration_state: "registered" } }] } }
+      } as any);
+
+      containerServiceMock.containerSerial.set("CONT-WIZ-NO-REG");
 
       wizardFixture.detectChanges();
       TestBed.flushEffects();

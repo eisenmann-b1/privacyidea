@@ -18,7 +18,7 @@
  **/
 
 import { Component, computed, inject, Signal } from "@angular/core";
-import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from "@angular/material/dialog";
+import { MatDialogActions, MatDialogClose, MatDialogContent } from "@angular/material/dialog";
 import { MatButton } from "@angular/material/button";
 import { ContainerRegistrationCompletedDialogComponent } from "./container-registration-completed-dialog.component";
 import { AuthService, AuthServiceInterface } from "../../../../services/auth/auth.service";
@@ -35,7 +35,6 @@ import { environment } from "../../../../../environments/environment";
   styleUrls: ["./container-registration-completed-dialog.component.scss"],
   imports: [
     MatDialogContent,
-    MatDialogTitle,
     MatDialogActions,
     MatButton,
     MatDialogClose,

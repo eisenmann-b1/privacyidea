@@ -19,13 +19,7 @@
 import { AsyncPipe } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
 import { Component, computed, inject, SecurityContext, Signal } from "@angular/core";
-import {
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogContent,
-  MatDialogRef,
-  MatDialogTitle
-} from "@angular/material/dialog";
+import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from "@angular/material/dialog";
 import { DomSanitizer } from "@angular/platform-browser";
 import { catchError, map, of } from "rxjs";
 import { MatButton } from "@angular/material/button";
@@ -37,14 +31,14 @@ import { environment } from "../../../../../environments/environment";
 
 @Component({
   selector: "app-container-created-wizard-dialog",
-  imports: [MatDialogContent, MatDialogTitle, MatDialogActions, MatDialogClose, MatButton, AsyncPipe],
+  imports: [MatDialogContent, MatDialogActions, MatDialogClose, MatButton, AsyncPipe],
   templateUrl: "./container-created-dialog.wizard.component.html",
   styleUrl: "./container-created-dialog.component.scss"
 })
 export class ContainerCreatedDialogWizardComponent extends ContainerCreatedDialogComponent {
   protected override readonly containerService: ContainerServiceInterface = inject(ContainerService);
-  public readonly authService: AuthServiceInterface = inject(AuthService);
   protected override readonly dialogRef: MatDialogRef<ContainerCreatedDialogWizardComponent> = inject(MatDialogRef);
+  public readonly authService: AuthServiceInterface = inject(AuthService);
   tagData: Signal<Record<string, string>> = computed(() => ({
     containerSerial: this.data().containerSerial(),
     containerRegistrationURL: this.data().response.result?.value?.container_url?.value || "",

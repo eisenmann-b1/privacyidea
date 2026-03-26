@@ -651,8 +651,22 @@ body.selfservice-layout {
   }
 
   .cdk-overlay-container {
+    &:has(.nav-accessible-dialog):has(.nav-blocking-dialog) {
+      margin-left: 0;
+      width: 100%;
+
+      .mat-mdc-dialog-panel {
+        margin-left: var(--overlay-margin);
+      }
+    }
+
     margin-left: var(--overlay-margin);
     width: calc(100% - var(--overlay-margin));
+
+    &:has(.nav-accessible-dialog) {
+      margin-left: var(--overlay-margin);
+      width: calc(100% - var(--overlay-margin));
+    }
 
     .mat-mdc-select-panel {
       margin-left: calc(-1 * var(--overlay-margin));
@@ -671,7 +685,8 @@ body.selfservice-layout {
     }
 
     &:has(.welcome-dialog-panel),
-    &:has(.global-dialog-panel) {
+    &:has(.global-dialog-panel),
+    &:has(.nav-blocking-dialog):not(:has(.nav-accessible-dialog)) {
       margin-left: 0;
       width: 100%;
 

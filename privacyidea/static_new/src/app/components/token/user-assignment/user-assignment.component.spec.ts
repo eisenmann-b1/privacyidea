@@ -167,4 +167,20 @@ describe("UserAssignmentComponent", () => {
     // Simulate template logic: checkbox is enabled if userFilterCtrl.value is falsy
     expect(!userCtrl.value).toBe(true);
   });
+
+  it("should update control when signal changes (fallback simulation)", () => {
+    // Re-create the component with clean state
+    fixture = TestBed.createComponent(UserAssignmentComponent);
+    component = fixture.componentInstance;
+    userServiceMock.selectedUserRealm.set("");
+    fixture.detectChanges();
+
+    expect(component.selectedUserRealmCtrl.value).toBe("");
+
+    // Simulate signal getting a value (like from fallback)
+    userServiceMock.selectedUserRealm.set("fallback-realm");
+    fixture.detectChanges();
+
+    expect(component.selectedUserRealmCtrl.value).toBe("fallback-realm");
+  });
 });

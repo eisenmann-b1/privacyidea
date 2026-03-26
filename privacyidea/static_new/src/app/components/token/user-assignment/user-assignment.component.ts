@@ -109,6 +109,13 @@ export class UserAssignmentComponent {
         this.userFilterCtrl.enable({ emitEvent: false });
       }
     });
+
+    effect(() => {
+      const realm = this.userService.selectedUserRealm();
+      if (realm !== this.selectedUserRealmCtrl.value) {
+        this.selectedUserRealmCtrl.setValue(realm, { emitEvent: false });
+      }
+    });
   }
 
   ngOnInit(): void {

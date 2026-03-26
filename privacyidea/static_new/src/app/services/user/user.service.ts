@@ -230,6 +230,7 @@ export class UserService implements UserServiceInterface {
       routeUrl: this.contentService.routeUrl(),
       currentUrl: this.router.url,
       defaultRealm: this.realmService.defaultRealm(),
+      realmOptions: this.realmService.realmOptions(),
       selectedTokenType: this.tokenService.selectedTokenType(),
       authRole: this.authService.role(),
       authRealm: this.authService.realm()
@@ -251,7 +252,8 @@ export class UserService implements UserServiceInterface {
       } else if (source.routeUrl.startsWith(ROUTE_PATHS.USERS) && previous?.value) {
         return previous.value;
       }
-      return source.authRole === "user" ? source.authRealm : source.defaultRealm;
+      const realm = source.authRole === "user" ? source.authRealm : source.defaultRealm;
+      return realm || source.realmOptions[0] || "";
     }
   });
 

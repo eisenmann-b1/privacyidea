@@ -1,5 +1,5 @@
 /**
- * (c) NetKnights GmbH 2025,  https://netknights.it
+ * (c) NetKnights GmbH 2026,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -16,19 +16,6 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { PendingChangesServiceInterface } from "../../app/services/pending-changes/pending-changes.service";
 
-export class MockPendingChangesService implements PendingChangesServiceInterface {
-  hasChangesMockValue = false;
-  validChangesMockValue = true;
-
-  get hasChanges() {return this.hasChangesMockValue;};
-
-  get validChanges() {return this.validChangesMockValue;};
-
-  registerHasChanges = jest.fn();
-  clearAllRegistrations = jest.fn();
-  registerSave = jest.fn();
-  save = jest.fn().mockReturnValue(true);
-  registerValidChanges = jest.fn();
-}
+export const NAVIGATION_ACCESSIBLE_DIALOG_CLASS = "nav-accessible-dialog";
+export const NAVIGATION_BLOCKING_DIALOG_CLASS = "nav-blocking-dialog";

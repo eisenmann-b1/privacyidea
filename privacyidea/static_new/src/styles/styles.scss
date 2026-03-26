@@ -38,6 +38,7 @@ body {
 }
 
 :root {
+  --overlay-margin: 297px;
   --blur: 4px;
   --border-radius: 4px;
   --light-distance: -4px;
@@ -111,6 +112,10 @@ body {
   --mat-tab-header-inactive-ripple-color: white;
   --mat-select-focused-arrow-color: var(--mat-sys-primary-light);
   --mdc-outlined-text-field-focus-outline-color: var(--mat-sys-primary-light);
+}
+
+body.selfservice-layout {
+  --overlay-margin: 256px;
 }
 
 .shadow {
@@ -493,6 +498,10 @@ body {
   margin-left: 64px;
 }
 
+.max-width-300 {
+  max-width: 300px;
+}
+
 .copy-button {
   background: unset;
   border: unset;
@@ -642,41 +651,50 @@ body {
   }
 
   .cdk-overlay-container {
-    // Handle special case: navigation blocking dialog wins over navigation accessible dialog, e.g. confirmation dialog
-    // over resolver edit
     &:has(.nav-accessible-dialog):has(.nav-blocking-dialog) {
       margin-left: 0;
       width: 100%;
 
-      // Keep shift for dialog position to avoid layout jumps
       .mat-mdc-dialog-panel {
-        margin-left: 297px;
+        margin-left: var(--overlay-margin);
       }
     }
 
-    // Dialogs where navigation should remain accessible get shifted
+    margin-left: var(--overlay-margin);
+    width: calc(100% - var(--overlay-margin));
+
     &:has(.nav-accessible-dialog) {
-      margin-left: 297px;
-      width: calc(100% - 297px);
+      margin-left: var(--overlay-margin);
+      width: calc(100% - var(--overlay-margin));
     }
 
-    // Shift back components which could be contained in the dialog to be correctly aligned
-    &:has(.nav-accessible-dialog):has(.nav-blocking-dialog),
-    &:has(.nav-accessible-dialog) {
-      .mat-mdc-select-panel {
-        margin-left: -297px;
-      }
+    .mat-mdc-select-panel {
+      margin-left: calc(-1 * var(--overlay-margin));
+    }
 
-      .mat-mdc-autocomplete-panel {
-        margin-left: -297px;
-      }
+    .mat-mdc-autocomplete-panel {
+      margin-left: calc(-1 * var(--overlay-margin));
+    }
 
-      .mat-mdc-menu-panel {
-        margin-left: -297px;
-      }
+    .mat-mdc-menu-panel {
+      margin-left: calc(-1 * var(--overlay-margin));
+    }
 
+    .mat-mdc-tooltip {
+      margin-left: calc(-1 * (var(--overlay-margin) + 43px));
+    }
+
+    &:has(.welcome-dialog-panel),
+    &:has(.global-dialog-panel),
+    &:has(.nav-blocking-dialog):not(:has(.nav-accessible-dialog)) {
+      margin-left: 0;
+      width: 100%;
+
+      .mat-mdc-select-panel,
+      .mat-mdc-autocomplete-panel,
+      .mat-mdc-menu-panel,
       .mat-mdc-tooltip {
-        margin-left: -340px;
+        margin-left: 0 !important;
       }
     }
   }

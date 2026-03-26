@@ -55,10 +55,12 @@ export class EditPolicyDialogComponent extends PendingChangesDialogComponent<
 
   readonly actions = computed<DialogAction<"submit" | null>[]>(() => [
     {
-      label: this.mode === "create" ? $localize`Create Policy` : $localize`Save Changes`,
+      label: this.mode === "create" ? $localize`Create Policy` : $localize`Save`,
       value: "submit",
       type: "confirm",
-      disabled: !this.canSave()
+      primary: true,
+      disabled: !this.canSave(),
+      className: "button-width-s",
     }
   ]);
 
@@ -70,7 +72,7 @@ export class EditPolicyDialogComponent extends PendingChangesDialogComponent<
     // will only be triggered when there are no unsaved changes or when the user confirmed discarding them.
     effect(() => {
       if (!this.contentService.routeUrl().startsWith(ROUTE_PATHS.POLICIES)) {
-        super.close();
+        this.dialogRef.close();
       }
     });
   }
@@ -94,7 +96,7 @@ export class EditPolicyDialogComponent extends PendingChangesDialogComponent<
       success = await this.policyService.savePolicyEdits(this.policy().name, { ...this.policy(), ...this.policyEdits() });
     }
     if (success) {
-      super.close();
+      this.dialogRef.close();
     }
     return success;
   }

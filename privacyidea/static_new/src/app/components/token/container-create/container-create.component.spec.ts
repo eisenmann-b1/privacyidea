@@ -255,6 +255,10 @@ describe("ContainerCreateComponent", () => {
   });
 
   it("pollContainerRolloutState: closes dialog and opens completed dialog when state === 'registered'", () => {
+    authService.authData.set({
+      ...authService.authData()!,
+      container_wizard: { ...authService.authData()!.container_wizard, registration: true }
+    });
     const dialog = TestBed.inject(MatDialog) as unknown as { closeAll: jest.Mock; open: jest.Mock };
     const closeSpy = jest.spyOn(dialog, "closeAll");
     const openSpy = jest.spyOn(dialog, "open");
@@ -325,10 +329,13 @@ describe("ContainerCreateComponent", () => {
     expect(removeClass).toHaveBeenCalledWith((component as any).stickyHeader.nativeElement, "is-sticky");
   });
 
-  it("smartphone without register policy does not open registration dialog", () => {
+  it("smartphone without registration wizard policy does not open registration completed dialog", () => {
     wizardFixture.destroy();
     selfFixture.destroy();
-    authService.actionAllowed.mockImplementation((action: string) => action !== "container_register");
+    authService.authData.set({
+      ...authService.authData()!,
+      container_wizard: { ...authService.authData()!.container_wizard, registration: false }
+    });
 
     const dialog = TestBed.inject(MatDialog);
     const registerSpy = jest.spyOn(dialog, "open");

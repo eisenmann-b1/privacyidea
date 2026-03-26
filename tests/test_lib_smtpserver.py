@@ -109,8 +109,8 @@ class SMTPServerTestCase(MyTestCase):
         server_list = get_smtpservers(identifier="myserver")
         server = server_list[0].config
         # assume encryption
-        self.assertEqual(len(encryptPassword("top_secret")), len(server.private_key_password))
-        self.assertNotEqual("top_secret", server.private_key_password)
+        self.assertEqual(len(encryptPassword("new_secret")), len(server.private_key_password))
+        self.assertNotEqual("new_secret", server.private_key_password)
         self.assertEqual("new_secret", decryptPassword(server.private_key_password))
 
         # Update keeps unspecified private key password unchanged

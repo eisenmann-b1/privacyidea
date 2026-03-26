@@ -320,7 +320,7 @@ def list_smtpservers(identifier=None, server=None):
 def add_smtpserver(identifier, server: str = None, port: int = 25, username: str = "", password: str = "",
                    sender: str = "", description: str = "", tls: bool = False, timeout: int = TIMEOUT,
                    enqueue_job: bool = False, smime: bool = False, dont_send_on_error: bool = False,
-                   private_key: str = "", private_key_password: str = None, certificate: str = ""):
+                   private_key: str = "", private_key_password: str | None = None, certificate: str = ""):
     """
     This adds an smtp server to the smtp server database table.
 

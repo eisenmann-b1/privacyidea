@@ -129,10 +129,11 @@ describe("EditPolicyDialogComponent", () => {
     expect(saveSpy).not.toHaveBeenCalled();
   });
 
-  it("savePolicy calls savePolicyEdits in edit mode", async () => {
+  it("savePolicy calls savePolicyEdits in edit mode and closes the dialog", async () => {
     const spy = jest.spyOn(policyService, "savePolicyEdits").mockResolvedValue(true);
     await component.onSave();
     expect(spy).toHaveBeenCalledWith("TestPolicy", expect.any(Object));
+    expect(mockDialogRef.close).toHaveBeenCalled();
   });
 });
 
@@ -167,9 +168,11 @@ describe("Create Policy in EditPolicyDialogComponent", () => {
     fixture.detectChanges();
   });
 
-  it("savePolicy calls saveNewPolicy in create mode", async () => {
+  it("savePolicy calls saveNewPolicy in create mode and closes the dialog", async () => {
     const spy = jest.spyOn(policyService, "saveNewPolicy").mockResolvedValue(true);
+    const closeSpy = jest.spyOn(component["dialogRef"], "close");
     await component.onSave();
     expect(spy).toHaveBeenCalled();
+    expect(closeSpy).toHaveBeenCalled();
   });
 });

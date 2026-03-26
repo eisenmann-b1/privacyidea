@@ -184,7 +184,7 @@ export class ContainerCreateComponent {
           this.registrationDialog.closeAll();
           this.containerService.stopPolling();
 
-          if (container?.type === "smartphone" && this.authService.actionAllowed("container_register")) {
+          if (container?.type === "smartphone" && this.authService.actionAllowed("container_wizard_registration")) {
             let registrationCompletedDialogComponent: any = ContainerRegistrationCompletedDialogComponent;
             if (this.wizard) {
               registrationCompletedDialogComponent = ContainerRegistrationCompletedDialogWizardComponent;

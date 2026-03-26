@@ -57,3 +57,12 @@
     [innerHTML]="postBottomHtml$ | async"
     class="margin-bottom-16"></div>
 </mat-dialog-content>
+
+<mat-dialog-actions>
+  <button
+    (click)="authService.logout()"
+    mat-dialog-close
+    mat-button>
+    Logout
+  </button>
+</mat-dialog-actions>

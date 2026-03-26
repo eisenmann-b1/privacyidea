@@ -51,7 +51,9 @@ export class EditPolicyDialogComponent extends AbstractDialogComponent<
       label: this.data.mode === "create" ? $localize`Create Policy` : $localize`Save Changes`,
       value: "submit",
       type: "confirm",
-      disabled: !this.canSave()
+      primary: true,
+      disabled: !this.canSave(),
+      className: "button-width-m",
     }
   ]);
 

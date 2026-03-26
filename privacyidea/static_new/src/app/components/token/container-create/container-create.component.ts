@@ -176,20 +176,31 @@ export class ContainerCreateComponent {
       }
 
       if (containerDetailResource?.result?.value) {
-        const registrationState = containerDetailResource.result.value.containers[0]?.info?.registration_state;
+        const container = containerDetailResource.result.value.containers[0];
+        const registrationState = container?.info?.registration_state;
 
         if (registrationState !== "client_wait") {
           this.registrationDialog.closeAll();
           this.containerService.stopPolling();
 
-          let registrationCompletedDialogComponent: any = ContainerRegistrationCompletedDialogComponent;
-          if (this.wizard) {
-            registrationCompletedDialogComponent = ContainerRegistrationCompletedDialogWizardComponent;
-          }
+          if (container?.type === "smartphone") {
+            let registrationCompletedDialogComponent: any = ContainerRegistrationCompletedDialogComponent;
+            if (this.wizard) {
+              registrationCompletedDialogComponent = ContainerRegistrationCompletedDialogWizardComponent;
+            }
 
-          this.registrationDialog.open(registrationCompletedDialogComponent, {
-            data: { containerSerial: serial } as ContainerRegistrationCompletedDialogData
-          });
+            this.registrationDialog.open(registrationCompletedDialogComponent, {
+              data: { containerSerial: serial } as ContainerRegistrationCompletedDialogData
+            });
+          } else if (this.wizard) {
+            this.openRegistrationDialog({
+              result: {
+                value: {
+                  container_serial: serial
+                }
+              }
+            } as unknown as PiResponse<ContainerRegisterData>);
+          }
         }
       }
     });

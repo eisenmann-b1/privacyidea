@@ -44,6 +44,7 @@ import { VersioningService } from "../../../services/version/version.service";
 import { Renderer2, signal } from "@angular/core";
 import { ContainerCreateSelfServiceComponent } from "./container-create.self-service.component";
 import { ContainerCreateWizardComponent } from "./container-create.wizard.component";
+import { ContainerCreatedDialogWizardComponent } from "./container-created-dialog/container-created-dialog.wizard.component";
 import { ROUTE_PATHS } from "../../../route_paths";
 import { MockAuthService } from "../../../../testing/mock-services/mock-auth-service";
 
@@ -260,7 +261,7 @@ describe("ContainerCreateComponent", () => {
     const stopPollingSpy = jest.spyOn(containerServiceMock, "stopPolling");
 
     jest.spyOn(containerServiceMock.containerDetailResource, "value").mockReturnValue({
-      result: { value: { containers: [{ info: { registration_state: "registered" } }] } }
+      result: { value: { containers: [{ type: "smartphone", info: { registration_state: "registered" } }] } }
     } as any);
 
     containerServiceMock.containerSerial.set("CONT-OK");
@@ -411,6 +412,34 @@ describe("ContainerCreateComponent", () => {
       // check registration
       expect(wizardComponent.generateQRCode()).toBe(false);
       expect(registerSpy).not.toHaveBeenCalled();
+    });
+
+    it("container wizard opens create dialog for non-smartphone", () => {
+      authService.authData.set({
+        ...authService.authData()!,
+        container_wizard: {
+          enabled: true,
+          type: "generic",
+          registration: false,
+          template: null
+        }
+      });
+      wizardFixture = TestBed.createComponent(ContainerCreateWizardComponent);
+      const wizardComp = wizardFixture.componentInstance;
+      const dialog = TestBed.inject(MatDialog) as any;
+      const openSpy = jest.spyOn(dialog, "open");
+
+      jest.spyOn(containerServiceMock.containerDetailResource, "value").mockReturnValue({
+        result: { value: { containers: [{ type: "generic", info: {} }] } }
+      } as any);
+
+      containerServiceMock.containerSerial.set("CONT-GENERIC");
+
+      wizardFixture.detectChanges();
+      TestBed.flushEffects();
+
+      expect(openSpy).toHaveBeenCalled();
+      expect(openSpy.mock.calls[0][0]).toBe(ContainerCreatedDialogWizardComponent);
     });
   });
 });

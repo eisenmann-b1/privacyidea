@@ -263,6 +263,8 @@ export class ContainerCreateComponent {
         }
         if (this.generateQRCode()) {
           this.registerContainer(containerSerial);
+        } else if (this.wizard) {
+          this.containerSerial.set(containerSerial);
         } else {
           this.router.navigateByUrl(ROUTE_PATHS.TOKENS_CONTAINERS_DETAILS + containerSerial);
           this.containerSerial.set(containerSerial);

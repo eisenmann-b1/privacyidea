@@ -18,15 +18,16 @@
  **/
 
 import { Component, computed, inject, Signal } from "@angular/core";
-import { MatDialogActions, MatDialogClose, MatDialogContent } from "@angular/material/dialog";
+import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from "@angular/material/dialog";
 import { MatButton } from "@angular/material/button";
 import { ContainerRegistrationCompletedDialogComponent } from "./container-registration-completed-dialog.component";
 import { AuthService, AuthServiceInterface } from "../../../../services/auth/auth.service";
-import { map } from "rxjs";
+import { catchError, map, of } from "rxjs";
 import { StringUtils } from "../../../../utils/string.utils";
 import { HttpClient } from "@angular/common/http";
 import { DomSanitizer } from "@angular/platform-browser";
 import { AsyncPipe } from "@angular/common";
+import { environment } from "../../../../../environments/environment";
 
 @Component({
   selector: "app-container-registration-completed-dialog-wizard",
@@ -34,6 +35,7 @@ import { AsyncPipe } from "@angular/common";
   styleUrls: ["./container-registration-completed-dialog.component.scss"],
   imports: [
     MatDialogContent,
+    MatDialogTitle,
     MatDialogActions,
     MatButton,
     MatDialogClose,
@@ -48,10 +50,12 @@ export class ContainerRegistrationCompletedDialogWizardComponent extends Contain
   }));
 
   readonly registeredHtml$ = this.http
-    .get("/static/public/customize/container-create.wizard.registered.html", {
+    .get(environment.proxyUrl + "/static/public/customize/container-create.wizard.registered.html", {
       responseType: "text"
     })
-    .pipe(map((raw) => ({
+    .pipe(
+      catchError(() => of("")),
+      map((raw) => ({
         hasContent: !!raw && raw.trim().length > 0,
         sanitized: this.sanitizer.bypassSecurityTrustHtml(StringUtils.replaceWithTags(raw, this.tagData()))
       }))

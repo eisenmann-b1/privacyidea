@@ -38,6 +38,8 @@ myApp.controller("smtpServerController", ["$scope", "$stateParams", "inform",
             timeout: 10
         }
 
+        $scope.initialPrivateKeyPassword = "";
+
         // Get all servers
         $scope.getSmtpServers = function () {
             ConfigFactory.getSmtp(function (data) {
@@ -49,6 +51,7 @@ myApp.controller("smtpServerController", ["$scope", "$stateParams", "inform",
                     // We are editing an existing SMTP Server
                     $scope.params = $scope.smtpServers[$scope.identifier];
                     $scope.params["identifier"] = $scope.identifier;
+                    $scope.initialPrivateKeyPassword = $scope.params.private_key_password;
                 } else {
                     // This is a new SMTP server
                     $scope.params = {
@@ -93,6 +96,10 @@ myApp.controller("smtpServerController", ["$scope", "$stateParams", "inform",
         };
 
         $scope.saveSMTPServer = function () {
+            if ($scope.params.private_key_password === $scope.initialPrivateKeyPassword) {
+                // password has not changed, and we only know the encrypted version, so we do not send it to the backend
+                delete $scope.params.private_key_password;
+            }
             ConfigFactory.addSmtp($scope.params, function (data) {
                 if (data.result.status === true) {
                     inform.add(gettextCatalog.getString("SMTP Config saved."),

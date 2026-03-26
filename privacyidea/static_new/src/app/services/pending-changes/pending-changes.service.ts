@@ -18,10 +18,26 @@
  **/
 import { Injectable, signal } from "@angular/core";
 
+export interface PendingChangesServiceInterface {
+  hasChanges: boolean;
+  validChanges: boolean;
+
+  registerHasChanges(fn: () => boolean): void;
+
+  clearAllRegistrations(): void;
+
+  registerSave(fn: () => Promise<boolean> | boolean): void;
+
+  save(): Promise<boolean> | boolean;
+
+  registerValidChanges(fn: () => boolean): void;
+}
+
 @Injectable({ providedIn: "root" })
-export class PendingChangesService {
+export class PendingChangesService implements PendingChangesServiceInterface {
   private _hasChangesFn = signal<(() => boolean) | null>(null);
-  private _saveFn = signal<(() => Promise<void> | void) | null>(null);
+  private _saveFn = signal<(() => Promise<boolean> | boolean) | null>(null);
+  private _validChanges: () => boolean = signal(true);
 
   get hasChanges(): boolean {
     const fn = this._hasChangesFn();
@@ -32,17 +48,26 @@ export class PendingChangesService {
     this._hasChangesFn.set(fn);
   }
 
-  unregisterHasChanges(): void {
+  clearAllRegistrations(): void {
     this._hasChangesFn.set(null);
     this._saveFn.set(null);
+    this._validChanges = signal(true);
   }
 
-  registerSave(fn: () => Promise<void> | void): void {
+  registerSave(fn: () => Promise<boolean> | boolean): void {
     this._saveFn.set(fn);
   }
 
-  save(): Promise<void> | void {
+  save(): Promise<boolean> | boolean {
     const fn = this._saveFn();
-    return fn ? fn() : undefined;
+    return fn ? fn() : false;
+  }
+
+  registerValidChanges(fn: () => boolean): void {
+    this._validChanges = fn;
+  }
+
+  get validChanges(): boolean {
+    return this._validChanges();
   }
 }

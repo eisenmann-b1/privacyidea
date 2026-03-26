@@ -10,8 +10,7 @@
   @include styles.table-container-styles;
   @include styles.base-table-structure(".event-handler-table", ".event-handler-table-filter", ".table-scroll-container");
   max-height: var(--max-height);
-  // navigation width is 295px and additionally keep margin around the component
-  max-width: calc(100vw - var(--double-global-padding) * 2 - 295px);
+  max-width: calc(100vw - var(--drawer-width) - 2 * var(--double-global-padding));
   overflow: auto;
   display: grid;
 }
@@ -64,8 +63,11 @@
   padding-left: 16px;
 }
 
+.column-max-width {
+  max-width: 280px;
+}
+
 .event-table-cell {
-  max-width: 250px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

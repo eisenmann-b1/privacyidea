@@ -60,20 +60,24 @@ import { TokenEnrolledTextComponent } from "@components/token/token-enrollment/t
   styleUrl: "./token-enrollment-last-step-dialog.component.scss"
 })
 export class TokenEnrollmentLastStepDialogWizardComponent extends TokenEnrollmentLastStepDialogComponent {
-  protected readonly actions: DialogAction<"create_container" | "logout">[] = [
-    {
-      type: "auxiliary",
-      label: "Create Container",
-      value: "create_container",
-      className: "button-width-m"
-    },
-    {
+  protected readonly actions = computed(() => {
+    const actions: DialogAction<"create_container" | "logout">[] = [];
+    if (this.authService.containerWizard().enabled) {
+      actions.push({
+        type: "auxiliary",
+        label: "Create Container",
+        value: "create_container",
+        className: "button-width-m"
+      });
+    }
+    actions.push({
       type: "auxiliary",
       label: "Logout",
       value: "logout",
       primary: true,
-    }
-  ];
+    });
+    return actions;
+  });
 
   protected override readonly Object = Object;
   private readonly http: HttpClient = inject(HttpClient);
@@ -132,7 +136,6 @@ export class TokenEnrollmentLastStepDialogWizardComponent extends TokenEnrollmen
   }
 
   logout(): void {
-    this.dialogRef.close();
     this.authService.logout();
   }
 }

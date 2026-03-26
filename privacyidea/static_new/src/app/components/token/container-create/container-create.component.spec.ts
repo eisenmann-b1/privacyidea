@@ -354,6 +354,32 @@ describe("ContainerCreateComponent", () => {
     expect(registerSpy).not.toHaveBeenCalled();
   });
 
+  it("smartphone with registration wizard policy but without register right does not open registration completed dialog", () => {
+    wizardFixture.destroy();
+    selfFixture.destroy();
+    authService.authData.set({
+      ...authService.authData()!,
+      container_wizard: { ...authService.authData()!.container_wizard, registration: true }
+    });
+    authService.actionAllowed.mockImplementation((action: string) => action !== "container_register");
+
+    const dialog = TestBed.inject(MatDialog);
+    const registerSpy = jest.spyOn(dialog, "open");
+    const stopPollingSpy = jest.spyOn(containerServiceMock, "stopPolling");
+
+    jest.spyOn(containerServiceMock.containerDetailResource, "value").mockReturnValue({
+      result: { value: { containers: [{ type: "smartphone", info: { registration_state: "registered" } }] } }
+    } as any);
+
+    containerServiceMock.containerSerial.set("CONT-NO-RIGHT");
+
+    fixture.detectChanges();
+    TestBed.flushEffects();
+
+    expect(stopPollingSpy).toHaveBeenCalled();
+    expect(registerSpy).not.toHaveBeenCalled();
+  });
+
   describe("wizard", () => {
     it("show loaded templates if not empty", async () => {
       authService.authData.set({
@@ -410,6 +436,31 @@ describe("ContainerCreateComponent", () => {
       // check registration
       expect(wizardComponent.generateQRCode()).toBe(true);
       expect(registerSpy).toHaveBeenCalled();
+    });
+
+    it("container wizard does not register smartphone if register right is missing", () => {
+      authService.authData.set({
+        ...authService.authData()!,
+        container_wizard: {
+          enabled: true,
+          type: "smartphone",
+          registration: true,
+          template: "custom-template"
+        }
+      });
+      authService.actionAllowed.mockImplementation((action: string) => action !== "container_register");
+
+      contentService.routeUrl.set(ROUTE_PATHS.TOKENS_CONTAINERS_WIZARD);
+      containerServiceMock.selectedContainerType.set({ containerType: "smartphone", description: "", token_types: [] });
+
+      const createSpy = jest.spyOn(containerServiceMock, "createContainer");
+      const registerSpy = jest.spyOn(containerServiceMock, "registerContainer");
+
+      wizardComponent.createContainer();
+
+      expect(createSpy).toHaveBeenCalled();
+      expect(wizardComponent.generateQRCode()).toBe(false);
+      expect(registerSpy).not.toHaveBeenCalled();
     });
 
     it("container wizard creates generic container without template and without registration", () => {

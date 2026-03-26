@@ -66,9 +66,10 @@ export class ContainerCreateWizardComponent extends ContainerCreateComponent {
   override generateQRCode: WritableSignal<boolean> = linkedSignal({
     source: () => ({
       registration: this.authService.containerWizard().registration,
-      containerType: this.containerService.selectedContainerType()?.containerType
+      containerType: this.containerService.selectedContainerType()?.containerType,
+      canRegister: this.authService.actionAllowed("container_register"),
     }),
-    computation: (source) => source.registration && source.containerType === "smartphone"
+    computation: (source) => source.registration && source.containerType === "smartphone" && source.canRegister
   });
   override selectedTemplate = linkedSignal({
     source: this.authService.containerWizard,

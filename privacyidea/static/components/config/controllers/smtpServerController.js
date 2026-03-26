@@ -96,6 +96,7 @@ myApp.controller("smtpServerController", ["$scope", "$stateParams", "inform",
         };
 
         $scope.saveSMTPServer = function () {
+            const newPrivateKeyPassword = $scope.params.private_key_password;
             if ($scope.params.private_key_password === $scope.initialPrivateKeyPassword) {
                 // password has not changed, and we only know the encrypted version, so we do not send it to the backend
                 delete $scope.params.private_key_password;
@@ -107,6 +108,9 @@ myApp.controller("smtpServerController", ["$scope", "$stateParams", "inform",
                     $scope.deselectSMTPServer();
                     $state.go('config.smtp.list');
                     $scope.reload();
+                } else {
+                    // Re-add the private key password to the parameters on failure
+                    $scope.params.private_key_password = newPrivateKeyPassword;
                 }
             });
         };

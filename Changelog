@@ -35,12 +35,11 @@ Version 3.13
   * Fixed a bug with search_on_enter (webui policy) (#4967)
   * Fixed a bug where passkey_trigger_by_pin in combination with multiple passkeys for the user, would cause failed
     authentications (#4951)
-  * Fixed the autocomplete for user search in the WebUI (#4939)
   * Fixed a bug with the passwd resolver where trying to access the token details would cause an error (#4887)
   * Fixed the interaction of two_step_enrollment and verify_enrollment that would previously cause problems (#3170)
   * Fixed TLS configuration for machine resolver (#4964)
   * Verify token enrollment now throws an error for a failed verification (#5056)
-
+  * Fixed displaying of checkbox to use userstore password for container registration (#5114)
 
 Version 3.12.2, 2025-12-04
 

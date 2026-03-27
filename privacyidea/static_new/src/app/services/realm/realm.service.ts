@@ -133,7 +133,6 @@ export class RealmService implements RealmServiceInterface {
 
   realmOptions = computed(() => {
     const realms = this.realmResource.value()?.result?.value;
-    console.log("Realm options:", realms);
     return realms ? Object.keys(realms) : [];
   });
 

@@ -252,7 +252,12 @@ export class UserService implements UserServiceInterface {
       } else if (source.routeUrl.startsWith(ROUTE_PATHS.USERS) && previous?.value) {
         return previous.value;
       }
-      const realm = source.authRole === "user" ? source.authRealm : source.defaultRealm;
+      let defaultRealm = source.defaultRealm;
+      if (!this.realmService.realmOptions().includes(defaultRealm)) {
+        // user is not allowed to see the default realm
+        defaultRealm = "";
+      }
+      const realm = source.authRole === "user" ? source.authRealm : defaultRealm;
       return realm || source.realmOptions[0] || "";
     }
   });
@@ -360,10 +365,12 @@ export class UserService implements UserServiceInterface {
       realm: this.selectedUserRealm()
     }),
     computation: (source, previous) => {
-      if (source.realm !== previous?.source.realm) {
+      const users = source.resourceValue?.result?.value
+      if (!users && source.realm !== previous?.source.realm) {
+        // If the realm changed we do not fall back on the previous user list
         return [];
       }
-      return source.resourceValue?.result?.value ?? previous?.value ?? [];
+      return users ?? previous?.value ?? [];
     }
   });
 

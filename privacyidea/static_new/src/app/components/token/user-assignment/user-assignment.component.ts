@@ -25,7 +25,7 @@ import { MatError, MatFormField, MatHint } from "@angular/material/form-field";
 import { MatSelect } from "@angular/material/select";
 import { UserData, UserService, UserServiceInterface } from "../../../services/user/user.service";
 import { RealmService, RealmServiceInterface } from "../../../services/realm/realm.service";
-import { MatCheckbox } from "@angular/material/checkbox";
+import { MatCheckbox, MatCheckboxChange } from "@angular/material/checkbox";
 
 @Component({
   selector: "app-user-assignment",
@@ -83,8 +83,8 @@ export class UserAssignmentComponent {
 
   onlyAddToRealm = signal(false);
 
-  onOnlyAddToRealmChange(event: any) {
-    this.onlyAddToRealm.set(event.checked);
+  onOnlyAddToRealmChange(checked: boolean) {
+    this.onlyAddToRealm.set(checked);
   }
 
   onSelectedRealmChange(realm: string) {

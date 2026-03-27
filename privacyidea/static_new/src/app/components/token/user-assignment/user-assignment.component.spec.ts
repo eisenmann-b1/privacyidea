@@ -70,10 +70,10 @@ describe("UserAssignmentComponent", () => {
     userServiceMock.selectedUserRealm.set("realm1");
     fixture.detectChanges();
     const userCtrl = component.userFilterCtrl;
-    component.onOnlyAddToRealmChange({ checked: true });
+    component.onOnlyAddToRealmChange(true);
     fixture.detectChanges();
     expect(userCtrl.disabled).toBe(true);
-    component.onOnlyAddToRealmChange({ checked: false });
+    component.onOnlyAddToRealmChange(false);
     fixture.detectChanges();
     expect(userCtrl.enabled).toBe(true);
   });

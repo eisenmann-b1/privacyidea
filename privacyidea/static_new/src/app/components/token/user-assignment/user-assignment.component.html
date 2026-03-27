@@ -70,7 +70,7 @@
       <mat-checkbox
         [checked]="onlyAddToRealm()"
         [disabled]="!!userFilterCtrl.value"
-        (change)="onOnlyAddToRealmChange($event)">
+        (change)="onOnlyAddToRealmChange($event.checked)">
         Only add to the realm (no user assignment)
       </mat-checkbox>
     </div>

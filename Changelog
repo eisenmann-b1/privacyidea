@@ -40,6 +40,7 @@ Version 3.13
   * Fixed TLS configuration for machine resolver (#4964)
   * Verify token enrollment now throws an error for a failed verification (#5056)
   * Fixed displaying of checkbox to use userstore password for container registration (#5114)
+  * Fixed updating of phone and email settings in the token info during SMS and email token rollover (#5073)
 
 Version 3.12.2, 2025-12-04
 

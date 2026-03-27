@@ -604,14 +604,11 @@ class EmailTokenTestCase(MyTestCase):
         address and vice versa.
         """
         # 1. Create a token with a static email address
-        db_token = Token("PIEM_DYN_TEST1", tokentype="email")
-        db_token.save()
-        token = EmailTokenClass(db_token)
-        token.update({"email": "static@example.com"})
-        token.save()
+        token = init_token(param={'serial': "PIEM_DYN_TEST1", 'type': 'email', 'otpkey': '12345',
+                                  "email": "static@example.com"})
 
         # Verify the static email is set and dynamic_email is not
-        self.assertEqual(token.get_tokeninfo("email"), "static@example.com")
+        self.assertEqual("static@example.com", token.get_tokeninfo("email"))
         self.assertIsNone(token.get_tokeninfo("dynamic_email"))
 
         # Now update the token to use dynamic_email
@@ -629,7 +626,7 @@ class EmailTokenTestCase(MyTestCase):
 
         # Verify that dynamic_email has been removed
         # and the static email address is set
-        self.assertEqual(token.get_tokeninfo("email"), "new_static@example.com")
+        self.assertEqual("new_static@example.com", token.get_tokeninfo("email"))
         self.assertIsNone(token.get_tokeninfo("dynamic_email"))
 
         # Clean up

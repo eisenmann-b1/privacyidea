@@ -161,6 +161,7 @@ class SmsTokenClass(HotpTokenClass):
 
     """
     mode = [AuthenticationMode.CHALLENGE]
+    DYNAMIC_PHONE_KEY = "dynamic_phone"
 
     def __init__(self, db_token):
         HotpTokenClass.__init__(self, db_token)
@@ -274,14 +275,14 @@ class SmsTokenClass(HotpTokenClass):
         """
         verify = getParam(param, "verify", optional=True)
         if not verify:
-            if getParam(param, "dynamic_phone", optional):
-                self.add_tokeninfo("dynamic_phone", True)
+            if getParam(param, self.DYNAMIC_PHONE_KEY, optional):
+                self.add_tokeninfo(self.DYNAMIC_PHONE_KEY, True)
                 self.delete_tokeninfo("phone")
             else:
                 # specific - phone
                 phone = getParam(param, "phone", required)
                 self.add_tokeninfo("phone", phone)
-                self.delete_tokeninfo("dynamic_phone")
+                self.delete_tokeninfo(self.DYNAMIC_PHONE_KEY)
 
             # in case of the sms token, only the server must know the otpkey
             # thus if none is provided, we let create one (in the TokenClass)
@@ -415,7 +416,7 @@ class SmsTokenClass(HotpTokenClass):
         :return: submitted message
         :rtype: string
         """
-        if is_true(self.get_tokeninfo("dynamic_phone")):
+        if is_true(self.get_tokeninfo(self.DYNAMIC_PHONE_KEY)):
             phone = self.user.get_user_phone("mobile")
             if isinstance(phone, list) and phone:
                 # if there is a non-empty list, we use the first entry
@@ -597,7 +598,7 @@ class SmsTokenClass(HotpTokenClass):
         from privacyidea.lib.token import init_token
         from privacyidea.lib.tokenclass import ClientMode
         token_obj = init_token({"type": cls.get_class_type(),
-                                "dynamic_phone": 1}, user=user_obj)
+                                cls.DYNAMIC_PHONE_KEY: 1}, user=user_obj)
         content.get("result")["value"] = False
         content.get("result")["authentication"] = "CHALLENGE"
 
@@ -630,7 +631,7 @@ class SmsTokenClass(HotpTokenClass):
         :param options:
         :return:
         """
-        self.delete_tokeninfo("dynamic_phone")
+        self.delete_tokeninfo(self.DYNAMIC_PHONE_KEY)
         self.add_tokeninfo("phone", passw)
         # Dynamically we remember that we need to do another challenge
         self.currently_in_challenge = True

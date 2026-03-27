@@ -102,6 +102,7 @@ class EmailTokenClass(HotpTokenClass):
     """
 
     EMAIL_ADDRESS_KEY = "email"
+    DYNAMIC_EMAIL_KEY = "dynamic_email"
     # The HOTP token provides means to verify the enrollment
     can_verify_enrollment = True
     mode = [AuthenticationMode.CHALLENGE]
@@ -115,7 +116,7 @@ class EmailTokenClass(HotpTokenClass):
 
     @property
     def _email_address(self):
-        if is_true(self.get_tokeninfo("dynamic_email")):
+        if is_true(self.get_tokeninfo(self.DYNAMIC_EMAIL_KEY)):
             email = self.user.get_specific_info([self.EMAIL_ADDRESS_KEY]).get(self.EMAIL_ADDRESS_KEY)
             if isinstance(email, list) and email:
                 # If there is a non-empty list, we use the first entry
@@ -226,15 +227,15 @@ class EmailTokenClass(HotpTokenClass):
         """
         verify = getParam(param, "verify", optional=True)
         if not verify:
-            if getParam(param, "dynamic_email", optional=True):
-                self.add_tokeninfo("dynamic_email", True)
+            if getParam(param, self.DYNAMIC_EMAIL_KEY, optional=True):
+                self.add_tokeninfo(self.DYNAMIC_EMAIL_KEY, True)
                 self.delete_tokeninfo(self.EMAIL_ADDRESS_KEY)
             else:
                 # specific - e-mail
                 self._email_address = getParam(param,
                                                self.EMAIL_ADDRESS_KEY,
                                                optional=False)
-                self.delete_tokeninfo("dynamic_email")
+                self.delete_tokeninfo(self.DYNAMIC_EMAIL_KEY)
 
             # in case of the e-mail token, only the server must know the otpkey
             # thus if none is provided, we let create one (in the TokenClass)
@@ -548,7 +549,7 @@ class EmailTokenClass(HotpTokenClass):
         from privacyidea.lib.token import init_token
         from privacyidea.lib.tokenclass import ClientMode
         token_obj = init_token({"type": cls.get_class_type(),
-                                "dynamic_email": 1}, user=user_obj)
+                                cls.DYNAMIC_EMAIL_KEY: 1}, user=user_obj)
         content.get("result")["value"] = False
         content.get("result")["authentication"] = "CHALLENGE"
 
@@ -597,7 +598,7 @@ class EmailTokenClass(HotpTokenClass):
         validate_email = get_email_validators().get(validate_module)
         if validate_email(passw):
             # TODO: If anything special happens, we could leave it as a dynamic email
-            self.delete_tokeninfo("dynamic_email")
+            self.delete_tokeninfo(self.DYNAMIC_EMAIL_KEY)
             self.add_tokeninfo(self.EMAIL_ADDRESS_KEY, passw)
             # Dynamically we remember that we need to do another challenge
             self.currently_in_challenge = True

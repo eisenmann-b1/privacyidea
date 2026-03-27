@@ -571,14 +571,11 @@ class SMSTokenTestCase(MyTestCase):
         number and vice versa.
         """
         # 1. Create a token with a static phone number
-        db_token = Token("PISM_DYN_TEST1", tokentype="sms")
-        db_token.save()
-        token = SmsTokenClass(db_token)
-        token.update({"phone": "+49 111111111"})
-        token.save()
+        token = init_token(param={'serial': "PISM_DYN_TEST1", 'type': 'sms', 'otpkey': '12345',
+                                  "phone": "+49 111111111"})
 
         # Verify the static phone is set and dynamic_phone is not
-        self.assertEqual(token.get_tokeninfo("phone"), "+49 111111111")
+        self.assertEqual("+49 111111111", token.get_tokeninfo("phone"))
         self.assertIsNone(token.get_tokeninfo("dynamic_phone"))
 
         # Now update the token to use dynamic_phone
@@ -596,7 +593,7 @@ class SMSTokenTestCase(MyTestCase):
 
         # Verify that dynamic_phone has been removed
         # and the static phone number is set
-        self.assertEqual(token.get_tokeninfo("phone"), "+49 222222222")
+        self.assertEqual("+49 222222222", token.get_tokeninfo("phone"))
         self.assertIsNone(token.get_tokeninfo("dynamic_phone"))
 
         # Clean up

@@ -335,6 +335,8 @@ def add_smtpserver(identifier, server: str = None, port: int = 25, username: str
     :return: The Id of the database object
     """
     encrypted_password = encryptPassword(password)
+    # private_key_password could be empty string or None, which have a different effect later.
+    # here we only care if it has an actual value that we should encrypt, otherwise leave it at empty string or None
     encrypted_private_key_password = private_key_password
     if private_key_password:
         encrypted_private_key_password = encryptPassword(private_key_password)

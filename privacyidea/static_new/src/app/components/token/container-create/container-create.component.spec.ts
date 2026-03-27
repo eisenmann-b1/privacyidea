@@ -157,9 +157,6 @@ describe("ContainerCreateComponent", () => {
     jest
       .spyOn(containerServiceMock, "createContainer")
       .mockReturnValue(of({ result: { value: { container_serial: "C-001" } } } as any));
-    jest
-      .spyOn(containerServiceMock, "registerContainer")
-      .mockReturnValue(of({ result: { value: {} }, detail: { info: "registered" } } as any));
     jest.spyOn(containerServiceMock, "pollContainerRolloutState").mockReturnValue(
       of({
         result: { value: { containers: [{ info: { registration_state: "ok" } }] } }
@@ -227,7 +224,8 @@ describe("ContainerCreateComponent", () => {
 
     (component as any).registrationConfigComponent = {
       passphraseResponse: signal(""),
-      passphrasePrompt: signal("")
+      passphrasePrompt: signal(""),
+      userStorePassphrase: signal(false)
     };
 
     (component as any).registerContainer("C-001");

@@ -19,7 +19,7 @@
 import {
   AfterViewInit,
   Component,
-  computed,
+  computed, DestroyRef,
   effect,
   ElementRef,
   inject,
@@ -59,11 +59,15 @@ import { ContentService } from "../../../services/content/content.service";
 import { PendingChangesService } from "../../../services/pending-changes/pending-changes.service";
 import { ClearableInputComponent } from "../../shared/clearable-input/clearable-input.component";
 import { DialogService, DialogServiceInterface } from "../../../services/dialog/dialog.service";
-import { SimpleConfirmationDialogComponent } from "../../shared/dialog/confirmation-dialog/confirmation-dialog.component";
+import { SaveAndExitDialogComponent } from "../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "../../../constants/global.constants";
 
 @Component({
   selector: "app-user-new-resolver",
   standalone: true,
+  host: {
+    class: NAVIGATION_ACCESSIBLE_DIALOG_CLASS
+  },
   imports: [
     FormsModule,
     MatFormField,
@@ -101,6 +105,7 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
   protected readonly renderer: Renderer2 = inject(Renderer2);
   public readonly dialogRef = inject(MatDialogRef<UserNewResolverComponent>, { optional: true });
   public readonly data = inject(MAT_DIALOG_DATA, { optional: true });
+  private readonly destroyRef = inject(DestroyRef);
 
   private observer!: IntersectionObserver;
   private editInitialized = false;
@@ -139,6 +144,7 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
   isTesting = signal(false);
   testUsername = "";
   testUserId = "";
+  initialRoute = this.contentService.routeUrl();
 
   constructor() {
     const dialogResolver = this.data?.resolver;
@@ -160,10 +166,10 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
 
     if (this.dialogRef) {
       this.dialogRef.disableClose = true;
-      this.dialogRef.backdropClick().subscribe(() => {
+      this.dialogRef.backdropClick().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
         this.onCancel();
       });
-      this.dialogRef.keydownEvents().subscribe((event) => {
+      this.dialogRef.keydownEvents().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => {
         if (event.key === "Escape") {
           this.onCancel();
         }
@@ -172,9 +178,11 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
 
     this.pendingChangesService.registerHasChanges(() => this.hasChanges);
     this.pendingChangesService.registerSave(() => this.onSave());
+    this.pendingChangesService.registerValidChanges(() => this.canSave);
 
+    // Ensure dialog is closed on different route
     effect(() => {
-      if (!this.contentService.routeUrl().startsWith(ROUTE_PATHS.USERS)) {
+      if (this.contentService.routeUrl() !== this.initialRoute) {
         this.dialogRef?.close(true);
       }
     });
@@ -287,7 +295,7 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.resolverService.selectedResolverName.set("");
-    this.pendingChangesService.unregisterHasChanges();
+    this.pendingChangesService.clearAllRegistrations();
     if (this.observer) {
       this.observer.disconnect();
     }
@@ -322,19 +330,19 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  onSave(): Promise<void> | void {
+  async onSave(): Promise<boolean> {
     const name = this.resolverName.trim();
     if (!name) {
       this.notificationService.openSnackBar($localize`Please enter a resolver name.`);
-      return;
+      return false;
     }
     if (!this.resolverType) {
       this.notificationService.openSnackBar($localize`Please select a resolver type.`);
-      return;
+      return false;
     }
     if (!this.isAdditionalFieldsValid) {
       this.notificationService.openSnackBar($localize`Please fill in all required fields.`);
-      return;
+      return false;
     }
 
     const payload: any = {
@@ -349,7 +357,7 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
 
     this.isSaving.set(true);
 
-    return new Promise<void>((resolve) => {
+    return new Promise<boolean>((resolve) => {
       this.resolverService
         .postResolver(name, payload)
         .subscribe({
@@ -367,20 +375,22 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
                 this.formData = {};
                 this.router.navigateByUrl(ROUTE_PATHS.USERS_RESOLVERS);
               }
+              resolve(true);
             } else {
               const message =
                 res.detail?.description || res.result?.error?.message || $localize`Unknown error occurred.`;
               this.notificationService.openSnackBar($localize`Failed to save resolver. ${message}`);
+              resolve(false);
             }
           },
           error: (err: HttpErrorResponse) => {
             const message = err.error?.result?.error?.message || err.message;
             this.notificationService.openSnackBar($localize`Failed to save resolver. ${message}`);
+            resolve(false);
           }
         })
         .add(() => {
           setTimeout(() => this.isSaving.set(false));
-          resolve();
         });
     });
   }
@@ -397,24 +407,24 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
     if (this.hasChanges) {
       this.dialogService
         .openDialog({
-          component: SimpleConfirmationDialogComponent,
+          component: SaveAndExitDialogComponent,
           data: {
             title: $localize`Discard changes`,
-            confirmAction: { label: "Save and exit", type: "confirm", value: true },
-            items: [this.resolverName || "New Resolver"],
-            itemType: "resolver"
+            allowSaveExit: this.canSave,
+            saveExitDisabled: !this.canSave
           }
         })
         .afterClosed()
         .subscribe((result) => {
-          if (result === true) {
+          if (result === "save-exit") {
             if (!this.canSave) return;
-            Promise.resolve(this.pendingChangesService.save()).then(() => {
-              this.pendingChangesService.unregisterHasChanges();
+            Promise.resolve(this.pendingChangesService.save()).then((success) => {
+              if (!success) return;
+              this.pendingChangesService.clearAllRegistrations();
               this.closeCurrent();
             });
-          } else if (result === false) {
-            this.pendingChangesService.unregisterHasChanges();
+          } else if (result === "discard") {
+            this.pendingChangesService.clearAllRegistrations();
             this.closeCurrent();
           }
         });

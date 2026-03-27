@@ -19,7 +19,7 @@
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
 import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
-import { computed, inject, Injectable, linkedSignal, Signal, signal, WritableSignal } from "@angular/core";
+import { computed, effect, inject, Injectable, linkedSignal, Signal, signal, WritableSignal } from "@angular/core";
 import { RealmService, RealmServiceInterface } from "../realm/realm.service";
 import { TokenService, TokenServiceInterface } from "../token/token.service";
 
@@ -130,6 +130,14 @@ export class UserService implements UserServiceInterface {
   private readonly notificationService = inject(NotificationService);
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+
+  constructor() {
+    effect(() => {
+      // Ensure the users are loaded for the autocomplete on allowed routes.
+      this.selectionFilteredUsernames();
+    });
+  }
+
   readonly apiFilter = apiFilter;
   readonly advancedApiFilter = advancedApiFilter;
   private baseUrl = environment.proxyUrl + "/user/";
@@ -222,6 +230,7 @@ export class UserService implements UserServiceInterface {
       routeUrl: this.contentService.routeUrl(),
       currentUrl: this.router.url,
       defaultRealm: this.realmService.defaultRealm(),
+      realmOptions: this.realmService.realmOptions(),
       selectedTokenType: this.tokenService.selectedTokenType(),
       authRole: this.authService.role(),
       authRealm: this.authService.realm()
@@ -243,7 +252,13 @@ export class UserService implements UserServiceInterface {
       } else if (source.routeUrl.startsWith(ROUTE_PATHS.USERS) && previous?.value) {
         return previous.value;
       }
-      return source.authRole === "user" ? source.authRealm : source.defaultRealm;
+      let defaultRealm = source.defaultRealm;
+      if (!this.realmService.realmOptions().includes(defaultRealm)) {
+        // user is not allowed to see the default realm
+        defaultRealm = "";
+      }
+      const realm = source.authRole === "user" ? source.authRealm : defaultRealm;
+      return realm || source.realmOptions[0] || "";
     }
   });
 
@@ -350,10 +365,12 @@ export class UserService implements UserServiceInterface {
       realm: this.selectedUserRealm()
     }),
     computation: (source, previous) => {
-      if (source.realm !== previous?.source.realm) {
+      const users = source.resourceValue?.result?.value
+      if (!users && source.realm !== previous?.source.realm) {
+        // If the realm changed we do not fall back on the previous user list
         return [];
       }
-      return source.resourceValue?.result?.value ?? previous?.value ?? [];
+      return users ?? previous?.value ?? [];
     }
   });
 

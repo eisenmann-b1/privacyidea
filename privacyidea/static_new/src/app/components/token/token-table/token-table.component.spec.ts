@@ -63,40 +63,6 @@ describe("TokenTableComponent + TokenTableSelfServiceComponent", () => {
   let tableUtilsService: MockTableUtilsService;
 
   beforeAll(() => {
-    Object.defineProperty(window, "matchMedia", {
-      writable: true,
-      value: (q: string) => ({
-        matches: false,
-        media: q,
-        onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn()
-      })
-    });
-
-    class RO {
-      observe = jest.fn();
-      unobserve = jest.fn();
-      disconnect = jest.fn();
-    }
-
-    (globalThis as any).ResizeObserver = RO;
-
-    if (!(globalThis as any).MutationObserver) {
-      (globalThis as any).MutationObserver = class {
-        observe() {}
-
-        disconnect() {}
-
-        takeRecords() {
-          return [];
-        }
-      };
-    }
-
     jest.spyOn(console, "warn").mockImplementation(() => {});
   });
 
@@ -263,6 +229,21 @@ describe("TokenTableComponent + TokenTableSelfServiceComponent", () => {
 
     table.onSortEvent({ active: "description", direction: "desc" } as any);
     expect(table.sort()).toEqual({ active: "description", direction: "desc" });
+  });
+
+  it("onFilterInput should only update filter if user: and realm: are NOT in the input", () => {
+    const inputEvent = { target: { value: "type: hotp" } } as any;
+    table.onFilterInput(inputEvent);
+    expect(tokenService.handleFilterInput).toHaveBeenCalledWith(inputEvent);
+
+    jest.clearAllMocks();
+    const inputEventWithUser = { target: { value: "user: admin" } } as any;
+    table.onFilterInput(inputEventWithUser);
+    expect(tokenService.handleFilterInput).not.toHaveBeenCalled();
+
+    const inputEventWithRealm = { target: { value: "realm: default" } } as any;
+    table.onFilterInput(inputEventWithRealm);
+    expect(tokenService.handleFilterInput).not.toHaveBeenCalled();
   });
 
   it("tokenDataSource/totalLength reflect tokenResource; fall back to empty skeleton when undefined", () => {

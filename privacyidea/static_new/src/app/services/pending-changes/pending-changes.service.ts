@@ -1,5 +1,5 @@
 /**
- * (c) NetKnights GmbH 2025,  https://netknights.it
+ * (c) NetKnights GmbH 2026,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -26,9 +26,9 @@ export interface PendingChangesServiceInterface {
 
   clearAllRegistrations(): void;
 
-  registerSave(fn: () => Promise<boolean> | boolean): void;
+  registerSave(fn: () => Promise<boolean>): void;
 
-  save(): Promise<boolean> | boolean;
+  save(): Promise<boolean>;
 
   registerValidChanges(fn: () => boolean): void;
 }
@@ -36,7 +36,7 @@ export interface PendingChangesServiceInterface {
 @Injectable({ providedIn: "root" })
 export class PendingChangesService implements PendingChangesServiceInterface {
   private _hasChangesFn = signal<(() => boolean) | null>(null);
-  private _saveFn = signal<(() => Promise<boolean> | boolean) | null>(null);
+  private _saveFn = signal<(() => Promise<boolean>) | null>(null);
   private _validChanges: () => boolean = signal(true);
 
   get hasChanges(): boolean {
@@ -54,11 +54,11 @@ export class PendingChangesService implements PendingChangesServiceInterface {
     this._validChanges = signal(true);
   }
 
-  registerSave(fn: () => Promise<boolean> | boolean): void {
+  registerSave(fn: () => Promise<boolean>): void {
     this._saveFn.set(fn);
   }
 
-  save(): Promise<boolean> | boolean {
+  async save(): Promise<boolean> {
     const fn = this._saveFn();
     return fn ? fn() : false;
   }

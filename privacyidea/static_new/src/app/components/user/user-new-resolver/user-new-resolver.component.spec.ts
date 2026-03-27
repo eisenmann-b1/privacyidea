@@ -1,5 +1,5 @@
 /**
- * (c) NetKnights GmbH 2025,  https://netknights.it
+ * (c) NetKnights GmbH 2026,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -23,7 +23,7 @@ import { NotificationService } from "../../../services/notification/notification
 import { DialogService } from "../../../services/dialog/dialog.service";
 import { SaveAndExitDialogComponent } from "../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
 import { ActivatedRoute, Router } from "@angular/router";
-import { of } from "rxjs";
+import { of, throwError } from "rxjs";
 import { provideHttpClient } from "@angular/common/http";
 import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { MockResolverService } from "../../../../testing/mock-services/mock-resolver-service";
@@ -144,7 +144,7 @@ describe("UserNewResolverComponent", () => {
     expect(component.resolverType).toBe("passwdresolver");
     expect(component.formData["fileName"]).toBe("/tmp/test");
 
-    const inputElement = fixture.nativeElement.querySelector("input[placeholder=\"/etc/passwd\"]");
+    const inputElement = fixture.nativeElement.querySelector('input[placeholder="/etc/passwd"]');
     expect(inputElement?.value).toBe("/tmp/test");
   });
 
@@ -180,7 +180,7 @@ describe("UserNewResolverComponent", () => {
     expect(component.isEditMode).toBeTruthy();
     expect(component.resolverType).toBe("sqlresolver");
 
-    const dbInput = fixture.nativeElement.querySelector("input[placeholder=\"YourDatabase\"]");
+    const dbInput = fixture.nativeElement.querySelector('input[placeholder="YourDatabase"]');
     expect(dbInput?.value).toBe("testdb");
   });
 
@@ -335,13 +335,13 @@ describe("UserNewResolverComponent", () => {
     component.resolverName = "err-res";
     component.resolverType = "passwdresolver";
     fixture.detectChanges();
-    const errorResponse = { message: "Network error", error: { result: { error: { message: "Detailed error" } } } };
-    resolverService.postResolver.mockReturnValue({
-      subscribe: (obs: any) => {
-        obs.error(errorResponse);
-        return { add: jest.fn() };
-      }
-    } as any);
+
+    const errorResponse = {
+      message: "Network error",
+      error: { result: { error: { message: "Detailed error" } } }
+    };
+    resolverService.postResolver.mockReturnValue(throwError(() => errorResponse));
+
     const notificationService = TestBed.inject(NotificationService) as unknown as MockNotificationService;
 
     const success = await component.onSave();
@@ -416,16 +416,15 @@ describe("UserNewResolverComponent", () => {
   it("should show error on test when subscription fails", async () => {
     component.resolverType = "passwdresolver";
     fixture.detectChanges();
+
     const errorResponse = { message: "Network error" };
-    resolverService.postResolverTest.mockReturnValue({
-      subscribe: (obs: any) => {
-        obs.error(errorResponse);
-        return { add: jest.fn() };
-      }
-    } as any);
+
+    resolverService.postResolverTest.mockReturnValue(throwError(() => errorResponse));
+
     const notificationService = TestBed.inject(NotificationService) as unknown as MockNotificationService;
 
     component.onTest();
+
     expect(notificationService.openSnackBar).toHaveBeenCalledWith(expect.stringContaining("Network error"));
   });
 
@@ -601,7 +600,7 @@ describe("UserNewResolverComponent", () => {
 
     component.onCancel();
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     expect(pendingChangesService.clearAllRegistrations).toHaveBeenCalled();
     expect(dialogRef.close).toHaveBeenCalled();
@@ -627,7 +626,7 @@ describe("UserNewResolverComponent", () => {
 
     component.onCancel();
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
     expect(closeSpy).not.toHaveBeenCalled();
@@ -648,7 +647,7 @@ describe("UserNewResolverComponent", () => {
 
     component.onCancel();
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     expect(pendingChangesService.save).not.toHaveBeenCalled();
     expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();

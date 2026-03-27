@@ -110,6 +110,8 @@ export class NewSmtpServerComponent implements OnInit, OnDestroy {
     return !this.smtpForm.get("server")?.value?.toLowerCase().startsWith("smtps:");
   }
 
+  initialPrivateKeyPassword = this.data?.private_key_password || "";
+
   ngOnInit(): void {
     this.isEditMode = !!this.data;
     this.smtpForm = this.formBuilder.group({
@@ -147,6 +149,10 @@ export class NewSmtpServerComponent implements OnInit, OnDestroy {
     const server: SmtpServer = {
       ...this.smtpForm.getRawValue()
     };
+
+    if (server.private_key_password === this.initialPrivateKeyPassword) {
+      delete server.private_key_password;
+    }
 
     try {
       await this.smtpService.postSmtpServer(server);

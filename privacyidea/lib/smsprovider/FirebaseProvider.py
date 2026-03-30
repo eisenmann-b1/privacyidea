@@ -177,8 +177,12 @@ class FirebaseProvider(ISMSProvider):
         """
         file_path = self.smsgateway.option_dict.get(FirebaseConfig.JSON_CONFIG)
         server_config = None
-        with open(file_path) as config_file:
-            server_config = json.load(config_file)
+        try:
+            with open(file_path) as config_file:
+                server_config = json.load(config_file)
+        except FileNotFoundError as error:
+            log.error("The JSON config file could not be found: %s", error)
+            raise ConfigAdminError(description="The JSON config file could not be found.")
         if server_config:
             if server_config.get("type") != "service_account":
                 raise ConfigAdminError(description="The JSON file is not a valid firebase credentials file.")

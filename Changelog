@@ -41,6 +41,7 @@ Version 3.13
   * Verify token enrollment now throws an error for a failed verification (#5056)
   * Fixed displaying of checkbox to use userstore password for container registration (#5114)
   * Fixed updating of phone and email settings in the token info during SMS and email token rollover (#5073)
+  * Catch FileNotFoundError for saving firebase sms gateway with invalid config file (#5119)
 
 Version 3.12.2, 2025-12-04
 

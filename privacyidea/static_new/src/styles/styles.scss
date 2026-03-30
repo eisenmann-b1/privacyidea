@@ -15,6 +15,18 @@
 @include meta.load-css("list.scss");
 @include meta.load-css("actions.scss");
 
+@mixin main-component-style {
+  padding: var(--global-padding);
+  border-radius: var(--border-radius);
+  @include mat.elevation(5);
+  background-color: var(--table-color);
+  // subtract double global padding to preserve margin around the component
+  // subtract single global padding which is the defined padding above to correctly get the displayed width of the component
+  max-width: calc(100vw - var(--drawer-width) - 2 * var(--double-global-padding) - 2 * var(--global-padding));
+  max-height: var(--max-height);
+  overflow: auto;
+}
+
 html,
 body {
   background: var(--mat-sys-background);
@@ -114,7 +126,7 @@ body {
   --mdc-outlined-text-field-focus-outline-color: var(--mat-sys-primary-light);
 }
 
-body.selfservice-layout {
+body.self-service-layout {
   --overlay-margin: 256px;
 }
 

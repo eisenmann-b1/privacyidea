@@ -32,8 +32,9 @@
   opacity: 0.33;
 }
 
-.drawer-container {
+.admin-layout {
   height: 100vh;
+  --drawer-width: 298px;
 }
 
 .drawer {
@@ -64,10 +65,11 @@
   gap: 20px;
 }
 
-.selfservice-layout {
+.self-service-layout {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  --drawer-width: 256px;
 }
 
 .selfservice-content-container {

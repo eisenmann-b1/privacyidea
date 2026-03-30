@@ -2,10 +2,8 @@
 @use "table";
 
 .container-create-container {
-  @include table.table-container-styles;
-  max-height: var(--max-height);
+  @include styles.main-component-style;
   display: grid;
-  overflow: auto;
 }
 
 .container-type-hint {

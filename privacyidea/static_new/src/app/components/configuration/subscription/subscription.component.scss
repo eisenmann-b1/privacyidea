@@ -1,11 +1,8 @@
 @use "../../../../styles" as styles;
 
 .subscription-layout {
-  @include styles.table-container-styles;
+  @include styles.main-component-style;
   @include styles.base-table-structure(".token-table", ".token-table-filter", ".table-scroll-container");
-  max-height: var(--max-height);
-  max-width: calc(100vw - var(--global-padding) * 5 - 48px);
-  overflow: auto;
   display: grid;
 }
 

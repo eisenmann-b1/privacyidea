@@ -12,6 +12,7 @@ jobs:
   trigger-gitlab:
     name: Trigger internal GitLab pipeline
     runs-on: ubuntu-latest
+    environment: gitlab
 
     steps:
       - name: Trigger GitLab pipeline

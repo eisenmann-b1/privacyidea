@@ -813,8 +813,16 @@ class FirebaseProviderTestCase(MyTestCase):
     def test_set_configuration_fail(self):
         invalid_config = {FirebaseConfig.JSON_CONFIG: "non-existing-file.json"}
 
-        with self.assertRaises(ConfigAdminError) as context:
-            set_smsgateway("test",
-                           'privacyidea.lib.smsprovider.FirebaseProvider.FirebaseProvider',
-                           "", invalid_config)
-        self.assertEqual("The JSON config file could not be found.", str(context.exception.message))
+        try:
+            with self.assertRaises(ConfigAdminError) as context:
+                set_smsgateway("test",
+                               'privacyidea.lib.smsprovider.FirebaseProvider.FirebaseProvider',
+                               "", invalid_config)
+            self.assertEqual("The JSON config file could not be found.", str(context.exception.message))
+        finally:
+            # Ensure no invalid gateway configuration with identifier "test" remains.
+            try:
+                delete_smsgateway("test")
+            except Exception:
+                # Ignore cleanup errors; gateway may not have been created.
+                pass

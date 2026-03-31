@@ -22,7 +22,6 @@ jobs:
     name: Audit Python dependencies
     permissions:
       contents: read
-      security-events: write # to upload SARIF results
 
     runs-on: ubuntu-latest
     steps:
@@ -39,17 +38,5 @@ jobs:
         run: pip install pip-audit
 
       - name: Run pip-audit
-        run: |
-          pip-audit \
-            --requirement requirements.txt \
-            --format sarif \
-            --output pip-audit-results.sarif \
-            --progress-spinner off
+        run: pip-audit --requirement requirements.txt --progress-spinner off
         continue-on-error: true
-
-      - name: Upload SARIF results
-        if: hashFiles('pip-audit-results.sarif') != ''
-        uses: github/codeql-action/upload-sarif@fca7ace96b7d713c7035871441bd52efbe39e27e # v3.28.19
-        with:
-          sarif_file: pip-audit-results.sarif
-          category: pip-audit

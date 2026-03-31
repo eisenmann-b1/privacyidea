@@ -10,8 +10,7 @@ updates:
 
   # Python dependencies are fully pinned pip-compile lock files with hashes.
   # Dependabot cannot regenerate them correctly (it patches individual pins without
-  # re-solving the graph). Vulnerability detection is handled by pip-audit in CI.
-  # See notes/python-dependency-updates.md for the update procedure.
+  # re-solving the graph). Vulnerability detection is handled by pip-audit manually.
 
   - package-ecosystem: "npm"
     # New Angular frontend — dependabot can update package.json ranges correctly

@@ -49,6 +49,12 @@ from privacyidea.lib.utils import (is_true, censor_connect_string,
                                    convert_column_to_unicode)
 from privacyidea.lib.error import ParameterError, ResolverError
 
+# passlib 1.7.4 uses bcrypt.__about__.__version__ for version detection, which was
+# removed in bcrypt 4.0. Patch it before passlib is imported to restore compatibility.
+import bcrypt as _bcrypt
+if not hasattr(_bcrypt, '__about__'):
+    _bcrypt.__about__ = type('__about__', (), {'__version__': _bcrypt.__version__})()
+
 from passlib.context import CryptContext
 from passlib.utils import h64
 from passlib.utils.compat import uascii_to_str

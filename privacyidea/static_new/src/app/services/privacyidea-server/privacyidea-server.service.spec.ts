@@ -114,7 +114,7 @@ describe("PrivacyideaServerService", () => {
     async function testLoadResource() {
       const piServerResponse = { pi1: {}, pi2: {} };
       const mockResponse = MockPiResponse.fromValue(piServerResponse);
-      TestBed.flushEffects();
+      TestBed.tick();
       const req = httpMock.expectOne(service.privacyideaServerBaseUrl);
       expect(req.request.method).toBe("GET");
       req.flush(mockResponse);

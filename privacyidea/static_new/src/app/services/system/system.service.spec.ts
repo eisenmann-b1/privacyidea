@@ -58,7 +58,7 @@ describe("SystemService", () => {
     async function testLoadResource() {
       const caConnectorResponse = { service1: {}, service2: {} };
       const mockResponse = MockPiResponse.fromValue(caConnectorResponse);
-      TestBed.flushEffects();
+      TestBed.tick();
       const req = httpMock.expectOne(`${environment.proxyUrl}/system/names/caconnector`);
       expect(req.request.method).toBe("GET");
       req.flush(mockResponse);

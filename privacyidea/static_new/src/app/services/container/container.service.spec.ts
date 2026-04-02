@@ -268,9 +268,9 @@ describe("ContainerService", () => {
       } as any);
 
     containerService.startPolling("SMPH1");
-    TestBed.flushEffects();
+    TestBed.tick();
     (containerService as any)["pollingTrigger"].update((n: number) => n + 1);
-    TestBed.flushEffects();
+    TestBed.tick();
 
     expect(valueSpy).toHaveBeenCalled();
     expect(containerService.containerDetailResource.value()?.result?.value?.containers[0].info.registration_state).toBe(
@@ -297,9 +297,9 @@ describe("ContainerService", () => {
       } as any);
 
     containerService.startPolling("SMPH1");
-    TestBed.flushEffects();
+    TestBed.tick();
     (containerService as any)["pollingTrigger"].update((n: number) => n + 1);
-    TestBed.flushEffects();
+    TestBed.tick();
 
     expect(valueSpy).toHaveBeenCalled();
     expect(containerService.containerDetailResource.value()?.result?.value?.containers[0].info.registration_state).toBe(

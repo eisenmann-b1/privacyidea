@@ -125,7 +125,7 @@ describe("ActionSelectorComponent", () => {
   it("should handle scope change", () => {
     const spy = jest.spyOn(component.scopeChange, "emit");
     component.selectActionScope("admin");
-    TestBed.flushEffects();
+    TestBed.tick();
     fixture.detectChanges();
 
     expect(spy).toHaveBeenCalledWith("admin");

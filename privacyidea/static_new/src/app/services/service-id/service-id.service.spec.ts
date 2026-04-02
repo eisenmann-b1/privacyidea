@@ -100,7 +100,7 @@ describe("ServiceIdService", () => {
     async function testLoadResource() {
       const serviceIdResponse = { service1: {}, service2: {} };
       const mockResponse = MockPiResponse.fromValue(serviceIdResponse);
-      TestBed.flushEffects();
+      TestBed.tick();
       const req = httpMock.expectOne(`${environment.proxyUrl}/serviceid/`);
       expect(req.request.method).toBe("GET");
       req.flush(mockResponse);

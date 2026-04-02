@@ -211,7 +211,7 @@ describe("EventService", () => {
 
     it("should fetch all events if on the events route and has permission", async () => {
       // Setup
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Execute
       const req = httpMock.expectOne(`${service.eventBaseUrl}/`);
@@ -230,7 +230,7 @@ describe("EventService", () => {
         }
       ];
       req.flush({ result: { value: eventHandlers } });
-      TestBed.flushEffects();
+      TestBed.tick();
       await Promise.resolve();
 
       // Assertion
@@ -243,7 +243,7 @@ describe("EventService", () => {
     it("should not fetch events if not on the events route", async () => {
       // Setup
       contentServiceMock.routeUrl.set(ROUTE_PATHS.TOKENS);
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Assertion
       httpMock.expectNone(`${service.eventBaseUrl}/`);
@@ -254,7 +254,7 @@ describe("EventService", () => {
     it("should not fetch events if action not allowed", async () => {
       // Setup
       authServiceMock.actionAllowed.mockReturnValue(false);
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Assertion
       httpMock.expectNone(`${service.eventBaseUrl}/`);
@@ -264,13 +264,13 @@ describe("EventService", () => {
 
     it("should load all handler modules", async () => {
       // Setup
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Execute
       const req = httpMock.expectOne(`${service.eventBaseUrl}/handlermodules`);
       const handlerModules = ["module1", "module2"];
       req.flush({ result: { value: handlerModules } });
-      TestBed.flushEffects();
+      TestBed.tick();
       await Promise.resolve();
 
       // Assertion
@@ -283,7 +283,7 @@ describe("EventService", () => {
     it("eventHandlerModules should return empty list if resource not loaded", () => {
       // Setup
       contentServiceMock.routeUrl.set(ROUTE_PATHS.TOKENS);
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Assertion
       httpMock.expectNone(`${service.eventBaseUrl}/handlermodules`);
@@ -293,13 +293,13 @@ describe("EventService", () => {
 
     it("should load all event", async () => {
       // Setup
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Execute
       const req = httpMock.expectOne(`${service.eventBaseUrl}/available`);
       const events = ["event1", "event2"];
       req.flush({ result: { value: events } });
-      TestBed.flushEffects();
+      TestBed.tick();
       await Promise.resolve();
 
       // Assertion
@@ -312,7 +312,7 @@ describe("EventService", () => {
     it("availableEvents should return empty list if resource not loaded", () => {
       // Setup
       contentServiceMock.routeUrl.set(ROUTE_PATHS.TOKENS);
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Assertion
       httpMock.expectNone(`${service.eventBaseUrl}/available`);
@@ -323,13 +323,13 @@ describe("EventService", () => {
     it("should load all module positions if handler module is selected", async () => {
       // Setup
       service.selectedHandlerModule.set("testModule");
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Execute
       const req = httpMock.expectOne(`${service.eventBaseUrl}/positions/testModule`);
       const positions = ["pre", "post"];
       req.flush({ result: { value: positions } });
-      TestBed.flushEffects();
+      TestBed.tick();
       await Promise.resolve();
 
       // Assertion
@@ -342,7 +342,7 @@ describe("EventService", () => {
     it("modulePositions should return empty list if resource not loaded", () => {
       // Setup
       contentServiceMock.routeUrl.set(ROUTE_PATHS.TOKENS);
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Assertion
       httpMock.expectNone(`${service.eventBaseUrl}/positions/testModule`);
@@ -353,13 +353,13 @@ describe("EventService", () => {
     it("should load all module actions if handler module is selected", async () => {
       // Setup
       service.selectedHandlerModule.set("testModule");
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Execute
       const req = httpMock.expectOne(`${service.eventBaseUrl}/actions/testModule`);
       const actions = [{ action1: { option1: {}, option2: {} } }, { action2: {} }];
       req.flush({ result: { value: actions } });
-      TestBed.flushEffects();
+      TestBed.tick();
       await Promise.resolve();
 
       // Assertion
@@ -372,7 +372,7 @@ describe("EventService", () => {
     it("moduleActions should return empty dict if resource not loaded", () => {
       // Setup
       contentServiceMock.routeUrl.set(ROUTE_PATHS.TOKENS);
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Assertion
       httpMock.expectNone(`${service.eventBaseUrl}/actions/testModule`);
@@ -383,13 +383,13 @@ describe("EventService", () => {
     it("should load all module conditions if handler module is selected", async () => {
       // Setup
       service.selectedHandlerModule.set("testModule");
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Execute
       const req = httpMock.expectOne(`${service.eventBaseUrl}/conditions/testModule`);
       const conditions = { condition1: { desc: "", type: "str" }, condition2: { desc: "", type: "int" } };
       req.flush({ result: { value: conditions } });
-      TestBed.flushEffects();
+      TestBed.tick();
       await Promise.resolve();
 
       // Assertion
@@ -402,7 +402,7 @@ describe("EventService", () => {
     it("moduleConditions should return empty list if resource not loaded", () => {
       // Setup
       contentServiceMock.routeUrl.set(ROUTE_PATHS.TOKENS);
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Assertion
       httpMock.expectNone(`${service.eventBaseUrl}/actions/testModule`);
@@ -413,7 +413,7 @@ describe("EventService", () => {
     it("moduleConditionsByGroup should sort conditions by the defined group", async () => {
       // Setup
       service.selectedHandlerModule.set("testModule");
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Execute
       const req = httpMock.expectOne(`${service.eventBaseUrl}/conditions/testModule`);
@@ -424,7 +424,7 @@ describe("EventService", () => {
         condition4: { desc: "", type: "str", group: "group1" }
       };
       req.flush({ result: { value: conditions } });
-      TestBed.flushEffects();
+      TestBed.tick();
       await Promise.resolve();
 
       // Assertion

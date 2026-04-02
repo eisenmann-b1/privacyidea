@@ -84,7 +84,7 @@ describe("MachineResolverService", () => {
         resolver2: { resolvername: "resolver2", type: "ldap", data: { resolver: "resolver2", type: "ldap" } }
       });
 
-      TestBed.flushEffects(); // Ensure computed properties are updated
+      TestBed.tick(); // Ensure computed properties are updated
 
       service.machineResolverResource.value(); // Trigger the resource load
       const req = httpMock.expectOne(`${service.machineResolverBaseUrl}`);
@@ -103,7 +103,7 @@ describe("MachineResolverService", () => {
     });
     it("should handle HTTP errors and notify", async () => {
       authServiceMock.actionAllowed.mockImplementation((arg) => (arg === "mresolverread" ? true : false));
-      TestBed.flushEffects(); // Ensure computed properties are updated
+      TestBed.tick(); // Ensure computed properties are updated
 
       service.machineResolverResource.value(); // Trigger the resource load
       const req = httpMock.expectOne(`${service.machineResolverBaseUrl}`);

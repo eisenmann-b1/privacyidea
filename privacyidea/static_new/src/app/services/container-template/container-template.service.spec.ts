@@ -81,11 +81,11 @@ describe("ContainerTemplateService", () => {
     });
 
     it("should fetch templates when on the correct route and with permission", async () => {
-      TestBed.flushEffects();
+      TestBed.tick();
 
       const req = httpMock.expectOne(`${service.containerTemplateBaseUrl}`);
       req.flush({ result: { value: { templates: [{ name: "template1" }] } } });
-      TestBed.flushEffects();
+      TestBed.tick();
       await Promise.resolve();
 
       const value = service.templatesResource.value();
@@ -97,7 +97,7 @@ describe("ContainerTemplateService", () => {
 
     it("should not fetch templates if action is not allowed", async () => {
       authServiceMock.actionAllowed.mockReturnValue(false);
-      TestBed.flushEffects();
+      TestBed.tick();
 
       httpMock.expectNone(`${service.containerTemplateBaseUrl}?container_type=test-type`);
       const value = service.templatesResource.value();
@@ -107,7 +107,7 @@ describe("ContainerTemplateService", () => {
 
     it("should not fetch templates if not on the correct route", async () => {
       contentServiceMock.routeUrl.set("/wrong/route");
-      TestBed.flushEffects();
+      TestBed.tick();
       await Promise.resolve();
 
       httpMock.expectNone(`${service.containerTemplateBaseUrl}?container_type=test-type`);
@@ -131,12 +131,12 @@ describe("ContainerTemplateService", () => {
     });
 
     it("should fetch token types", async () => {
-      TestBed.flushEffects();
+      TestBed.tick();
 
       const tokenTypesReq = httpMock.expectOne(`${environment.proxyUrl}/container/template/tokentypes`);
       const mockTokenTypes = { type1: { description: "Type 1", token_types: ["token1"] } };
       tokenTypesReq.flush({ result: { value: mockTokenTypes } });
-      TestBed.flushEffects();
+      TestBed.tick();
       await Promise.resolve();
 
       const value = service.templateTokenTypesResource.value();
@@ -147,7 +147,7 @@ describe("ContainerTemplateService", () => {
 
     it("should not fetch token types if not on the correct route", async () => {
       contentServiceMock.routeUrl.set("/wrong/route");
-      TestBed.flushEffects();
+      TestBed.tick();
 
       httpMock.expectNone(`${environment.proxyUrl}/container/template/tokentypes`);
       const value = service.templateTokenTypesResource.value();
@@ -157,7 +157,7 @@ describe("ContainerTemplateService", () => {
 
     it("should not fetch token types if action is not allowed", async () => {
       authServiceMock.actionAllowed.mockReturnValue(false);
-      TestBed.flushEffects();
+      TestBed.tick();
 
       httpMock.expectNone(`${environment.proxyUrl}/container/template/tokentypes`);
       const value = service.templateTokenTypesResource.value();
@@ -183,7 +183,7 @@ describe("ContainerTemplateService", () => {
     });
 
     it("should return token types for a given container type", async () => {
-      TestBed.flushEffects();
+      TestBed.tick();
 
       const templatesReq = httpMock.expectOne(`${service.containerTemplateBaseUrl}`);
       templatesReq.flush({ result: { value: { templates: [] } } });
@@ -191,14 +191,14 @@ describe("ContainerTemplateService", () => {
       const mockTokenTypes = { type1: { description: "Type 1", token_types: ["token1", "token2"] } };
       tokenTypesReq.flush({ result: { value: mockTokenTypes } });
 
-      TestBed.flushEffects();
+      TestBed.tick();
       await Promise.resolve();
 
       expect(service.getTokenTypesForContainerType("type1")).toEqual(["token1", "token2"]);
     });
 
     it("should return an empty array for a non-existent container type", async () => {
-      TestBed.flushEffects();
+      TestBed.tick();
 
       const templatesReq = httpMock.expectOne(`${service.containerTemplateBaseUrl}`);
       templatesReq.flush({ result: { value: { templates: [] } } });
@@ -206,7 +206,7 @@ describe("ContainerTemplateService", () => {
       const mockTokenTypes = { type1: { description: "Type 1", token_types: ["token1", "token2"] } };
       tokenTypesReq.flush({ result: { value: mockTokenTypes } });
 
-      TestBed.flushEffects();
+      TestBed.tick();
       await Promise.resolve();
 
       expect(service.getTokenTypesForContainerType("non-existent")).toEqual([]);
@@ -241,7 +241,7 @@ describe("ContainerTemplateService", () => {
 
     it("should check permissions and throw if denied", async () => {
       authServiceMock.actionAllowed.mockReturnValue(false);
-      TestBed.flushEffects();
+      TestBed.tick();
 
       const templateName = "template-to-delete";
 
@@ -313,7 +313,7 @@ describe("ContainerTemplateService", () => {
     beforeEach(() => {
       contentServiceMock.routeUrl.set(ROUTE_PATHS.TOKENS_CONTAINERS_CREATE);
       authServiceMock.actionAllowed.mockReturnValue(true);
-      TestBed.flushEffects();
+      TestBed.tick();
       const reqs = httpMock.match(() => true);
       reqs.forEach((req) => req.flush({ result: { value: {} } }));
     });

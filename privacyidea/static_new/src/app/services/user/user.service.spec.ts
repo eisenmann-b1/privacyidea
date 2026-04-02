@@ -374,7 +374,7 @@ describe("UserService", () => {
     it("should return undefined if route is not USER_DETAILS", async () => {
       contentServiceMock.routeUrl.update(() => ROUTE_PATHS.TOKENS);
       const mockBackend = TestBed.inject(HttpTestingController);
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Expect and flush the HTTP request
       mockBackend.expectNone(environment.proxyUrl + "/user/");
@@ -390,7 +390,7 @@ describe("UserService", () => {
       userService.detailsUsername.set(user);
       userService.selectedUserRealm.set(realm);
       const mockBackend = TestBed.inject(HttpTestingController);
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Expect and flush the main user details request
       const req = mockBackend.expectOne(environment.proxyUrl + "/user/?user=" + user + "&realm=" + realm);
@@ -414,31 +414,31 @@ describe("UserService", () => {
     it("should clear users when changing realm even if request fails", async () => {
       contentServiceMock.routeUrl.set(ROUTE_PATHS.USERS);
       userService.selectedUserRealm.set("other");
-      TestBed.flushEffects();
+      TestBed.tick();
       httpMock.match(() => true).forEach(r => r.flush({ result: { value: [] } }));
 
       userService.selectedUserRealm.set("realm1");
       userService.users();
-      TestBed.flushEffects();
+      TestBed.tick();
 
       const req1 = httpMock.expectOne((req) => req.url.includes("/user") && req.params.get("realm") === "realm1");
       req1.flush(MockPiResponse.fromValue([buildUser("user1")]));
       await Promise.resolve();
-      TestBed.flushEffects();
+      TestBed.tick();
 
       expect(userService.users()).toHaveLength(1);
       expect(userService.users()[0].username).toBe("user1");
 
       userService.selectedUserRealm.set("realm2");
       userService.users();
-      TestBed.flushEffects();
+      TestBed.tick();
 
       expect(userService.users()).toHaveLength(0);
 
       const req2 = httpMock.expectOne((req) => req.url.includes("/user") && req.params.get("realm") === "realm2");
       req2.flush("Error", { status: 500, statusText: "Server Error" });
       await Promise.resolve();
-      TestBed.flushEffects();
+      TestBed.tick();
 
       expect(userService.users()).toHaveLength(0);
     });

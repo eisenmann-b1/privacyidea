@@ -852,7 +852,7 @@ describe("TokenService", () => {
     it("should return undefined if route is not USER_DETAILS", async () => {
       contentServiceMock.routeUrl.update(() => ROUTE_PATHS.TOKENS);
       const mockBackend = TestBed.inject(HttpTestingController);
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Expect and flush the HTTP request
       mockBackend.expectNone(environment.proxyUrl + "/token/");
@@ -868,7 +868,7 @@ describe("TokenService", () => {
       contentServiceMock.detailsUsername.set(user);
       tokenService.userRealm.set(realm);
       const mockBackend = TestBed.inject(HttpTestingController);
-      TestBed.flushEffects();
+      TestBed.tick();
 
       // Expect and flush the HTTP request
       const req = mockBackend.expectOne(environment.proxyUrl + "/token/?user=" + user + "&realm=" + realm);

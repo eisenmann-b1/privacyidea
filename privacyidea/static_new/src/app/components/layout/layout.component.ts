@@ -58,9 +58,9 @@ export class LayoutComponent {
   updateBodyClasses() {
     if (this.authService.role() === "admin") {
       this.renderer.addClass(this.document.body, "admin-layout");
-      this.renderer.removeClass(this.document.body, "selfservice-layout");
+      this.renderer.removeClass(this.document.body, "self-service-layout");
     } else {
-      this.renderer.addClass(this.document.body, "selfservice-layout");
+      this.renderer.addClass(this.document.body, "self-service-layout");
       this.renderer.removeClass(this.document.body, "admin-layout");
     }
   }
@@ -90,7 +90,7 @@ export class LayoutComponent {
 
   ngOnDestroy(): void {
     this.renderer.removeClass(this.document.body, "admin-layout");
-    this.renderer.removeClass(this.document.body, "selfservice-layout");
+    this.renderer.removeClass(this.document.body, "self-service-layout");
     this.loadingService.removeListener("layout");
     window.removeEventListener("resize", this.updateOverflowState);
   }

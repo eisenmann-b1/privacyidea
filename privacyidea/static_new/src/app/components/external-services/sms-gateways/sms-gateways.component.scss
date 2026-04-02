@@ -3,12 +3,8 @@
 
 .sms-gateways-container {
   @include styles.main-component-style;
-  @include styles.base-table-structure(".sms-gateways-table", ".table-filter", ".table-scroll-container");;
+  @include styles.base-table-structure(".sms-gateways-table", ".table-filter", ".table-scroll-container");
   display: grid;
-}
-
-.sms-gateways-layout {
-  padding: 24px;
 }
 
 .actions-container {

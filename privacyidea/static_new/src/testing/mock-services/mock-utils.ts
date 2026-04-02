@@ -44,7 +44,7 @@ export class MockHttpResourceRef<T> implements HttpResourceRef<T> {
       reload: this.reload,
       error: this.error,
       hasValue: this.hasValue.bind(this),
-      status: signal(ResourceStatus.Resolved),
+      status: signal("resolved"),
       isLoading: signal(false)
     } as any;
   }
@@ -59,7 +59,7 @@ export class MockHttpResourceRef<T> implements HttpResourceRef<T> {
 
   destroy(): void {}
 
-  status: Signal<ResourceStatus> = signal(ResourceStatus.Resolved);
+  status: Signal<ResourceStatus> = signal("resolved");
   error = signal<Error | null>(null);
   isLoading: Signal<boolean> = signal(false);
   reload = jest.fn();

@@ -132,7 +132,7 @@ describe("UserNewResolverComponent", () => {
         value: resolverData
       }
     });
-    const resourceStatus = signal(ResourceStatus.Resolved);
+    const resourceStatus = signal("resolved");
 
     (resolverService.selectedResolverResource as any).value = resourceValue;
     (resolverService.selectedResolverResource as any).status = resourceStatus;
@@ -170,7 +170,7 @@ describe("UserNewResolverComponent", () => {
         value: resolverData
       }
     });
-    const resourceStatus = signal(ResourceStatus.Resolved);
+    const resourceStatus = signal("resolved");
 
     (resolverService.selectedResolverResource as any).value = resourceValue;
     (resolverService.selectedResolverResource as any).status = resourceStatus;
@@ -200,7 +200,7 @@ describe("UserNewResolverComponent", () => {
     const resourceValue = signal({
       result: { status: true, value: initialData }
     });
-    const resourceStatus = signal(ResourceStatus.Resolved);
+    const resourceStatus = signal("resolved");
 
     (resolverService.selectedResolverResource as any).value = resourceValue;
     (resolverService.selectedResolverResource as any).status = resourceStatus;
@@ -208,7 +208,7 @@ describe("UserNewResolverComponent", () => {
     await detectChangesStable();
     expect(component.formData["fileName"]).toBe("/initial");
 
-    resourceStatus.set(ResourceStatus.Reloading);
+    resourceStatus.set("reloading");
     await detectChangesStable();
 
     const updatedData = {
@@ -221,7 +221,7 @@ describe("UserNewResolverComponent", () => {
     };
 
     resourceValue.set({ result: { status: true, value: updatedData } });
-    resourceStatus.set(ResourceStatus.Resolved);
+    resourceStatus.set("resolved");
 
     await detectChangesStable();
     expect(component.formData["fileName"]).toBe("/updated");

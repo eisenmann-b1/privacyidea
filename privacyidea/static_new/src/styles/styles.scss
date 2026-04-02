@@ -651,50 +651,31 @@ body.selfservice-layout {
   }
 
   .cdk-overlay-container {
+    // Navigation blocking dialog wins over navigation accessible dialog, e.g. confirmation dialog over resolver edit
     &:has(.nav-accessible-dialog):has(.nav-blocking-dialog) {
       margin-left: 0;
       width: 100%;
 
+      // Keep shift for dialog position to avoid layout jumps
       .mat-mdc-dialog-panel {
         margin-left: var(--overlay-margin);
       }
     }
 
-    margin-left: var(--overlay-margin);
-    width: calc(100% - var(--overlay-margin));
-
+    // Dialogs where navigation should remain accessible shift the overlay
     &:has(.nav-accessible-dialog) {
       margin-left: var(--overlay-margin);
       width: calc(100% - var(--overlay-margin));
     }
 
-    .mat-mdc-select-panel {
-      margin-left: calc(-1 * var(--overlay-margin));
-    }
-
-    .mat-mdc-autocomplete-panel {
-      margin-left: calc(-1 * var(--overlay-margin));
-    }
-
-    .mat-mdc-menu-panel {
-      margin-left: calc(-1 * var(--overlay-margin));
-    }
-
-    .mat-mdc-tooltip {
-      margin-left: calc(-1 * (var(--overlay-margin) + 43px));
-    }
-
-    &:has(.welcome-dialog-panel),
-    &:has(.global-dialog-panel),
-    &:has(.nav-blocking-dialog):not(:has(.nav-accessible-dialog)) {
-      margin-left: 0;
-      width: 100%;
-
+    // Shift back components which could be contained in the dialog to be correctly aligned
+    &:has(.nav-accessible-dialog):has(.nav-blocking-dialog),
+    &:has(.nav-accessible-dialog) {
       .mat-mdc-select-panel,
       .mat-mdc-autocomplete-panel,
       .mat-mdc-menu-panel,
       .mat-mdc-tooltip {
-        margin-left: 0 !important;
+        margin-left: calc(-1 * var(--overlay-margin));
       }
     }
   }

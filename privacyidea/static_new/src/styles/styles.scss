@@ -113,7 +113,7 @@ body {
   --mat-select-focused-arrow-color: var(--mat-sys-primary-light);
   --mdc-outlined-text-field-focus-outline-color: var(--mat-sys-primary-light);
 
-  --drawer-width-admin: 298px;
+  --drawer-width-admin: var(--overlay-margin);
   --drawer-width-self-service: 256px;
 }
 
@@ -130,7 +130,7 @@ body {
 }
 
 body.self-service-layout {
-  --overlay-margin: 256px;
+  --overlay-margin: var(--drawer-width-self-service);
 }
 
 .shadow {

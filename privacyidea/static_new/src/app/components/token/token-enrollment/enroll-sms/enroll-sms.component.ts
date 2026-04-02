@@ -164,14 +164,10 @@ export class EnrollSmsComponent implements OnInit {
         this.smsGatewayControl.setValue(id);
       }
     });
-    effect(() => {
-      if (this.enrollmentData()) {
-        this._setInitialFormValues();
-      }
-    });
   }
 
   ngOnInit(): void {
+    this._setInitialFormValues();
     this.additionalFormFieldsChange.emit({
       smsGateway: this.smsGatewayControl,
       phoneNumber: this.phoneNumberControl,

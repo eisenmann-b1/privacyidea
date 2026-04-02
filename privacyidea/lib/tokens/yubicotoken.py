@@ -46,7 +46,7 @@ from urllib.parse import urlencode
 
 import requests
 
-from privacyidea.api.lib.utils import getParam
+from privacyidea.lib.params import get_required
 from privacyidea.lib import _
 from privacyidea.lib.config import get_from_config
 from privacyidea.lib.crypto import geturandom
@@ -68,8 +68,6 @@ DO_YUBICO_POST = False
 DEFAULT_CLIENT_ID = 20771
 DEFAULT_API_KEY = "9iE9DRkPHQDJbAFFC31/dum5I54="
 
-optional = True
-required = False
 
 log = logging.getLogger(__name__)
 
@@ -132,7 +130,7 @@ class YubicoTokenClass(TokenClass):
         return ret
 
     def update(self, param):
-        tokenid = getParam(param, "yubico.tokenid", required)
+        tokenid = get_required(param, "yubico.tokenid")
         if len(tokenid) < YUBICO_LEN_ID:
             log.error("The tokenid needs to be {0:d} characters long!".format(YUBICO_LEN_ID))
             raise Exception("The Yubikey token ID needs to be {0:d} characters long!".format(YUBICO_LEN_ID))

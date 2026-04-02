@@ -118,8 +118,6 @@ from privacyidea.models.utils import clob_to_varchar
 
 log = logging.getLogger(__name__)
 
-optional = True
-required = False
 
 ENCODING = "utf-8"
 

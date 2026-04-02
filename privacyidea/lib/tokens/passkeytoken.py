@@ -36,7 +36,7 @@ from webauthn.helpers.structs import (AttestationConveyancePreference, Authentic
                                       PublicKeyCredentialCreationOptions)
 from webauthn.registration.verify_registration_response import VerifiedRegistration
 
-from privacyidea.api.lib.utils import get_optional, get_required, get_required_one_of, get_optional_one_of
+from privacyidea.lib.params import get_optional, get_required, get_required_one_of, get_optional_one_of
 from privacyidea.lib import _, fido2
 from privacyidea.lib.challenge import get_challenges
 from privacyidea.lib.config import get_from_config

@@ -43,8 +43,6 @@ from privacyidea.lib import _
 from privacyidea.lib.policy import SCOPE, GROUP
 from privacyidea.lib.policies.actions import PolicyAction
 
-optional = True
-required = False
 
 import logging
 log = logging.getLogger(__name__)

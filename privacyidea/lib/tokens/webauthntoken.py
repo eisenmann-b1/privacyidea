@@ -26,7 +26,7 @@ from cryptography import x509
 from sqlalchemy import select
 from webauthn.helpers import bytes_to_base64url
 
-from privacyidea.api.lib.utils import (attestation_certificate_allowed, get_required_one_of,
+from privacyidea.lib.params import (attestation_certificate_allowed, get_required_one_of,
                                        get_optional_one_of, get_optional, get_required)
 from privacyidea.lib import _, lazy_gettext
 from privacyidea.lib.challenge import get_challenges
@@ -485,8 +485,6 @@ PUBLIC_KEY_CREDENTIAL_ALGORITHMS = {
 PUBKEY_CRED_ALGORITHMS_ORDER = ['ecdsa', 'rsassa-pss', 'rsassa-pkcs1v1_5']
 
 log = logging.getLogger(__name__)
-optional = True
-required = False
 
 WEBAUTHN_TOKEN_SPECIFIC_SETTINGS = {
     FIDO2ConfigOptions.TRUST_ANCHOR_DIR: 'public',

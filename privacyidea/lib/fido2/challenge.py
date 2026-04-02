@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from sqlalchemy import select
 from webauthn.helpers import bytes_to_base64url
 
-from privacyidea.api.lib.utils import get_required_one_of, get_optional_one_of, get_required
+from privacyidea.lib.params import get_required_one_of, get_optional_one_of, get_required
 from privacyidea.lib import fido2
 from privacyidea.lib.config import get_from_config
 from privacyidea.lib.crypto import geturandom

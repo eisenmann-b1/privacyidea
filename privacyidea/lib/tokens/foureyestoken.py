@@ -35,7 +35,7 @@ and the splitting sign.
 The code is tested in tests/test_lib_tokens_4eyes.
 """
 import logging
-from privacyidea.api.lib.utils import getParam
+from privacyidea.lib.params import get_optional, get_required
 from privacyidea.lib.config import get_from_config
 from privacyidea.lib.log import log_with
 from privacyidea.lib.tokenclass import TokenClass, Tokenkind
@@ -50,8 +50,6 @@ import json
 import datetime
 
 log = logging.getLogger(__name__)
-optional = True
-required = False
 
 
 class FourEyesTokenClass(TokenClass):
@@ -238,8 +236,8 @@ class FourEyesTokenClass(TokenClass):
         """
         TokenClass.update(self, param)
 
-        realms = getParam(param, "4eyes", required)
-        separator = getParam(param, "separator", optional, default=" ")
+        realms = get_required(param, "4eyes")
+        separator = get_optional(param, "separator", default=" ")
         if len(separator) > 1:
             raise ParameterError("The separator must only be one single "
                                  "character")

@@ -48,9 +48,10 @@ import logging
 import traceback
 import binascii
 from privacyidea.lib.utils import is_true, hexlify_and_unicode
+from privacyidea.lib.error import ParameterError
 from privacyidea.lib.tokens.remotetoken import RemoteTokenClass
 from privacyidea.lib.tokenclass import TokenClass, Tokenkind, AuthenticationMode
-from privacyidea.api.lib.utils import getParam, ParameterError
+from privacyidea.lib.params import get_optional, get_required
 from privacyidea.lib.log import log_with
 from privacyidea.lib.config import get_from_config
 from privacyidea.lib.decorators import check_token_locked
@@ -65,8 +66,6 @@ from privacyidea.lib import _
 from privacyidea.lib.policy import SCOPE, GROUP
 from privacyidea.lib.policies.actions import PolicyAction
 
-optional = True
-required = False
 
 log = logging.getLogger(__name__)
 
@@ -135,16 +134,16 @@ class RadiusTokenClass(RemoteTokenClass):
     @log_with(log, hide_args_keywords={'param': 'pin'})
     def update(self, param):
         # New value
-        radius_identifier = getParam(param, "radius.identifier")
+        radius_identifier = get_optional(param, "radius.identifier")
         self.add_tokeninfo("radius.identifier", radius_identifier)
 
         # old values
         if not radius_identifier:
-            radiusServer = getParam(param, "radius.server", optional=required)
+            radiusServer = get_required(param, "radius.server")
             self.add_tokeninfo("radius.server", radiusServer)
-            radius_secret = getParam(param, "radius.secret", optional=required)
+            radius_secret = get_required(param, "radius.secret")
             self.token.set_otpkey(hexlify_and_unicode(radius_secret))
-            system_settings = getParam(param, "radius.system_settings",
+            system_settings = get_optional(param, "radius.system_settings",
                                        default=False)
             self.add_tokeninfo("radius.system_settings", system_settings)
 
@@ -155,9 +154,9 @@ class RadiusTokenClass(RemoteTokenClass):
         # be overwritten by the parent class, which is ok.
         self.set_otplen(6)
         TokenClass.update(self, param)
-        val = getParam(param, "radius.local_checkpin", optional) or 0
+        val = get_optional(param, "radius.local_checkpin") or 0
         self.add_tokeninfo("radius.local_checkpin", val)
-        val = getParam(param, "radius.user", required)
+        val = get_required(param, "radius.user")
         self.add_tokeninfo("radius.user", val)
         self.add_tokeninfo("tokenkind", Tokenkind.VIRTUAL)
 

@@ -139,15 +139,14 @@ class RadiusTokenClass(RemoteTokenClass):
 
         # old values
         if not radius_identifier:
-            radiusServer = get_required(param, "radius.server")
+            radiusServer = get_optional(param, "radius.server")
             self.add_tokeninfo("radius.server", radiusServer)
-            radius_secret = get_required(param, "radius.secret")
-            self.token.set_otpkey(hexlify_and_unicode(radius_secret))
-            system_settings = get_optional(param, "radius.system_settings",
-                                       default=False)
+            radius_secret = get_optional(param, "radius.secret")
+            self.token.set_otpkey(hexlify_and_unicode(radius_secret or ""))
+            system_settings = get_optional(param, "radius.system_settings")
             self.add_tokeninfo("radius.system_settings", system_settings)
 
-            if not (radiusServer or radius_secret) and not system_settings:
+            if not (radiusServer or radius_secret) and not is_true(system_settings):
                 raise ParameterError("Missing parameter: radius.identifier", id=905)
 
         # if another OTP length would be specified in /admin/init this would
@@ -462,7 +461,7 @@ class RadiusTokenClass(RemoteTokenClass):
         if radius_identifier:
             # New configuration
             radius_server_object = get_radius(radius_identifier)
-        elif system_radius_settings:
+        elif is_true(system_radius_settings):
             # system configuration
             radius_server = get_from_config("radius.server").split(':')
             radius_secret = get_from_config("radius.secret")

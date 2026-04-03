@@ -233,7 +233,8 @@ class EmailTokenClass(HotpTokenClass):
             else:
                 # specific - e-mail
                 self._email_address = get_required(param,
-                                               self.EMAIL_ADDRESS_KEY)
+                                               self.EMAIL_ADDRESS_KEY,
+                                               allow_empty=True)
                 self.delete_tokeninfo(self.DYNAMIC_EMAIL_KEY)
 
             # in case of the e-mail token, only the server must know the otpkey

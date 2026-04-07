@@ -361,11 +361,13 @@ export class UserService implements UserServiceInterface {
 
   users: WritableSignal<UserData[]> = linkedSignal({
     source: () => ({
-      resourceValue: this.usersResource.value(),
       realm: this.selectedUserRealm()
     }),
     computation: (source, previous) => {
-      const users = source.resourceValue?.result?.value
+      let users: UserData[] | undefined = [];
+      if (this.usersResource.hasValue()) {
+        users = this.usersResource.value()?.result?.value;
+      }
       if (!users && source.realm !== previous?.source.realm) {
         // If the realm changed we do not fall back on the previous user list
         return [];

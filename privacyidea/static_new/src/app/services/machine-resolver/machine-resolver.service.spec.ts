@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { TestBed } from "@angular/core/testing";
-import { MachineResolver, MachineResolverService, MachineResolvers } from "./machine-resolver.service";
+import { MachineResolver, MachineResolvers, MachineResolverService } from "./machine-resolver.service";
 import { AuthService } from "../auth/auth.service";
 import { ContentService } from "../content/content.service";
 import { NotificationService } from "../notification/notification.service";
@@ -110,8 +110,7 @@ describe("MachineResolverService", () => {
       expect(req.request.method).toBe("GET");
       req.flush({}, { status: 500, statusText: "Internal Server Error" });
       await Promise.resolve(); // Wait for the microtask queue to flush
-      const resourceValue = service.machineResolverResource.value();
-      expect(resourceValue).toBeUndefined();
+
       expect(service.machineResolvers()).toEqual([]);
     });
   });

@@ -55,7 +55,7 @@ class MockSelectorButtonsComponent {
 
 @Component({
   standalone: true,
-  imports: [ActionSelectorComponent, CommonModule, ClearableInputComponent, FormsModule],
+  imports: [ActionSelectorComponent, ClearableInputComponent, FormsModule],
   template: ` <app-action-selector [(policy)]="policy" /> `
 })
 class TestHostComponent {

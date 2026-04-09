@@ -52,7 +52,6 @@ type KeyValueRow = { key: string; value: string };
     class: NAVIGATION_ACCESSIBLE_DIALOG_CLASS
   },
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     FormsModule,
     MatDialogModule,

@@ -11,7 +11,7 @@ from testfixtures import log_capture, LogCapture
 from privacyidea.config import TestingConfig
 from privacyidea.lib.config import set_privacyidea_config
 from privacyidea.lib.framework import get_app_config
-from privacyidea.lib.realm import (set_realm, delete_realm, get_realm_id)
+from privacyidea.lib.realm import (set_realm, delete_realm, get_realm_id, get_ordered_resolvers)
 from privacyidea.lib.resolver import (save_resolver, delete_resolver)
 from privacyidea.lib.resolvers.EntraIDResolver import (CLIENT_ID, CLIENT_CREDENTIAL_TYPE, ClientCredentialType,
                                                        CLIENT_SECRET, TENANT)
@@ -30,6 +30,7 @@ from .test_lib_resolver_httpresolver import ConfidentialClientApplicationMock
 
 PWFILE = "tests/testdata/passwd"
 PWFILE2 = "tests/testdata/passwords"
+PWFILE3 = "tests/testdata/passwd-mask-user"
 
 
 class UserTestCase(MyTestCase):
@@ -472,8 +473,7 @@ class UserTestCase(MyTestCase):
         self.assertEqual(0, len(failed), failed)
         self.assertEqual(4, len(added), added)
 
-        root = User("root", "sort_realm")
-        r = root.get_ordered_resolvers()
+        r = get_ordered_resolvers("sort_realm")
         self.assertEqual(r[0], "reso4")
         self.assertEqual(r[1], "resolver2")
         self.assertEqual(r[2], "reso3")
@@ -514,7 +514,7 @@ class UserTestCase(MyTestCase):
         # Test on node 1
         get_app_config()["PI_NODE_UUID"] = nd1_uuid
         root = User("root", "sort_node_realm")
-        r = root.get_ordered_resolvers()
+        r = get_ordered_resolvers("sort_node_realm")
         self.assertEqual(3, len(r), r)
         self.assertEqual(r[0], "reso4")
         self.assertEqual(r[1], "resolver2")
@@ -522,8 +522,7 @@ class UserTestCase(MyTestCase):
 
         # Test on node 2
         get_app_config()["PI_NODE_UUID"] = nd2_uuid
-        root = User("root", "sort_node_realm")
-        r = root.get_ordered_resolvers()
+        r = get_ordered_resolvers("sort_node_realm")
         self.assertEqual(3, len(r), r)
         self.assertEqual(r[0], "reso4")
         self.assertEqual(r[1], "reso3")
@@ -783,6 +782,32 @@ class UserTestCase(MyTestCase):
         user.delete_attribute()
         delete_realm(self.realm1)
         delete_resolver(self.resolvername1)
+
+    def test_90_masking_users_in_ordered_resolvers(self):
+        realmname = "masked_realm"
+        save_resolver({"resolver": self.resolvername1,
+                       "type": "passwdresolver",
+                       "fileName": PWFILE3})
+        save_resolver({"resolver": self.resolvername2,
+                       "type": "passwdresolver",
+                       "fileName": PWFILE})
+
+        (added, failed) = set_realm(realmname,
+                                    [
+                                        {'name': self.resolvername1, 'priority': 1},
+                                        {'name': self.resolvername2, 'priority': 2}])
+        self.assertEqual(len(failed), 0)
+        self.assertEqual(len(added), 2)
+
+        r = get_user_list({"realm": realmname, "username": "cornelius"})
+        # User cornelius should only be contained once.
+        self.assertEqual(1, len(r))
+        # And it should be the correct one, from PWFILE3
+        print(r)
+
+        delete_realm(realmname)
+        delete_resolver(self.resolvername1)
+        delete_resolver(self.resolvername2)
 
     def test_50_user_attributes(self):
         save_resolver({"resolver": self.resolvername1, "type": "passwdresolver",

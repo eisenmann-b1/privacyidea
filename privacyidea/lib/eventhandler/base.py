@@ -95,6 +95,7 @@ class CONDITION(object):
     CONTAINER_RESOLVER = "container_resolver"
     CONTAINER_LAST_AUTH = "container_last_authentication"
     CONTAINER_LAST_SYNC = "container_last_synchronization"
+    USER_INFO = "user_info"
 
 
 class GROUP(object):
@@ -208,6 +209,15 @@ class BaseEventHandler(object):
                     "type": "multi",
                     "desc": _("The resolver of the user, for which this event should apply."),
                     "value": [{"name": r} for r in resolvers],
+                    "group": GROUP.USER
+                },
+            CONDITION.USER_INFO:
+                {
+                    "type": "str",
+                    "desc": _("This condition can check any arbitrary userinfo "
+                              "field. You need to enter something like "
+                              "'<fieldname> == <fieldvalue>', '<fieldname> > "
+                              "<fieldvalue>' or '<fieldname> < <fieldvalue>'."),
                     "group": GROUP.USER
                 },
             CONDITION.TOKENREALM:
@@ -748,6 +758,19 @@ class BaseEventHandler(object):
 
         if CONDITION.REALM in conditions:
             if user.realm not in conditions.get(CONDITION.REALM).split(","):
+                return False
+
+        if CONDITION.USER_INFO in conditions:
+            cond = conditions.get(CONDITION.USER_INFO)
+            # replace {now} in condition
+            cond, td = parse_time_offset_from_now(cond)
+            s_now = (datetime.datetime.now(tzlocal()) + td).strftime(
+                DATE_FORMAT)
+            cond = cond.format(now=s_now)
+            if not compare_generic(cond,
+                                   lambda key: user.get_specific_info([key]).get(key),
+                                   "Misconfiguration in your userinfo "
+                                   "condition: {0!s}"):
                 return False
 
         if CONDITION.RESOLVER in conditions:

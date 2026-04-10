@@ -735,6 +735,14 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
     If users are searched in more than one realm, it also contains the realm name.
     If users are only searched in a specific resolver, it does not contain the realm name.
 
+    Fixme: Please note: If a realm and a resolver is given, the resolver is currently ignored. So all users
+    of this realm are returned. This is the old/current behaviour. When filtering for a resolver in a realm, we
+    should probably take care, that masked users (in low priority resolvers) are not returned.
+
+    Fixme: Please note: When filtering only for a resolver, the function simply returns objects found in the user store.
+    However, this object might not be found as a user in a realm, since the object from this resolver might be masked
+    by an object found in a higher priority resolver.
+
     :param param: search parameters
     :param user:  a specific user object to return
     :param include_custom_attributes:  Set to True, if you want to receive custom attributes of external users.

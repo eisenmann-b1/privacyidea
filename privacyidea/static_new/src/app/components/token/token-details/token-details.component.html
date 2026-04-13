@@ -84,14 +84,16 @@
                       </mat-autocomplete>
                     </mat-form-field>
                   } @else {
-                    <a
-                      (click)="contentService.containerSelected(element.value)"
-                      attr.aria-label="{{ element.keyMap.label }} Link">
-                      {{ element.value }}
-                    </a>
-                    @if (element.value !== "") {
-                      <app-copy-button [copyText]="element.value"></app-copy-button>
-                    }
+                    <div class="flex-row flex-nowrap ali-center">
+                      <a
+                        (click)="contentService.containerSelected(element.value)"
+                        attr.aria-label="{{ element.keyMap.label }} Link">
+                        {{ element.value }}
+                      </a>
+                      @if (element.value !== "") {
+                        <app-copy-button [copyText]="element.value"></app-copy-button>
+                      }
+                    </div>
                   }
                 }
                 @case ("realms") {

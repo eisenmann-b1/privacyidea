@@ -4,22 +4,7 @@
 .token-table-layout {
   @include styles.main-component-style;
   @include table.base-table-structure(".token-table", ".token-table-filter", ".table-scroll-container");
-  display: grid;
-  max-width: 100%;
-  min-width: 0;
-  overflow-x: hidden;
 }
-
-.filter-paginator-container {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background-color: var(--table-color);
-  // Negative margins to offset the padding of the main container
-  margin: calc(-1 * var(--global-padding)) calc(-1 * var(--global-padding)) 16px calc(-1 * var(--global-padding));
-  padding: var(--global-padding);
-}
-
 
 .realm-break {
   margin-top: 3px;

@@ -4,7 +4,6 @@
 .radius-servers-container {
   @include styles.main-component-style;
   @include styles.base-table-structure(".radius-servers-table", ".table-filter", ".table-scroll-container");
-  display: grid;
 }
 
 .actions-container {

@@ -137,14 +137,16 @@
                       [disabled]="total() === 0"></mat-checkbox>
                   }
                   @case ("serial") {
-                    <a
-                      (click)="contentService.containerSelected(element.serial)"
-                      attr.aria-label="{{ column.label }} Link">
-                      {{ element[column.key] }}
-                    </a>
-                    @if (element.serial !== "") {
-                      <app-copy-button [copyText]="element.serial"></app-copy-button>
-                    }
+                    <div class="flex-row flex-nowrap ali-center">
+                      <a
+                        (click)="contentService.containerSelected(element.serial)"
+                        attr.aria-label="{{ column.label }} Link">
+                        {{ element[column.key] }}
+                      </a>
+                      @if (element.serial !== "") {
+                        <app-copy-button [copyText]="element.serial"></app-copy-button>
+                      }
+                    </div>
                   }
                   @case ("realms") {
                     <div [ngClass]="{ 'realm-list': (element[column.key]?.length || 0) > 1 }">
@@ -198,7 +200,7 @@
               class="expanded-detail">
               <div class="expanded-token-list">
                 @for (token of element.tokens; track token) {
-                  <div class="token-item">
+                  <div class="token-item flex-row flex-nowrap ali-center">
                     <a (click)="contentService.tokenSelected(token.serial)"> {{ token.serial }}</a>
                     <app-copy-button [copyText]="token.serial"></app-copy-button>
                     [{{ token.tokentype }}]

@@ -606,6 +606,7 @@ body.self-service-layout {
 .sticky-controls {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--global-gap);
 }
 
@@ -627,6 +628,11 @@ body.self-service-layout {
 .flex-row {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.flex-nowrap {
+  flex-wrap: nowrap !important;
 }
 
 .flex-grow-1 {

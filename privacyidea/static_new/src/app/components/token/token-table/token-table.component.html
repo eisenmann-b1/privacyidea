@@ -23,10 +23,7 @@
   class="token-table-layout"
   i18n-aria-label>
   @if (authService.actionAllowed("tokenlist")) {
-    <div #stickySentinel></div>
-    <div
-      #stickyHeader
-      class="filter-paginator-container sticky-header">
+    <div class="filter-paginator-container">
       <mat-form-field
         subscriptSizing="dynamic"
         class="token-table-filter">
@@ -158,7 +155,7 @@
                       [disabled]="totalLength() === 0" />
                   }
                   @case ("serial") {
-                    <div class="flex-row">
+                    <div class="flex-row flex-nowrap ali-center">
                       <a
                         (click)="contentService.tokenSelected(tokenDetails.serial)"
                         attr.aria-label="{{ column.label }} Link"
@@ -197,14 +194,16 @@
                     </div>
                   }
                   @case ("container_serial") {
-                    <a
-                      (click)="contentService.containerSelected(tokenDetails.container_serial)"
-                      attr.aria-label="{{ column.label }} Link">
-                      {{ tokenDetails[column.key] }}
-                    </a>
-                    @if (tokenDetails.container_serial !== "") {
-                      <app-copy-button [copyText]="tokenDetails.container_serial" />
-                    }
+                    <div class="flex-row flex-nowrap ali-center">
+                      <a
+                        (click)="contentService.containerSelected(tokenDetails.container_serial)"
+                        attr.aria-label="{{ column.label }} Link">
+                        {{ tokenDetails[column.key] }}
+                      </a>
+                      @if (tokenDetails.container_serial !== "") {
+                        <app-copy-button [copyText]="tokenDetails.container_serial" />
+                      }
+                    </div>
                   }
                   @case ("username") {
                     <a

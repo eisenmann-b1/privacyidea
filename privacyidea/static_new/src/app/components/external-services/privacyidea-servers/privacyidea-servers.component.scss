@@ -4,7 +4,6 @@
 .privacyidea-servers-container {
   @include styles.main-component-style;
   @include styles.base-table-structure(".privacyidea-servers-table", ".table-filter", ".table-scroll-container");
-  display: grid;
 }
 
 .actions-container {

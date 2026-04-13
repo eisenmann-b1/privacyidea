@@ -4,7 +4,6 @@
 .ca-connectors-container {
   @include styles.main-component-style;
   @include styles.base-table-structure(".ca-connectors-table", ".table-filter", ".table-scroll-container");
-  display: grid;
 }
 
 .actions-container {

@@ -89,14 +89,16 @@
                     [disabled]="total() === 0" />
                 }
                 @case ("serial") {
-                  <a
-                    (click)="contentService.containerSelected(element.serial)"
-                    attr.aria-label="{{ column.label }} Link">
-                    {{ element[column.key] }}
-                  </a>
-                  @if (element.serial !== "") {
-                    <app-copy-button [copyText]="element.serial" />
-                  }
+                  <div class="flex-row flex-nowrap ali-center">
+                    <a
+                      (click)="contentService.containerSelected(element.serial)"
+                      attr.aria-label="{{ column.label }} Link">
+                      {{ element[column.key] }}
+                    </a>
+                    @if (element.serial !== "") {
+                      <app-copy-button [copyText]="element.serial" />
+                    }
+                  </div>
                 }
                 @case ("realms") {
                   <div [ngClass]="(element[column.key]?.length || 0) > 1 ? 'realm-list' : 'realm'">

@@ -108,7 +108,7 @@ class mTimeOtp:
             otp = self.calcOtp(i, to_unicode(key), to_unicode(pin))
             if safe_compare(anOtpVal, otp):
                 res = i
-                log.debug(f"otpvalue {anOtpVal!r} found at: {res!r}")
+                log.debug(f"otpvalue found at: {res!r}")
                 break
 
         if self.secretObject is not None:

@@ -413,7 +413,7 @@ class TotpTokenClass(HotpTokenClass):
 
         # check if the otpval is valid in the sync scope
         res = hmac2Otp.checkOtp(anOtpVal, syncWindow, symetric=True)
-        log.debug(f"found otpval {anOtpVal!r} in syncwindow ({syncWindow!r}): {res!r}")
+        log.debug(f"checked otpval in syncwindow ({syncWindow!r}): {res!r}")
 
         if res != -1:
             # if former is defined
@@ -491,7 +491,7 @@ class TotpTokenClass(HotpTokenClass):
                            counter,
                            otplen,
                            self.get_hashlib(self.hashlib))
-        log.debug(f"{otp2!s} in otpkey: {secretHOtp!s} ")
+        log.debug("checking second otp value in syncwindow")
         res2 = hmac2Otp.checkOtp(otp2,
                                  int(sync_window),
                                  symetric=True)  # TEST -remove the 10
@@ -501,7 +501,7 @@ class TotpTokenClass(HotpTokenClass):
                            counter - 1,
                            otplen,
                            self.get_hashlib(self.hashlib))
-        log.debug(f"{otp1!s} in otpkey: {secretHOtp!s} ")
+        log.debug("checking first otp value in syncwindow")
         res1 = hmac2Otp.checkOtp(otp1,
                                  int(sync_window),
                                  symetric=True)  # TEST -remove the 10

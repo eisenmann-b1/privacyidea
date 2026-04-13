@@ -44,17 +44,17 @@ The functions of this module are tested in tests/test_lib_policy_decorator.py
 import datetime
 import functools
 import logging
-import pyrad
 import re
 
+import pyrad
 from dateutil.tz import tzlocal
 
 from privacyidea.lib.authcache import verify_in_cache, add_to_cache
 from privacyidea.lib.error import PolicyError, UserError, AuthError, Error
-from privacyidea.lib.policies.helper import check_max_auth_fail, check_max_auth_success
-from privacyidea.lib.policy import SCOPE, ACTIONVALUE, LOGINMODE
 from privacyidea.lib.policies.actions import PolicyAction
+from privacyidea.lib.policies.helper import check_max_auth_fail, check_max_auth_success
 from privacyidea.lib.policy import Match
+from privacyidea.lib.policy import SCOPE, ACTIONVALUE, LOGINMODE
 from privacyidea.lib.radiusserver import get_radius
 from privacyidea.lib.user import User
 from privacyidea.lib.utils import parse_timedelta, split_pin_pass
@@ -289,7 +289,19 @@ def auth_user_passthru(wrapped_function, user_object, passw, options=None):
         pass_thru = Match.user(g, scope=SCOPE.AUTH, action=PolicyAction.PASSTHRU,
                                user_object=user_object).policies(write_to_audit_log=False)
         # We only go to passthru, if the user has no tokens!
-        if pass_thru and get_tokens(user=user_object, count=True) == 0:
+        # If PASSTHRU_IGNORE_ROLLOUT_STATE is set, tokens with a rollout state
+        # listed in the policy are ignored when counting the user's tokens.
+        ignore_rollout_state = (Match.user(g, scope=SCOPE.AUTH, action=PolicyAction.PASSTHRU_IGNORE_ROLLOUT_STATE,
+                                           user_object=user_object)
+                                .action_values(unique=False, write_to_audit_log=False))
+        token_count = get_tokens(user=user_object, count=True)
+        if ignore_rollout_state and token_count > 0:
+            ignored_states = {s.lower() for s in ignore_rollout_state}
+            user_tokens = get_tokens(user=user_object)
+            relevant_tokens = [t for t in user_tokens
+                               if (t.token.rollout_state or "").lower() not in ignored_states]
+            token_count = len(relevant_tokens)
+        if pass_thru and token_count == 0:
             # Ensure that there are no conflicting action values within the same priority
             policy_object.check_for_conflicts(pass_thru, "passthru")
             pass_thru_action = pass_thru[0].get("action").get("passthru")

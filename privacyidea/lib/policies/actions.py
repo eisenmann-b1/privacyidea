@@ -66,6 +66,7 @@ class PolicyAction:
     PASSNOTOKEN = "passOnNoToken"
     PASSNOUSER = "passOnNoUser"
     PASSTHRU = "passthru"
+    PASSTHRU_IGNORE_ROLLOUT_STATE = "passthru_ignore_rollout_state"
     PASSTHRU_ASSIGN = "passthru_assign"
     PASSWORDRESET = "password_reset"
     PINHANDLING = "pinhandling"

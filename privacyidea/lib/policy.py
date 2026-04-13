@@ -2592,6 +2592,12 @@ def get_static_policy_definitions(scope=None):
                           'given RADIUS config,'
                           ' if the user has no tokens assigned.')
             },
+            PolicyAction.PASSTHRU_IGNORE_ROLLOUT_STATE: {
+                'type': 'str',
+                'multiple': True,
+                'desc': _('Ignore token in given rollout state. This will only work if passthru policy is activ.'),
+                'value': ['clientwait', 'pending', 'verify', 'enrolled', 'broken', 'failed', 'denied']
+            },
             PolicyAction.PASSTHRU_ASSIGN: {
                 'type': 'str',
                 'desc': _('This allows to automatically assign a Token within privacyIDEA, if the '

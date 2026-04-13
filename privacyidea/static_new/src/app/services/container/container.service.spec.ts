@@ -271,7 +271,7 @@ describe("ContainerService", () => {
           }
         }
       } as any);
-    jest.spyOn(containerService.containerDetailResource, "hasValue").mockReturnValueOnce(false).mockReturnValue(true);
+    jest.spyOn(containerService.containerDetailResource, "hasValue").mockReturnValue(true);
 
     containerService.startPolling("SMPH1");
     TestBed.tick();
@@ -301,7 +301,7 @@ describe("ContainerService", () => {
           }
         }
       } as any);
-    jest.spyOn(containerService.containerDetailResource, "hasValue").mockReturnValueOnce(false).mockReturnValue(true);
+    jest.spyOn(containerService.containerDetailResource, "hasValue").mockReturnValue(true);
 
     containerService.startPolling("SMPH1");
     TestBed.tick();

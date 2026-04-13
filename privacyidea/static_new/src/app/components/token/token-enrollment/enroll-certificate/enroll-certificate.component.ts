@@ -1,4 +1,4 @@
-./**
+/**
  * (c) NetKnights GmbH 2025,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or

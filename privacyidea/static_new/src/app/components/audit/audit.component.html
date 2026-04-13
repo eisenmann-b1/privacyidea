@@ -98,6 +98,19 @@
                   </span>
                 </div>
               }
+              @case ("authentication") {
+                <div class="flex just-center">
+                  <span
+                    [ngClass]="
+                      tableUtilsService.getSpanClassForKey({
+                        key: column.key,
+                        value: element[column.key]
+                      })
+                    ">
+                    {{ element[column.key] }}
+                  </span>
+                </div>
+              }
               @case ("serial") {
                 <div class="flex-row ali-center">
                   <a

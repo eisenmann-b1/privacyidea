@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU Affero General Public
 # License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Unicode, Integer, UniqueConstraint, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -23,6 +24,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from privacyidea.lib.log import log_with
 from privacyidea.models import db
 from privacyidea.models.config import (TimestampMethodsMixin)
+
+if TYPE_CHECKING:
+    from privacyidea.models.token import Token
 
 log = logging.getLogger(__name__)
 
@@ -38,8 +42,8 @@ class Tokengroup(TimestampMethodsMixin, db.Model):
     Description: Mapped[str | None] = mapped_column(Unicode(2000), default='')
 
     # Define relationship back to Token for deletion cascade
-    tokens: Mapped[list['TokenTokengroup']] = relationship('Token', secondary='tokentokengroup',
-                                                           back_populates='tokengroup_list')
+    tokens: Mapped[list['Token']] = relationship('Token', secondary='tokentokengroup',
+                                                 back_populates='tokengroup_list')
 
     @log_with(log)
     def __init__(self, groupname: str, description: str | None = None):

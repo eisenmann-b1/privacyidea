@@ -24,7 +24,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
     from privacyidea.models.machine import MachineToken
-    from privacyidea.models.tokengroup import TokenTokengroup
+    from privacyidea.models.tokengroup import Tokengroup
 
 from privacyidea.lib.crypto import (geturandom, encrypt, hexlify_and_unicode,
                                     pass_hash, encryptPin, decryptPin, hash,
@@ -127,8 +127,8 @@ class Token(MethodsMixin, db.Model):
     #  table TokenRealm (requires changes in the token query, etc.)
     realm_list = relationship('TokenRealm', lazy='joined', back_populates='token')
 
-    tokengroup_list: Mapped[list['TokenTokengroup']] = relationship('Tokengroup', secondary='tokentokengroup',
-                                                                    back_populates='tokens', single_parent=True)
+    tokengroup_list: Mapped[list['Tokengroup']] = relationship('Tokengroup', secondary='tokentokengroup',
+                                                               back_populates='tokens', single_parent=True)
     machine_list: Mapped[list['MachineToken']] = relationship('MachineToken', back_populates='token',
                                                               cascade="all, delete-orphan")
 

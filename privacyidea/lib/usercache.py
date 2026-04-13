@@ -108,7 +108,8 @@ def delete_user_cache(resolver: str = None, username: str = None, expired: bool 
     row_count = result.rowcount
     db.session.commit()
     log.info(f'Deleted {row_count} entries from the user cache '
-             f'(resolver={resolver!r}, username={username!r}, expired={expired!r})')
+             f'(resolver={resolver!r}, username_provided={username is not None!r}, '
+             f'expired={expired!r})')
     return row_count
 
 

@@ -298,7 +298,7 @@ def export_machineresolver(name=None):
 @register_import('machineresolver')
 def import_machineresolver(data, name=None):
     """Import machineresolver configuration"""
-    log.debug(f'Import caconnector config: {data!s}')
+    log.debug(f'Import machine resolver config for: {list(data.keys())!s}')
     for _res_name, res_data in data.items():
         if name and name != res_data.get('resolvername'):
             continue
@@ -307,5 +307,5 @@ def import_machineresolver(data, name=None):
         res_data['name'] = res_data.pop('resolvername')
         res_data.update(res_data.pop('data'))
         rid = save_resolver(res_data)
-        log.info('Import of caconnector "{!s}" finished,'
+        log.info('Import of machine resolver "{!s}" finished,'
                  ' id: {!s}'.format(res_data['name'], rid))

@@ -89,7 +89,7 @@ class MachineApplication(MachineApplicationBase):
                               "option ({!s}) of the SSH application.".format(
                         user_filter, options.get("user")))
         else:
-            log.info(f"Token {serial!r}, type {serial!r} is not supported by "
+            log.info(f"Token {serial!r}, type {token_type!r} is not supported by "
                      "SSH application module")
 
         return ret

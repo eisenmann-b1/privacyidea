@@ -306,7 +306,6 @@ class YubikeyTokenClass(TokenClass):
             return -3
 
         uid = msg_hex[0:12]
-        log.debug(f"uid: {uid!r}")
         log.debug(f"prefix: {yubi_prefix!r}")
         # usage_counter can go from 1 – 0x7fff
         usage_counter = msg_hex[12:16]
@@ -326,7 +325,7 @@ class YubikeyTokenClass(TokenClass):
 
         tokenid = self.get_tokeninfo("yubikey.tokenid")
         if not tokenid:
-            log.debug(f"Got no tokenid for {serial!r}. Setting to {uid!r}.")
+            log.debug(f"Got no tokenid for {serial!r}. Initializing.")
             tokenid = uid
             self.add_tokeninfo("yubikey.tokenid", tokenid)
 
@@ -337,8 +336,7 @@ class YubikeyTokenClass(TokenClass):
 
         if tokenid != uid:
             # wrong token!
-            log.warning(f"The wrong token was presented for {serial}. "
-                        f"Got {uid}, expected {tokenid}.")
+            log.warning(f"The wrong token was presented for {serial!r}.")
             return -2
 
         # TODO: We also could check the timestamp

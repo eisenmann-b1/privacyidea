@@ -168,7 +168,7 @@ class YubicoTokenClass(TokenClass):
 
         tokenid = self.get_tokeninfo("yubico.tokenid")
         if len(anOtpVal) < 12:
-            log.warning(f"The otpval is too short: {anOtpVal!r}")
+            log.warning(f"The otpval is too short: length {len(anOtpVal)}")
         elif anOtpVal[:12] != tokenid:
             log.warning("The tokenid in the OTP value does not match "
                         "the assigned token!")

@@ -17,11 +17,15 @@
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <div
+  #scrollContainer
   appScrollToTop
   aria-label="Token Table"
   class="token-table-layout"
   i18n-aria-label>
-  <div class="filter-paginator-container">
+  <div #stickySentinel></div>
+  <div
+    #stickyHeader
+    class="filter-paginator-container sticky-header">
     <h3
       class="selfservice-paginator-label"
       i18n>

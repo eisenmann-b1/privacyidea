@@ -29,8 +29,8 @@ from privacyidea.api.lib.prepolicy import (check_base_action, prepolicy, check_u
                                            check_container_register_rollover, container_registration_config,
                                            smartphone_config, check_client_container_action, hide_tokeninfo,
                                            check_client_container_disabled_action, hide_container_info)
-from privacyidea.api.lib.utils import (getParam, get_required_one_of, map_error_to_code, required,
-                                        send_error, send_result)
+from privacyidea.api.lib.utils import map_error_to_code, send_error, send_result
+from privacyidea.lib.params import get_optional, get_required, get_required_one_of
 from privacyidea.lib.container import (find_container_by_serial, init_container, get_container_classes_descriptions,
                                        get_container_token_types, get_all_containers, add_container_info,
                                        set_container_description, set_container_states, set_container_realms,
@@ -95,7 +95,7 @@ def list_containers():
         The following units are supported: y (years), d (days), h (hours), m (minutes), s (seconds)
     :query last_sync_delta: The maximum time difference the last synchronization may have to now, e.g. "1y", "14d", "1h"
         The following units are supported: y (years), d (days), h (hours), m (minutes), s (seconds)
-    :query state: State the container should have (case-insensitive and allows "*" as wildcard), optional
+    :query state: State the container should have (case-insensitive and allows "*" as wildcard)
     :query sortby: Sort by a container attribute (serial or type)
     :query sortdir: Sort direction (asc or desc)
     :query pagesize: Number of containers per page
@@ -104,31 +104,31 @@ def list_containers():
     """
     param = request.all_data
     user = request.User
-    cserial = getParam(param, "container_serial", optional=True)
-    ctype = getParam(param, "type", optional=True)
-    token_serial = getParam(param, "token_serial", optional=True)
-    template = getParam(param, "template", optional=True)
-    realm = getParam(param, "container_realm", optional=True)
-    description = getParam(param, "description", optional=True)
-    resolver = getParam(param, "resolver", optional=True)
-    assigned = getParam(param, "assigned", optional=True)
+    cserial = get_optional(param, "container_serial")
+    ctype = get_optional(param, "type")
+    token_serial = get_optional(param, "token_serial")
+    template = get_optional(param, "template")
+    realm = get_optional(param, "container_realm")
+    description = get_optional(param, "description")
+    resolver = get_optional(param, "resolver")
+    assigned = get_optional(param, "assigned")
     if assigned is not None:
         assigned = is_true(assigned)
-    info_key = getParam(param, "info_key", optional=True)
-    info_value = getParam(param, "info_value", optional=True)
-    last_auth_delta = getParam(param, "last_auth_delta", optional=True)
-    last_sync_delta = getParam(param, "last_sync_delta", optional=True)
-    state = getParam(param, "state", optional=True)
-    sortby = getParam(param, "sortby", optional=True, default="serial")
-    sortdir = getParam(param, "sortdir", optional=True, default="asc")
-    psize = int(getParam(param, "pagesize", optional=True) or 0)
-    page = int(getParam(param, "page", optional=True) or 0)
-    no_token = getParam(param, "no_token", optional=True, default=False)
+    info_key = get_optional(param, "info_key")
+    info_value = get_optional(param, "info_value")
+    last_auth_delta = get_optional(param, "last_auth_delta")
+    last_sync_delta = get_optional(param, "last_sync_delta")
+    state = get_optional(param, "state")
+    sortby = get_optional(param, "sortby", default="serial")
+    sortdir = get_optional(param, "sortdir", default="asc")
+    psize = int(get_optional(param, "pagesize") or 0)
+    page = int(get_optional(param, "page") or 0)
+    no_token = get_optional(param, "no_token", default=False)
     logged_in_user_role = g.logged_in_user.get("role")
     allowed_container_realms = getattr(request, "pi_allowed_container_realms", None)
     allowed_token_realms = getattr(request, "pi_allowed_realms", None)
-    hide_container_info = getParam(param, "hide_container_info", optional=True)
-    hide_token_info = getParam(param, "hidden_tokeninfo", optional=True)
+    hide_container_info = get_optional(param, "hide_container_info")
+    hide_token_info = get_optional(param, "hidden_tokeninfo")
 
     # Set info dictionary (if either key or value is None, filter for all keys/values using * as wildcard)
     info = None
@@ -164,7 +164,7 @@ def assign(container_serial):
     :jsonparam user: Username of the user
     :jsonparam realm: Name of the realm of the user
     """
-    user = get_user_from_param(request.all_data, required)
+    user = get_user_from_param(request.all_data, False)
     res = assign_user(container_serial, user)
 
     container = find_container_by_serial(container_serial)
@@ -232,13 +232,13 @@ def init():
     :jsonparam container_serial: Optional unique serial (not case-sensitive)
     :jsonparam user: Optional username to assign the container to. Requires realm param to be present as well.
     :jsonparam realm: Optional realm to assign the container to. Requires user param to be present as well.
-    :jsonparam template: The template to create the container from (dictionary), optional
-    :jsonparam template_name: The name of the template to create the container from, optional
+    :jsonparam template: The template to create the container from (dictionary)
+    :jsonparam template_name: The name of the template to create the container from
     """
     user_role = g.logged_in_user.get("role")
     allowed_realms = getattr(request, "pi_allowed_realms", None)
     if user_role == "admin" and allowed_realms:
-        req_realm = getParam(request.all_data, "realm", optional=True)
+        req_realm = get_optional(request.all_data, "realm")
         if not req_realm or req_realm == "":
             # The container has to be in one realm the admin is allowed to manage
             request.all_data["realm"] = allowed_realms[0]
@@ -308,7 +308,7 @@ def add_token(container_serial):
     :param container_serial: serial of the container
     :jsonparam serial: Serial of the token to add.
     """
-    token_serial = getParam(request.all_data, "serial", optional=False, allow_empty=False)
+    token_serial = get_required(request.all_data, "serial", allow_empty=False)
 
     success = add_token_to_container(container_serial, token_serial)
 
@@ -339,12 +339,12 @@ def add_all_tokens(container_serial):
     :param container_serial: serial of the container
     :jsonparam serial: Comma separated list of token serials
     """
-    serial = getParam(request.all_data, "serial", optional=False, allow_empty=False)
+    serial = get_required(request.all_data, "serial", allow_empty=False)
     token_serials = serial.replace(' ', '').split(',')
 
     res = add_multiple_tokens_to_container(container_serial, token_serials)
 
-    not_authorized_serials = getParam(request.all_data, "not_authorized_serials", optional=True)
+    not_authorized_serials = get_optional(request.all_data, "not_authorized_serials")
     res = add_not_authorized_tokens_result(res, not_authorized_serials)
 
     # Audit log
@@ -377,7 +377,7 @@ def remove_token(container_serial):
     :param container_serial: serial of the container
     :jsonparam serial: Serial of the token to remove.
     """
-    token_serial = getParam(request.all_data, "serial", optional=False, allow_empty=False)
+    token_serial = get_required(request.all_data, "serial", allow_empty=False)
 
     success = remove_token_from_container(container_serial, token_serial)
 
@@ -409,12 +409,12 @@ def remove_all_tokens(container_serial):
     :jsonparam serial: Comma separated list of token serials.
     """
     # allow serial to be empty if the pre-policy removes all tokens
-    serial = getParam(request.all_data, "serial", optional=False, allow_empty=True)
+    serial = get_required(request.all_data, "serial", allow_empty=True)
     token_serials = serial.replace(' ', '').split(',')
 
     res = remove_multiple_tokens_from_container(container_serial, token_serials)
 
-    not_authorized_serials = getParam(request.all_data, "not_authorized_serials", optional=True)
+    not_authorized_serials = get_optional(request.all_data, "not_authorized_serials")
     res = add_not_authorized_tokens_result(res, not_authorized_serials)
 
     # Audit log
@@ -467,7 +467,7 @@ def set_description(container_serial):
     :param container_serial: Serial of the container
     :jsonparam description: New description to be set
     """
-    new_description = getParam(request.all_data, "description", optional=required)
+    new_description = get_required(request.all_data, "description", allow_empty=True)
     set_container_description(container_serial, new_description)
 
     # Audit log
@@ -495,7 +495,7 @@ def set_states(container_serial):
 
     :jsonparam states: string of comma separated states
     """
-    states_string = getParam(request.all_data, "states", required, allow_empty=False)
+    states_string = get_required(request.all_data, "states", allow_empty=False)
     states_string = states_string.replace(" ", "")
     states = states_string.split(",")
     res = set_container_states(container_serial, states)
@@ -551,7 +551,7 @@ def set_realms(container_serial):
     :jsonparam realms: comma separated string of realms, e.g. "realm1,realm2"
     """
     # Get parameters
-    container_realms = getParam(request.all_data, "realms", required, allow_empty=True)
+    container_realms = get_required(request.all_data, "realms", allow_empty=True)
     realm_list = [r.strip() for r in container_realms.split(",")]
     allowed_realms = getattr(request, "pi_allowed_realms", None)
 
@@ -590,7 +590,7 @@ def set_container_info(container_serial, key):
     :param key: Key of the container info
     :jsonparam value: Value to set
     """
-    value = getParam(request.all_data, "value", required)
+    value = get_required(request.all_data, "value")
     res = add_container_info(container_serial, key, value)
 
     # Audit log
@@ -651,14 +651,14 @@ def registration_init():
             }
     """
     params = request.all_data
-    container_serial = getParam(params, "container_serial", required)
-    container_rollover = getParam(params, "rollover", optional=True)
+    container_serial = get_required(params, "container_serial")
+    container_rollover = get_optional(params, "rollover")
     container = find_container_by_serial(container_serial)
     # Params set by pre-policies
-    server_url = getParam(params, SERVER_URL)
-    challenge_ttl = getParam(params, CHALLENGE_TTL)
-    registration_ttl = getParam(params, REGISTRATION_TTL)
-    ssl_verify = getParam(params, SSL_VERIFY)
+    server_url = get_optional(params, SERVER_URL)
+    challenge_ttl = get_optional(params, CHALLENGE_TTL)
+    registration_ttl = get_optional(params, REGISTRATION_TTL)
+    ssl_verify = get_optional(params, SSL_VERIFY)
 
     # Audit log
     info_str = (f"server_url={server_url}, challenge_ttl={challenge_ttl}min, registration_ttl={registration_ttl}min, "
@@ -695,7 +695,7 @@ def registration_finalize():
         type.
     """
     params = request.all_data
-    container_serial = getParam(params, "container_serial", required)
+    container_serial = get_required(params, "container_serial")
 
     try:
         res = finalize_registration(container_serial, params)
@@ -766,7 +766,7 @@ def registration_terminate_client():
             {"success": True}
     """
     params = request.all_data
-    container_serial = getParam(params, "container_serial", required)
+    container_serial = get_required(params, "container_serial")
 
     try:
         container = find_container_by_serial(container_serial)
@@ -823,8 +823,8 @@ def create_challenge():
     """
     # Get params
     params = request.all_data
-    scope = getParam(params, "scope", optional=False)
-    container_serial = getParam(params, "container_serial", optional=False)
+    scope = get_required(params, "scope")
+    container_serial = get_required(params, "container_serial")
 
     try:
         container = find_container_by_serial(container_serial)
@@ -856,8 +856,7 @@ def create_challenge():
             g,
             scope=SCOPE.CONTAINER,
             action=PolicyAction.HIDE_SPECIFIC_ERROR_MESSAGE,
-            user_object=request.User if hasattr(request, "User") else None,
-        ).any():
+            user_object=request.User if hasattr(request, "User") else None).any():
             return send_error("Failed creating container challenge", error_code=Error.CONTAINER), map_error_to_code(e)
         raise
 
@@ -911,8 +910,8 @@ def synchronize():
 
     """
     params = request.all_data
-    container_serial = getParam(params, "container_serial", optional=False)
-    container_client_str = getParam(params, "container_dict_client", optional=True)
+    container_serial = get_required(params, "container_serial")
+    container_client_str = get_optional(params, "container_dict_client")
     container_client = json.loads(container_client_str) if container_client_str else {}
 
     # write client token serials to audit log
@@ -993,8 +992,7 @@ def synchronize():
             g,
             scope=SCOPE.CONTAINER,
             action=PolicyAction.HIDE_SPECIFIC_ERROR_MESSAGE,
-            user_object=request.User if hasattr(request, "User") else None,
-        ).any():
+            user_object=request.User if hasattr(request, "User") else None).any():
             return send_error("Failed container synchronization", error_code=Error.CONTAINER), map_error_to_code(e)
         raise
 
@@ -1032,12 +1030,12 @@ def rollover():
             }
     """
     params = request.all_data
-    container_serial = getParam(params, "container_serial", optional=False)
+    container_serial = get_required(params, "container_serial")
     # Params set by pre-policies
-    server_url = getParam(params, SERVER_URL)
-    challenge_ttl = getParam(params, CHALLENGE_TTL)
-    registration_ttl = getParam(params, REGISTRATION_TTL)
-    ssl_verify = getParam(params, SSL_VERIFY)
+    server_url = get_optional(params, SERVER_URL)
+    challenge_ttl = get_optional(params, CHALLENGE_TTL)
+    registration_ttl = get_optional(params, REGISTRATION_TTL)
+    ssl_verify = get_optional(params, SSL_VERIFY)
 
     try:
         container = find_container_by_serial(container_serial)
@@ -1068,8 +1066,7 @@ def rollover():
             g,
             scope=SCOPE.CONTAINER,
             action=PolicyAction.HIDE_SPECIFIC_ERROR_MESSAGE,
-            user_object=request.User if hasattr(request, "User") else None,
-        ).any():
+            user_object=request.User if hasattr(request, "User") else None).any():
             return send_error("Failed container rollover", error_code=Error.CONTAINER), map_error_to_code(e)
         raise
 
@@ -1082,12 +1079,12 @@ def get_template():
     """
     Get all container templates filtered by the given parameters.
 
-    :query name: Name of the template, optional
-    :query container_type: Type of the container, optional
-    :query page: Number of the page (starts with 1), optional
-    :query pagesize: Number of templates displayed per page, optional
-    :query sortdir: Sort direction, optional, default is "asc"
-    :query sortby: column name to sort by, optional, default is "name"
+    :query name: Name of the template
+    :query container_type: Type of the container
+    :query page: Number of the page (starts with 1)
+    :query pagesize: Number of templates displayed per page
+    :query sortdir: Sort direction, default is "asc"
+    :query sortby: column name to sort by, default is "name"
 
     :return: Dictionary with at least an entry "templates" and further entries if pagination is used.
 
@@ -1106,12 +1103,12 @@ def get_template():
         }
     """
     params = request.all_data
-    name = getParam(params, "name", optional=True)
-    container_type = getParam(params, "container_type", optional=True)
-    page = int(getParam(params, "page", optional=True, default=0) or 0)
-    pagesize = int(getParam(params, "pagesize", optional=True, default=0) or 0)
-    sortdir = getParam(params, "sortdir", optional=True, default="asc")
-    sortby = getParam(params, "sortby", optional=True, default="name")
+    name = get_optional(params, "name")
+    container_type = get_optional(params, "container_type")
+    page = int(get_optional(params, "page", default=0) or 0)
+    pagesize = int(get_optional(params, "pagesize", default=0) or 0)
+    sortdir = get_optional(params, "sortdir", default="asc")
+    sortby = get_optional(params, "sortby", default="name")
 
     templates_dict = get_templates_by_query(name=name, container_type=container_type, page=page, pagesize=pagesize,
                                             sortdir=sortdir, sortby=sortby)
@@ -1142,8 +1139,8 @@ def create_template_with_name(container_type, template_name):
             }
     """
     params = request.all_data
-    template_options = getParam(params, "template_options", optional=True) or {}
-    default_template = getParam(params, "default", optional=True, default=False)
+    template_options = get_optional(params, "template_options") or {}
+    default_template = get_optional(params, "default", default=False)
 
     # Audit log
     g.audit_object.log({"container_type": container_type,
@@ -1212,7 +1209,7 @@ def compare_template_with_containers(template_name):
     If a container serial is provided, only this container will be compared to the template.
 
     :param template_name: Name of the template
-    :jsonparam container_serial: Serial of the container to compare with the template, optional
+    :jsonparam container_serial: Serial of the container to compare with the template
     :return: A dictionary with the differences between the template and each container in the format:
 
         ::
@@ -1228,7 +1225,7 @@ def compare_template_with_containers(template_name):
     allowed_realms = getattr(request, "pi_allowed_container_realms", None)
     user = request.User
     user_role = g.logged_in_user.get("role")
-    container_serial = getParam(request.all_data, "container_serial", optional=True)
+    container_serial = get_optional(request.all_data, "container_serial")
 
     # Audit log
     g.audit_object.log({"container_serial": container_serial,

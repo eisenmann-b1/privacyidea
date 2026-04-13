@@ -86,8 +86,6 @@ from ...lib.users.custom_user_attributes import InternalCustomUserAttributes
 
 log = logging.getLogger(__name__)
 
-optional = True
-required = False
 DEFAULT_LOGOUT_TIME = 120
 DEFAULT_AUDIT_PAGE_SIZE = 10
 DEFAULT_PAGE_SIZE = 15

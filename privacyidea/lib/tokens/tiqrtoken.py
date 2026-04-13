@@ -80,7 +80,7 @@ This code is tested in tests/test_lib_tokens_tiqr.
 
 from urllib.parse import quote, quote_plus
 
-from privacyidea.api.lib.utils import getParam
+from privacyidea.lib.params import get_optional, get_required
 from privacyidea.lib.config import get_from_config
 from privacyidea.lib.tokenclass import TokenClass, AuthenticationMode, ClientMode
 from privacyidea.lib.log import log_with
@@ -99,8 +99,6 @@ from privacyidea.lib.policy import SCOPE, GROUP
 from privacyidea.lib.policies.actions import PolicyAction
 
 log = logging.getLogger(__name__)
-optional = True
-required = False
 
 
 OCRA_DEFAULT_SUITE = "OCRA-1:HOTP-SHA1-6:QN10"
@@ -250,14 +248,14 @@ class TiqrTokenClass(OcraTokenClass):
         :return: Flask Response or text
         """
         params = request.all_data
-        action = getParam(params, "action", optional) or \
+        action = get_optional(params, "action") or \
                  API_ACTIONS.AUTHENTICATION
         if action not in API_ACTIONS.ALLOWED_ACTIONS:
             raise ParameterError(f"Allowed actions are {API_ACTIONS.ALLOWED_ACTIONS!s}")
 
         if action == API_ACTIONS.METADATA:
-            session = getParam(params, "session", required)
-            serial = getParam(params, "serial", required)
+            session = get_required(params, "session")
+            serial = get_required(params, "serial")
             # The user identifier is displayed in the App
             # We need to set the user ID
             token = get_one_token(serial=serial, tokentype="tiqr")
@@ -305,9 +303,9 @@ class TiqrTokenClass(OcraTokenClass):
             serial:
             """
             res = "Fail"
-            serial = getParam(params, "serial", required)
-            session = getParam(params, "session", required)
-            secret = getParam(params, "secret", required)
+            serial = get_required(params, "serial")
+            session = get_required(params, "session")
+            secret = get_required(params, "secret")
             # The secret needs to be stored in the token object.
             # We take the token "serial" and check, if it contains the "session"
             # in the tokeninfo.
@@ -325,10 +323,10 @@ class TiqrTokenClass(OcraTokenClass):
             return "plain", res
         elif action == API_ACTIONS.AUTHENTICATION:
             res = "FAIL"
-            getParam(params, "userId", required)
-            session = getParam(params, "sessionKey", required)
-            passw = getParam(params, "response", required)
-            getParam(params, "operation", required)
+            get_required(params, "userId")
+            session = get_required(params, "sessionKey")
+            passw = get_required(params, "response")
+            get_required(params, "operation")
             res = "INVALID_CHALLENGE"
             # The sessionKey is stored in the db_challenge.transaction_id
             # We need to get the token serial for this sessionKey

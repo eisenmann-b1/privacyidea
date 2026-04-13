@@ -45,7 +45,7 @@ import requests
 from privacyidea.lib.utils import is_true
 from privacyidea.lib.decorators import check_token_locked
 from privacyidea.lib.config import get_from_config
-from privacyidea.api.lib.utils import getParam
+from privacyidea.lib.params import get_optional, get_required
 from privacyidea.lib.log import log_with
 from privacyidea.lib.policydecorators import challenge_response_allowed
 from privacyidea.lib.tokenclass import TokenClass, Tokenkind, AuthenticationMode
@@ -54,8 +54,6 @@ from privacyidea.lib import _
 from privacyidea.lib.policy import SCOPE, GROUP
 from privacyidea.lib.policies.actions import PolicyAction
 
-optional = True
-required = False
 
 log = logging.getLogger(__name__)
 
@@ -151,22 +149,22 @@ class RemoteTokenClass(TokenClass):
         self.set_otplen(6)
         TokenClass.update(self, param)
 
-        remote_server_id = getParam(param, "remote.server_id", optional)
+        remote_server_id = get_optional(param, "remote.server_id")
 
         if remote_server_id is not None:
             if get_privacyideaserver(id=remote_server_id):
                 self.add_tokeninfo("remote.server_id", remote_server_id)
         else:
-            remoteServer = getParam(param, "remote.server", required)
+            remoteServer = get_required(param, "remote.server")
             self.add_tokeninfo("remote.server", remoteServer)
             log.warning("Using remote.server for remote tokens is deprecated. Use remote.server_id!")
 
-        val = getParam(param, "remote.local_checkpin", optional) or 0
+        val = get_optional(param, "remote.local_checkpin") or 0
         self.add_tokeninfo("remote.local_checkpin", val)
 
         for key in ["remote.serial", "remote.user", "remote.path",
                     "remote.realm", "remote.resolver"]:
-            val = getParam(param, key, optional)
+            val = get_optional(param, key)
             if val is not None:
                 self.add_tokeninfo(key, val)
 

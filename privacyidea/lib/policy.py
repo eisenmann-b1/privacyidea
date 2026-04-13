@@ -202,13 +202,27 @@ from .log import log_with
 from .policies.actions import PolicyAction, PasskeyLoginButtonOptions
 from .policies.conditions import PolicyConditionClass, ConditionCheck, ConditionSection
 from .policies.evaluators import EVALUATOR_FUNCTIONS
-from ..api.lib.utils import check_policy_name
 from ..models import (Policy, db, save_config_timestamp, PolicyDescription, PolicyCondition)
 
 log = logging.getLogger(__name__)
 
-optional = True
-required = False
+
+
+def check_policy_name(name):
+    """
+    Check that the given name is a valid policy name.
+
+    :param name: The name of the policy
+    :raises ParameterError: if the name is not valid
+    """
+    disallowed_patterns = [("^check$", re.IGNORECASE),
+                           ("^pi-update-policy-", re.IGNORECASE)]
+    for disallowed_pattern in disallowed_patterns:
+        if re.search(disallowed_pattern[0], name, flags=disallowed_pattern[1]):
+            raise ParameterError(_("Invalid policy name:") + f" {name}")
+
+    if not re.match(r'^[a-zA-Z0-9_.\- ]*$', name):
+        raise ParameterError(_("The name of the policy may only contain the characters a-zA-Z0-9_. -"))
 
 DEFAULT_ANDROID_APP_URL = "https://play.google.com/store/apps/details?id=it.netknights.piauthenticator"
 DEFAULT_IOS_APP_URL = "https://apps.apple.com/us/app/privacyidea-authenticator/id1445401301"

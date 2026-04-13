@@ -23,7 +23,7 @@ import binascii
 __doc__ = """This is the implementation of the VASCO token"""
 
 import logging
-from privacyidea.api.lib.utils import getParam
+from privacyidea.lib.params import get_optional
 from privacyidea.lib.utils import is_true
 from privacyidea.lib.decorators import check_token_locked
 from privacyidea.lib.error import ParameterError
@@ -34,8 +34,6 @@ from privacyidea.lib import _
 from privacyidea.lib.policy import SCOPE, GROUP
 from privacyidea.lib.policies.actions import PolicyAction
 
-optional = True
-required = False
 
 log = logging.getLogger(__name__)
 
@@ -136,7 +134,7 @@ class VascoTokenClass(TokenClass):
 
         :return: nothing
         """
-        if is_true(getParam(param, 'genkey', optional)):
+        if is_true(get_optional(param, 'genkey')):
             raise ParameterError("Generating OTP keys is not supported")
 
         upd_param = param.copy()

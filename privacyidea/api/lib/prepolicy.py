@@ -79,7 +79,7 @@ from privacyidea.api.lib.policyhelper import (get_init_tokenlabel_parameters,
                                               check_container_action_allowed,
                                               UserAttributes,
                                               get_container_user_attributes)
-from privacyidea.api.lib.utils import getParam, attestation_certificate_allowed, is_fqdn, get_optional
+from privacyidea.api.lib.utils import attestation_certificate_allowed, is_fqdn, get_optional
 from privacyidea.lib.auth import ROLE
 from privacyidea.lib.clientapplication import save_clientapplication
 from privacyidea.lib.config import get_token_class
@@ -125,8 +125,6 @@ from privacyidea.lib.utils import (parse_timedelta, is_true,
 
 log = logging.getLogger(__name__)
 
-optional = True
-required = False
 
 
 class prepolicy:
@@ -592,7 +590,7 @@ def init_tokenlabel(request=None, action=None):
     """
     params = request.all_data
     user_object = get_user_from_param(params)
-    token_type = getParam(params, "type", optional, "hotp").lower()
+    token_type = get_optional(params, "type", default="hotp").lower()
     request.all_data = get_init_tokenlabel_parameters(g, params=params, token_type=token_type, user_object=user_object)
     return True
 
@@ -608,7 +606,7 @@ def init_ca_connector(request=None, action=None):
     """
     params = request.all_data
     user_object = get_user_from_param(params)
-    token_type = getParam(request.all_data, "type", optional)
+    token_type = get_optional(request.all_data, "type")
     if token_type and token_type.lower() == "certificate":
         # get the CA connectors from the policies
         ca_pols = Match.user(g, scope=SCOPE.ENROLL, action=CERTIFICATE_ACTION.CA_CONNECTOR,
@@ -629,7 +627,7 @@ def init_ca_template(request=None, action=None):
     """
     params = request.all_data
     user_object = get_user_from_param(params)
-    token_type = getParam(request.all_data, "type", optional)
+    token_type = get_optional(request.all_data, "type")
     if token_type and token_type.lower() == "certificate":
         # get the CA template from the policies
         template_pols = Match.user(g, scope=SCOPE.ENROLL, action=CERTIFICATE_ACTION.CERTIFICATE_TEMPLATE,
@@ -650,7 +648,7 @@ def init_subject_components(request=None, action=None):
     """
     params = request.all_data
     user_object = get_user_from_param(params)
-    token_type = getParam(request.all_data, "type", optional)
+    token_type = get_optional(request.all_data, "type")
     if token_type and token_type.lower() == "certificate":
         # get the subject list from the policies
         subject_pols = Match.user(g, scope=SCOPE.ENROLL,
@@ -671,9 +669,9 @@ def twostep_enrollment_activation(request=None, action=None):
     If no policy matches, the ``2stepinit`` parameter is removed from the request data.
     """
     user_object = get_user_from_param(request.all_data)
-    serial = getParam(request.all_data, "serial", optional)
-    token_type = getParam(request.all_data, "type", optional, "hotp")
-    rollover = getParam(request.all_data, "rollover", optional=True)
+    serial = get_optional(request.all_data, "serial")
+    token_type = get_optional(request.all_data, "type", default="hotp")
+    rollover = get_optional(request.all_data, "rollover")
     token = None
     if serial:
         tokensobject_list = get_tokens(serial=serial)
@@ -724,8 +722,8 @@ def twostep_enrollment_parameters(request=None, action=None):
 
     This policy function is used to decorate the ``/token/init`` endpoint.
     """
-    serial = getParam(request.all_data, "serial", optional)
-    token_type = getParam(request.all_data, "type", optional, "hotp")
+    serial = get_optional(request.all_data, "serial")
+    token_type = get_optional(request.all_data, "type", default="hotp")
     if serial:
         tokensobject_list = get_tokens(serial=serial)
         if len(tokensobject_list) == 1:
@@ -736,7 +734,7 @@ def twostep_enrollment_parameters(request=None, action=None):
     (role, username, userrealm, adminuser, adminrealm) = determine_logged_in_userparams(g.logged_in_user,
                                                                                         request.all_data)
     # Tokentypes have separate twostep actions
-    if is_true(getParam(request.all_data, "2stepinit", optional)):
+    if is_true(get_optional(request.all_data, "2stepinit")):
         parameters = ("2step_serversize", "2step_clientsize", "2step_difficulty")
         for parameter in parameters:
             action = f"{token_type}_{parameter}"
@@ -760,7 +758,7 @@ def verify_enrollment(request=None, action=None):
     :param action:
     :return:
     """
-    serial = getParam(request.all_data, "serial", optional)
+    serial = get_optional(request.all_data, "serial")
     # Early exit: no serial provided
     if not serial:
         return
@@ -780,7 +778,7 @@ def verify_enrollment(request=None, action=None):
         return
 
     # Check if verify parameter is present
-    verify = getParam(request.all_data, "verify", optional)
+    verify = get_optional(request.all_data, "verify")
     if not verify:
         raise ParameterError("Token is in verify_pending state but 'verify' parameter is missing.")
 
@@ -818,7 +816,7 @@ def check_max_token_user(request=None, action=None, token_type=None):
     error_msg_active_limit = "The number of active tokens for this user is limited!"
     error_msg_type_limit = "The number of active tokens of type {0!s} for this user is limited!"
     params = request.all_data
-    serial = getParam(params, "serial")
+    serial = get_optional(params, "serial")
     user_object = get_user_from_param(params)
     if user_object.is_empty() and serial:
         try:
@@ -828,7 +826,7 @@ def check_max_token_user(request=None, action=None, token_type=None):
             pass
     if user_object.login:
         # prefer the explicit token_type
-        tokentype = token_type or getParam(params, "type")
+        tokentype = token_type or get_optional(params, "type")
         if not tokentype:
             if serial:
                 # If we have a serial but no tokentype, we can get the tokentype from
@@ -1006,7 +1004,7 @@ def required_email(request=None, action=None):
     :param action: An optional Action
     :return: Modifies the request parameters or raises an Exception
     """
-    email = getParam(request.all_data, "email")
+    email = get_optional(request.all_data, "email")
     email_found = False
     email_pols = Match.action_only(g, scope=SCOPE.REGISTER, action=PolicyAction.REQUIREDEMAIL).action_values(
         unique=False)
@@ -1638,7 +1636,7 @@ def check_container_register_rollover(request=None, action=None):
     :return: True if the action is allowed, otherwise raises an Exception
     """
     params = request.all_data
-    container_rollover = getParam(params, "rollover", optional)
+    container_rollover = get_optional(params, "rollover")
     if container_rollover:
         return check_container_action(request, PolicyAction.CONTAINER_ROLLOVER)
     else:

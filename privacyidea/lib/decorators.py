@@ -19,7 +19,7 @@
 import functools
 import logging
 
-from privacyidea.api.lib.utils import get_optional_one_of, get_optional
+from privacyidea.lib.params import get_optional_one_of, get_optional
 from privacyidea.lib import _
 from privacyidea.lib.error import ParameterError
 from privacyidea.lib.error import TokenAdminError

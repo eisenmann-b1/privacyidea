@@ -25,7 +25,7 @@ The code is tested in tests/test_lib_tokens_ssh
 
 import logging
 from privacyidea.lib import _
-from privacyidea.api.lib.utils import getParam
+from privacyidea.lib.params import get_required
 from privacyidea.lib.error import TokenAdminError
 from privacyidea.lib.log import log_with
 from privacyidea.lib.tokenclass import TokenClass, RolloutState, AuthenticationMode
@@ -35,8 +35,6 @@ from privacyidea.lib.policies.actions import PolicyAction
 log = logging.getLogger(__name__)
 
 
-optional = True
-required = False
 
 
 ##TODO: We should save a fingerprint of the SSH Key in the encrypted OTP
@@ -120,7 +118,7 @@ class SSHkeyTokenClass(TokenClass):
         # be missing the token.id
         self.token.save()
 
-        getParam(param, "sshkey", required)
+        get_required(param, "sshkey")
 
         key_elem = param.get("sshkey").split(" ", 2)
         if key_elem[0] not in ["ssh-rsa", "ssh-ed25519", "ecdsa-sha2-nistp256",

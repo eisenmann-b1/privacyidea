@@ -33,7 +33,8 @@ from flask import g, Blueprint, request
 
 from privacyidea.api.auth import admin_required
 from privacyidea.api.lib.prepolicy import prepolicy, check_base_action, realmadmin, check_custom_user_attributes
-from privacyidea.api.lib.utils import getParam, send_result
+from privacyidea.api.lib.utils import send_result
+from privacyidea.lib.params import get_optional, get_required
 from privacyidea.lib.error import ParameterError
 from privacyidea.lib.event import event
 from privacyidea.lib.policies.actions import PolicyAction
@@ -89,7 +90,7 @@ def get_users():
             "status": true,
             "value": [
               {
-                "description": "Cornelius K\u00f6lbel,,+49 151 2960 1417,cornelius.koelbel@netknights.it",
+                "description": "Cornelius K\u00f6lbel,+49 151 2960 1417,cornelius.koelbel@netknights.it",
                 "email": "cornelius.koelbel@netknights.it",
                 "givenname": "Cornelius",
                 "mobile": "+49 151 2960 1417",
@@ -104,7 +105,7 @@ def get_users():
           "version": "privacyIDEA unknown"
         }
     """
-    realm = getParam(request.all_data, "realm")
+    realm = get_optional(request.all_data, "realm")
     search_parameters = dict(request.all_data)
     custom_attributes = is_attribute_at_all()
     requested_attributes = request.all_data.get("attributes")
@@ -142,10 +143,10 @@ def set_user_attribute():
     # We basically need a user, otherwise we will fail, but the
     # user object is later simply used from request.User. We only
     # need to avoid an empty User object.
-    _user = getParam(request.all_data, "user", optional=False)
-    attrkey = getParam(request.all_data, "key", optional=False)
-    attrvalue = getParam(request.all_data, "value", optional=False)
-    attrtype = getParam(request.all_data, "type", optional=True)
+    _user = get_required(request.all_data, "user")
+    attrkey = get_required(request.all_data, "key")
+    attrvalue = get_required(request.all_data, "value")
+    attrtype = get_optional(request.all_data, "type")
 
     # Check if the attribute starts with an internally used prefix
     internal_prefixes = InternalCustomUserAttributes.get_internal_prefixes()
@@ -176,8 +177,8 @@ def get_user_attribute():
          all custom attributes of the user are returned.
 
     """
-    _user = getParam(request.all_data, "user", optional=False)
-    attrkey = getParam(request.all_data, "key", optional=True)
+    _user = get_required(request.all_data, "user")
+    attrkey = get_optional(request.all_data, "key")
     r = request.User.attributes
     if attrkey:
         r = r.get(attrkey)
@@ -201,7 +202,7 @@ def get_editable_attributes():
     Works for admins and normal users.
     :return:
     """
-    _user = getParam(request.all_data, "user", optional=False)
+    _user = get_required(request.all_data, "user")
     r = get_allowed_custom_attributes(g, request.User)
     g.audit_object.log({"success": True})
     return send_result(r)
@@ -288,8 +289,8 @@ def create_user_api():
     # We can not use "get_user_from_param", since this checks the existence
     # of the user.
     attributes = _get_attributes_from_param(request.all_data)
-    username = getParam(request.all_data, "user", optional=False)
-    resolvername = getParam(request.all_data, "resolver", optional=False)
+    username = get_required(request.all_data, "user")
+    resolvername = get_required(request.all_data, "resolver")
     # Remove the password from the attributes, so that we can hide it in the
     # logs
     password = attributes.get("password")
@@ -335,9 +336,9 @@ def update_user():
        username.
     """
     attributes = _get_attributes_from_param(request.all_data)
-    username = getParam(request.all_data, "user", optional=False)
-    resolvername = getParam(request.all_data, "resolver", optional=False)
-    userid = getParam(request.all_data, "userid")
+    username = get_required(request.all_data, "user")
+    resolvername = get_required(request.all_data, "resolver")
+    userid = get_optional(request.all_data, "userid")
     if userid is not None:
         # Create the user object by uid
         user_obj = User(resolver=resolvername, uid=userid)
@@ -356,14 +357,14 @@ def update_user():
 
 def _get_attributes_from_param(param):
     from privacyidea.lib.resolver import get_resolver_object
-    map = get_resolver_object(getParam(param, "resolver", optional=False)).map
-    username = getParam(param, "user", optional=False)
+    map = get_resolver_object(get_required(param, "resolver")).map
+    username = get_required(param, "user")
 
     # Add attributes
     attributes = {"username": username}
     for attribute in map.keys():
-        value = getParam(param, attribute)
+        value = get_optional(param, attribute)
         if value:
-            attributes[attribute] = getParam(param, attribute)
+            attributes[attribute] = get_optional(param, attribute)
 
     return attributes

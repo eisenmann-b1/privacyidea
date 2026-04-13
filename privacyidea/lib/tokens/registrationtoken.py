@@ -38,8 +38,6 @@ from privacyidea.lib.policies.actions import PolicyAction
 DEFAULT_LENGTH = 24
 DEFAULT_CONTENTS = 'cn'
 
-optional = True
-required = False
 
 log = logging.getLogger(__name__)
 

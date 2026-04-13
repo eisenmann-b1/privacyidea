@@ -51,7 +51,7 @@ import traceback
 from passlib.crypto.digest import pbkdf2_hmac
 
 from privacyidea.api.lib.policyhelper import get_init_tokenlabel_parameters
-from privacyidea.api.lib.utils import getParam
+from privacyidea.lib.params import get_optional, get_required
 from privacyidea.lib import _, lazy_gettext
 from privacyidea.lib.apps import create_google_authenticator_url as cr_google
 from privacyidea.lib.apps import create_oathtoken_url as cr_oath
@@ -72,8 +72,6 @@ from .HMAC import HmacOtp
 from ..policies.actions import PolicyAction
 from ..user import User
 
-optional = True
-required = False
 log = logging.getLogger(__name__)
 
 keylen = {'sha1': 20,
@@ -346,18 +344,18 @@ class HotpTokenClass(TokenClass):
             upd_param[k] = v
 
         # Special handling of 2-step enrollment
-        if is_true(getParam(param, "2stepinit", optional)):
+        if is_true(get_optional(param, "2stepinit")):
             # Use the 2step_serversize setting for the size of the server secret
             # (if it is set)
             if "2step_serversize" in upd_param:
-                upd_param["keysize"] = int(getParam(upd_param, "2step_serversize", required))
+                upd_param["keysize"] = int(get_required(upd_param, "2step_serversize"))
             # Add twostep settings to the tokeninfo
             for key, default in [
                 ("2step_difficulty", TWOSTEP_DEFAULT_DIFFICULTY),
                 ("2step_clientsize", TWOSTEP_DEFAULT_CLIENTSIZE)]:
-                self.add_tokeninfo(key, getParam(param, key, optional, default))
+                self.add_tokeninfo(key, get_optional(param, key, default))
 
-        val = getParam(upd_param, "hashlib", optional)
+        val = get_optional(upd_param, "hashlib")
         if val is not None:
             hashlib_str = val
         else:

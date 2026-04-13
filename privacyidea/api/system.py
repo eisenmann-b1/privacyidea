@@ -61,11 +61,9 @@ from privacyidea.lib.resolver import get_resolver_list
 from privacyidea.lib.usercache import delete_user_cache
 from privacyidea.lib.utils import hexlify_and_unicode, b64encode_and_unicode
 from .auth import admin_required
-from .lib.utils import (getParam,
-                        getLowerParams,
-                        optional,
-                        required,
+from .lib.utils import (getLowerParams,
                         send_result, send_file)
+from ..lib.params import get_optional, get_required
 from ..api.lib.prepolicy import prepolicy, check_base_action
 from ..lib.caconnector import get_caconnector_list
 from ..lib.config import (get_token_class,
@@ -270,9 +268,9 @@ def set_config():
     for key in param:
         if key.split(".")[-1] not in ["type", "desc"]:
             # Only store base values, not type or desc
-            value = getParam(param, key, optional)
-            typ = getParam(param, key + ".type", optional)
-            desc = getParam(param, key + ".desc", optional)
+            value = get_optional(param, key)
+            typ = get_optional(param, key + ".type")
+            desc = get_optional(param, key + ".desc")
             res = set_privacyidea_config(key, value, typ, desc)
             result[key] = res
             g.audit_object.add_to_log({"info": f"{key!s}={value!s}, "})
@@ -312,7 +310,7 @@ def set_default():
     result = {}
     for k in keys:
         if k.lower() in param:
-            value = getParam(param, k.lower(), required)
+            value = get_required(param, k.lower())
             res = set_privacyidea_config(k, value)
             result[k] = res
             g.audit_object.log({"success": True})
@@ -354,7 +352,7 @@ def set_security_module():
     """
     Set the password for the security module
     """
-    password = getParam(request.all_data, "password", required)
+    password = get_required(request.all_data, "password")
     is_ready = set_hsm_password(password)
     res = {"is_ready": is_ready}
     g.audit_object.log({'success': res})
@@ -393,8 +391,8 @@ def rand():
 
     :return: key material
     """
-    length = int(getParam(request.all_data, "len") or 20)
-    encode = getParam(request.all_data, "encode")
+    length = int(get_optional(request.all_data, "len") or 20)
+    encode = get_optional(request.all_data, "encode")
 
     r = geturandom(length=length)
     if encode == "b64":

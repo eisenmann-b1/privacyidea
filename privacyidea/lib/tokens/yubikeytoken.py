@@ -59,7 +59,7 @@ from privacyidea.lib.tokenclass import TokenClass
 from privacyidea.lib.utils import (modhex_decode, hexlify_and_unicode, checksum,
                                    to_bytes, b64encode_and_unicode)
 from privacyidea.lib.decorators import check_token_locked, check_token_otp_length
-from privacyidea.api.lib.utils import getParam
+from privacyidea.lib.params import get_optional
 import datetime
 import base64
 import hmac
@@ -70,8 +70,6 @@ from privacyidea.lib import _
 from privacyidea.lib.policy import SCOPE, GROUP
 from privacyidea.lib.policies.actions import PolicyAction
 
-optional = True
-required = False
 
 
 log = logging.getLogger(__name__)
@@ -383,10 +381,10 @@ class YubikeyTokenClass(TokenClass):
         Optional parameters timestamp, sl, timeout are not supported at the
         moment.
         """
-        id = getParam(request.all_data, "id")
-        otp = getParam(request.all_data, "otp")
-        nonce = getParam(request.all_data, "nonce")
-        signature = getParam(request.all_data, "h")
+        id = get_optional(request.all_data, "id")
+        otp = get_optional(request.all_data, "otp")
+        nonce = get_optional(request.all_data, "nonce")
+        signature = get_optional(request.all_data, "h")
         status = "MISSING_PARAMETER"
 
         timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ%f")

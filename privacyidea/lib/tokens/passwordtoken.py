@@ -30,8 +30,6 @@ from privacyidea.lib.policies.actions import PolicyAction
 from privacyidea.api.lib.prepolicy import _generate_pin_from_policy
 from privacyidea.lib.utils import is_true
 
-optional = True
-required = False
 
 # We use an easier length of 12 for password tokens
 DEFAULT_LENGTH = 12

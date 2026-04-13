@@ -38,8 +38,7 @@ from privacyidea.lib.utils import (sanity_name_check, get_data_from_params, fetc
 from privacyidea.lib.utils.export import (register_import, register_export)
 from .crypto import encryptPassword, decryptPassword
 from .log import log_with
-from ..api.lib.utils import getParam
-from ..api.lib.utils import required
+from privacyidea.lib.params import get_required
 from ..models import (MachineResolver,
                       MachineResolverConfig, db)
 
@@ -67,8 +66,8 @@ def save_resolver(params):
     """
     # before we create the resolver in the database, we need to check
     # for the name and type.
-    resolvername = getParam(params, 'name', required)
-    resolvertype = getParam(params, 'type', required)
+    resolvername = get_required(params, 'name')
+    resolvertype = get_required(params, 'type')
     update_resolver = False
     # check the name
     sanity_name_check(resolvername)

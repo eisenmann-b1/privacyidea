@@ -49,7 +49,7 @@ import traceback
 from privacyidea.lib.utils import b64encode_and_unicode, to_byte_string
 from privacyidea.lib.tokenclass import TokenClass, RolloutState
 from privacyidea.lib.log import log_with
-from privacyidea.api.lib.utils import getParam, get_optional
+from privacyidea.lib.params import get_optional, get_required
 from privacyidea.lib.caconnector import get_caconnector_object, get_caconnector_list
 from privacyidea.lib.user import get_user_from_param
 from privacyidea.lib.utils import determine_logged_in_userparams
@@ -59,8 +59,6 @@ from privacyidea.lib.policy import SCOPE, GROUP, Match
 from privacyidea.lib.policies.actions import PolicyAction as BASE_ACTION
 from privacyidea.lib.error import PrivacyIDEAError, CSRError, CSRPending, CAError
 
-optional = True
-required = False
 
 log = logging.getLogger(__name__)
 
@@ -453,7 +451,7 @@ class CertificateTokenClass(TokenClass):
         if request or generate:
             # If we do not upload a user certificate, then we need a CA do
             # sign the uploaded request or generated certificate.
-            ca = getParam(param, "ca", required)
+            ca = get_required(param, "ca")
             self.add_tokeninfo("CA", ca)
             ca_connector = get_caconnector_object(ca)
         if request:
@@ -470,8 +468,8 @@ class CertificateTokenClass(TokenClass):
                 if not request_csr.is_signature_valid:
                     raise PrivacyIDEAError("request has invalid signature.")
                 # If a request is sent, we can have an attestation certificate
-                attestation = getParam(param, "attestation", optional)
-                verify_attestation = getParam(param, "verify_attestation", optional)
+                attestation = get_optional(param, "attestation")
+                verify_attestation = get_optional(param, "verify_attestation")
                 if attestation:
                     request_numbers = request_csr.public_key().public_numbers()
                     attestation_cert = load_pem_x509_certificate(to_byte_string(attestation))
@@ -507,7 +505,7 @@ class CertificateTokenClass(TokenClass):
             * and the certificate
             We need the user for whom the certificate should be created
             """
-            user = get_user_from_param(param, optional_or_required=required)
+            user = get_user_from_param(param, optional_or_required=False)  # user is required
             keysize = get_optional(param, "keysize", 2048)
             # The key size should be at least 2048
             if keysize < 2048:

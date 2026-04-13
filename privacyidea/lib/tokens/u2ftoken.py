@@ -29,7 +29,7 @@ import binascii
 import json
 import logging
 
-from privacyidea.api.lib.utils import getParam, attestation_certificate_allowed
+from privacyidea.lib.params import get_optional, get_required, attestation_certificate_allowed
 from privacyidea.lib import _
 from privacyidea.lib.challenge import get_challenges
 from privacyidea.lib.config import get_from_config
@@ -197,8 +197,6 @@ IMAGES = {"yubico": "privacyidea/static/img/FIDO-U2F-Security-Key-444x444.png",
 U2F_Version = "U2F_V2"
 
 log = logging.getLogger(__name__)
-optional = True
-required = False
 
 
 class U2FAction:
@@ -330,18 +328,18 @@ class U2fTokenClass(TokenClass):
         :return: None
         """
         TokenClass.update(self, param)
-        reg_data = getParam(param, "regdata")
-        verify_cert = is_true(getParam(param, "u2f.verify_cert", default=True))
+        reg_data = get_optional(param, "regdata")
+        verify_cert = is_true(get_optional(param, "u2f.verify_cert", default=True))
         if not reg_data:
             self.token.rollout_state = RolloutState.CLIENTWAIT
             # Set the description in the first enrollment step
             if "description" in param:
-                self.set_description(getParam(param, "description", default=""))
+                self.set_description(get_optional(param, "description", default=""))
         elif reg_data and self.token.rollout_state == RolloutState.CLIENTWAIT:
             attestation_cert, user_pub_key, key_handle, \
                 signature, automatic_description = parse_registration_data(reg_data,
                                                                            verify_cert=verify_cert)
-            client_data = getParam(param, "clientdata", required)
+            client_data = get_required(param, "clientdata")
             client_data_str = url_decode(client_data)
             app_id = self.get_tokeninfo("appId", "")
             # Verify the registration data
@@ -363,7 +361,7 @@ class U2fTokenClass(TokenClass):
             # If no description has already been set, set the automatic description or the
             # description given in the 2nd request
             if not self.token.description:
-                self.set_description(getParam(param, "description", default=automatic_description))
+                self.set_description(get_optional(param, "description", default=automatic_description))
         else:
             raise ParameterError("regdata provided but token not in clientwait rollout_state.")
 

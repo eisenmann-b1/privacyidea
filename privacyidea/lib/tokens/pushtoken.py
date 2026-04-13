@@ -47,7 +47,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from dateutil.parser import isoparse
 
 from privacyidea.api.lib.policyhelper import get_pushtoken_add_config, get_init_tokenlabel_parameters
-from privacyidea.api.lib.utils import get_optional, get_required
+from privacyidea.lib.params import get_optional, get_required
 from privacyidea.lib import _, lazy_gettext
 from privacyidea.lib.apps import _construct_extra_parameters
 from privacyidea.lib.challenge import get_challenges

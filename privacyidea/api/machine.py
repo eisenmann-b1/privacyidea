@@ -25,7 +25,8 @@ The code is tested in tests/test_api_machines
 
 from flask import (Blueprint,
                    request, g)
-from .lib.utils import (getParam, send_result)
+from .lib.utils import (send_result)
+from ..lib.params import get_optional, get_required
 from ..api.lib.prepolicy import prepolicy, check_base_action, mangle
 from ..lib.policies.actions import PolicyAction
 
@@ -95,18 +96,18 @@ def list_machines_api():
           "version": "privacyIDEA unknown"
         }
     """
-    hostname = getParam(request.all_data, "hostname")
-    ip = getParam(request.all_data, "ip")
+    hostname = get_optional(request.all_data, "hostname")
+    ip = get_optional(request.all_data, "ip")
     if ip:
         try:
             ip = netaddr.IPAddress(ip)
         except netaddr.AddrFormatError:
             # This happens when filtering in the machine view
             ip = None
-    id = getParam(request.all_data, "id")
-    resolver = getParam(request.all_data, "resolver")
+    id = get_optional(request.all_data, "id")
+    resolver = get_optional(request.all_data, "resolver")
 
-    any = getParam(request.all_data, "any")
+    any = get_optional(request.all_data, "any")
 
     machines = get_machines(hostname=hostname, ip=ip, id=id, resolver=resolver,
                             any=any)
@@ -151,11 +152,11 @@ def attach_token_api():
          "application": "luks" }
 
     """
-    hostname = getParam(request.all_data, "hostname")
-    machine_id = getParam(request.all_data, "machineid")
-    resolver = getParam(request.all_data, "resolver")
-    serial = getParam(request.all_data, "serial", optional=False)
-    application = getParam(request.all_data, "application", optional=False)
+    hostname = get_optional(request.all_data, "hostname")
+    machine_id = get_optional(request.all_data, "machineid")
+    resolver = get_optional(request.all_data, "resolver")
+    serial = get_required(request.all_data, "serial")
+    application = get_required(request.all_data, "application")
     if resolver == "":
         resolver = None
         machine_id = None
@@ -242,13 +243,13 @@ def list_machinetokens_api():
        ...
        ]
     """
-    hostname = getParam(request.all_data, "hostname")
-    machineid = getParam(request.all_data, "machineid")
-    resolver = getParam(request.all_data, "resolver")
-    serial = getParam(request.all_data, "serial")
-    application = getParam(request.all_data, "application")
-    sortby = getParam(request.all_data, "sortby", "serial")
-    sortdir = getParam(request.all_data, "sortdir", "asc")
+    hostname = get_optional(request.all_data, "hostname")
+    machineid = get_optional(request.all_data, "machineid")
+    resolver = get_optional(request.all_data, "resolver")
+    serial = get_optional(request.all_data, "serial")
+    application = get_optional(request.all_data, "application")
+    sortby = get_optional(request.all_data, "sortby", default="serial")
+    sortdir = get_optional(request.all_data, "sortdir", default="asc")
     filter_params = {}
     # Use remaining params as filters
     for key, value in {k: v for k, v in request.all_data.items() if k not in [
@@ -302,12 +303,12 @@ def set_option_api():
 
     :return:
     """
-    hostname = getParam(request.all_data, "hostname")
-    machineid = getParam(request.all_data, "machineid")
-    resolver = getParam(request.all_data, "resolver")
-    serial = getParam(request.all_data, "serial")
-    application = getParam(request.all_data, "application")
-    mtid = getParam(request.all_data, "mtid")
+    hostname = get_optional(request.all_data, "hostname")
+    machineid = get_optional(request.all_data, "machineid")
+    resolver = get_optional(request.all_data, "resolver")
+    serial = get_optional(request.all_data, "serial")
+    application = get_optional(request.all_data, "application")
+    mtid = get_optional(request.all_data, "mtid")
 
     # get additional options:
     options_add = {}
@@ -388,8 +389,8 @@ def get_auth_items_api(application=None):
           "version": "privacyIDEA unknown"
         }
     """
-    challenge = getParam(request.all_data, "challenge")
-    hostname = getParam(request.all_data, "hostname", optional=False)
+    challenge = get_optional(request.all_data, "challenge")
+    hostname = get_required(request.all_data, "hostname")
     # Get optional additional filter parameters
     filter_param = request.all_data
     for key in ["challenge", "hostname", "application"]:

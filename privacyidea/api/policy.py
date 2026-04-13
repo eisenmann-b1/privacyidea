@@ -33,12 +33,10 @@ The code of this module is tested in tests/test_api_system.py
 """
 from flask_babel import _
 from flask import Blueprint, request, current_app
-from .lib.utils import (getParam,
-                        getLowerParams,
-                        optional,
-                        required,
+from .lib.utils import (getLowerParams,
                         send_result,
-                        check_policy_name, send_file, get_required)
+                        send_file, get_required)
+from ..lib.params import get_optional
 from ..lib.log import log_with
 from ..lib.policies.actions import PolicyAction
 from ..lib.policies.conditions import ConditionHandleMissingData
@@ -46,7 +44,8 @@ from ..lib.policy import (set_policy, rename_policy,
                           export_policies, import_policies,
                           delete_policy, get_static_policy_definitions,
                           enable_policy, get_policy_condition_sections,
-                          get_policy_condition_comparators, Match, validate_values, get_policies, SCOPE)
+                          get_policy_condition_comparators, Match, validate_values, get_policies, SCOPE,
+                          check_policy_name)
 from ..lib.token import get_dynamic_policy_definitions
 from ..lib.error import (ParameterError)
 from privacyidea.lib.utils import is_true
@@ -310,9 +309,9 @@ def get_policy(name=None, export=None):
         }
     """
     param = getLowerParams(request.all_data)
-    realm = getParam(param, "realm")
-    scope = getParam(param, "scope")
-    active = getParam(param, "active")
+    realm = get_optional(param, "realm")
+    scope = get_optional(param, "scope")
+    active = get_optional(param, "active")
     if active is not None:
         active = is_true(active)
 
@@ -511,12 +510,12 @@ def check_policy_api():
     res = {}
     param = getLowerParams(request.all_data)
 
-    user = getParam(param, "user", required)
-    realm = getParam(param, "realm", required)
-    scope = getParam(param, "scope", required)
-    action = getParam(param, "action", required)
-    client = getParam(param, "client", optional)
-    resolver = getParam(param, "resolver", optional)
+    user = get_required(param, "user")
+    realm = get_required(param, "realm")
+    scope = get_required(param, "scope")
+    action = get_required(param, "action")
+    client = get_optional(param, "client")
+    resolver = get_optional(param, "resolver")
 
     policies = Match.generic(g, scope=scope, user=user, resolver=resolver, realm=realm,
                              action=action, client=client, active=True).policies()

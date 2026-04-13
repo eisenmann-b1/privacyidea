@@ -18,7 +18,8 @@
 __doc__ = """The tokengroup endpoint allows administrators to manage tokengroup definitions.
 """
 from flask import (Blueprint, request)
-from .lib.utils import (getParam, send_result)
+from .lib.utils import (send_result)
+from ..lib.params import get_optional
 from ..lib.log import log_with
 from privacyidea.lib.tokengroup import get_tokengroups, set_tokengroup, delete_tokengroup
 from privacyidea.lib.event import event
@@ -81,7 +82,7 @@ def set_tokengroup_api(groupname):
 
     """
     param = request.all_data
-    description = getParam(param, "description", optional=True)
+    description = get_optional(param, "description")
 
     r = set_tokengroup(groupname, description)
 

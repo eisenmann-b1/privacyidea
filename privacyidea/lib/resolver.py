@@ -58,8 +58,7 @@ from .config import (get_resolver_types, get_resolver_classes, get_config_object
 from .crypto import encryptPassword
 from .error import ConfigAdminError
 from .log import log_with
-from ..api.lib.utils import getParam
-from ..api.lib.utils import required
+from privacyidea.lib.params import get_required
 from ..models import (Resolver,
                       ResolverConfig, save_config_timestamp, db)
 
@@ -89,8 +88,8 @@ def save_resolver(params):
     """
     # before we create the resolver in the database, we need to check
     # for the name and type thing...
-    resolvername = getParam(params, 'resolver', required)
-    resolvertype = getParam(params, 'type', required)
+    resolvername = get_required(params, 'resolver')
+    resolvertype = get_required(params, 'type')
     update_resolver = False
     # check the name
     sanity_name_check(resolvername)

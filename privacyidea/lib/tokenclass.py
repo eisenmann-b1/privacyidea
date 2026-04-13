@@ -102,14 +102,12 @@ from .log import log_with
 from .policies.actions import PolicyAction
 from .policydecorators import libpolicy, auth_otppin, challenge_response_allowed
 from .user import (User)
-from ..api.lib.utils import getParam
+from privacyidea.lib.params import get_optional, get_required
 from ..models import (TokenOwner, TokenTokengroup, Challenge, cleanup_challenges, TokenInfo, db, TokenRealm, Realm,
                       Tokengroup, TokenCredentialIdHash)
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M%z'
 AUTH_DATE_FORMAT = "%Y-%m-%d %H:%M:%S.%f%z"
-optional = True
-required = False
 FAILCOUNTER_EXCEEDED = "failcounter_exceeded"
 FAILCOUNTER_CLEAR_TIMEOUT = "failcounter_clear_timeout"
 
@@ -619,14 +617,14 @@ class TokenClass:
                       description, genkey, otpkey, pin
         :type: param: dict
         """
-        tdesc = getParam(param, "description", optional)
-        rollover = getParam(param, "rollover", optional)
+        tdesc = get_optional(param, "description")
+        rollover = get_optional(param, "rollover")
         if tdesc is not None:
             self.token.set_description(tdesc)
 
         # key_size as parameter overrules a prevoiusly set
         # value e.g. in hashlib in the upper classes
-        key_size = int(getParam(param, "keysize", optional) or 20)
+        key_size = int(get_optional(param, "keysize") or 20)
 
         #
         # process the otpkey:
@@ -636,11 +634,11 @@ class TokenClass:
         #   if required and otpkey == None:
         #      raise param Exception, that we require an otpkey
         #
-        otpKey = getParam(param, "otpkey", optional)
-        genkey = is_true(getParam(param, "genkey", optional))
-        twostep_init = is_true(getParam(param, "2stepinit", optional))
-        verify = getParam(param, "verify", optional)
-        otpkeyformat = getParam(param, "otpkeyformat", optional)
+        otpKey = get_optional(param, "otpkey")
+        genkey = is_true(get_optional(param, "genkey"))
+        twostep_init = is_true(get_optional(param, "2stepinit"))
+        verify = get_optional(param, "verify")
+        otpkeyformat = get_optional(param, "otpkeyformat")
 
         if otpKey is not None and otpkeyformat is not None:
             # have to decode OTP key
@@ -672,7 +670,7 @@ class TokenClass:
 
         # otpKey still None?? - raise the exception, if an otpkey is required, and we are not in verify state
         if otpKey is None and self.hKeyRequired is True and not verify:
-            otpKey = getParam(param, "otpkey", required)
+            otpKey = get_required(param, "otpkey")
 
         if otpKey is not None:
             if self.token.rollout_state == RolloutState.CLIENTWAIT:
@@ -692,22 +690,22 @@ class TokenClass:
             # After the key is generated, we set "waiting for the client".
             self.token.rollout_state = RolloutState.CLIENTWAIT
 
-        pin = getParam(param, "pin", optional)
+        pin = get_optional(param, "pin")
         if pin is not None:
             store_hashed = True
-            encrypt_pin = getParam(param, "encryptpin", optional)
+            encrypt_pin = get_optional(param, "encryptpin")
             if is_true(encrypt_pin):
                 store_hashed = False
             self.token.set_pin(pin, store_hashed)
 
-        otplen = getParam(param, 'otplen', optional)
+        otplen = get_optional(param, 'otplen')
         if otplen is not None:
             self.set_otplen(otplen)
 
         # Add parameters starting with the tokentype-name to the tokeninfo:
         for p in param.keys():
             if p.startswith(self.type + "."):
-                self.add_tokeninfo(p, getParam(param, p))
+                self.add_tokeninfo(p, get_optional(param, p))
 
         # The base class will be a software tokenkind
         self.add_tokeninfo("tokenkind", Tokenkind.SOFTWARE)

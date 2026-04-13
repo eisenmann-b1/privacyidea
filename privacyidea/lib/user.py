@@ -63,8 +63,7 @@ from .realm import (get_realms, realm_is_defined,
 from .resolver import (get_resolver_object,
                        get_resolver_type)
 from .usercache import (user_cache, cache_username, user_init, delete_user_cache)
-from ..api.lib.utils import (getParam,
-                             optional)
+from privacyidea.lib.params import get_optional, get_required
 
 log = logging.getLogger(__name__)
 
@@ -718,7 +717,7 @@ def split_user(username: str) -> tuple[str, str]:
 
 
 @log_with(log, hide_args_keywords={0: ["pass", "password"]})
-def get_user_from_param(param: dict, optional_or_required: bool = optional) -> User:
+def get_user_from_param(param: dict, optional_or_required: bool = True) -> User:
     """
     Find the parameter user, realm and resolver and
     create a user object from these parameters.
@@ -727,11 +726,15 @@ def get_user_from_param(param: dict, optional_or_required: bool = optional) -> U
     than one resolver.
 
     :param param: The dictionary of request parameters
-    :param optional_or_required: whether the user is required
+    :param optional_or_required: ``True`` (default) if the user param is optional,
+        ``False`` if it is required (raises ParameterError when absent).
     :return: User as found in the parameters
     """
     realm = ""
-    username = getParam(param, "user", optional_or_required)
+    if optional_or_required:
+        username = get_optional(param, "user")
+    else:
+        username = get_required(param, "user")
 
     if username is None:
         username = ""
@@ -787,8 +790,8 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
     log.debug('Changed search key to username: %s.', search_dict['username'])
 
     # determine which scope we want to show
-    param_resolver = getParam(param, "resolver")
-    param_realm = getParam(param, "realm")
+    param_resolver = get_optional(param, "resolver")
+    param_realm = get_optional(param, "realm")
     user_resolver = None
     user_realm = None
     if user is not None:

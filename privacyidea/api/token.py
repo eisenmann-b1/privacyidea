@@ -59,7 +59,7 @@ from flask import (Blueprint, request, g, current_app)
 
 from ..lib.container import find_container_by_serial, add_token_to_container, add_not_authorized_tokens_result
 from ..lib.log import log_with
-from .lib.utils import optional, send_result, send_csv_result, required, getParam, get_optional, get_required
+from .lib.utils import send_result, send_csv_result, get_optional, get_required
 from ..lib.tokenclass import RolloutState
 from ..lib.tokens.passkeytoken import PasskeyTokenClass
 from ..lib.tokens.webauthntoken import WebAuthnTokenClass
@@ -198,7 +198,7 @@ def init():
 
     Depending on the token type there can be additional parameters.
     In the tokenclass you can see additional parameters in the method ``update``
-    when looking for ``getParam`` functions.
+    when looking for ```` functions.
 
     **Example response**:
 
@@ -376,11 +376,11 @@ def get_challenges_api(serial=None):
     :return: json
     """
     param = request.all_data
-    page = int(getParam(param, "page", optional, default=1))
-    sort = getParam(param, "sortby", optional, default="timestamp")
-    sdir = getParam(param, "sortdir", optional, default="asc")
-    psize = int(getParam(param, "pagesize", optional, default=15))
-    transaction_id = getParam(param, "transaction_id", optional)
+    page = int(get_optional(param, "page", default=1))
+    sort = get_optional(param, "sortby", default="timestamp")
+    sdir = get_optional(param, "sortdir", default="asc")
+    psize = int(get_optional(param, "pagesize", default=15))
+    transaction_id = get_optional(param, "transaction_id")
     g.audit_object.log({"serial": serial})
     challenges = get_challenges_paginate(serial=serial, sortby=sort,
                                          transaction_id=transaction_id,
@@ -472,19 +472,19 @@ def list_api():
     :rtype: json
     """
     param = request.all_data
-    serial = getParam(param, "serial", optional)
-    page = int(getParam(param, "page", optional, default=1))
-    tokentype = getParam(param, "type", optional)
-    token_type_list = getParam(param, "type_list", optional)
+    serial = get_optional(param, "serial")
+    page = int(get_optional(param, "page", default=1))
+    tokentype = get_optional(param, "type")
+    token_type_list = get_optional(param, "type_list")
     if token_type_list:
         token_type_list = token_type_list.replace(" ", "").split(",")
-    description = getParam(param, "description", optional)
-    sort = getParam(param, "sortby", optional, default="serial")
-    sdir = getParam(param, "sortdir", optional, default="asc")
-    psize = int(getParam(param, "pagesize", optional, default=15))
-    realm = getParam(param, "tokenrealm", optional)
-    userid = getParam(param, "userid", optional)
-    resolver = getParam(param, "resolver", optional)
+    description = get_optional(param, "description")
+    sort = get_optional(param, "sortby", default="serial")
+    sdir = get_optional(param, "sortdir", default="asc")
+    psize = int(get_optional(param, "pagesize", default=15))
+    realm = get_optional(param, "tokenrealm")
+    userid = get_optional(param, "userid")
+    resolver = get_optional(param, "resolver")
 
     # Only admins may use the "user" and "realm" query parameters to query
     # tokens of arbitrary users or realms. For callers with role "user" we
@@ -492,21 +492,21 @@ def list_api():
     # their own identity) so that a regular user can never see other users'
     # tokens via these params.
     is_admin = g.logged_in_user.get("role") == "admin"
-    user_param = getParam(param, "user", optional)
-    realm_param = getParam(param, "realm", optional)
+    user_param = get_optional(param, "user")
+    realm_param = get_optional(param, "realm")
     if is_admin and user_param:
         user = get_user_from_param(param)
     elif is_admin and realm_param:
         user = User(login="", realm=realm_param)
     else:
         user = request.User
-    output_format = getParam(param, "outform", optional)
-    assigned = getParam(param, "assigned", optional)
-    active = getParam(param, "active", optional)
-    tokeninfokey = getParam(param, "infokey", optional)
-    tokeninfovalue = getParam(param, "infovalue", optional)
-    rollout_state = getParam(param, "rollout_state", optional)
-    container_serial = getParam(param, "container_serial", optional)
+    output_format = get_optional(param, "outform")
+    assigned = get_optional(param, "assigned")
+    active = get_optional(param, "active")
+    tokeninfokey = get_optional(param, "infokey")
+    tokeninfovalue = get_optional(param, "infovalue")
+    rollout_state = get_optional(param, "rollout_state")
+    container_serial = get_optional(param, "container_serial")
     tokeninfo = None
     if tokeninfokey and tokeninfovalue:
         tokeninfo = {tokeninfokey: tokeninfovalue}
@@ -521,7 +521,7 @@ def list_api():
     g.audit_object.log({'info': "realm: {0!s}".format(allowed_realms)})
 
     # get hide_tokeninfo setting from all_data
-    hidden_tokeninfo = getParam(param, 'hidden_tokeninfo', default=None)
+    hidden_tokeninfo = get_optional(param, 'hidden_tokeninfo', default=None)
 
     # get list of tokens as a dictionary
     tokens = get_tokens_paginate(serial=serial, realm=realm, page=page,
@@ -561,10 +561,10 @@ def assign_api():
     :return: In case of success it returns "value": True.
     :rtype: json object
     """
-    user = get_user_from_param(request.all_data, required)
-    serial = getParam(request.all_data, "serial", required, allow_empty=False)
-    pin = getParam(request.all_data, "pin")
-    encrypt_pin_param = getParam(request.all_data, "encryptpin")
+    user = get_user_from_param(request.all_data, False)
+    serial = get_required(request.all_data, "serial", allow_empty=False)
+    pin = get_optional(request.all_data, "pin")
+    encrypt_pin_param = get_optional(request.all_data, "encryptpin")
     if g.logged_in_user.get("role") == "user":
         err_message = "Token already assigned to another user."
     else:
@@ -660,7 +660,7 @@ def revoke_api(serial=None):
     """
     user = request.User
     if not serial:
-        serial = getParam(request.all_data, "serial", optional)
+        serial = get_optional(request.all_data, "serial")
     g.audit_object.log({"serial": serial})
 
     res = revoke_token(serial, user=user)
@@ -686,7 +686,7 @@ def enable_api(serial=None):
     """
     user = request.User
     if not serial:
-        serial = getParam(request.all_data, "serial", optional)
+        serial = get_optional(request.all_data, "serial")
     g.audit_object.log({"serial": serial})
 
     res = enable_token(serial, enable=True, user=user)
@@ -714,7 +714,7 @@ def disable_api(serial=None):
     """
     user = request.User
     if not serial:
-        serial = getParam(request.all_data, "serial", optional)
+        serial = get_optional(request.all_data, "serial")
     g.audit_object.log({"serial": serial})
 
     res = enable_token(serial, enable=False, user=user)
@@ -791,7 +791,7 @@ def reset_api(serial=None):
     """
     user = request.User
     if not serial:
-        serial = getParam(request.all_data, "serial", optional)
+        serial = get_optional(request.all_data, "serial")
     g.audit_object.log({"serial": serial})
 
     res = reset_token(serial, user=user)
@@ -816,10 +816,10 @@ def resync_api(serial=None):
     """
     user = request.User
     if not serial:
-        serial = getParam(request.all_data, "serial", required)
+        serial = get_required(request.all_data, "serial")
     g.audit_object.log({"serial": serial})
-    otp1 = getParam(request.all_data, "otp1", required)
-    otp2 = getParam(request.all_data, "otp2", required)
+    otp1 = get_required(request.all_data, "otp1")
+    otp2 = get_required(request.all_data, "otp2")
 
     res = resync_token(serial, otp1, otp2, user=user)
     g.audit_object.log({"success": bool(res)})
@@ -851,13 +851,13 @@ def setpin_api(serial=None):
     :rtype: json object
     """
     if not serial:
-        serial = getParam(request.all_data, "serial", required)
+        serial = get_required(request.all_data, "serial")
     g.audit_object.log({"serial": serial})
-    userpin = getParam(request.all_data, "userpin")
-    sopin = getParam(request.all_data, "sopin")
-    otppin = getParam(request.all_data, "otppin")
+    userpin = get_optional(request.all_data, "userpin")
+    sopin = get_optional(request.all_data, "sopin")
+    otppin = get_optional(request.all_data, "otppin")
     user = request.User
-    encrypt_pin_param = getParam(request.all_data, "encryptpin")
+    encrypt_pin_param = get_optional(request.all_data, "encryptpin")
 
     res = 0
     if userpin is not None:
@@ -897,11 +897,11 @@ def setrandompin_api(serial=None):
     :rtype: json object
     """
     if not serial:
-        serial = getParam(request.all_data, "serial", required)
+        serial = get_required(request.all_data, "serial")
     g.audit_object.log({"serial": serial})
     user = request.User
-    encrypt_pin_param = getParam(request.all_data, "encryptpin")
-    pin = getParam(request.all_data, "pin")
+    encrypt_pin_param = get_optional(request.all_data, "encryptpin")
+    pin = get_optional(request.all_data, "pin")
     if not pin:
         raise TokenAdminError(
             "We have an empty PIN. Please check your policy 'otp_pin_set_random'.")
@@ -928,9 +928,9 @@ def set_description_api(serial=None):
     """
     user = request.User
     if not serial:
-        serial = getParam(request.all_data, "serial", required)
+        serial = get_required(request.all_data, "serial")
     g.audit_object.log({"serial": serial})
-    description = getParam(request.all_data, "description", optional=required)
+    description = get_required(request.all_data, "description", allow_empty=True)
     g.audit_object.add_to_log({'action_detail': "description={0!r}".format(description)})
     token = get_one_token(serial=serial, user=user)
     request.all_data["type"] = token.type
@@ -974,19 +974,19 @@ def set_api(serial=None):
     :rtype: json object
     """
     if not serial:
-        serial = getParam(request.all_data, "serial", required)
+        serial = get_required(request.all_data, "serial")
     g.audit_object.log({"serial": serial})
     user = request.User
 
-    description = getParam(request.all_data, "description")
-    count_window = getParam(request.all_data, "count_window")
-    sync_window = getParam(request.all_data, "sync_window")
-    hashlib = getParam(request.all_data, "hashlib")
-    max_failcount = getParam(request.all_data, "max_failcount")
-    count_auth_max = getParam(request.all_data, "count_auth_max")
-    count_auth_success_max = getParam(request.all_data, "count_auth_success_max")
-    validity_period_start = getParam(request.all_data, "validity_period_start")
-    validity_period_end = getParam(request.all_data, "validity_period_end")
+    description = get_optional(request.all_data, "description")
+    count_window = get_optional(request.all_data, "count_window")
+    sync_window = get_optional(request.all_data, "sync_window")
+    hashlib = get_optional(request.all_data, "hashlib")
+    max_failcount = get_optional(request.all_data, "max_failcount")
+    count_auth_max = get_optional(request.all_data, "count_auth_max")
+    count_auth_success_max = get_optional(request.all_data, "count_auth_success_max")
+    validity_period_start = get_optional(request.all_data, "validity_period_start")
+    validity_period_end = get_optional(request.all_data, "validity_period_end")
 
     res = 0
 
@@ -1066,7 +1066,7 @@ def tokenrealm_api(serial=None):
     :return: returns value=True in case of success
     :rtype: bool
     """
-    realms = getParam(request.all_data, "realms", required)
+    realms = get_required(request.all_data, "realms")
     if isinstance(realms, list):
         realm_list = realms
     else:
@@ -1104,17 +1104,17 @@ def loadtokens_api(filename=None):
     :rtype: int
     """
     if not filename:
-        filename = getParam(request.all_data, "filename", required)
+        filename = get_required(request.all_data, "filename")
     known_types = ['aladdin-xml', 'oathcsv', "OATH CSV", 'yubikeycsv',
                    'Yubikey CSV', 'pskc']
-    file_type = getParam(request.all_data, "type", required)
-    aes_validate_mac = getParam(request.all_data, "pskcValidateMAC", default='check_fail_hard')
-    aes_psk = getParam(request.all_data, "psk")
-    aes_password = getParam(request.all_data, "password")
+    file_type = get_required(request.all_data, "type")
+    aes_validate_mac = get_optional(request.all_data, "pskcValidateMAC", default='check_fail_hard')
+    aes_psk = get_optional(request.all_data, "psk")
+    aes_password = get_optional(request.all_data, "password")
     if aes_psk and len(aes_psk) != 32:
         raise TokenAdminError(_("The Pre Shared Key must be 128 Bit hex "
                                 "encoded. It must be 32 characters long!"))
-    trealms = getParam(request.all_data, "tokenrealms") or ""
+    trealms = get_optional(request.all_data, "tokenrealms") or ""
     tokenrealms = []
     if trealms:
         tokenrealms = trealms.split(",")
@@ -1200,8 +1200,8 @@ def copypin_api():
     :return: returns value=True in case of success
     :rtype: bool
     """
-    serial_from = getParam(request.all_data, "from", required)
-    serial_to = getParam(request.all_data, "to", required)
+    serial_from = get_required(request.all_data, "from")
+    serial_to = get_required(request.all_data, "to")
     res = copy_token_pin(serial_from, serial_to)
     g.audit_object.log({"success": True})
     return send_result(res)
@@ -1223,8 +1223,8 @@ def copyuser_api():
     :return: returns value=True in case of success
     :rtype: bool
     """
-    serial_from = getParam(request.all_data, "from", required)
-    serial_to = getParam(request.all_data, "to", required)
+    serial_from = get_required(request.all_data, "from")
+    serial_to = get_required(request.all_data, "to")
     res = copy_token_user(serial_from, serial_to)
     g.audit_object.log({"success": True})
     return send_result(res)
@@ -1288,12 +1288,12 @@ def get_serial_by_otp_api(otp=None):
     :query window: The number of OTP look ahead (default=10)
     :return: The serial number of the token found
     """
-    ttype = getParam(request.all_data, "type")
-    unassigned_param = getParam(request.all_data, "unassigned")
-    assigned_param = getParam(request.all_data, "assigned")
-    serial_substr = getParam(request.all_data, "serial")
-    count_only = getParam(request.all_data, "count")
-    window = int(getParam(request.all_data, "window", default=10))
+    ttype = get_optional(request.all_data, "type")
+    unassigned_param = get_optional(request.all_data, "unassigned")
+    assigned_param = get_optional(request.all_data, "assigned")
+    serial_substr = get_optional(request.all_data, "serial")
+    count_only = get_optional(request.all_data, "count")
+    window = int(get_optional(request.all_data, "window", default=10))
 
     serial_substr = serial_substr or ""
 
@@ -1336,7 +1336,7 @@ def set_tokeninfo_api(serial, key):
     :return: returns value=True in case the token info could be set
     :rtype: bool
     """
-    value = getParam(request.all_data, "value", required)
+    value = get_required(request.all_data, "value")
     g.audit_object.log({"serial": serial})
     count = add_tokeninfo(serial, key, value)
     success = count > 0
@@ -1391,7 +1391,7 @@ def assign_tokengroup_api(serial, groupname=None):
         g.audit_object.add_to_log({'action_detail': groupname})
         assign_tokengroup(serial, tokengroup=groupname)
     else:
-        groups = getParam(request.all_data, "groups", required)
+        groups = get_required(request.all_data, "groups")
         if isinstance(groups, list):
             group_list = groups
         else:

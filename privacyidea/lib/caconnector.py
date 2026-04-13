@@ -38,7 +38,7 @@ from .config import (get_caconnector_types,
                      get_caconnector_class_dict)
 from .crypto import encryptPassword, decryptPassword
 from .log import log_with
-from ..api.lib.utils import get_required
+from privacyidea.lib.params import get_required
 from ..models import (CAConnector,
                       CAConnectorConfig, db, save_config_timestamp)
 

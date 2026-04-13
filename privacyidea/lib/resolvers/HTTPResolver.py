@@ -35,7 +35,7 @@ from .UserIdResolver import UserIdResolver
 from ..error import ParameterError, ResolverError
 from ..log import log_with
 from ..utils import is_true
-from ...api.lib.utils import get_required
+from privacyidea.lib.params import get_required
 
 ENCODING = "utf-8"
 EDITABLE = "Editable"

@@ -68,7 +68,7 @@ import datetime
 import logging
 import traceback
 
-from privacyidea.api.lib.utils import getParam
+from privacyidea.lib.params import get_optional, get_required
 from privacyidea.lib import _
 from privacyidea.lib.config import get_from_config, get_email_validators
 from privacyidea.lib.crypto import safe_compare
@@ -225,16 +225,16 @@ class EmailTokenClass(HotpTokenClass):
         :return: nothing
 
         """
-        verify = getParam(param, "verify", optional=True)
+        verify = get_optional(param, "verify")
         if not verify:
-            if getParam(param, self.DYNAMIC_EMAIL_KEY, optional=True):
+            if get_optional(param, self.DYNAMIC_EMAIL_KEY):
                 self.add_tokeninfo(self.DYNAMIC_EMAIL_KEY, True)
                 self.delete_tokeninfo(self.EMAIL_ADDRESS_KEY)
             else:
                 # specific - e-mail
-                self._email_address = getParam(param,
+                self._email_address = get_required(param,
                                                self.EMAIL_ADDRESS_KEY,
-                                               optional=False)
+                                               allow_empty=True)
                 self.delete_tokeninfo(self.DYNAMIC_EMAIL_KEY)
 
             # in case of the e-mail token, only the server must know the otpkey
@@ -498,15 +498,15 @@ class EmailTokenClass(HotpTokenClass):
 
     @classmethod
     def test_config(cls, params=None):
-        mailserver = getParam(params, "email.mailserver", optional=False)
+        mailserver = get_required(params, "email.mailserver")
         subject = "Your TEST OTP"
         message = "This is a test."
-        mail_from = getParam(params, "email.mailfrom", optional=False)
-        recipient = getParam(params, "email.recipient", optional=False)
-        password = getParam(params, "email.password")
-        username = getParam(params, "email.username")
-        port = getParam(params, "email.port", default=25)
-        email_tls = getParam(params, "email.tls", default=False)
+        mail_from = get_required(params, "email.mailfrom")
+        recipient = get_required(params, "email.recipient")
+        password = get_optional(params, "email.password")
+        username = get_optional(params, "email.username")
+        port = get_optional(params, "email.port", default=25)
+        email_tls = get_optional(params, "email.tls", default=False)
         r = send_email_data(mailserver, subject, message, mail_from,
                             recipient, username=username,
                             password=password, port=port, email_tls=email_tls)

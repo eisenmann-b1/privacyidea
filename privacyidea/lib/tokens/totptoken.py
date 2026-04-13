@@ -46,8 +46,6 @@ from privacyidea.lib.tokenclass import TokenClass
 from privacyidea.lib.tokens.HMAC import HmacOtp
 from privacyidea.lib.tokens.hotptoken import HotpTokenClass
 
-optional = True
-required = False
 
 log = logging.getLogger(__name__)
 

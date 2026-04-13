@@ -51,8 +51,7 @@ import logging
 import traceback
 from json import loads
 
-from privacyidea.api.lib.utils import getParam
-from privacyidea.api.lib.utils import required, optional
+from privacyidea.lib.params import get_optional, get_required
 from privacyidea.lib import _
 from privacyidea.lib.config import get_from_config
 from privacyidea.lib.crypto import safe_compare
@@ -273,14 +272,14 @@ class SmsTokenClass(HotpTokenClass):
         :type param: dict
         :return: nothing
         """
-        verify = getParam(param, "verify", optional=True)
+        verify = get_optional(param, "verify")
         if not verify:
-            if getParam(param, self.DYNAMIC_PHONE_KEY, optional):
+            if get_optional(param, self.DYNAMIC_PHONE_KEY):
                 self.add_tokeninfo(self.DYNAMIC_PHONE_KEY, True)
                 self.delete_tokeninfo("phone")
             else:
                 # specific - phone
-                phone = getParam(param, "phone", required)
+                phone = get_required(param, "phone")
                 self.add_tokeninfo("phone", phone)
                 self.delete_tokeninfo(self.DYNAMIC_PHONE_KEY)
 

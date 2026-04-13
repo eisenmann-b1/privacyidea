@@ -28,7 +28,7 @@ This code is tested in tests/test_lib_tokens_tiqr.
 import logging
 import hashlib
 
-from privacyidea.api.lib.utils import getParam
+from privacyidea.lib.params import get_optional
 from privacyidea.lib.config import get_from_config
 from privacyidea.lib.tokenclass import TokenClass
 from privacyidea.lib.log import log_with
@@ -45,8 +45,6 @@ from privacyidea.lib.policies.actions import PolicyAction
 OCRA_DEFAULT_SUITE = "OCRA-1:HOTP-SHA1-8:QH40"
 
 log = logging.getLogger(__name__)
-optional = True
-required = False
 
 
 class OcraTokenClass(TokenClass):
@@ -136,11 +134,11 @@ class OcraTokenClass(TokenClass):
         :type param: dict
         :return: None
         """
-        user_object = get_user_from_param(param, optional)
+        user_object = get_user_from_param(param)  # user is optional
         if user_object:
             self.add_user(user_object)
 
-        ocrasuite = getParam(param, "ocrasuite", default=OCRA_DEFAULT_SUITE)
+        ocrasuite = get_optional(param, "ocrasuite", default=OCRA_DEFAULT_SUITE)
         OCRASuite(ocrasuite)
         self.add_tokeninfo("ocrasuite", ocrasuite)
         TokenClass.update(self, param)

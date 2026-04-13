@@ -25,7 +25,7 @@ from typing import Union, Optional
 import msal
 from requests import Response
 
-from privacyidea.api.lib.utils import get_required, get_optional
+from privacyidea.lib.params import get_required, get_optional
 from privacyidea.lib.error import ResolverError, ParameterError
 from privacyidea.lib.log import log_with
 from privacyidea.lib.resolvers.HTTPResolver import (HTTPResolver, METHOD, ENDPOINT,

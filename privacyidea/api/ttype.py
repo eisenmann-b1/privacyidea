@@ -38,7 +38,7 @@ from flask import (Blueprint,
                    request)
 from flask import g, jsonify, current_app
 
-from privacyidea.api.lib.utils import get_all_params, map_error_to_code, send_error
+from privacyidea.api.lib.utils import get_all_params, get_optional, map_error_to_code, send_error
 from privacyidea.lib.audit import getAudit
 from privacyidea.lib.config import (get_token_class, get_from_config,
                                     SYSCONF, ensure_no_config_object, get_privacyidea_node)
@@ -47,7 +47,6 @@ from privacyidea.lib.event import EventConfiguration, event
 from privacyidea.lib.policy import PolicyClass, PolicyAction, SCOPE, Match
 from privacyidea.lib.user import get_user_from_param
 from privacyidea.lib.utils import get_client_ip, get_plugin_info_from_useragent
-from .lib.utils import getParam
 from ..lib.framework import get_app_config_value
 from ..lib.log import log_with
 from ..lib.tokens.push_types import PushAction
@@ -77,7 +76,7 @@ def before_request():
     # access_route contains the ip addresses of all clients, hops and proxies.
     g.client_ip = get_client_ip(request,
                                 get_from_config(SYSCONF.OVERRIDECLIENT))
-    g.serial = getParam(request.all_data, "serial", default=None)
+    g.serial = get_optional(request.all_data, "serial", default=None)
     ua_name, ua_version, _ua_comment = get_plugin_info_from_useragent(request.user_agent.string)
     g.user_agent = ua_name
     g.audit_object.log({"success": False,
@@ -128,7 +127,7 @@ def token(ttype=None):
         ).any():
             return send_error("Failed special token function"), map_error_to_code(e)
         raise
-    serial = getParam(request.all_data, "serial")
+    serial = get_optional(request.all_data, "serial")
     user = get_user_from_param(request.all_data)
     g.audit_object.log({"success": 1,
                         "user": user.login,

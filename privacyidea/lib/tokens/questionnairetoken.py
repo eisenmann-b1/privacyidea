@@ -24,7 +24,7 @@ user is asked one of these questions and can respond with the corresponding
 answer.
 """
 
-from privacyidea.api.lib.utils import getParam
+from privacyidea.lib.params import get_required
 from privacyidea.lib.config import get_from_config
 from privacyidea.lib.tokenclass import TokenClass
 from privacyidea.lib.log import log_with
@@ -42,8 +42,6 @@ import json
 import datetime
 
 log = logging.getLogger(__name__)
-optional = True
-required = False
 DEFAULT_NUM_ANSWERS = 5
 
 
@@ -152,7 +150,7 @@ class QuestionnaireTokenClass(TokenClass):
         :type param: dict
         :return: None
         """
-        j_questions = getParam(param, "questions", required)
+        j_questions = get_required(param, "questions")
         try:
             # If we have a string, we load the json format
             questions = json.loads(j_questions)

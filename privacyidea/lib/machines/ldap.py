@@ -43,7 +43,7 @@ import logging
 import ldap3
 from ldap3.utils.conv import escape_filter_chars
 
-from privacyidea.api.lib.utils import get_required
+from privacyidea.lib.params import get_required
 from .base import Machine
 from .base import BaseMachineResolver
 from .base import MachineResolverError

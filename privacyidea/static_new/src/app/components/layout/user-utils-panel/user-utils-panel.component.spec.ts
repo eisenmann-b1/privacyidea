@@ -17,7 +17,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 
-import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { provideExperimentalZonelessChangeDetection } from "@angular/core";
 
 import { UserUtilsPanelComponent } from "./user-utils-panel.component";
 import { ActivatedRoute, provideRouter, Router } from "@angular/router";
@@ -110,6 +111,7 @@ describe("UserUtilsPanelComponent", () => {
         { provide: PendingChangesService, useClass: MockPendingChangesService },
         { provide: DialogService, useClass: MockDialogService },
         { provide: MatSnackBar, useValue: { open: jest.fn() } },
+        provideExperimentalZonelessChangeDetection(),
         MockLocalService,
         MockNotificationService
       ]
@@ -248,35 +250,35 @@ describe("UserUtilsPanelComponent", () => {
   });
 
   describe("logout", () => {
-    it("calls authService.logout if no pending changes", fakeAsync(() => {
+    it("calls authService.logout if no pending changes", async () => {
       pendingChangesService.hasChangesMockValue = false;
       component.logout();
-      tick();
+      await fixture.whenStable();
       expect(authService.logout).toHaveBeenCalled();
-    }));
+    });
 
-    it("opens SaveAndExitDialog if there are pending changes", fakeAsync(() => {
+    it("opens SaveAndExitDialog if there are pending changes", async () => {
       pendingChangesService.hasChangesMockValue = true;
       component.logout();
-      tick();
+      await fixture.whenStable();
       expect(dialogService.openDialog).toHaveBeenCalled();
       expect(authService.logout).not.toHaveBeenCalled();
-    }));
+    });
 
-    it("calls authService.logout if pending changes are discarded", fakeAsync(() => {
+    it("calls authService.logout if pending changes are discarded", async () => {
       pendingChangesService.hasChangesMockValue = true;
       const dialogRef = dialogService.openDialog();
       dialogService.openDialog.mockReturnValue(dialogRef);
       jest.spyOn(dialogRef, "afterClosed").mockReturnValue(of("discard"));
 
       component.logout();
-      tick();
+      await fixture.whenStable();
 
       expect(pendingChangesService.clearAllRegistrations).toHaveBeenCalled();
       expect(authService.logout).toHaveBeenCalled();
-    }));
+    });
 
-    it("calls pendingChangesService.save and logout if save-exit is chosen", fakeAsync(() => {
+    it("calls pendingChangesService.save and logout if save-exit is chosen", async () => {
       pendingChangesService.hasChangesMockValue = true;
       const dialogRef = dialogService.openDialog();
       dialogService.openDialog.mockReturnValue(dialogRef);
@@ -284,11 +286,11 @@ describe("UserUtilsPanelComponent", () => {
       pendingChangesService.save.mockReturnValue(true);
 
       component.logout();
-      tick();
+      await fixture.whenStable();
 
       expect(pendingChangesService.save).toHaveBeenCalled();
       expect(pendingChangesService.clearAllRegistrations).toHaveBeenCalled();
       expect(authService.logout).toHaveBeenCalled();
-    }));
+    });
   });
 });

@@ -40,7 +40,7 @@ export interface SystemServiceInterface {
   systemConfig: Signal<any>;
   systemConfigInit: Signal<any>;
   nodes: Signal<NodeInfo[]>;
-  radiusServers: Signal<any[]>;
+  radiusServers: Signal<string[]>;
 
   saveSystemConfig(config: any): Observable<PiResponse<any>>;
 
@@ -82,7 +82,7 @@ export class SystemService implements SystemServiceInterface {
       headers: this.authService.getHeaders()
     };
   });
-  radiusServerResource = httpResource<any>(() => {
+  radiusServerResource = httpResource<PiResponse<string[]>>(() => {
     // Do not load RADIUS server details if the action is not allowed.
     if (!this.authService.actionAllowed("enrollRADIUS")) {
       return undefined;
@@ -151,8 +151,8 @@ export class SystemService implements SystemServiceInterface {
     return this.nodesResource.value()?.result?.value ?? [];
   });
   radiusServers = computed(() => {
-    if (!this.radiusServerResource.hasValue()) return {};
-    return this.radiusServerResource.value()?.result?.value ?? {};
+    if (!this.radiusServerResource.hasValue()) return [];
+    return this.radiusServerResource.value()?.result?.value ?? [];
   });
 
   saveSystemConfig(config: any): Observable<PiResponse<any>> {

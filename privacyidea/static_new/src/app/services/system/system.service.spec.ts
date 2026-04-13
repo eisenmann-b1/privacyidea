@@ -193,7 +193,7 @@ describe("SystemService", () => {
     });
 
     it("radiusServers falls back to default when resource is empty", () => {
-      expect(service.radiusServers()).toEqual({});
+      expect(service.radiusServers()).toEqual([]);
     });
 
     it("should update radiusServers signal based on radiusServersResource on successful response", async () => {
@@ -202,17 +202,7 @@ describe("SystemService", () => {
 
       const req = httpMock.expectOne((r) => r.url === "/system/names/radius");
       expect(req.request.method).toBe("GET");
-      const radiusServers = {
-        server1: {
-          description: "",
-          dictionary: "",
-          port: 1812,
-          secret: "",
-          retries: 3,
-          server: "1.2.3.4",
-          timeout: 5
-        }
-      };
+      const radiusServers = ["server1", "server2"];
       let response = MockPiResponse.fromValue(radiusServers);
       req.flush(response);
       await Promise.resolve();
@@ -232,7 +222,7 @@ describe("SystemService", () => {
       await Promise.resolve();
 
       expect(service.radiusServerResource.hasValue()).toEqual(false);
-      expect(service.radiusServers()).toEqual({});
+      expect(service.radiusServers()).toEqual([]);
     });
   });
 });

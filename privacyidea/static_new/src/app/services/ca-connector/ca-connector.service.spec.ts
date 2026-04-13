@@ -120,7 +120,7 @@ describe("CaConnectorService", () => {
     service.caConnectorResource.reload();
     TestBed.tick();
     req = httpMock.expectOne((req) => req.url.includes(service.caConnectorBaseUrl));
-    req.flush("Error", { status: 500, statusText: "Unexpected error occured"});
+    req.flush("Error", { status: 500, statusText: "Unexpected error occurred"});
     await Promise.resolve();
     expect(service.caConnectors()).toEqual(caConnectors);
   });

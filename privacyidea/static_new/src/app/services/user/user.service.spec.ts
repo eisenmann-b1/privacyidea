@@ -346,7 +346,7 @@ describe("UserService", () => {
 
       const req = httpMock.expectOne((r) => r.url === "/user/editable_attributes/");
       expect(req.request.method).toBe("GET");
-      const attributePolicy = { delete: ["test1", "test2"], set: [{ "test2": ["*"], "test3": ["opt1", "opt2"] }] };
+      const attributePolicy = { delete: ["test1", "test2"], set: { "test2": ["*"], "test3": ["opt1", "opt2"] } };
       req.flush(MockPiResponse.fromValue(attributePolicy));
       await Promise.resolve();
 

@@ -904,7 +904,6 @@ export class ContainerService implements ContainerServiceInterface {
       const onAllowedRoute =
         this.contentService.onTokensContainersCreate() || this.contentService.onTokensContainersDetails();
 
-      const hasValue = this.containerDetailResource.hasValue();
       if (!active || !serial || !this.containerDetailResource.hasValue() || !onAllowedRoute) {
         return;
       }

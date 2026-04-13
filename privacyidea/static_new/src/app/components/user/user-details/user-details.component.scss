@@ -55,7 +55,7 @@
 
 .label {
   font-weight: 600;
-  overflow: scroll;
+  overflow: auto;
   text-overflow: ellipsis;
   display: block;
   margin-block: auto;
@@ -64,7 +64,7 @@
 
 .value {
   grid-column: 2;
-  overflow: scroll;
+  overflow: auto;
   text-overflow: ellipsis;
   display: block;
   margin-block: auto;

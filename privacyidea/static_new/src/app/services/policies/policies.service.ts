@@ -256,7 +256,10 @@ export class PolicyService implements PolicyServiceInterface {
     //   return this.filteredPolicyActionGroups(this.alreadyAddedActionNames(), this.actionFilter());
     // });
 
-  _allPolicies = computed(() => this.allPoliciesResource.value()?.result?.value ?? []);
+  _allPolicies = computed(() => {
+    if (!this.allPoliciesResource.hasValue()) return [];
+    return this.allPoliciesResource.value()?.result?.value ?? []
+  });
 
   getEmptyPolicy(): PolicyDetail {
     return {
@@ -286,10 +289,11 @@ export class PolicyService implements PolicyServiceInterface {
     computation: (_) => false
   });
   policyActions = computed(() => {
+    if (!this.policyActionResource.hasValue()) return {};
     return this.policyActionResource.value()?.result?.value ?? {};
   });
   allPolicyActionsFlat = computed(() => {
-    const policyActions = this.policyActionResource.value()?.result?.value;
+    const policyActions = this.policyActions();
     if (!policyActions) return {};
     const flat: { [actionName: string]: PolicyActionDetail } = {};
     for (const scope in policyActions) {
@@ -301,12 +305,12 @@ export class PolicyService implements PolicyServiceInterface {
     return flat;
   });
   allPolicyScopes = computed(() => {
-    const policyActions = this.policyActionResource.value()?.result?.value;
+    const policyActions = this.policyActions();
     if (!policyActions) return [];
     return Object.keys(policyActions);
   });
   policyActionsByGroup = computed<PolicyActionGroups>(() => {
-    const policyActions = this.policyActionResource.value()?.result?.value;
+    const policyActions = this.policyActions();
     if (!policyActions) return {};
     const grouped: PolicyActionGroups = {};
     for (const scope in policyActions) {
@@ -329,6 +333,7 @@ export class PolicyService implements PolicyServiceInterface {
     if (!filterValue && alreadyAddedActionNames.length === 0) {
       return this.policyActionsByGroup();
     }
+    if (!this.policyActionResource.hasValue()) return {};
     const policyActions = this.policyActionResource.value()?.result?.value;
     if (!policyActions) return {};
     const grouped: PolicyActionGroups = {};

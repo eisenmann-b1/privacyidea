@@ -162,18 +162,20 @@ export class MachineService implements MachineServiceInterface {
   pageSize = linkedSignal({
     source: () => ({
       selectedApplicationType: this.selectedApplicationType,
-      tokenApplicationResource: this.tokenService.tokenDetailResource.value
+      tokenApplicationResource: this.tokenService.tokenDetailResourceValue
     }),
     computation: () => 10
   });
 
   machineFilter: WritableSignal<FilterValue> = linkedSignal({
     source: () => ({
-      selectedApplicationType: this.selectedApplicationType,
-      tokenDetailResource: this.tokenService.tokenDetailResource.value
+      selectedApplicationType: this.selectedApplicationType
     }),
     computation: (source) => {
-      const tokenSerial = source.tokenDetailResource()?.result?.value?.tokens[0]?.serial;
+      let tokenSerial: string | undefined = "";
+      if (this.tokenService.tokenDetailResource.hasValue()) {
+        tokenSerial = this.tokenService.tokenDetailResource.value()?.result?.value?.tokens[0]?.serial;
+      }
       if (!tokenSerial) {
         return new FilterValue();
       }
@@ -212,7 +214,7 @@ export class MachineService implements MachineServiceInterface {
       application: this.selectedApplicationType(),
       filter: this.machineFilter(),
       sort: this.sort(),
-      tokenApplicationResource: this.tokenService.tokenDetailResource.value
+      tokenApplicationResource: this.tokenService.tokenDetailResourceValue
     }),
     computation: () => 0
   });
@@ -272,13 +274,19 @@ export class MachineService implements MachineServiceInterface {
   });
 
   machines: WritableSignal<Machines | undefined> = linkedSignal({
-    source: this.machinesResource.value,
-    computation: (machinesResource, previous) => machinesResource?.result?.value ?? previous?.value
+    source: () => {},
+    computation: (_, previous) => {
+      if (!this.machinesResource.hasValue()) return undefined;
+      return this.machinesResource.value()?.result?.value ?? previous?.value;
+    }
   });
 
   tokenApplications: Signal<TokenApplications | undefined> = linkedSignal({
-    source: this.tokenApplicationResource.value,
-    computation: (tokenApplicationResource, previous) => tokenApplicationResource?.result?.value ?? previous?.value
+    source: () => {},
+    computation: (_, previous) => {
+      if (!this.tokenApplicationResource.hasValue()) return undefined;
+      return this.tokenApplicationResource.value()?.result?.value ?? previous?.value;
+    }
   });
 
   handleFilterInput($event: Event): void {

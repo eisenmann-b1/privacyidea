@@ -77,8 +77,16 @@ export class CaConnectorService implements CaConnectorServiceInterface {
   });
 
   caConnectors: WritableSignal<CaConnectors> = linkedSignal({
-    source: this.caConnectorResource.value,
-    computation: (source, previous) => source?.result?.value ?? previous?.value ?? []
+    source: () => {},
+    computation: (_, previous) => {
+      if (this.caConnectorResource.hasValue()) {
+        const caConnectors = this.caConnectorResource.value()?.result?.value;
+        if (caConnectors && caConnectors.length > 0) {
+          return caConnectors;
+        }
+      }
+      return previous?.value ?? [];
+    }
   });
 
   async postCaConnector(connector: CaConnector): Promise<void> {

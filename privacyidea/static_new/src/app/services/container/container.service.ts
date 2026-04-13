@@ -315,8 +315,11 @@ export class ContainerService implements ContainerServiceInterface {
   });
 
   private readonly tokenInContainer = computed<boolean>(() => {
-    const tokenDetailsRes = this.tokenService.tokenDetailResource.value();
-    const assigned = tokenDetailsRes?.result?.value?.tokens?.[0]?.container_serial ?? "";
+    let assigned = "";
+    if (this.tokenService.tokenDetailResource.hasValue()) {
+      const tokenDetailsRes = this.tokenService.tokenDetailResource.value();
+      assigned = tokenDetailsRes?.result?.value?.tokens?.[0]?.container_serial ?? "";
+    }
     return String(assigned).trim() !== "";
   });
 
@@ -328,6 +331,7 @@ export class ContainerService implements ContainerServiceInterface {
 
     // On token details only load containers if details are available and the token is not already in a container.
     if (this.contentService.onTokenDetails()) {
+      if (!this.tokenService.tokenDetailResource.hasValue()) return undefined;
       const tokenRes = this.tokenService.tokenDetailResource.value();
       if (!tokenRes) {
         return undefined;
@@ -382,28 +386,27 @@ export class ContainerService implements ContainerServiceInterface {
     };
   });
 
-  containerOptions = linkedSignal({
-    source: this.containerResource.value,
-    computation: (containerResource) => {
-      return containerResource?.result?.value?.containers.map((container) => container.serial) ?? [];
+  containerOptions = linkedSignal(() => {
+      if (!this.containerResource.hasValue()) return [];
+      return this.containerResource.value()?.result?.value?.containers.map((container) => container.serial) ?? [];
     }
-  });
+  );
 
   filteredContainerOptions = computed(() => {
     const filter = (this.selectedContainer() || "").toLowerCase();
     return this.containerOptions().filter((option) => option.toLowerCase().includes(filter));
   });
 
-  containersForTokenType = linkedSignal({
-    source: this.containerResource.value,
-    computation: (containerResource) => {
+  containersForTokenType = linkedSignal(
+    () => {
+      if (!this.containerResource.hasValue()) return [];
       return (
-        containerResource?.result?.value?.containers
+        this.containerResource.value()?.result?.value?.containers
           .filter((container) => this.compatibleTypes().includes(container.type))
           .map((container) => container.serial) ?? []
       );
     }
-  });
+  );
 
   containerSelection: WritableSignal<ContainerDetailData[]> = linkedSignal({
     source: () => ({
@@ -436,6 +439,7 @@ export class ContainerService implements ContainerServiceInterface {
   });
 
   containerTypeOptions = computed<ContainerType[]>(() => {
+    if (!this.containerTypesResource.hasValue()) return [];
     const value = this.containerTypesResource.value()?.result?.value;
     if (!value) {
       return [];
@@ -488,10 +492,13 @@ export class ContainerService implements ContainerServiceInterface {
   });
 
   containerDetail: WritableSignal<ContainerDetails> = linkedSignal({
-    source: this.containerDetailResource.value,
-    computation: (containerDetailResource, previous) => {
-      if (containerDetailResource?.result?.value) {
-        return containerDetailResource.result?.value;
+    source: () => {},
+    computation: (_, previous) => {
+      if (this.containerDetailResource.hasValue()) {
+        const containerDetail = this.containerDetailResource.value()?.result?.value;
+        if (containerDetail) {
+          return containerDetail;
+        }
       }
       return (
         previous?.value ?? {
@@ -812,6 +819,9 @@ export class ContainerService implements ContainerServiceInterface {
   }
 
   containerBelongsToUser(containerSerial: any): false | true | undefined {
+    if (!this.containerResource.hasValue()) {
+      return undefined;
+    }
     return this.containerResource
       .value()
       ?.result?.value?.containers?.some((container) => container.serial === containerSerial);
@@ -889,13 +899,18 @@ export class ContainerService implements ContainerServiceInterface {
       clearTimeout(this.pollingTimeoutId);
       this.pollingTrigger();
       const serial = this.containerSerial();
-      const resourceValue = this.containerDetailResource.value();
       const active = this.isPollingActive();
 
       const onAllowedRoute =
         this.contentService.onTokensContainersCreate() || this.contentService.onTokensContainersDetails();
 
-      if (!active || !serial || !resourceValue?.result?.value || !onAllowedRoute) {
+      const hasValue = this.containerDetailResource.hasValue();
+      if (!active || !serial || !this.containerDetailResource.hasValue() || !onAllowedRoute) {
+        return;
+      }
+
+      const resourceValue = this.containerDetailResource.value();
+      if (!resourceValue?.result?.value) {
         return;
       }
 

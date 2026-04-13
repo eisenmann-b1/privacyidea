@@ -53,6 +53,7 @@ export class SubscriptionComponent {
   private dialogService = inject(DialogService);
   subscriptionsResource = this.subscriptionService.subscriptionsResource;
   subscriptions = computed(() => {
+    if (!this.subscriptionsResource.hasValue()) return [];
     const value = this.subscriptionsResource.value()?.result?.value;
     return value ? Object.values(value) : [];
   });

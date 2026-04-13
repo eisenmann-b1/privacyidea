@@ -125,10 +125,13 @@ export class AuditComponent {
   filterInput!: ElementRef<HTMLInputElement>;
 
   totalLength: WritableSignal<number> = linkedSignal({
-    source: this.auditService.auditResource.value,
-    computation: (auditResource, previous) => {
-      if (auditResource) {
-        return auditResource.result?.value?.count ?? 0;
+    source: () => {},
+    computation: (_, previous) => {
+      if (this.auditService.auditResource.hasValue()) {
+        const auditResource = this.auditService.auditResource.value();
+        if (auditResource) {
+          return auditResource.result?.value?.count ?? 0;
+        }
       }
       return previous?.value ?? 0;
     }
@@ -139,10 +142,13 @@ export class AuditComponent {
       Array.from({ length: pageSize }, () => Object.fromEntries(this.columnKeysMap.map((col) => [col.key, ""])))
   });
   auditDataSource: WritableSignal<MatTableDataSource<AuditData>> = linkedSignal({
-    source: this.auditService.auditResource.value,
-    computation: (auditResource, previous) => {
-      if (auditResource) {
-        return new MatTableDataSource(auditResource.result?.value?.auditdata);
+    source: () => {},
+    computation: (_, previous) => {
+      if (this.auditService.auditResource.hasValue()) {
+        const auditResource = this.auditService.auditResource.value();
+        if (auditResource) {
+          return new MatTableDataSource(auditResource.result?.value?.auditdata);
+        }
       }
       return previous?.value ?? new MatTableDataSource(this.emptyResource());
     }

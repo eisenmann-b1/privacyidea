@@ -102,6 +102,7 @@ export class NewSmsGatewayComponent implements OnInit, OnDestroy {
   headerFooterColumns: string[] = ["footerKey", "footerValue", "footerActions"];
 
   providers = computed<Record<string, SmsProvider>>(() => {
+    if (!this.smsGatewayService.smsProvidersResource.hasValue()) return {};
     return this.smsGatewayService.smsProvidersResource.value()?.result?.value ?? {};
   });
 

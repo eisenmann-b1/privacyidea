@@ -27,7 +27,12 @@ import { NotificationService } from "../notification/notification.service";
 import { ROUTE_PATHS } from "../../route_paths";
 import { environment } from "../../../environments/environment";
 import { provideHttpClient } from "@angular/common/http";
-import { MockContainerService, MockContentService, MockNotificationService } from "../../../testing/mock-services";
+import {
+  MockContainerService,
+  MockContentService,
+  MockNotificationService,
+  MockPiResponse
+} from "../../../testing/mock-services";
 import { MockAuthService } from "../../../testing/mock-services/mock-auth-service";
 
 describe("ContainerTemplateService", () => {
@@ -115,6 +120,18 @@ describe("ContainerTemplateService", () => {
       expect(value).toBeUndefined();
       expect(service.templates()).toEqual([]);
     });
+
+    it("should handle http error", async () => {
+      TestBed.tick();
+
+      const req = httpMock.expectOne(`${service.containerTemplateBaseUrl}`);
+      req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
+        status: 403, statusText: "Permission denied"
+      });
+      await Promise.resolve();
+
+      expect(service.templates()).toEqual([]);
+    });
   });
 
   describe("templateTokentypesResource", () => {
@@ -143,6 +160,19 @@ describe("ContainerTemplateService", () => {
       expect(value).toBeDefined();
       expect(value?.result?.value).toEqual(mockTokenTypes);
       expect(service.templateTokenTypes()).toEqual(mockTokenTypes);
+    });
+
+    it("should handle http error", async () => {
+      TestBed.tick();
+
+      const tokenTypesReq = httpMock.expectOne(`${environment.proxyUrl}/container/template/tokentypes`);
+      tokenTypesReq.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
+        status: 403, statusText: "Permission denied"
+      });
+      TestBed.tick();
+      await Promise.resolve();
+
+      expect(service.templateTokenTypes()).toEqual({});
     });
 
     it("should not fetch token types if not on the correct route", async () => {
@@ -228,7 +258,8 @@ describe("ContainerTemplateService", () => {
 
     it("should throw error on delete", async () => {
       const templateName = "template-to-fail";
-      const deletePromise = service.deleteTemplate(templateName).catch(() => {});
+      const deletePromise = service.deleteTemplate(templateName).catch(() => {
+      });
       const req = httpMock.expectOne((req) => req.url.includes(`/container/template/${templateName}`));
 
       req.flush("Error", { status: 500, statusText: "Server Error" });
@@ -281,7 +312,8 @@ describe("ContainerTemplateService", () => {
       const spy = jest.spyOn(service.templatesResource, "reload");
       const templateNames = ["template-1", "template-2"];
 
-      const deletePromise = service.deleteTemplates(templateNames).catch(() => {});
+      const deletePromise = service.deleteTemplates(templateNames).catch(() => {
+      });
 
       const req1 = httpMock.expectOne((req) => req.url.includes(`/container/template/${templateNames[0]}`));
       req1.flush(
@@ -356,7 +388,7 @@ describe("ContainerTemplateService", () => {
         container_type: "generic",
         default: false,
         template_options: {
-          tokens: [{ type: "token1", genkey: false, hashlib: "", otplen: 6, timeStep: 0, user: false }]
+          tokens: [{ type: "hotp", genkey: false, hashlib: "", otplen: 6, timeStep: 0, user: false }]
         }
       };
     });
@@ -368,7 +400,10 @@ describe("ContainerTemplateService", () => {
       expect(service.canSaveTemplate(invalidTemplate)).toBe(false);
     });
     it("should return false on empty token list", () => {
-      const invalidTemplate = { ...validTemplate, template_options: { ...validTemplate.template_options, tokens: [] } };
+      const invalidTemplate = {
+        ...validTemplate,
+        template_options: { ...validTemplate.template_options, tokens: [] }
+      };
       expect(service.canSaveTemplate(invalidTemplate)).toBe(false);
     });
   });
@@ -385,7 +420,8 @@ describe("ContainerTemplateService", () => {
     });
 
     it("should show a generic error notification on delete if error response contains no message", async () => {
-      const deletePromise = service.deleteTemplate("some-template").catch(() => {});
+      const deletePromise = service.deleteTemplate("some-template").catch(() => {
+      });
 
       const req = httpMock.expectOne((req) => req.url.includes(`/container/template/some-template`));
       req.flush({ result: { error: {} } }, { status: 500, statusText: "Internal Server Error" });

@@ -21,7 +21,12 @@ import { TestBed } from "@angular/core/testing";
 import { EventService } from "./event.service";
 import { provideHttpClient } from "@angular/common/http";
 import { HttpTestingController, provideHttpClientTesting } from "@angular/common/http/testing";
-import { MockContentService, MockDialogService, MockNotificationService } from "../../../testing/mock-services";
+import {
+  MockContentService,
+  MockDialogService,
+  MockNotificationService,
+  MockPiResponse
+} from "../../../testing/mock-services";
 import { MockAuthService } from "../../../testing/mock-services/mock-auth-service";
 import { NotificationService } from "../notification/notification.service";
 import { of, Subject } from "rxjs";
@@ -240,6 +245,21 @@ describe("EventService", () => {
       expect(service.eventHandlers()).toEqual(eventHandlers);
     });
 
+    it("should handle http error for allEventsResource", async () => {
+      // Setup
+      TestBed.tick();
+
+      // Execute
+      const req = httpMock.expectOne(`${service.eventBaseUrl}/`);
+      req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
+        status: 403, statusText: "Permission denied"
+      });
+      await Promise.resolve();
+
+      // Assertion
+      expect(service.eventHandlers()).toEqual([]);
+    });
+
     it("should not fetch events if not on the events route", async () => {
       // Setup
       contentServiceMock.routeUrl.set(ROUTE_PATHS.TOKENS);
@@ -270,7 +290,6 @@ describe("EventService", () => {
       const req = httpMock.expectOne(`${service.eventBaseUrl}/handlermodules`);
       const handlerModules = ["module1", "module2"];
       req.flush({ result: { value: handlerModules } });
-      TestBed.tick();
       await Promise.resolve();
 
       // Assertion
@@ -288,6 +307,18 @@ describe("EventService", () => {
       // Assertion
       httpMock.expectNone(`${service.eventBaseUrl}/handlermodules`);
       expect(service.eventHandlerModulesResource.value()).toBeUndefined();
+      expect(service.eventHandlerModules()).toEqual([]);
+    });
+
+    it("eventHandlerModules should return empty list if http error occurs", async () => {
+      TestBed.tick();
+
+      const req = httpMock.expectOne(`${service.eventBaseUrl}/handlermodules`);
+      req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
+        status: 403, statusText: "Permission denied"
+      });
+      await Promise.resolve();
+
       expect(service.eventHandlerModules()).toEqual([]);
     });
 
@@ -309,6 +340,18 @@ describe("EventService", () => {
       expect(service.availableEvents()).toEqual(events);
     });
 
+    it("should handle http error for availableEventsResource", async () => {
+      TestBed.tick();
+
+      const req = httpMock.expectOne(`${service.eventBaseUrl}/available`);
+      req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
+        status: 403, statusText: "Permission denied"
+      });
+      await Promise.resolve();
+
+      expect(service.availableEvents()).toEqual([]);
+    });
+
     it("availableEvents should return empty list if resource not loaded", () => {
       // Setup
       contentServiceMock.routeUrl.set(ROUTE_PATHS.TOKENS);
@@ -321,6 +364,22 @@ describe("EventService", () => {
     });
 
     it("should load all module positions if handler module is selected", async () => {
+      // Setup
+      service.selectedHandlerModule.set("testModule");
+      TestBed.tick();
+
+      // Execute
+      const req = httpMock.expectOne(`${service.eventBaseUrl}/positions/testModule`);
+      req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
+        status: 403, statusText: "Permission denied"
+      });
+      await Promise.resolve();
+
+      // Assertion
+      expect(service.modulePositions()).toEqual([]);
+    });
+
+    it("should handle http error for modulePositionsResource", async () => {
       // Setup
       service.selectedHandlerModule.set("testModule");
       TestBed.tick();
@@ -369,6 +428,22 @@ describe("EventService", () => {
       expect(service.moduleActions()).toEqual(actions);
     });
 
+    it("should handle http error for moduleActionsResource", async () => {
+      // Setup
+      service.selectedHandlerModule.set("testModule");
+      TestBed.tick();
+
+      // Execute
+      const req = httpMock.expectOne(`${service.eventBaseUrl}/actions/testModule`);
+      req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
+        status: 403, statusText: "Permission denied"
+      });
+      await Promise.resolve();
+
+      // Assertion
+      expect(service.moduleActions()).toEqual({});
+    });
+
     it("moduleActions should return empty dict if resource not loaded", () => {
       // Setup
       contentServiceMock.routeUrl.set(ROUTE_PATHS.TOKENS);
@@ -397,6 +472,22 @@ describe("EventService", () => {
       expect(value).toBeDefined();
       expect(value?.result?.value).toEqual(conditions);
       expect(service.moduleConditions()).toEqual(conditions);
+    });
+
+    it("should handle http error for moduleConditionsResource", async () => {
+      // Setup
+      service.selectedHandlerModule.set("testModule");
+      TestBed.tick();
+
+      // Execute
+      const req = httpMock.expectOne(`${service.eventBaseUrl}/conditions/testModule`);
+      req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
+        status: 403, statusText: "Permission denied"
+      });
+      await Promise.resolve();
+
+      // Assertion
+      expect(service.moduleConditions()).toEqual({});
     });
 
     it("moduleConditions should return empty list if resource not loaded", () => {

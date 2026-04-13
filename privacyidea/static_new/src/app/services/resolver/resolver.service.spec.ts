@@ -111,7 +111,23 @@ describe("ResolverService", () => {
     expect(req.request.method).toBe("GET");
     req.flush(mockResponse);
     await lastValueFrom(of({})); // Wait for async updates
+    expect(resolverService.resolverResourceValue()).toEqual({ resolver1, resolver2 });
     expect(resolverService.resolvers()).toEqual([resolver1, resolver2]);
+  });
+
+  it("should handle http error of resolverResource", async () => {
+    TestBed.tick();
+    const req = httpMock.expectOne(resolverService.resolverBaseUrl);
+    expect(req.request.method).toBe("GET");
+    req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
+        status: 403, statusText: "Permission denied"
+      });
+    await lastValueFrom(of({})); // Wait for async updates
+
+    expect(resolverService.resolverResourceValue()).toEqual({});
+    expect(resolverService.resolvers()).toEqual([]);
+    expect(resolverService.resolverOptions()).toEqual([]);
+    expect(resolverService.editableResolvers()).toEqual([]);
   });
 
   it("should get resolver options", async () => {
@@ -155,7 +171,7 @@ describe("ResolverService", () => {
     req.flush(mockResponse);
     await lastValueFrom(of({})); // Wait for async updates
 
-    TestBed.flushEffects && TestBed.tick();
+    TestBed.tick();
     expect(resolverService.editableResolvers()).toEqual(["ldap1", "ldap2", "ldap3"]);
   });
 

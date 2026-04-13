@@ -118,26 +118,14 @@ describe("UserDetailsComponent", () => {
   });
 
   it("tokenDataSource populates from tokenResource and keeps previous when resource is missing", () => {
-    tokenServiceMock.tokenResource.value.set({
-      detail: {},
-      id: 0,
-      jsonrpc: "2.0",
-      signature: "",
-      time: Date.now(),
-      version: "1.0",
-      versionnumber: "1.0",
-      result: {
-        status: true,
-        value: {
-          count: 2,
-          current: 2,
-          tokens: [
-            { serial: "T-1", revoked: false, locked: false } as any,
-            { serial: "T-2", revoked: false, locked: false } as any
-          ]
-        }
-      }
-    } as any);
+    tokenServiceMock.tokenResourceValue.set({
+      count: 2,
+      current: 2,
+      tokens: [
+        { serial: "T-1", revoked: false, locked: false } as any,
+        { serial: "T-2", revoked: false, locked: false } as any
+      ]
+    });
     fixture.detectChanges();
 
     expect(component.tokenDataSource().data.map((t) => t.serial)).toEqual(["T-1", "T-2"]);

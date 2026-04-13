@@ -136,6 +136,7 @@ describe("UserNewResolverComponent", () => {
 
     (resolverService.selectedResolverResource as any).value = resourceValue;
     (resolverService.selectedResolverResource as any).status = resourceStatus;
+    (resolverService.selectedResolverResource as any).hasValue = jest.fn().mockReturnValue(true);
 
     await detectChangesStable();
 
@@ -174,6 +175,7 @@ describe("UserNewResolverComponent", () => {
 
     (resolverService.selectedResolverResource as any).value = resourceValue;
     (resolverService.selectedResolverResource as any).status = resourceStatus;
+    (resolverService.selectedResolverResource as any).hasValue = jest.fn().mockReturnValue(true);
 
     await detectChangesStable();
 
@@ -204,6 +206,7 @@ describe("UserNewResolverComponent", () => {
 
     (resolverService.selectedResolverResource as any).value = resourceValue;
     (resolverService.selectedResolverResource as any).status = resourceStatus;
+    (resolverService.selectedResolverResource as any).hasValue = jest.fn().mockReturnValue(true);
 
     await detectChangesStable();
     expect(component.formData["fileName"]).toBe("/initial");
@@ -315,6 +318,7 @@ describe("UserNewResolverComponent", () => {
     (resolverService.selectedResolverResource as any).value.set({
       result: { status: true, value: resolverData }
     });
+    (resolverService.selectedResolverResource as any).hasValue = jest.fn().mockReturnValue(true);
     await detectChangesStable();
 
     const successResponse = new MockPiResponse<number, any>({
@@ -455,6 +459,7 @@ describe("UserNewResolverComponent", () => {
       }
     };
     (resolverService.selectedResolverResource as any).value.set({ result: { status: true, value: resolverData } });
+    (resolverService.selectedResolverResource as any).hasValue = jest.fn().mockReturnValue(true);
     await detectChangesStable();
 
     resolverService.postResolverTest.mockReturnValue(of(new MockPiResponse({ result: { status: true, value: 1 } })));

@@ -1,4 +1,4 @@
-/**
+./**
  * (c) NetKnights GmbH 2025,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or
@@ -100,7 +100,9 @@ export class EnrollCertificateComponent implements OnInit {
 
   caConnectorOptions = computed(
     () =>
-      this.systemService.caConnectorResource?.value()?.result?.value.map((config: any) => config.connectorname) || []
+      (this.systemService.caConnectorResource?.hasValue()
+        ? this.systemService.caConnectorResource?.value()?.result?.value.map((config: any) => config.connectorname)
+        : []) || []
   );
 
   caConnectorValueSignal = toSignal(this.caConnectorControl.valueChanges, {

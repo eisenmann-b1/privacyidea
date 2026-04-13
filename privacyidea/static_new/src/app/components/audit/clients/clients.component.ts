@@ -152,21 +152,23 @@ export class ClientsComponent {
     return rows;
   };
 
-  clientResource = this.clientService.clientsResource;
   clientDataSource: WritableSignal<MatTableDataSource<FlattenedClientRow>> = linkedSignal({
-    source: this.clientResource.value,
-    computation: (clientResource, previous) => {
-      if (clientResource) {
-        const clientData = clientResource.result?.value || ({} as ClientsDict);
-        const dataSource = new MatTableDataSource(this.flattenedClientRowsFromDict(clientData));
-        // Custom sorting for lastseen
-        dataSource.sortingDataAccessor = (item, property) => {
-          if (property === "lastseen") {
-            return item.lastseen ? item.lastseen.getTime() : 0;
-          }
-          return (item as any)[property];
-        };
-        return dataSource;
+    source: () => {},
+    computation: (_, previous) => {
+      if (this.clientService.clientsResource.hasValue()) {
+        const clientResource = this.clientService.clientsResource.value();
+        if (clientResource) {
+          const clientData = clientResource.result?.value || ({} as ClientsDict);
+          const dataSource = new MatTableDataSource(this.flattenedClientRowsFromDict(clientData));
+          // Custom sorting for lastseen
+          dataSource.sortingDataAccessor = (item, property) => {
+            if (property === "lastseen") {
+              return item.lastseen ? item.lastseen.getTime() : 0;
+            }
+            return (item as any)[property];
+          };
+          return dataSource;
+        }
       }
       return previous?.value ?? new MatTableDataSource([] as FlattenedClientRow[]);
     }

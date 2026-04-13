@@ -201,7 +201,7 @@ export class UserNewResolverComponent implements AfterViewInit, OnDestroy {
       }
 
       const status = resourceRef.status();
-      if (status === "loading" || status === "reloading") {
+      if (status === "loading" || status === "reloading" || !resourceRef.hasValue()) {
         if (status === "reloading") {
           this._editInitialized = false;
         }

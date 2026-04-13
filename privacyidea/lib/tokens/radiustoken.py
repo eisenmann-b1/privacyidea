@@ -349,7 +349,7 @@ class RadiusTokenClass(RemoteTokenClass):
         :return: bool
         """
         local_check = is_true(self.get_tokeninfo("radius.local_checkpin"))
-        log.debug("local checking pin? {0!r}".format(local_check))
+        log.debug(f"local checking pin? {local_check!r}")
 
         return local_check
 
@@ -487,10 +487,8 @@ class RadiusTokenClass(RemoteTokenClass):
             )
 
         # here we also need to check for radius.user
-        log.debug("checking OTP len:{0!s} on radius server: "
-                  "{1!s}, user: {2!r}".format(len(otpval),
-                                              radius_server_object.config.server,
-                                              radius_user))
+        log.debug(f"checking OTP len:{len(otpval)!s} on radius server: "
+                  f"{radius_server_object.config.server!s}, user: {radius_user!r}")
 
         try:
             # TODO: At the moment we support only one radius server.
@@ -520,14 +518,14 @@ class RadiusTokenClass(RemoteTokenClass):
             else:
                 radius_state = '<REJECTED>'
                 radius_message = 'RADIUS authentication failed'
-                log.debug("radius response code: %r" % response.code)
+                log.debug(f"radius response code: {response.code!r}")
                 log.info(f"Radiusserver {radius_server_object.config.identifier} "
                          f"rejected access to user {radius_user}!")
                 result = AccessReject
 
         except Exception as e:  # pragma: no cover
             log.error(f"Error contacting radius Server: {e}")
-            log.info("{0!s}".format(traceback.format_exc()))
+            log.info(f"{traceback.format_exc()!s}")
 
         options.update({'radius_result': result})
         options.update({'radius_state': radius_state})

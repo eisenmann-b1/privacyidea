@@ -494,7 +494,7 @@ WEBAUTHN_TOKEN_SPECIFIC_SETTINGS = {
 }
 
 
-class WebAuthnGroup(object):
+class WebAuthnGroup:
     """
     Categories used to group WebAuthn token actions.
     """

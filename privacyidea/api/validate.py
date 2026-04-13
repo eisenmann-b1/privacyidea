@@ -182,8 +182,8 @@ def before_request():
                         "user_agent": ua_name,
                         "user_agent_version": ua_version,
                         "privacyidea_server": privacyidea_server,
-                        "action": "{0!s} {1!s}".format(request.method, request.url_rule),
-                        "thread_id": "{0!s}".format(threading.current_thread().ident),
+                        "action": f"{request.method!s} {request.url_rule!s}",
+                        "thread_id": f"{threading.current_thread().ident!s}",
                         "info": ""})
     # Add preliminary user to audit in case we fail with an error
     g.audit_object.log({
@@ -890,7 +890,7 @@ def trigger_challenge():
         "realm": user.realm,
         "success": result_obj > 0,
         "authentication": r.json.get("result").get("authentication"),
-        "info": log_used_user(user, "triggered {0!s} challenges".format(result_obj)),
+        "info": log_used_user(user, f"triggered {result_obj!s} challenges"),
         "serial": ",".join(challenge_serials),
     })
 

@@ -71,10 +71,10 @@ def create_container_registration_url(nonce: str, time_stamp: str, server_url: s
     extra_data = extra_data or {}
     url_extra_data = _construct_extra_parameters(extra_data)
     url_passphrase = quote(passphrase.encode("utf-8"))
-    url_send_passphrase = quote(f"{send_passphrase}".encode("utf-8"))
+    url_send_passphrase = quote(f"{send_passphrase}".encode())
     url_key_algorithm = quote(key_algorithm.encode("utf-8"))
     url_hash_algorithm = quote(hash_algorithm.encode("utf-8"))
-    url_ssl_verify = quote(f"{ssl_verify}".encode("utf-8"))
+    url_ssl_verify = quote(f"{ssl_verify}".encode())
     url_server_url = quote(server_url.encode("utf-8"))
 
     url = (f"pia://container/{url_label}?issuer={url_issuer}&ttl={ttl}&nonce={url_nonce}&time={url_time_stamp}"
@@ -272,7 +272,8 @@ class SmartphoneContainer(TokenContainerClass):
 
         ::
 
-            message = <nonce>|<time>|<serial>|<scope>|<device_brand>|<device_model>|<passphrase_response>|<public_key_client>
+            message = <nonce>|<time>|<serial>|<scope>|<device_brand>|<device_model>|
+                      <passphrase_response>|<public_key_client>
 
         To verify the signature, the ECDSA signature algorithm with SHA256 hash function is used. The public key is
         expected to be an ecc key of curve secp384r1.

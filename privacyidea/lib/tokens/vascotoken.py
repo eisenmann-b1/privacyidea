@@ -185,7 +185,7 @@ class VascoTokenClass(TokenClass):
             elif result == -205:
                 log.warning("VASCO token failed to authenticate, response not decimal!")
             else:
-                log.warning("VASCO token failed to authenticate, result: {!r}".format(result))
+                log.warning(f"VASCO token failed to authenticate, result: {result!r}")
             return -1
 
     def export_token(self) -> dict:

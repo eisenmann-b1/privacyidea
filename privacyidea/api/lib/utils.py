@@ -147,10 +147,10 @@ def getParam(param, key, optional=True, default=None, allow_empty=True, allowed_
     elif default:
         ret = default
     elif not optional:
-        raise ParameterError("Missing parameter: {0!r}".format(key), id=905)
+        raise ParameterError(f"Missing parameter: {key!r}", id=905)
 
     if not allow_empty and ret == "":
-        raise ParameterError("Parameter {0!r} must not be empty".format(key), id=905)
+        raise ParameterError(f"Parameter {key!r} must not be empty", id=905)
 
     if allowed_values and ret not in allowed_values:
         ret = default
@@ -246,7 +246,7 @@ def send_file(output, filename, content_type='text/csv'):
     :return: The generated response
     :rtype: flask.Response
     """
-    headers = {'Content-disposition': 'attachment; filename={0!s}'.format(filename)}
+    headers = {'Content-disposition': f'attachment; filename={filename!s}'}
     return current_app.response_class(output, headers=headers, mimetype=content_type)
 
 
@@ -276,7 +276,7 @@ def send_csv_result(obj, data_key="tokens",
     if data_key in obj and len(obj[data_key]) > 0:
         # Do the header
         for k, _v in obj.get(data_key)[0].items():
-            output += "{0!s}{1!s}{2!s}, ".format(delim, k, delim)
+            output += f"{delim!s}{k!s}{delim!s}, "
         output += "\n"
 
         # Do the data
@@ -286,7 +286,7 @@ def send_csv_result(obj, data_key="tokens",
                     value = val.replace("\n", " ")
                 else:
                     value = val
-                output += "{0!s}{1!s}{2!s}, ".format(delim, value, delim)
+                output += f"{delim!s}{value!s}{delim!s}, "
             output += "\n"
 
     return send_file(output, filename)
@@ -340,14 +340,12 @@ def get_all_params(request):
     body = request.data
     return_param = {}
     if param:
-        log.debug("Update params in request {0!s} {1!s} with values.".format(request.method,
-                                                                             request.base_url))
+        log.debug(f"Update params in request {request.method!s} {request.base_url!s} with values.")
         # Add the unquoted HTML and form parameters
         return_param = check_unquote(request, request.values)
 
     if request.is_json:
-        log.debug("Update params in request {0!s} {1!s} with JSON data.".format(request.method,
-                                                                                request.base_url))
+        log.debug(f"Update params in request {request.method!s} {request.base_url!s} with JSON data.")
         # Add the original JSON data
         return_param.update(request.json)
     elif body:
@@ -357,11 +355,10 @@ def get_all_params(request):
             for k, v in json_data.items():
                 return_param[k] = v
         except Exception as exx:
-            log.debug("Can not get param: {0!s}".format(exx))
+            log.debug(f"Can not get param: {exx!s}")
 
     if request.view_args:
-        log.debug("Update params in request {0!s} {1!s} with view_args.".format(request.method,
-                                                                                request.base_url))
+        log.debug(f"Update params in request {request.method!s} {request.base_url!s} with view_args.")
         # We add the unquoted view_args
         return_param.update(check_unquote(request, request.view_args))
 

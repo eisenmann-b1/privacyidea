@@ -31,7 +31,7 @@ webservice!
 
 import logging
 
-from sqlalchemy import func, select, update
+from sqlalchemy import func, select
 
 from privacyidea.lib.config import get_machine_resolver_class_dict
 from privacyidea.lib.utils import (sanity_name_check, get_data_from_params, fetch_one_resource)
@@ -75,8 +75,8 @@ def save_resolver(params):
     # check the type
     (class_dict, type_dict) = get_machine_resolver_class_dict()
     if resolvertype not in type_dict.values():
-        raise Exception("machine resolver type : {0!s} "
-                        "not in {1!s}".format(resolvertype, list(type_dict.values())))
+        raise Exception(f"machine resolver type : {resolvertype!s} "
+                        f"not in {list(type_dict.values())!s}")
 
     # check the name
     resolvers = get_resolver_list(filter_resolver_name=resolvername)
@@ -87,7 +87,7 @@ def save_resolver(params):
             update_resolver = True
         else:  # pragma: no cover
             raise Exception("machine resolver with similar name and other type "
-                            "already exists: %s" % r_name)
+                            f"already exists: {r_name}")
 
     # create a dictionary for the ResolverConfig
     resolver_config = get_resolver_config_description(resolvertype)
@@ -263,7 +263,7 @@ def get_resolver_object(resolvername):
         if r_obj_class is None:  # pragma: no cover
             # This can only happen if a resolver class definition would be
             # removed.
-            log.error("unknown resolver class for type {0!s} ".format(
+            log.error("unknown resolver class for type {!s} ".format(
                 resolver.get("type")))
         else:
             # create the resolver instance and load the config
@@ -298,7 +298,7 @@ def export_machineresolver(name=None):
 @register_import('machineresolver')
 def import_machineresolver(data, name=None):
     """Import machineresolver configuration"""
-    log.debug('Import caconnector config: {0!s}'.format(data))
+    log.debug(f'Import caconnector config: {data!s}')
     for _res_name, res_data in data.items():
         if name and name != res_data.get('resolvername'):
             continue
@@ -307,5 +307,5 @@ def import_machineresolver(data, name=None):
         res_data['name'] = res_data.pop('resolvername')
         res_data.update(res_data.pop('data'))
         rid = save_resolver(res_data)
-        log.info('Import of caconnector "{0!s}" finished,'
-                 ' id: {1!s}'.format(res_data['name'], rid))
+        log.info('Import of caconnector "{!s}" finished,'
+                 ' id: {!s}'.format(res_data['name'], rid))

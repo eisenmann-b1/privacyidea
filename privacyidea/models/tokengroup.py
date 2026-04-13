@@ -16,7 +16,6 @@
 # You should have received a copy of the GNU Affero General Public
 # License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
-from typing import List, Optional
 
 from sqlalchemy import Unicode, Integer, UniqueConstraint, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -36,14 +35,14 @@ class Tokengroup(TimestampMethodsMixin, db.Model):
     __tablename__ = 'tokengroup'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False)
     name: Mapped[str] = mapped_column(Unicode(255), default='', unique=True, nullable=False)
-    Description: Mapped[Optional[str]] = mapped_column(Unicode(2000), default='')
+    Description: Mapped[str | None] = mapped_column(Unicode(2000), default='')
 
     # Define relationship back to Token for deletion cascade
-    tokens: Mapped[List['TokenTokengroup']] = relationship('Token', secondary='tokentokengroup',
+    tokens: Mapped[list['TokenTokengroup']] = relationship('Token', secondary='tokentokengroup',
                                                            back_populates='tokengroup_list')
 
     @log_with(log)
-    def __init__(self, groupname: str, description: Optional[str] = None):
+    def __init__(self, groupname: str, description: str | None = None):
         self.name = groupname
         self.Description = description
 
@@ -56,10 +55,10 @@ class TokenTokengroup(TimestampMethodsMixin, db.Model):
     __tablename__ = 'tokentokengroup'
     __table_args__ = (UniqueConstraint('token_id', 'tokengroup_id', name='ttgix_2'),)
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    token_id: Mapped[Optional[int]] = mapped_column(Integer, db.ForeignKey('token.id'))
-    tokengroup_id: Mapped[Optional[int]] = mapped_column(Integer, db.ForeignKey('tokengroup.id'))
+    token_id: Mapped[int | None] = mapped_column(Integer, db.ForeignKey('token.id'))
+    tokengroup_id: Mapped[int | None] = mapped_column(Integer, db.ForeignKey('tokengroup.id'))
 
-    def __init__(self, tokengroup_id: int = 0, token_id: int = 0, tokengroupname: Optional[str] = None):
+    def __init__(self, tokengroup_id: int = 0, token_id: int = 0, tokengroupname: str | None = None):
         """
         Create a new TokenTokengroup assignment
         :param tokengroup_id: The id of the token group

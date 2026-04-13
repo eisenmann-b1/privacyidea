@@ -92,7 +92,6 @@ from privacyidea.lib.error import ParameterError
 from privacyidea.models import Challenge
 from privacyidea.lib.tokens.ocra import OCRASuite
 from privacyidea.lib.challenge import get_challenges
-from privacyidea.models import cleanup_challenges
 from privacyidea.lib import _
 from privacyidea.lib.decorators import check_token_locked
 from privacyidea.lib.tokens.ocratoken import OcraTokenClass
@@ -107,7 +106,7 @@ required = False
 OCRA_DEFAULT_SUITE = "OCRA-1:HOTP-SHA1-6:QN10"
 
 
-class API_ACTIONS(object):
+class API_ACTIONS:
     METADATA = "metadata"
     ENROLLMENT = "enrollment"
     AUTHENTICATION = "authentication"
@@ -209,7 +208,7 @@ class TiqrTokenClass(OcraTokenClass):
         # smartphone needs to contain a userId.
         if not self.user:
             # The user and realms should have already been set in init_token()
-            raise ParameterError("Missing parameter: {0!r}".format("user"), id=905)
+            raise ParameterError("Missing parameter: {!r}".format("user"), id=905)
 
         ocrasuite = get_from_config("tiqr.ocrasuite") or OCRA_DEFAULT_SUITE
         OCRASuite(ocrasuite)
@@ -224,14 +223,12 @@ class TiqrTokenClass(OcraTokenClass):
         response_detail = TokenClass.get_init_detail(self, params, user)
         params = params or {}
         enroll_url = get_from_config("tiqr.regServer")
-        log.info("using tiqr.regServer for enrollment: {0!s}".format(enroll_url))
+        log.info(f"using tiqr.regServer for enrollment: {enroll_url!s}")
         serial = self.token.serial
         session = generate_otpkey()
         # save the session in the token
         self.add_tokeninfo("session", session)
-        tiqrenroll = "tiqrenroll://{0!s}?action={1!s}&session={2!s}&serial={3!s}".format(
-            enroll_url, API_ACTIONS.METADATA,
-            session, serial)
+        tiqrenroll = f"tiqrenroll://{enroll_url!s}?action={API_ACTIONS.METADATA!s}&session={session!s}&serial={serial!s}"
 
         response_detail["tiqrenroll"] = {"description":
                                                     _("URL for TiQR "
@@ -256,8 +253,7 @@ class TiqrTokenClass(OcraTokenClass):
         action = getParam(params, "action", optional) or \
                  API_ACTIONS.AUTHENTICATION
         if action not in API_ACTIONS.ALLOWED_ACTIONS:
-            raise ParameterError("Allowed actions are {0!s}".format(
-                                 API_ACTIONS.ALLOWED_ACTIONS))
+            raise ParameterError(f"Allowed actions are {API_ACTIONS.ALLOWED_ACTIONS!s}")
 
         if action == API_ACTIONS.METADATA:
             session = getParam(params, "session", required)
@@ -283,13 +279,10 @@ class TiqrTokenClass(OcraTokenClass):
                        "logoUrl": logo_url,
                        "infoUrl": info_url,
                        "authenticationUrl":
-                           "{0!s}".format(auth_server),
+                           f"{auth_server!s}",
                        "ocraSuite": ocrasuite,
                        "enrollmentUrl":
-                           "{0!s}?action={1!s}&session={2!s}&serial={3!s}".format(
-                               reg_server,
-                               API_ACTIONS.ENROLLMENT,
-                               session, serial)
+                           f"{reg_server!s}?action={API_ACTIONS.ENROLLMENT!s}&session={session!s}&serial={serial!s}"
                        }
             identity = {"identifier": user_identifier,
                         "displayName": user_displayname
@@ -332,10 +325,10 @@ class TiqrTokenClass(OcraTokenClass):
             return "plain", res
         elif action == API_ACTIONS.AUTHENTICATION:
             res = "FAIL"
-            userId = getParam(params, "userId", required)
+            getParam(params, "userId", required)
             session = getParam(params, "sessionKey", required)
             passw = getParam(params, "response", required)
-            operation = getParam(params, "operation", required)
+            getParam(params, "operation", required)
             res = "INVALID_CHALLENGE"
             # The sessionKey is stored in the db_challenge.transaction_id
             # We need to get the token serial for this sessionKey
@@ -363,7 +356,7 @@ class TiqrTokenClass(OcraTokenClass):
                             token.inc_failcount()
                             fail = token.get_failcount()
                             maxfail = token.get_max_failcount()
-                            res = "INVALID_RESPONSE:{0!s}".format(maxfail - fail)
+                            res = f"INVALID_RESPONSE:{maxfail - fail!s}"
                             break
                 if not challenge.is_valid():
                     # The challenge is not valid anymore. We delete the challenge.
@@ -425,12 +418,7 @@ class TiqrTokenClass(OcraTokenClass):
 
         # Encode the user to UTF-8 and quote the result
         encoded_user_identifier = quote_plus(user_identifier.encode('utf-8'))
-        authurl = "tiqrauth://{0!s}@{1!s}/{2!s}/{3!s}/{4!s}".format(
-                                              encoded_user_identifier,
-                                              service_identifier,
-                                              db_challenge.transaction_id,
-                                              challenge,
-                                              quote(service_displayname))
+        authurl = f"tiqrauth://{encoded_user_identifier!s}@{service_identifier!s}/{db_challenge.transaction_id!s}/{challenge!s}/{quote(service_displayname)!s}"
         image = create_img(authurl)
         attributes = {"img": image,
                       "value": authurl,

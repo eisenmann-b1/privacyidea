@@ -57,9 +57,9 @@
 from flask_babel import _
 from flask import (Blueprint, request, g, current_app)
 
-from ..lib.container import find_container_by_serial, add_token_to_container, add_not_authorized_tokens_result
+from ..lib.container import find_container_by_serial, add_token_to_container
 from ..lib.log import log_with
-from .lib.utils import optional, send_result, send_csv_result, required, getParam, get_optional, get_required
+from .lib.utils import optional, send_result, send_csv_result, required, getParam, get_optional
 from ..lib.tokenclass import RolloutState
 from ..lib.tokens.passkeytoken import PasskeyTokenClass
 from ..lib.tokens.webauthntoken import WebAuthnTokenClass
@@ -211,17 +211,17 @@ def init():
               "detail": {
                 "googleurl": {
                   "description": "URL for google Authenticator",
-                  "img": "<img width=250 src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAcIAAAHCAQAAAABUY/ToAAADsUlEQVR4nO2czY3bMBCF34QCfKSALcClyB2kpCAlpQOxlBQQgDwaoPBy4I+p9W4OSRaWF28OgizxgylgMJw/0oi/k/DlL0FApEiRIkWKFCnyeKRVmdrjNAFh3srTMuSS2qjLg2cr8pDkQpKMgF3SBITz1QA4YolVfQA4kiT35CNmK/JQZLM8aQaWH+3pEkEgTZlhBojksgGAAS7/83+K/ORkOF/NLtismiCfYXbOd+AxZivygCTXdCLCDJRLfTbhTo4wW5FHIJtyeAJIAJb4AobLBIP/ZQRAwMcyakxIPtd3ivw4EqObXJzody9t1EKS63N9p8iPI4sO3QTwGSSbA1Q0x+cWunWRDolsUjSnxvau6VB0xMIMrp4EPAnAkWsjpEMiu+ysD1mUZomuKk1/i6WtedIhkXupS1MEsMRmaVafh7dVfXwGV0D+kMj3yXDOsIsngXQiV59R0tZIE7jC0b4VA3WE2Yo8CtkTPy7b8sPA8HWbWML6dCKAqxG4GgADw+weOVuRRyTHuGztbk+PwdqQPIzTWibyDbJWVdOJQDLj9xkod4yOCK2gbzZvVpyip/xOkR9B4maCbnF8c53vHGuuLVaTHRLZpBgYgweAVP0hLPElA+mFtVrvf3W/aTM+brYij0j23o8JthAweNc1J5cCmSFNYDCAS5wfOVuRRyT7QpVL9F6XLN/zjhG4ZSAHj1trmcgmLcfoWoq6/B4LZLeqBxmVpxb5WobYfl8vaxfU7DSA4mdLh0S+TW5W2xXTiaWZ0WbALqiXmi5KU/n5tN8p8r+TzaqUH936MKNW6/2uIkvZIZF/IEleDfAZZnYi1zSB/DmVpa2YJZtVLxP5JmnfWCutty5qwNcFrWSsV2xGxs3+03+K/Cxk74WtTWflDr652L0XtoZuylOLvJNb9H7XPzQ0DOX9RTokcpAhAzRYpN4LO5TsI1rQLx0SOci4z7VcSuvQZgxWX1gfbfBX1ctEvhLupbZSe5bNQK0Jv/dTe9U6RL6WtoIBqDs33NA7Xdey3SYzrWUi99L8IfJW4cC4pYNjg+Ow/+O5vlPkx5OpnSsUzler2cbS29g8pmBmWH6elGMU+UqaFwS0NBBa9O45Rmhr26Mof0jkTt440MNlC9aOGQqzA8McaQs34xJfsv3rf4r8XOTduR+lezHN5fyh0sdY76qz/cDZijwwGcxqs0c9gNFx5w9t7e18hNmKPBRZ7NDtXKF6V1qp2e9qtZ7DkOf6TpEiRYoUKVKkyPfkNyq7YXtdjZCIAAAAAElFTkSuQmCC\\"/>",
+                  "img": "<img width=250 src=\\"data:image/png;base64,iVBORw0KGgoAAAAN...\\"/>",
                   "value": "otpauth://hotp/mylabel?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&counter=0"
                 },
                 "oathurl": {
                   "description": "URL for OATH token",
-                  "img": "<img width=250 src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAcIAAAHCAQAAAABUY/ToAAADfElEQVR4nO2cTYrjMBCFX40EvZRvkKPIN5gz9c3so/QBBqxlwObNQpIlp2cYaBI6zrxamDjyhywo6leyEV+T+ccXQUCkSJEiRYoUKfL5SCviy7+zmZWBAbARmwGpPjXeZU6RL0ZGkuQCAMkMCCTmqlJ8HwAb4UiSPJJfn1Pki5Fpty8AED/MEBeAU/JoA52pOuk6Rd6f9H/60xBWbwCMyG7Mg0j3mlPky5OOiB9v5AQACCQnONr4yDlFnpisdigQQAIM4WpE2oyAWy0umyfCku1QX5A81zpFPo5EHybDEXH566U+FUlyOtc6RT6OzHao2RfOgwMQVqBYJADz5WrFVN1jTpGvRRY7FLmCExwR8y3JKbAm84HkFFawieyQyCpFJRagaMniikqRK4C9KpSVa3GULxN5lGZp8n3kinrr2H5xCmsZlQ6JPEiLqbPzKh5sRefL4uJILq4MyJeJPEjzZb2jQnFopQmSH3FZw2SHRB6lC3bQeatDiI2wghOAaoykQyKb7L2OzQPpjZjNEUgDDNiMSAMAOFpchjvNKfK1yGqHlkNetofYxclVs5RzNfkykZ/J4rc+So+++S2zy1ofDVezMXmURtoZ1ynyEeRuh1xXSiwJPtCFRyUygupDIm+l5fa9Q+Na0rT8yCG3lw6JPEqtMZaCUNfmyPWhBajtMx46Iedap8jHkV2/DK0cDWBXqapczY0ptxd5kFZjLEqzlJi6C4WyHYJjHZAOieyk2aGsSNyjoF2l0Jsg9TpE/oVMHpgvK8wupRZkIwDMQy0S5QMfbVfsOdcp8v5kF1M3N9ZaGrX/sbf2g+yQyFtpPdW2/75pTtGX5tWCcnuRt9L1OtguLcFve9DazmrpkMheOn3Ju4aA4tX6gVopiurbi7yV3Lc3IJ+vh0VuHoBbAWyeSH41hF+fzzKea50iH012QdE8OPJ92MzG9HY4NJRDpqt9+9uKfEayffeDU/J7z3UzG8PVSlqfPMrlm99W5FOSsUY8Noarmdkb+T7UTSF7Wv8kbyvyqcguL+u23k/7cDvdmm9Vpxb5LzLbobErObbc/lFzijw3eZtvcR4WAtjKx2Lmn1djztBAWN5ZPX3X24p8RrI719HcWNnsEVoz1vWPyJeJ7KXYoTln7A4Wcz6/eQL7xxxyRr95IlwNskMiezF941ykSJEiRYoU+Z+TvwF49nApsKFZZAAAAABJRU5ErkJggg==\\"/>",
+                  "img": "<img width=250 src=\\"data:image/png;base64,iVBORw0KGgoAAAAN...\\"/>",
                   "value": "oathtoken:///addToken?name=mylabel&lockdown=true&key=3132333435363738393031323334353637383930"
                 },
                 "otpkey": {
                   "description": "OTP seed",
-                  "img": "<img width=200 src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAAFKAQAAAABTUiuoAAAB70lEQVR4nO2aTY6jQAyFPw9IWYI0B+ijwNHhKH0DWLZU6PXCVYSOZkF6xM/CXkQkfIsnWRU/22ViZ4x/9pIQaKCBBhpooEeilqPGrAWzdjGYy8/94QICfQftJEkTAIsBlYBKkqSf6DECAn0HnfMRkj4fnjfrATOrzxEQ6I6oX74bYGJuzxIQ6H9kqySqSjCfISDQX6CNpKE8mX18lT9GpXMEBLofHc3M7WA/19B9PgQsbgnPEBDonrCXyZMB/HMaFZOnu6DWz2aMZqaBZ79Vw9gu0W/dBsU7qm4CL16aKq9geonhcq2BlqR4jirRSYImoaF8eO8c2boeXR38YnRavIwJkNFUsg1xudZAy5ywreSFyqcabgxr8lE7XECgu8JPjpj/Ao2AJtXAYoIEYzsVi3i51kBz3Rq8O658RFhKVn4Rdesu6MYTemZoEm468kh+TejlWgNdjXoeMGVjOJXXnVJk6zboa1uFb7Wm1csTZ+tu6HN3TKcEYwvZIlLJ+sMFBPoO+twdjz7GXQy8Mf6Kqe7t0HV37FaDSp630R7Rb90WtR6ytxiaFPute6Gvu2OY6wRzC92EtguUy7UGWvqtzWgX8DtPZZ8cnvAuKNs7aH4v7ZnBPH6PWcZd0DInLPHjqSTvSAGBBhpooIEG+gb6DeDWV0l+Ofz2AAAAAElFTkSuQmCC\\"/>",
+                  "img": "<img width=200 src=\\"data:image/png;base64,iVBORw0KGgoAAAAN...\\"/>",
                   "value": "seed://3132333435363738393031323334353637383930"
                 },
                 "serial": "OATH00096020"
@@ -518,7 +518,7 @@ def list_api():
     # allowed_realms determines, which realms the admin would be allowed to see
     # In certain cases like for users, we do not have allowed_realms
     allowed_realms = getattr(request, "pi_allowed_realms", None)
-    g.audit_object.log({'info': "realm: {0!s}".format(allowed_realms)})
+    g.audit_object.log({'info': f"realm: {allowed_realms!s}"})
 
     # get hide_tokeninfo setting from all_data
     hidden_tokeninfo = getParam(param, 'hidden_tokeninfo', default=None)
@@ -931,7 +931,7 @@ def set_description_api(serial=None):
         serial = getParam(request.all_data, "serial", required)
     g.audit_object.log({"serial": serial})
     description = getParam(request.all_data, "description", optional=required)
-    g.audit_object.add_to_log({'action_detail': "description={0!r}".format(description)})
+    g.audit_object.add_to_log({'action_detail': f"description={description!r}"})
     token = get_one_token(serial=serial, user=user)
     request.all_data["type"] = token.type
     require_description_on_edit(request)
@@ -991,52 +991,43 @@ def set_api(serial=None):
     res = 0
 
     if description is not None:
-        g.audit_object.add_to_log({'action_detail': "description=%r, "
-                                                    "" % description})
+        g.audit_object.add_to_log({'action_detail': f"description={description!r}, "})
         res += set_description(serial, description, user=user)
 
     if count_window is not None:
-        g.audit_object.add_to_log({'action_detail': "count_window=%r, "
-                                                    "" % count_window})
+        g.audit_object.add_to_log({'action_detail': f"count_window={count_window!r}, "})
         res += set_count_window(serial, count_window, user=user)
 
     if sync_window is not None:
-        g.audit_object.add_to_log({'action_detail': "sync_window=%r, "
-                                                    "" % sync_window})
+        g.audit_object.add_to_log({'action_detail': f"sync_window={sync_window!r}, "})
         res += set_sync_window(serial, sync_window, user=user)
 
     if hashlib is not None:
-        g.audit_object.add_to_log({'action_detail': "hashlib=%r, "
-                                                    "" % hashlib})
+        g.audit_object.add_to_log({'action_detail': f"hashlib={hashlib!r}, "})
         res += set_hashlib(serial, hashlib, user=user)
 
     if max_failcount is not None:
-        g.audit_object.add_to_log({'action_detail': "max_failcount=%r, "
-                                                    "" % max_failcount})
+        g.audit_object.add_to_log({'action_detail': f"max_failcount={max_failcount!r}, "})
         res += set_max_failcount(serial, max_failcount, user=user)
 
     if count_auth_max is not None:
-        g.audit_object.add_to_log({'action_detail': "count_auth_max=%r, "
-                                                    "" % count_auth_max})
+        g.audit_object.add_to_log({'action_detail': f"count_auth_max={count_auth_max!r}, "})
         res += set_count_auth(serial, count_auth_max, user=user, max=True)
 
     if count_auth_success_max is not None:
         g.audit_object.add_to_log({'action_detail':
-            "count_auth_success_max={0!r}, ".format(
-                count_auth_success_max)})
+            f"count_auth_success_max={count_auth_success_max!r}, "})
         res += set_count_auth(serial, count_auth_success_max, user=user,
                               max=True, success=True)
 
     if validity_period_end is not None:
         g.audit_object.add_to_log({'action_detail':
-            "validity_period_end={0!r}, ".format(
-                validity_period_end)})
+            f"validity_period_end={validity_period_end!r}, "})
         res += set_validity_period_end(serial, user, validity_period_end)
 
     if validity_period_start is not None:
         g.audit_object.add_to_log({'action_detail':
-            "validity_period_start={0!r}, ".format(
-                validity_period_start)})
+            f"validity_period_start={validity_period_start!r}, "})
         res += set_validity_period_start(serial, user, validity_period_start)
 
     g.audit_object.log({"success": True})
@@ -1304,17 +1295,15 @@ def get_serial_by_otp_api(otp=None):
     if assigned_param:
         assigned = True
 
-    count = get_tokens(tokentype=ttype, serial_wildcard="*{0!s}*".format(
-        serial_substr), assigned=assigned, count=True)
+    count = get_tokens(tokentype=ttype, serial_wildcard=f"*{serial_substr!s}*", assigned=assigned, count=True)
     if not count_only:
         tokenobj_list = get_tokens(tokentype=ttype,
-                                   serial_wildcard="*{0!s}*".format(serial_substr),
+                                   serial_wildcard=f"*{serial_substr!s}*",
                                    assigned=assigned)
         serial = get_serial_by_otp(tokenobj_list, otp=otp, window=window)
 
     g.audit_object.log({"success": True,
-                        "info": "get {0!s} by OTP. {1!s} tokens".format(
-                            serial, count)})
+                        "info": f"get {serial!s} by OTP. {count!s} tokens"})
 
     return send_result({"serial": serial,
                         "count": count})

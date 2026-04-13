@@ -178,7 +178,7 @@ class FourEyesTokenClass(TokenClass):
         if type(realms) is dict:
             for realmname, v in realms.items():
                 if v.get("selected"):
-                    realms_string += "{0!s}:{1!s},".format(realmname, v.get("count"))
+                    realms_string += "{!s}:{!s},".format(realmname, v.get("count"))
             if realms_string[-1] == ',':
                 realms_string = realms_string[:-1]
         else:
@@ -274,8 +274,8 @@ class FourEyesTokenClass(TokenClass):
             if serial:
                 # check that not the same token is used again
                 if serial in used_tokens.get(realm, []):
-                    log.info("The same token {0!s} was already used. "
-                             "You can not use a token twice.".format(serial))
+                    log.info(f"The same token {serial!s} was already used. "
+                             "You can not use a token twice.")
                 else:
                     # Add the serial to the used tokens.
                     if realm in used_tokens:
@@ -283,7 +283,7 @@ class FourEyesTokenClass(TokenClass):
                     else:
                         used_tokens[realm] = [serial]
                     options["data"] = used_tokens
-                    log.debug("Partially authenticated with token {0!s}.".format(serial))
+                    log.debug(f"Partially authenticated with token {serial!s}.")
                     r_success = 1
                     break
         return r_success
@@ -325,8 +325,7 @@ class FourEyesTokenClass(TokenClass):
             found_serials[realm] = list(set(found_serials[realm]))
 
             if len(found_serials[realm]) < required_realms[realm]:
-                reply = {"foureyes": "Only found {0:d} tokens in realm {1!s}".format(
-                    len(found_serials[realm]), realm)}
+                reply = {"foureyes": f"Only found {len(found_serials[realm]):d} tokens in realm {realm!s}"}
                 otp_counter = -1
                 break
             else:
@@ -379,7 +378,7 @@ class FourEyesTokenClass(TokenClass):
             remaining_realms = self._get_remaining_realms(options.get("data", {}))
             if remaining_realms:
                 options["data"] = json.dumps(options.get("data", {}))
-                options["message"] = "Remaining tokens: {0!s}".format(remaining_realms)
+                options["message"] = f"Remaining tokens: {remaining_realms!s}"
                 return True
         return False
 
@@ -458,7 +457,7 @@ class FourEyesTokenClass(TokenClass):
         remaining_realms = self._get_remaining_realms(used_tokens)
         if remaining_realms:
             message = "Please authenticate with another token from " \
-                      "either realm: {0!s}.".format(", ".join(remaining_realms))
+                      "either realm: {!s}.".format(", ".join(remaining_realms))
 
         validity = int(get_from_config('DefaultChallengeValidityTime', 120))
         tokentype = self.get_tokentype().lower()
@@ -476,7 +475,7 @@ class FourEyesTokenClass(TokenClass):
         db_challenge.save()
         expiry_date = datetime.datetime.now() + \
                       datetime.timedelta(seconds=validity)
-        reply_dict = {'attributes': {'valid_until': "{0!s}".format(expiry_date)}}
+        reply_dict = {'attributes': {'valid_until': f"{expiry_date!s}"}}
         return True, message, db_challenge.transaction_id, reply_dict
 
     def is_challenge_request(self, passw, user=None, options=None):

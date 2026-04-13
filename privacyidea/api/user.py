@@ -89,7 +89,7 @@ def get_users():
             "status": true,
             "value": [
               {
-                "description": "Cornelius K\u00f6lbel,,+49 151 2960 1417,+49 561 3166797,cornelius.koelbel@netknights.it",
+                "description": "Cornelius K\u00f6lbel,,+49 151 2960 1417,cornelius.koelbel@netknights.it",
                 "email": "cornelius.koelbel@netknights.it",
                 "givenname": "Cornelius",
                 "mobile": "+49 151 2960 1417",
@@ -115,7 +115,7 @@ def get_users():
                           requested_attributes=requested_attributes)
 
     g.audit_object.log({'success': True,
-                        'info': "realm: {0!s}".format(realm)})
+                        'info': f"realm: {realm!s}"})
 
     return send_result(users)
 
@@ -156,7 +156,7 @@ def set_user_attribute():
 
     r = request.User.set_attribute(attrkey, attrvalue, attrtype)
     g.audit_object.log({"success": True,
-                        "info": "{0!s}".format(attrkey)})
+                        "info": f"{attrkey!s}"})
     return send_result(r)
 
 
@@ -182,7 +182,7 @@ def get_user_attribute():
     if attrkey:
         r = r.get(attrkey)
     g.audit_object.log({"success": True,
-                        "info": "{0!s}".format(attrkey)})
+                        "info": f"{attrkey!s}"})
     return send_result(r)
 
 
@@ -224,7 +224,7 @@ def delete_user_attribute(attrkey, username, realm=None):
     user = User(username, realm)
     r = user.delete_attribute(attrkey)
     g.audit_object.log({"success": True,
-                        "info": "{0!s}".format(attrkey)})
+                        "info": f"{attrkey!s}"})
     return send_result(r)
 
 
@@ -254,7 +254,7 @@ def delete_user(resolvername=None, username=None):
     user_obj = request.User
     res = user_obj.delete()
     g.audit_object.log({"success": res,
-                        "info": "{0!s}".format(user_obj)})
+                        "info": f"{user_obj!s}"})
     return send_result(res)
 
 
@@ -297,8 +297,7 @@ def create_user_api():
         del attributes["password"]
     uid = create_user(resolvername, attributes, password=password)
     g.audit_object.log({"success": True if uid else False,
-                        "info": "{0!s}: {1!s}/{2!s}".format(uid, username,
-                                                            resolvername)})
+                        "info": f"{uid!s}: {username!s}/{resolvername!s}"})
     return send_result(uid)
 
 
@@ -351,7 +350,7 @@ def update_user():
         del attributes["password"]
     success = user_obj.update_user_info(attributes, password=password)
     g.audit_object.log({"success": success,
-                        "info": "{0!s}: {1!s}/{2!s}".format(success, username, resolvername)})
+                        "info": f"{success!s}: {username!s}/{resolvername!s}"})
     return send_result(success)
 
 

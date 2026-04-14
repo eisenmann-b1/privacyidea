@@ -77,7 +77,7 @@ class ACTION(BASE_ACTION):
     CERTIFICATE_REQUEST_SUBJECT_COMPONENT = "certificate_request_subject_component"
 
 
-class REQUIRE_ACTIONS(object):
+class REQUIRE_ACTIONS:
     IGNORE = "ignore"
     VERIFY = "verify"
     REQUIRE_AND_VERIFY = "require_and_verify"
@@ -261,7 +261,7 @@ class CertificateTokenClass(TokenClass):
         try:
             self._update_rollout_state()
         except Exception as e:
-            log.warning("Failed to check for pending update. {0!s}".format(e))
+            log.warning(f"Failed to check for pending update. {e!s}")
 
     @staticmethod
     def get_class_type():
@@ -408,20 +408,20 @@ class CertificateTokenClass(TokenClass):
                 # TODO: Later we need to make the status CA dependent. Different CAs could return
                 #  different codes. So each CA Connector needs a mapper for its specific codes.
                 if status in [3, 4]:  # issued or "issued out of band"
-                    log.info("The certificate {0!s} has been issued by the CA.".format(self.token.serial))
+                    log.info(f"The certificate {self.token.serial!s} has been issued by the CA.")
                     certificate = cacon.get_issued_certificate(request_id)
                     # Update the rollout state
                     self.token.rollout_state = RolloutState.ENROLLED
                     self.add_tokeninfo("certificate", certificate)
                 elif status == 2:  # denied
-                    log.warning("The certificate {0!s} has been denied by the CA.".format(self.token.serial))
+                    log.warning(f"The certificate {self.token.serial!s} has been denied by the CA.")
                     self.token.rollout_state = RolloutState.DENIED
                     self.token.save()
                 else:
-                    log.info("The certificate {0!s} is still pending.".format(self.token.serial))
+                    log.info(f"The certificate {self.token.serial!s} is still pending.")
             else:
-                log.warning("The certificate token in rollout_state pending, but either the CA ({0!s}) "
-                            "or the requestId ({1!s}) is missing.".format(ca, request_id))
+                log.warning(f"The certificate token in rollout_state pending, but either the CA ({ca!s}) "
+                            f"or the requestId ({request_id!s}) is missing.")
         return status
 
     def update(self, param):
@@ -484,7 +484,7 @@ class CertificateTokenClass(TokenClass):
                     except Exception as e:
                         # We could have file system errors during verification.
                         log.debug(f"An error occurred while verifying the certificate path: {e}")
-                        log.debug("{0!s}".format(traceback.format_exc()))
+                        log.debug(f"{traceback.format_exc()!s}")
                         verified = False
 
                     if not verified:
@@ -671,19 +671,17 @@ class CertificateTokenClass(TokenClass):
         # determine the CA and its connector.
         ti = self.get_tokeninfo()
         ca_specifier = ti.get("CA")
-        log.debug("Revoking certificate {0!s} on CA {1!s}.".format(
-            self.token.serial, ca_specifier))
+        log.debug(f"Revoking certificate {self.token.serial!s} on CA {ca_specifier!s}.")
         certificate_pem = ti.get("certificate")
 
         # call CAConnector.revoke_cert()
         ca_obj = get_caconnector_object(ca_specifier)
         revoked = ca_obj.revoke_cert(certificate_pem,
                                      request_id=ti.get(REQUEST_ID))
-        log.info("Certificate {0!s} revoked on CA {1!s}.".format(revoked,
-                                                                 ca_specifier))
+        log.info(f"Certificate {revoked!s} revoked on CA {ca_specifier!s}.")
 
         # call CAConnector.create_crl()
         crl = ca_obj.create_crl()
-        log.info("CRL {0!s} created.".format(crl))
+        log.info(f"CRL {crl!s} created.")
 
         return revoked

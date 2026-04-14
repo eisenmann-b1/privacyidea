@@ -132,8 +132,8 @@ class YubicoTokenClass(TokenClass):
     def update(self, param):
         tokenid = get_required(param, "yubico.tokenid")
         if len(tokenid) < YUBICO_LEN_ID:
-            log.error("The tokenid needs to be {0:d} characters long!".format(YUBICO_LEN_ID))
-            raise Exception("The Yubikey token ID needs to be {0:d} characters long!".format(YUBICO_LEN_ID))
+            log.error(f"The tokenid needs to be {YUBICO_LEN_ID:d} characters long!")
+            raise Exception(f"The Yubikey token ID needs to be {YUBICO_LEN_ID:d} characters long!")
 
         if len(tokenid) > YUBICO_LEN_ID:
             tokenid = tokenid[:YUBICO_LEN_ID]
@@ -166,7 +166,7 @@ class YubicoTokenClass(TokenClass):
 
         tokenid = self.get_tokeninfo("yubico.tokenid")
         if len(anOtpVal) < 12:
-            log.warning("The otpval is too short: {0!r}".format(anOtpVal))
+            log.warning(f"The otpval is too short: length {len(anOtpVal)}")
         elif anOtpVal[:12] != tokenid:
             log.warning("The tokenid in the OTP value does not match "
                         "the assigned token!")
@@ -202,8 +202,8 @@ class YubicoTokenClass(TokenClass):
 
                     if not signature_valid:
                         log.error("The hash of the return from the yubico "
-                                  "authentication server ({0!s}) "
-                                  "does not match the data!".format(yubico_url))
+                                  f"authentication server ({yubico_url!s}) "
+                                  "does not match the data!")
 
                     if nonce != return_nonce:
                         log.error("The returned nonce does not match "
@@ -217,12 +217,12 @@ class YubicoTokenClass(TokenClass):
                     else:
                         # possible results are listed here:
                         # https://github.com/Yubico/yubikey-val/wiki/ValidationProtocolV20
-                        log.warning("failed with {0!r}".format(result))
+                        log.warning(f"failed with {result!r}")
 
             except Exception as ex:
                 log.error("Error getting response from Yubico Cloud Server"
-                          " (%r): %r" % (yubico_url, ex))
-                log.debug("{0!s}".format(traceback.format_exc()))
+                          f" ({yubico_url!r}): {ex!r}")
+                log.debug(f"{traceback.format_exc()!s}")
 
         return res
 

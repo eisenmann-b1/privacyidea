@@ -716,8 +716,10 @@ def registration_finalize():
             g,
             scope=SCOPE.CONTAINER,
             action=PolicyAction.HIDE_SPECIFIC_ERROR_MESSAGE,
-            user_object=request.User if hasattr(request, "User") else None).any():
-            return send_error("Failed finalizing container registration", error_code=Error.CONTAINER), map_error_to_code(e)
+            user_object=request.User if hasattr(request, "User") else None,
+        ).any():
+            return (send_error("Failed finalizing container registration", error_code=Error.CONTAINER),
+                    map_error_to_code(e))
         raise
 
 
@@ -790,8 +792,10 @@ def registration_terminate_client():
             g,
             scope=SCOPE.CONTAINER,
             action=PolicyAction.HIDE_SPECIFIC_ERROR_MESSAGE,
-            user_object=request.User if hasattr(request, "User") else None).any():
-            return send_error("Failed terminating container registration", error_code=Error.CONTAINER), map_error_to_code(e)
+            user_object=request.User if hasattr(request, "User") else None,
+        ).any():
+            return (send_error("Failed terminating container registration", error_code=Error.CONTAINER),
+                    map_error_to_code(e))
         raise
 
 
@@ -834,7 +838,7 @@ def create_challenge():
         registration_state = RegistrationState(container_info.get(RegistrationState.get_key()))
         if registration_state not in [RegistrationState.REGISTERED, RegistrationState.ROLLOVER,
                                       RegistrationState.ROLLOVER_COMPLETED]:
-            raise ContainerNotRegistered(f"Container is not registered.")
+            raise ContainerNotRegistered("Container is not registered.")
 
         # validity time for the challenge in minutes
         challenge_ttl = int(container_info.get(CHALLENGE_TTL, "2"))
@@ -932,7 +936,8 @@ def synchronize():
 
         # 2nd synchronization step: Validate challenge and get container diff between client and server
         container.check_challenge_response(params)
-        initially_add_tokens = request.all_data.get("client_policies").get(PolicyAction.INITIALLY_ADD_TOKENS_TO_CONTAINER)
+        initially_add_tokens = request.all_data.get("client_policies").get(
+            PolicyAction.INITIALLY_ADD_TOKENS_TO_CONTAINER)
         container_dict = container.synchronize_container_details(container_client, initially_add_tokens)
 
         # Write token serials to audit log
@@ -1042,11 +1047,13 @@ def rollover():
             raise ContainerNotRegistered("Container is not registered.")
 
         # Rollover
-        res_rollover = init_container_rollover(container, server_url, challenge_ttl, registration_ttl, ssl_verify, params)
+        res_rollover = init_container_rollover(container, server_url, challenge_ttl, registration_ttl,
+                                               ssl_verify, params)
 
         # Audit log
-        info_str = (f"server_url={server_url}, challenge_ttl={challenge_ttl}min, registration_ttl={registration_ttl}min, "
-                    f"ssl_verify={ssl_verify}, registration_state={registration_state.value}")
+        info_str = (f"server_url={server_url}, challenge_ttl={challenge_ttl}min, "
+                    f"registration_ttl={registration_ttl}min, ssl_verify={ssl_verify}, "
+                    f"registration_state={registration_state.value}")
         g.audit_object.log({"container_serial": container_serial,
                             "container_type": container.type,
                             "info": info_str,

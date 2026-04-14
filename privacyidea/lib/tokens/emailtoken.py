@@ -89,7 +89,7 @@ log = logging.getLogger(__name__)
 TEST_SUCCESSFUL = "Successfully sent email. Please check your inbox."
 
 
-class EMAILACTION(object):
+class EMAILACTION:
     EMAILTEXT = "emailtext"
     EMAILSUBJECT = "emailsubject"
     EMAILAUTO = "emailautosend"
@@ -124,7 +124,7 @@ class EmailTokenClass(HotpTokenClass):
         else:
             email = self.get_tokeninfo(self.EMAIL_ADDRESS_KEY)
         if not email:  # pragma: no cover
-            log.warning("Token {0!s} does not have an email address!".format(self.token.serial))
+            log.warning(f"Token {self.token.serial!s} does not have an email address!")
         return email
 
     @_email_address.setter
@@ -281,8 +281,7 @@ class EmailTokenClass(HotpTokenClass):
         success = False
         options = options or {}
         return_message = get_action_values_from_options(SCOPE.AUTH,
-                                                        "{0!s}_{1!s}".format(self.get_class_type(),
-                                                                             PolicyAction.CHALLENGETEXT),
+                                                        f"{self.get_class_type()!s}_{PolicyAction.CHALLENGETEXT!s}",
                                                         options) or _("Enter the OTP from the Email")
 
         return_message = return_message.replace(r'\,', ',')
@@ -292,7 +291,7 @@ class EmailTokenClass(HotpTokenClass):
 
         if self.is_active() is True:
             counter = self.get_otp_count()
-            log.debug("counter={0!r}".format(counter))
+            log.debug(f"counter={counter!r}")
 
             # At this point we must not bail out in case of a
             # Gateway error, since checkPIN is successful. A bailout
@@ -327,15 +326,15 @@ class EmailTokenClass(HotpTokenClass):
             except Exception as e:
                 info = _("The PIN was correct, but the "
                          "EMail could not be sent!")
-                log.warning(info + " ({0!r})".format(e))
-                log.debug("{0!s}".format(traceback.format_exc()))
+                log.warning(info + f" ({e!r})")
+                log.debug(f"{traceback.format_exc()!s}")
                 return_message = info
                 if is_true(options.get("exception")):
                     raise Exception(info)
 
         expiry_date = datetime.datetime.now() + \
                       datetime.timedelta(seconds=validity)
-        reply_dict['attributes']['valid_until'] = "{0!s}".format(expiry_date)
+        reply_dict['attributes']['valid_until'] = f"{expiry_date!s}"
 
         return success, return_message, transactionid, reply_dict
 
@@ -369,8 +368,8 @@ class EmailTokenClass(HotpTokenClass):
                                                    message=message,
                                                    subject=subject,
                                                    mimetype=mimetype)
-            log.debug("AutoEmail: send new SMS: {0!s}".format(success))
-            log.debug("AutoEmail: {0!r}".format(message))
+            log.debug(f"AutoEmail: send new SMS: {success!s}")
+            log.debug(f"AutoEmail: {message!r}")
         return ret
 
     @staticmethod
@@ -393,7 +392,8 @@ class EmailTokenClass(HotpTokenClass):
         g = options.get("g")
         user_object = options.get("user")
         if g:
-            messages = Match.user(g, scope=SCOPE.AUTH, action=action, user_object=user_object if user_object else None) \
+            messages = Match.user(g, scope=SCOPE.AUTH, action=action,
+                                  user_object=user_object if user_object else None) \
                 .action_values(unique=True, allow_white_space_in_action=True)
             if len(messages) == 1:
                 message = list(messages)[0]
@@ -403,13 +403,13 @@ class EmailTokenClass(HotpTokenClass):
         if message.startswith("file:"):
             # We read the template from the file.
             try:
-                with open(message[5:], "r") as f:
+                with open(message[5:]) as f:
                     message = f.read()
                     mimetype = "html"
             except Exception as e:  # pragma: no cover
                 message = default
-                log.warning("Failed to read email template: {0!r}".format(e))
-                log.debug("{0!s}".format(traceback.format_exc()))
+                log.warning(f"Failed to read email template: {e!r}")
+                log.debug(f"{traceback.format_exc()!s}")
 
         return message, mimetype
 
@@ -474,7 +474,7 @@ class EmailTokenClass(HotpTokenClass):
 
         subject = subject.format(otp=otp, **tags)
 
-        log.debug("sending Email to {0!r}".format(recipient))
+        log.debug(f"sending Email to {recipient!r}")
 
         # The token specific identifier has priority over the system-wide identifier
         identifier = self.get_tokeninfo("email.identifier") or get_from_config("email.identifier")

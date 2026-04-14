@@ -180,7 +180,7 @@ def delete_tokengroup_api(groupname=None):
         }
 
     """
-    ret = delete_tokengroup(groupname)
+    delete_tokengroup(groupname)
     g.audit_object.log({"success": True,
                         "info": groupname})
 

@@ -463,13 +463,13 @@ class PasskeyTokenClass(TokenClass):
         authentication could be made.
         """
         try:
-            authenticator_data = get_required_one_of(options, ["authenticatorData", "authenticatordata"])
-            client_data_json = get_required_one_of(options, ["clientDataJSON", "clientdata"])
-            signature = get_required_one_of(options, ["signature", "signaturedata"])
-            user_handle = get_optional_one_of(options, ["userHandle", "userhandle"])
-            expected_challenge = get_required(options, "challenge").encode("utf-8")
-            expected_origin = get_required(options, "HTTP_ORIGIN")
-            user_verification = get_optional(options, FIDO2PolicyAction.USER_VERIFICATION_REQUIREMENT, "preferred")
+            get_required_one_of(options, ["authenticatorData", "authenticatordata"])
+            get_required_one_of(options, ["clientDataJSON", "clientdata"])
+            get_required_one_of(options, ["signature", "signaturedata"])
+            get_optional_one_of(options, ["userHandle", "userhandle"])
+            get_required(options, "challenge")
+            get_required(options, "HTTP_ORIGIN")
+            get_optional(options, FIDO2PolicyAction.USER_VERIFICATION_REQUIREMENT, "preferred")
         except ParameterError as e:
             log.debug(f"Missing parameter for authentication with passkey: {e}")
             # TODO authenticate has horrible return values

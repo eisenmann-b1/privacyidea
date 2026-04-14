@@ -48,7 +48,7 @@ def get_caconnector_api(name=None):
     """
     returns a json list of the available CA connectors
     """
-    g.audit_object.log({"detail": "{0!s}".format(name)})
+    g.audit_object.log({"detail": f"{name!s}"})
     res = get_caconnector_list(filter_caconnector_name=name,
                                return_config=True)  # the endpoint is only accessed by admins
     g.audit_object.log({"success": True})
@@ -79,7 +79,7 @@ def save_caconnector_api(name=None):
     """
     param = request.all_data
     param["caconnector"] = name
-    g.audit_object.log({"detail": "{0!s}".format(name)})
+    g.audit_object.log({"detail": f"{name!s}"})
     res = save_caconnector(param)
     g.audit_object.log({"success": True})
     return send_result(res)
@@ -92,7 +92,7 @@ def delete_caconnector_api(name=None):
     """
     Delete a specific CA connector
     """
-    g.audit_object.log({"detail": "{0!s}".format(name)})
+    g.audit_object.log({"detail": f"{name!s}"})
     res = delete_caconnector(name)
     g.audit_object.log({"success": True})
     return send_result(res)

@@ -19,8 +19,8 @@
 # License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 __doc__ = """
-The OCRA token is the base OCRA functionality. Usually it is created by 
-importing a CSV or PSKC file. 
+The OCRA token is the base OCRA functionality. Usually it is created by
+importing a CSV or PSKC file.
 
 This code is tested in tests/test_lib_tokens_tiqr.
 """
@@ -272,23 +272,23 @@ class OcraTokenClass(TokenClass):
         return self.verify_response(otpval, options['challenge'])
 
     @staticmethod
-    def get_import_csv(l):
+    def get_import_csv(row):
         """
         Read the list from a csv file and return a dictionary, that can be used
         to do a token_init.
 
-        :param l: The list of the line of a csv file
-        :type l: list
+        :param row: The list of the line of a csv file
+        :type row: list
         :return: A dictionary of init params
         """
-        params = TokenClass.get_import_csv(l)
+        params = TokenClass.get_import_csv(row)
 
         # Delete the otplen, if it exists. The fourth column is the ocrasuite!
         if "otplen" in params:
             del params["otplen"]
 
         # ocrasuite
-        if len(l) >= 4:
-            params["ocrasuite"] = l[3].strip()
+        if len(row) >= 4:
+            params["ocrasuite"] = row[3].strip()
 
         return params

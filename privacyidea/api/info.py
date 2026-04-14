@@ -17,7 +17,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 
-from flask import (Blueprint, request, g, current_app)
+from flask import (Blueprint, request, g)
 from privacyidea.lib.info.rss import get_news, FETCH_DAYS
 import logging
 from .lib.utils import send_result

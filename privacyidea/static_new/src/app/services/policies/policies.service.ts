@@ -294,7 +294,6 @@ export class PolicyService implements PolicyServiceInterface {
   });
   allPolicyActionsFlat = computed(() => {
     const policyActions = this.policyActions();
-    if (!policyActions) return {};
     const flat: { [actionName: string]: PolicyActionDetail } = {};
     for (const scope in policyActions) {
       const actions = policyActions[scope];
@@ -306,12 +305,10 @@ export class PolicyService implements PolicyServiceInterface {
   });
   allPolicyScopes = computed(() => {
     const policyActions = this.policyActions();
-    if (!policyActions) return [];
     return Object.keys(policyActions);
   });
   policyActionsByGroup = computed<PolicyActionGroups>(() => {
     const policyActions = this.policyActions();
-    if (!policyActions) return {};
     const grouped: PolicyActionGroups = {};
     for (const scope in policyActions) {
       const actions = policyActions[scope];

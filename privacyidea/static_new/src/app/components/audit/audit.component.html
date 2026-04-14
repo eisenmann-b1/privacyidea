@@ -46,146 +46,144 @@
       [pageSize]="auditService.pageSize()"
       showFirstLastButtons />
   </div>
-  <div class="table-container">
-    <table
-      [dataSource]="auditDataSource()"
-      aria-label="Audit Data Table"
-      class="token-table"
-      i18n-aria-label
-      mat-table>
-      @for (column of columnKeysMap; track column) {
-        <ng-container [matColumnDef]="column.key">
-          <th
-            *matHeaderCellDef
-            attr.aria-label="{{ column.label }} Header"
-            mat-header-cell>
-            <div class="flex ali-center">
-              {{ column.label }}
-              @if (
-                !["number", "log_level", "clearance_level", "sig_check", "missing_line", "thread_id"].includes(column.key)
-              ) {
-                <div class="margin-left-16">
-                  <button
-                    (click)="onKeywordClick(apiFilterKeyMap[column.key])"
-                    class="filter-button"
-                    mat-icon-button>
-                    <mat-icon class="keyword-button-icon margin-left-0">
-                      {{ getFilterIconName(column.key) }}
-                    </mat-icon>
-                  </button>
+  <table
+    [dataSource]="auditDataSource()"
+    aria-label="Audit Data Table"
+    class="token-table"
+    i18n-aria-label
+    mat-table>
+    @for (column of columnKeysMap; track column) {
+      <ng-container [matColumnDef]="column.key">
+        <th
+          *matHeaderCellDef
+          attr.aria-label="{{ column.label }} Header"
+          mat-header-cell>
+          <div class="flex ali-center">
+            {{ column.label }}
+            @if (
+              !["number", "log_level", "clearance_level", "sig_check", "missing_line", "thread_id"].includes(column.key)
+            ) {
+              <div class="margin-left-16">
+                <button
+                  (click)="onKeywordClick(apiFilterKeyMap[column.key])"
+                  class="filter-button"
+                  mat-icon-button>
+                  <mat-icon class="keyword-button-icon margin-left-0">
+                    {{ getFilterIconName(column.key) }}
+                  </mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        </th>
+        <td
+          *matCellDef="let element; let row"
+          [ngClass]="{
+            'table-checkbox': column.key === 'select'
+          }"
+          attr.aria-label="{{ column.label }} Cell"
+          mat-cell>
+          <div>
+            @switch (column.key) {
+              @case ("success") {
+                <div class="flex just-center">
+                  <span
+                    [ngClass]="
+                      tableUtilsService.getSpanClassForKey({
+                        key: column.key,
+                        value: element[column.key]
+                      })
+                    ">
+                    {{ element[column.key] }}
+                  </span>
                 </div>
               }
-            </div>
-          </th>
-          <td
-            *matCellDef="let element; let row"
-            [ngClass]="{
-              'table-checkbox': column.key === 'select'
-            }"
-            attr.aria-label="{{ column.label }} Cell"
-            mat-cell>
-            <div>
-              @switch (column.key) {
-                @case ("success") {
-                  <div class="flex just-center">
-                    <span
-                      [ngClass]="
-                        tableUtilsService.getSpanClassForKey({
-                          key: column.key,
-                          value: element[column.key]
-                        })
-                      ">
-                      {{ element[column.key] }}
-                    </span>
-                  </div>
-                }
-                @case ("serial") {
-                  <div class="flex-row flex-nowrap ali-center">
-                    <a
-                      (click)="contentService.tokenSelected(element.serial)"
-                      attr.aria-label="{{ column.label }} Link"
-                      routerLink="/token">
-                      {{ element[column.key] }}
-                    </a>
-                    @if (element.serial && element.serial !== "") {
-                      <app-copy-button [copyText]="element.serial"></app-copy-button>
-                    }
-                  </div>
-                }
-                @case (column.key === "sig_check" || column.key === "missing_line" ? column.key : "") {
-                  <span [ngClass]="[element[column.key] === 'OK' ? 'highlight-true' : 'highlight-false']">
-                    {{ element[column.key] }}
-                  </span>
-                }
-                @case ("container_serial") {
-                  <div class="flex-row flex-nowrap ali-center">
-                    <a
-                      (click)="contentService.containerSelected(element.container_serial)"
-                      attr.aria-label="{{ column.label }} Link"
-                      routerLink="/token">
-                      {{ element[column.key] }}
-                    </a>
-                    @if (element.container_serial && element.container_serial !== "") {
-                      <app-copy-button [copyText]="element.container_serial"></app-copy-button>
-                    }
-                  </div>
-                }
-                @case ("startdate") {
-                  <span>
-                    {{ element[column.key].split(".")[0].replace("T", " ") }}
-                  </span>
-                }
-                @case ("date") {
-                  <span>
-                    {{ element[column.key].split(".")[0].replace("T", " ") }}
-                  </span>
-                }
-                @case ("policies") {
-                  @for (policy of element[column.key]?.split(","); track policy) {
-                    <span>
-                      {{ policy }}
-                    </span>
-                  }
-                }
-                @case ("user") {
+              @case ("serial") {
+                <div class="flex-row flex-nowrap ali-center">
                   <a
-                    (click)="contentService.userSelected(element[column.key], element['user_realm'])"
-                    attr.aria-label="{{ column.label }} Link">
+                    (click)="contentService.tokenSelected(element.serial)"
+                    attr.aria-label="{{ column.label }} Link"
+                    routerLink="/token">
                     {{ element[column.key] }}
                   </a>
-                }
-                @default {
-                  <span>
+                  @if (element.serial && element.serial !== "") {
+                    <app-copy-button [copyText]="element.serial"></app-copy-button>
+                  }
+                </div>
+              }
+              @case (column.key === "sig_check" || column.key === "missing_line" ? column.key : "") {
+                <span [ngClass]="[element[column.key] === 'OK' ? 'highlight-true' : 'highlight-false']">
+                  {{ element[column.key] }}
+                </span>
+              }
+              @case ("container_serial") {
+                <div class="flex-row flex-nowrap ali-center">
+                  <a
+                    (click)="contentService.containerSelected(element.container_serial)"
+                    attr.aria-label="{{ column.label }} Link"
+                    routerLink="/token">
                     {{ element[column.key] }}
+                  </a>
+                  @if (element.container_serial && element.container_serial !== "") {
+                    <app-copy-button [copyText]="element.container_serial"></app-copy-button>
+                  }
+                </div>
+              }
+              @case ("startdate") {
+                <span>
+                  {{ element[column.key].split(".")[0].replace("T", " ") }}
+                </span>
+              }
+              @case ("date") {
+                <span>
+                  {{ element[column.key].split(".")[0].replace("T", " ") }}
+                </span>
+              }
+              @case ("policies") {
+                @for (policy of element[column.key]?.split(","); track policy) {
+                  <span>
+                    {{ policy }}
                   </span>
                 }
               }
-            </div>
-          </td>
-        </ng-container>
-      }
-      <tr
-        *matHeaderRowDef="columnKeys"
-        aria-label="Header Row"
-        i18n-aria-label
-        mat-header-row></tr>
-      <tr
-        *matRowDef="let row; columns: columnKeys"
-        aria-label="Data Row"
-        i18n-aria-label
-        mat-row></tr>
-      <tr
-        *matNoDataRow
-        aria-label="No Data Row"
-        i18n-aria-label>
-        <td
-          [attr.colspan]="columnKeys.length"
-          aria-label="No Data Cell"
-          i18n
-          i18n-aria-label>
-          No data matching the filter.
+              @case ("user") {
+                <a
+                  (click)="contentService.userSelected(element[column.key], element['user_realm'])"
+                  attr.aria-label="{{ column.label }} Link">
+                  {{ element[column.key] }}
+                </a>
+              }
+              @default {
+                <span>
+                  {{ element[column.key] }}
+                </span>
+              }
+            }
+          </div>
         </td>
-      </tr>
-    </table>
-  </div>
+      </ng-container>
+    }
+    <tr
+      *matHeaderRowDef="columnKeys"
+      aria-label="Header Row"
+      i18n-aria-label
+      mat-header-row></tr>
+    <tr
+      *matRowDef="let row; columns: columnKeys"
+      aria-label="Data Row"
+      i18n-aria-label
+      mat-row></tr>
+    <tr
+      *matNoDataRow
+      aria-label="No Data Row"
+      i18n-aria-label>
+      <td
+        [attr.colspan]="columnKeys.length"
+        aria-label="No Data Cell"
+        i18n
+        i18n-aria-label>
+        No data matching the filter.
+      </td>
+    </tr>
+  </table>
 </div>

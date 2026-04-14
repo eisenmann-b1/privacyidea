@@ -55,12 +55,11 @@
       Create SMS Gateway
     </button>
   </div>
-  <div class="table-container">
-    <table
-      [dataSource]="smsDataSource()"
-      class="sms-gateways-table"
-      mat-table
-      matSort>
+  <table
+    [dataSource]="smsDataSource()"
+    class="sms-gateways-table"
+    mat-table
+    matSort>
 
     <ng-container matColumnDef="name">
       <th
@@ -148,5 +147,4 @@
       </td>
     </tr>
   </table>
-  </div>
 </div>

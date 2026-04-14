@@ -55,12 +55,11 @@
       Create Token Group
     </button>
   </div>
-  <div class="table-container">
-    <table
-      [dataSource]="tokengroupDataSource()"
-      class="tokengroups-table"
-      mat-table
-      matSort>
+  <table
+    [dataSource]="tokengroupDataSource()"
+    class="tokengroups-table"
+    mat-table
+    matSort>
 
     <ng-container matColumnDef="id">
       <th
@@ -149,5 +148,4 @@
       </td>
     </tr>
   </table>
-  </div>
 </div>

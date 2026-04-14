@@ -39,13 +39,12 @@
       [pageSize]="pageSize()"
       showFirstLastButtons />
   </div>
-  <div class="table-container">
-    <table
-      [dataSource]="tokenDataSource()"
-      aria-label="Token Data Table"
-      class="token-table"
-      i18n-aria-label
-      mat-table>
+  <table
+    [dataSource]="tokenDataSource()"
+    aria-label="Token Data Table"
+    class="token-table"
+    i18n-aria-label
+    mat-table>
       @for (column of columnKeysMapSelfService(); track column) {
         <ng-container [matColumnDef]="column.key">
           <th
@@ -72,10 +71,9 @@
             *matCellDef="let element; let row"
             attr.aria-label="{{ column.label }} Cell"
             mat-cell>
-            <div
-              [ngClass]="tableUtilsService.getClassForColumnKey(column.key)">
-              <div [ngClass]="tableUtilsService.getChildClassForColumnKey(column.key)">
-                @switch (column.key) {
+    <div
+      [ngClass]="tableUtilsService.getClassForColumnKey(column.key)">
+        @switch (column.key) {
                   @case ("serial") {
                     <div class="flex-row flex-nowrap ali-center">
                       <a
@@ -163,7 +161,6 @@
                     }
                   }
                 }
-              </div>
             </div>
           </td>
         </ng-container>
@@ -191,5 +188,4 @@
         </td>
       </tr>
     </table>
-  </div>
 </div>

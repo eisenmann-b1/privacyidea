@@ -58,13 +58,12 @@
     <div class="margin-bottom-16">
       <app-token-table-actions />
     </div>
-    <div class="table-container">
-      <table
-        [dataSource]="tokenDataSource()"
-        aria-label="Token Data Table"
-        class="token-table"
-        i18n-aria-label
-        mat-table>
+    <table
+      [dataSource]="tokenDataSource()"
+      aria-label="Token Data Table"
+      class="token-table"
+      i18n-aria-label
+      mat-table>
         @for (column of columnKeysMap; track column) {
           <ng-container [matColumnDef]="column.key">
             @if (column.key === "select") {
@@ -255,8 +254,7 @@
           </td>
         </tr>
       </table>
-    </div>
-  } @else {
+    } @else {
     <div i18n>You do not have the permission to view the token list.</div>
   }
 </div>

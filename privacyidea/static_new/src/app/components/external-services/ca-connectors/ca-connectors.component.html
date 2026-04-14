@@ -55,84 +55,83 @@
       Create CA Connector
     </button>
   </div>
-  <div class="table-container">
-    <table
-      [dataSource]="caConnectorDataSource()"
-      class="ca-connectors-table"
-      mat-table
-      matSort>
-      <ng-container matColumnDef="connectorname">
-        <th
-          *matHeaderCellDef
-          i18n
-          mat-header-cell
-          mat-sort-header> CA Connector Name
-        </th>
-        <td
-          *matCellDef="let connector"
-          mat-cell>
-          <div class="flex-row">
-            <a
-              (click)="openEditDialog(connector)"
-              class="flex ali-center">
-              {{ connector.connectorname }}
-            </a>
-            <app-copy-button [copyText]="connector.connectorname" />
-          </div>
-        </td>
-      </ng-container>
+  <table
+    [dataSource]="caConnectorDataSource()"
+    class="ca-connectors-table"
+    mat-table
+    matSort>
 
-      <ng-container matColumnDef="type">
-        <th
-          *matHeaderCellDef
-          i18n
-          mat-header-cell
-          mat-sort-header> Type
-        </th>
-        <td
-          *matCellDef="let connector"
-          mat-cell> {{ connector.type }}
-        </td>
-      </ng-container>
+    <ng-container matColumnDef="connectorname">
+      <th
+        *matHeaderCellDef
+        i18n
+        mat-header-cell
+        mat-sort-header> CA Connector Name
+      </th>
+      <td
+        *matCellDef="let connector"
+        mat-cell>
+        <div class="flex-row">
+          <a
+            (click)="openEditDialog(connector)"
+            class="flex ali-center">
+            {{ connector.connectorname }}
+          </a>
+          <app-copy-button [copyText]="connector.connectorname" />
+        </div>
+      </td>
+    </ng-container>
 
-      <ng-container matColumnDef="actions">
-        <th
-          *matHeaderCellDef
-          i18n
-          mat-header-cell> Actions
-        </th>
-        <td
-          *matCellDef="let connector"
-          mat-cell>
-          <div class="flex just-center">
-            <button
-              (click)="deleteConnector(connector)"
-              color="warn"
-              i18n-matTooltip
-              mat-icon-button
-              matTooltip="Delete">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </td>
-      </ng-container>
+    <ng-container matColumnDef="type">
+      <th
+        *matHeaderCellDef
+        i18n
+        mat-header-cell
+        mat-sort-header> Type
+      </th>
+      <td
+        *matCellDef="let connector"
+        mat-cell> {{ connector.type }}
+      </td>
+    </ng-container>
 
-      <tr
-        *matHeaderRowDef="displayedColumns"
-        mat-header-row></tr>
-      <tr
-        *matRowDef="let row; columns: displayedColumns;"
-        mat-row></tr>
+    <ng-container matColumnDef="actions">
+      <th
+        *matHeaderCellDef
+        i18n
+        mat-header-cell> Actions
+      </th>
+      <td
+        *matCellDef="let connector"
+        mat-cell>
+        <div class="flex just-center">
+          <button
+            (click)="deleteConnector(connector)"
+            color="warn"
+            i18n-matTooltip
+            mat-icon-button
+            matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </td>
+    </ng-container>
 
-      <tr
-        *matNoDataRow
-        class="mat-row">
-        <td
-          class="mat-cell"
-          colspan="3"
-          i18n>No CA connectors found.
-        </td>
-      </tr>
-    </table>
-  </div>
+    <tr
+      *matHeaderRowDef="displayedColumns"
+      mat-header-row></tr>
+    <tr
+      *matRowDef="let row; columns: displayedColumns;"
+      mat-row></tr>
+
+    <tr
+      *matNoDataRow
+      class="mat-row">
+      <td
+        class="mat-cell"
+        colspan="3"
+        i18n>No CA connectors found.
+      </td>
+    </tr>
+  </table>
 </div>

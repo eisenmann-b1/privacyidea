@@ -31,14 +31,13 @@
       [pageSize]="pageSize()"
       showFirstLastButtons />
   </div>
-  <div class="table-container">
-    <table
-      [dataSource]="containerDataSource()"
-      aria-label="Container Data Table"
-      class="container-table"
-      i18n-aria-label
-      mat-table
-      multiTemplateDataRows>
+  <table
+    [dataSource]="containerDataSource()"
+    aria-label="Container Data Table"
+    class="container-table"
+    i18n-aria-label
+    mat-table
+    multiTemplateDataRows>
       @for (column of columnKeysMapSelfService; track column) {
         <ng-container [matColumnDef]="column.key">
           @if (column.key === "select") {
@@ -205,5 +204,4 @@
         </td>
       </tr>
     </table>
-  </div>
 </div>

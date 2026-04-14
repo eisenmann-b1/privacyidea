@@ -49,12 +49,11 @@
           showFirstLastButtons />
       </div>
     </div>
-    <div class="table-container">
-      <table
-        [dataSource]="machineDataSource()"
-        class="machines-table"
-        mat-table
-        matSort>
+    <table
+      [dataSource]="machineDataSource()"
+      class="machines-table"
+      mat-table
+      matSort>
 
       <ng-container matColumnDef="hostname">
         <th
@@ -133,6 +132,5 @@
         </td>
       </tr>
     </table>
-    </div>
   </div>
 </div>

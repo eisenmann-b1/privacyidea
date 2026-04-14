@@ -21,8 +21,11 @@
 .policies-table-layout {
   @include styles.main-component-style;
   @include table.base-table-structure(".policies-table", ".policies-table-filter", ".table-scroll-container");
-  display: flex;
-  flex-direction: column;
+
+  & {
+    display: flex;
+    flex-direction: column;
+  }
 
   .policies-table-filter {
     max-width: 932px;

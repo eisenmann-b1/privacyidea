@@ -73,11 +73,10 @@
   </div>
 
   <div class="machines-container">
-    <div class="table-container">
-      <table
-        [dataSource]="dataSource"
-        class="tokens-table"
-        mat-table>
+    <table
+      [dataSource]="dataSource"
+      class="tokens-table"
+      mat-table>
       <ng-container matColumnDef="serial">
         <th
           *matHeaderCellDef
@@ -210,7 +209,6 @@
         mat-row></tr>
     </table>
   </div>
-</div>
 
   <form (ngSubmit)="attachToken()">
     <h3 i18n>Attach a New Token</h3>

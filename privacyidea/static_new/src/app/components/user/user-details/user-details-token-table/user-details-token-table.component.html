@@ -47,13 +47,12 @@
         showFirstLastButtons />
     </div>
     <div class="responsive-flex-row-1580">
-      <div class="table-container">
-        <table
-          [dataSource]="dataSource"
-          aria-label="Token Table of the User"
-          class="user-details-token-table"
-          i18n-aria-label
-          mat-table>
+      <table
+        [dataSource]="dataSource"
+        aria-label="Token Table of the User"
+        class="user-details-token-table"
+        i18n-aria-label
+        mat-table>
         @for (column of columnsKeyMap; track column) {
           <ng-container [matColumnDef]="column.key">
             <th
@@ -218,5 +217,4 @@
       </table>
     </div>
   </div>
-</div>
 </div>

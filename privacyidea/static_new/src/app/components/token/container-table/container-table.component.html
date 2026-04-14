@@ -51,14 +51,13 @@
         showFirstLastButtons />
     </div>
     <app-container-table-actions />
-    <div class="table-container">
-      <table
-        [dataSource]="containerDataSource()"
-        aria-label="Container Data Table"
-        class="container-table"
-        i18n-aria-label
-        mat-table
-        multiTemplateDataRows>
+    <table
+      [dataSource]="containerDataSource()"
+      aria-label="Container Data Table"
+      class="container-table"
+      i18n-aria-label
+      mat-table
+      multiTemplateDataRows>
         @for (column of columnsKeyMap; track column) {
           <ng-container [matColumnDef]="column.key">
             @if (column.key === "select") {
@@ -122,7 +121,7 @@
             <td
               *matCellDef="let element; let row"
               [ngClass]="{
-                'input-width-l': column.key === 'description',
+                'max-width-300': column.key === 'description',
                 'table-checkbox': column.key === 'select'
               }"
               attr.aria-label="{{ column.label }} Cell"
@@ -241,8 +240,7 @@
           </td>
         </tr>
       </table>
-    </div>
-  } @else {
+    } @else {
     <div i18n>You do not have the permission to view the container list.</div>
   }
 </div>

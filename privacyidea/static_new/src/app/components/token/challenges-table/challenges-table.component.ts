@@ -93,9 +93,8 @@ export class ChallengesTableComponent {
   challengesDataSource: WritableSignal<MatTableDataSource<Challenge>> = linkedSignal({
     source: () => this.challengesService.challengesResource.hasValue() ? this.challengesService.challengesResource.value() : undefined,
     computation: (challengesResource, previous) => {
-      const challenges = challengesResource?.result?.value?.challenges ?? [];
-      if (challenges.length > 0) {
-        return new MatTableDataSource(challenges);
+      if (challengesResource) {
+        return new MatTableDataSource(challengesResource.result?.value?.challenges);
       }
       return previous?.value ?? new MatTableDataSource<Challenge>([]);
     }

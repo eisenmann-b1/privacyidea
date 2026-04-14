@@ -102,11 +102,10 @@ export class UserDetailsTokenTableComponent {
   userTokenData: WritableSignal<MatTableDataSource<any, MatPaginator>> = linkedSignal({
     source: () => this.tokenService.userTokenResource.hasValue() ? this.tokenService.userTokenResource.value() : undefined,
     computation: (userTokenResource, previous) => {
-      const userTokens = userTokenResource?.result?.value?.tokens ?? [];
-      if (!userTokens || userTokens.length === 0) {
+      if (!userTokenResource) {
         return previous?.value ?? new MatTableDataSource<any, MatPaginator>([]);
       }
-      return new MatTableDataSource<any, MatPaginator>(userTokens);
+      return new MatTableDataSource<any, MatPaginator>(userTokenResource.result?.value?.tokens ?? []);
     }
   });
   pageSize = 10;

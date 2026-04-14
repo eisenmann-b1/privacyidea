@@ -16,7 +16,7 @@
 }
 
 .responsive-divider-1310 {
-  display: none;
+  display: none !important;
 
   @media (max-width: 1310px) {
     display: block;
@@ -35,7 +35,7 @@
 }
 
 .responsive-br-1580 {
-  display: none;
+  display: none !important;
 
   @media (max-width: 1580px) {
     display: block;

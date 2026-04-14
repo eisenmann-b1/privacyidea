@@ -119,14 +119,16 @@
                     }
                     @case ("container_serial") {
                       @if (authService.actionAllowed("container_list")) {
-                        <a
-                          (click)="contentService.containerSelected(element[column.key])"
-                          attr.aria-label="{{ column.label }} Link">
-                          {{ element[column.key] }}
-                        </a>
-                        @if (element.container_serial !== "") {
-                          <app-copy-button [copyText]="element[column.key]" />
-                        }
+                        <div class="flex-row flex-nowrap ali-center">
+                          <a
+                            (click)="contentService.containerSelected(element[column.key])"
+                            attr.aria-label="{{ column.label }} Link">
+                            {{ element[column.key] }}
+                          </a>
+                          @if (element.container_serial !== "") {
+                            <app-copy-button [copyText]="element[column.key]" />
+                          }
+                        </div>
                       }
                     }
                     @default {

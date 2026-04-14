@@ -749,7 +749,8 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
     :param param: search parameters
     :param user:  a specific user object to return
     :param include_custom_attributes:  Set to True, if you want to receive custom attributes of external users.
-    :param requested_attributes: A list of attributes to return for each user. If None or empty, all attributes are returned.
+    :param requested_attributes: A list of attributes to return for each user. If None or empty, all attributes are
+     returned.
     :return: list of user info as dictionaries
     """
     # The user list, that will be returned
@@ -837,9 +838,7 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
                 user_list = resolver.getUserList(search_dict, requested_user_store_attributes)
                 realm_id = get_realm_id(realm)
                 for user_info in user_list:
-                    if len(realm_iteration) > 1:
-                        # Only add the realm information, if we iterate over more than one realm
-                        user_info["realm"] = realm
+                    user_info["realm"] = realm
                     if not requested_attributes or "resolver" in requested_pi_user_attributes:
                         user_info["resolver"] = resolver_name
                     if not requested_attributes or "editable" in requested_pi_user_attributes:

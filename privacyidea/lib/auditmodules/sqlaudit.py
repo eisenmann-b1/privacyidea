@@ -88,7 +88,7 @@ def fn_to_isodate_sqlite(element, compiler, **kw):
 
 @compiles(to_isodate)
 def fn_to_isodate_default(element, compiler, **kw):
-    # The four percent signs are necessary for two format substitutions
+    # %% escapes a literal % past the DBAPI driver's pyformat paramstyle.
     return "date_format({}, '%%Y-%%m-%%d %%H:%%i:%%s')".format(compiler.process(
         element.clauses, **kw))
 

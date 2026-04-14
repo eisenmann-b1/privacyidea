@@ -44,12 +44,13 @@
       </mat-form-field>
     </div>
     <app-resolver-table-actions />
-    <table
-      [dataSource]="resolversDataSource()"
-      aria-label="Resolvers Table"
-      class="user-sources-table"
-      mat-table
-      matSort>
+    <div class="table-container">
+      <table
+        [dataSource]="resolversDataSource()"
+        aria-label="Resolvers Table"
+        class="user-sources-table"
+        mat-table
+        matSort>
       <ng-container matColumnDef="resolvername">
         <th
           *matHeaderCellDef
@@ -125,5 +126,6 @@
         </td>
       </tr>
     </table>
+    </div>
   </div>
 </div>

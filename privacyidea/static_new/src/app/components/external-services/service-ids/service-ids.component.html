@@ -65,11 +65,12 @@
     </p>
   </div>
 
-  <table
-    [dataSource]="serviceIdDataSource()"
-    class="service-ids-table"
-    mat-table
-    matSort>
+  <div class="table-container">
+    <table
+      [dataSource]="serviceIdDataSource()"
+      class="service-ids-table"
+      mat-table
+      matSort>
 
     <ng-container matColumnDef="id">
       <th
@@ -158,4 +159,5 @@
       </td>
     </tr>
   </table>
+  </div>
 </div>

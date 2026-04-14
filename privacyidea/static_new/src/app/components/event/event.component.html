@@ -64,127 +64,129 @@
     </mat-slide-toggle>
   </div>
 
-  <table
-    [dataSource]="eventHandlerDataSource()"
-    class="event-handler-table"
-    mat-table>
-    @for (column of Object.keys(columnKeysMap); track column) {
-      @if (column !== "delete" || authService.actionAllowed("eventhandling_write")) {
-        <ng-container [matColumnDef]="column">
-          <th
-            *matHeaderCellDef
-            mat-header-cell>
-            <div class="flex ali-center">
-              {{ columnKeysMap[column] }}
-              @if (column !== 'delete') {
-                <div class="margin-left-16 flex">
-                  <button
-                    (click)="tableUtilsService.onSortButtonClick(column, sort)"
-                    class="sort-button"
-                    mat-icon-button
-                    type="button">
-                    <mat-icon>{{ tableUtilsService.getSortIcon(column, sort()) }}</mat-icon>
-                  </button>
-                </div>
-              }
-            </div>
-          </th>
-          <td
-            *matCellDef="let element; let row"
-            class="column-max-width"
-            mat-cell>
-            @switch (column) {
-              @case ("name") {
-                <div
-                  [ngClass]="detailedView() ? 'break-words' : 'event-table-cell'"
-                  [attr.title]="element.name">
-                  @if (authService.actionAllowed("eventhandling_write")) {
-                    <a
-                      (click)="onEditEventHandler(element)"
-                      [innerHTML]="element.name | highlight:filterString()"
-                      tabindex="0"></a>
-                  } @else {
-                    <span [innerHTML]="element.name | highlight:filterString()"></span>
-                  }
-                </div>
-              }
-              @case ("event") {
-                @if (detailedView()) {
-                  <div class="detailed-cell-container">
-                    <ul class="no-indention margin-0">
-                      @for (event of getEventArray(element.event); track event) {
-                        <li [innerHTML]="event | highlight:filterString()"></li>
-                      }
-                    </ul>
-                  </div>
-                } @else {
-                  <div class="event-table-cell">
-                  <span [innerHTML]="(element.event?.join(', ')) | highlight:filterString()"></span>
+  <div class="table-container">
+    <table
+      [dataSource]="eventHandlerDataSource()"
+      class="event-handler-table"
+      mat-table>
+      @for (column of Object.keys(columnKeysMap); track column) {
+        @if (column !== "delete" || authService.actionAllowed("eventhandling_write")) {
+          <ng-container [matColumnDef]="column">
+            <th
+              *matHeaderCellDef
+              mat-header-cell>
+              <div class="flex ali-center">
+                {{ columnKeysMap[column] }}
+                @if (column !== 'delete') {
+                  <div class="margin-left-16 flex">
+                    <button
+                      (click)="tableUtilsService.onSortButtonClick(column, sort)"
+                      class="sort-button"
+                      mat-icon-button
+                      type="button">
+                      <mat-icon>{{ tableUtilsService.getSortIcon(column, sort()) }}</mat-icon>
+                    </button>
                   </div>
                 }
-              }
-              @case ("conditions") {
-                @if (detailedView()) {
-                  <div class="detailed-cell-container">
-                    <ul class="no-indention margin-0">
-                      @for (condition of Object.entries(element.conditions); track condition[0]) {
-                        <li [innerHTML]="(condition[0] + ': ' + condition[1]) | highlight:filterString()"></li>
-                      }
-                    </ul>
-                  </div>
-                } @else {
-                  <div class="event-table-cell">
-                    <span [innerHTML]="formatConditions(element.conditions) | highlight:filterString()"></span>
-                  </div>
-                }
-              }
-              @case ("action") {
-                <div [innerHTML]="element.action | highlight:filterString()"></div>
-                @if (detailedView()) {
-                  <ul class="no-indention margin-top-0">
-                    @for (option of Object.entries(element.options); track option[0]) {
-                      <li [innerHTML]="(option[0] + ': ' + option[1]) | highlight:filterString()"></li>
+              </div>
+            </th>
+            <td
+              *matCellDef="let element; let row"
+              class="column-max-width"
+              mat-cell>
+              @switch (column) {
+                @case ("name") {
+                  <div
+                    [ngClass]="detailedView() ? 'break-words' : 'event-table-cell'"
+                    [attr.title]="element.name">
+                    @if (authService.actionAllowed("eventhandling_write")) {
+                      <a
+                        (click)="onEditEventHandler(element)"
+                        [innerHTML]="element.name | highlight:filterString()"
+                        tabindex="0"></a>
+                    } @else {
+                      <span [innerHTML]="element.name | highlight:filterString()"></span>
                     }
-                  </ul>
+                  </div>
+                }
+                @case ("event") {
+                  @if (detailedView()) {
+                    <div class="detailed-cell-container">
+                      <ul class="no-indention margin-0">
+                        @for (event of getEventArray(element.event); track event) {
+                          <li [innerHTML]="event | highlight:filterString()"></li>
+                        }
+                      </ul>
+                    </div>
+                  } @else {
+                    <div class="event-table-cell">
+                      <span [innerHTML]="(element.event?.join(', ')) | highlight:filterString()"></span>
+                    </div>
+                  }
+                }
+                @case ("conditions") {
+                  @if (detailedView()) {
+                    <div class="detailed-cell-container">
+                      <ul class="no-indention margin-0">
+                        @for (condition of Object.entries(element.conditions); track condition[0]) {
+                          <li [innerHTML]="(condition[0] + ': ' + condition[1]) | highlight:filterString()"></li>
+                        }
+                      </ul>
+                    </div>
+                  } @else {
+                    <div class="event-table-cell">
+                      <span [innerHTML]="formatConditions(element.conditions) | highlight:filterString()"></span>
+                    </div>
+                  }
+                }
+                @case ("action") {
+                  <div [innerHTML]="element.action | highlight:filterString()"></div>
+                  @if (detailedView()) {
+                    <ul class="no-indention margin-top-0">
+                      @for (option of Object.entries(element.options); track option[0]) {
+                        <li [innerHTML]="(option[0] + ': ' + option[1]) | highlight:filterString()"></li>
+                      }
+                    </ul>
+                  }
+                }
+                @case ("active") {
+                  <mat-slide-toggle
+                    (click)="toggleActive(element); $event.stopPropagation()"
+                    [checked]="element.active"
+                    [disableRipple]="true"
+                    [disabled]="!authService.actionAllowed('eventhandling_write')"
+                    matTooltip="Toggle Active Status"></mat-slide-toggle>
+                }
+                @case ("delete") {
+                  <button
+                    (click)="onDeleteEventHandler(element); $event.stopPropagation()"
+                    mat-icon-button
+                    matTooltip="Delete Event Handler">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                }
+                @case ("ordering") {
+                  {{ element.ordering }}
+                }
+                @default {
+                  <span
+                    [innerHTML]="element[column] | highlight:filterString()"
+                    [ngClass]="detailedView() ? 'break-words' : 'text-overflow-ellipsis'"></span>
                 }
               }
-              @case ("active") {
-                <mat-slide-toggle
-                  (click)="toggleActive(element); $event.stopPropagation()"
-                  [checked]="element.active"
-                  [disableRipple]="true"
-                  [disabled]="!authService.actionAllowed('eventhandling_write')"
-                  matTooltip="Toggle Active Status"></mat-slide-toggle>
-              }
-              @case ("delete") {
-                <button
-                  (click)="onDeleteEventHandler(element); $event.stopPropagation()"
-                  mat-icon-button
-                  matTooltip="Delete Event Handler">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              }
-              @case ("ordering") {
-                {{ element.ordering }}
-              }
-              @default {
-                <span
-                  [innerHTML]="element[column] | highlight:filterString()"
-                  [ngClass]="detailedView() ? 'break-words' : 'text-overflow-ellipsis'"></span>
-              }
-            }
-          </td>
-        </ng-container>
+            </td>
+          </ng-container>
+        }
       }
-    }
 
-    <tr
-      *matHeaderRowDef="columnKeys()"
-      mat-header-row></tr>
-    <tr
-      *matRowDef="let row; columns: columnKeys()"
-      [ngClass]="detailedView() ? 'detailed-row' : 'compact-row'"
-      class="example-element-row"
-      mat-row></tr>
-  </table>
+      <tr
+        *matHeaderRowDef="columnKeys()"
+        mat-header-row></tr>
+      <tr
+        *matRowDef="let row; columns: columnKeys()"
+        [ngClass]="detailedView() ? 'detailed-row' : 'compact-row'"
+        class="example-element-row"
+        mat-row></tr>
+    </table>
+  </div>
 </div>

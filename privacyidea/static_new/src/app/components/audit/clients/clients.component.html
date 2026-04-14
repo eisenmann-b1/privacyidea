@@ -45,13 +45,14 @@
     </app-clearable-input>
   </mat-form-field>
 
-  <table
-    (matSortChange)="onSortChange($event)"
-    [dataSource]="clientDataSource()"
-    class="clients-table"
-    aria-label="Client Data Table"
-    mat-table
-    matSort>
+  <div class="table-container">
+    <table
+      (matSortChange)="onSortChange($event)"
+      [dataSource]="clientDataSource()"
+      class="clients-table"
+      aria-label="Client Data Table"
+      mat-table
+      matSort>
     @for (column of columnKeysMap; let colIdx = $index; track column) {
       <ng-container [matColumnDef]="column.key">
         <th
@@ -113,4 +114,5 @@
       </td>
     </tr>
   </table>
+  </div>
 </div>

@@ -55,11 +55,12 @@
       Create RADIUS Server
     </button>
   </div>
-  <table
-    [dataSource]="radiusDataSource()"
-    class="radius-servers-table"
-    mat-table
-    matSort>
+  <div class="table-container">
+    <table
+      [dataSource]="radiusDataSource()"
+      class="radius-servers-table"
+      mat-table
+      matSort>
 
     <ng-container matColumnDef="identifier">
       <th
@@ -160,4 +161,5 @@
       </td>
     </tr>
   </table>
+  </div>
 </div>

@@ -336,3 +336,31 @@ def import_realms(data, name=None):
             set_default_realm(realm)
         log.info(f'realm: {realm!s:<15} resolver added: {added!s} '
                  f'failed: {failed!s}')
+
+
+@log_with(log)
+def get_ordered_resolvers(realm) -> list[str]:
+    """
+    returns a list of resolver names ordered by priority.
+    The resolver with the lowest priority is the first.
+    If resolvers have the same priority, they are ordered alphabetically.
+
+    :return: list of resolver names
+    :rtype: list
+    """
+    resolver_tuples = []
+    realm_config = get_realms(realm)
+    resolvers_in_realm = realm_config.get(realm, {}).get("resolver", [])
+    for resolver in resolvers_in_realm:
+        resolver_tuples.append((resolver.get("name"),
+                                resolver.get("priority") or 1000,
+                                resolver.get("node")))
+
+    # sort the resolvers by the 2nd entry in the tuple, the priority
+    sorted_resolvers = sorted(resolver_tuples, key=lambda res: res[1])
+    # if the resolver contains a node setting, we only add it if it is on the correct node
+    local_node_uuid = get_app_config_value("PI_NODE_UUID")
+    resolvers = [r[0] for r in sorted_resolvers if not r[2] or r[2] == local_node_uuid]
+    # remove duplicate resolver names but keeping the order
+    seen = set()
+    return [x for x in resolvers if not (x in seen or seen.add(x))]

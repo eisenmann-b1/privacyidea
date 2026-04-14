@@ -809,43 +809,58 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
         # user id is required to later get the custom attributes for the user
         requested_attributes.append("userid")
         remove_user_id = True
-    for resolver_name in set(resolvers):
-        try:
-            log.debug(f"Check for resolver class: {resolver_name!r}")
-            resolver = get_resolver_object(resolver_name)
-            # Continue if we couldn't find a resolver with the given name
-            if not resolver:
-                continue
-            log.debug("With this search dictionary: %r", search_dict)
-            requested_pi_user_attributes = list({"resolver", "editable"}.intersection(requested_attributes or []))
-            requested_user_store_attributes = list(set(requested_attributes or []) - set(requested_pi_user_attributes))
-            user_list = resolver.getUserList(search_dict, requested_user_store_attributes)
-            # Add resolvername to the list
-            realm_id = get_realm_id(param_realm or user_realm)
-            for user_info in user_list:
-                if not requested_attributes or "resolver" in requested_pi_user_attributes:
-                    user_info["resolver"] = resolver_name
-                if not requested_attributes or "editable" in requested_pi_user_attributes:
-                    user_info["editable"] = resolver.editable
-                if include_custom_attributes and realm_id is not None:
-                    # Add the custom attributes, by class method from User
-                    # with uid, resolvername and realm_id, which we need to determine by the realm name
-                    custom_attributes = get_attributes(user_info.get("userid"), resolver_name, realm_id,
-                                                       requested_attributes)
-                    user_info.update(custom_attributes)
-                if remove_user_id:
-                    # Remove the userid if it is not requested, as it is only needed for the custom attributes
-                    user_info.pop("userid", None)
-            log.debug(f"Found this userlist: {user_list!r}")
-            users.extend(user_list)
+    log.debug(f"With this search dictionary: {search_dict!r}")
+    requested_pi_user_attributes = list({"resolver", "editable"}.intersection(requested_attributes or []))
+    requested_user_store_attributes = list(set(requested_attributes or []) - set(requested_pi_user_attributes))
 
-        except (ResolverError, ParameterError) as ex:
-            # In case of wrong search parameters or broken resolver we continue
-            # All other errors will be passed down.
-            # TODO: Reflect the broken resolver/query in the result data
-            log.warning(f"Unable to get user list for resolver '{resolver_name}': {ex!r}")
-            log.debug(f"{traceback.format_exc()!s}")
-            continue
+    for realm in realm_iteration:
+        if realm:
+            resolvers = get_ordered_resolvers(realm)
+        else:
+            # The realm is None, since a specific resolver was given.
+            if param_resolver:
+                resolvers.append(param_resolver)
+            if user_resolver:
+                resolvers.append(user_resolver)
+
+        for resolver_name in resolvers:
+            try:
+                log.debug(f"Check for resolver class: {resolver_name!r}")
+                resolver = get_resolver_object(resolver_name)
+                # Continue if we couldn't find a resolver with the given name
+                if not resolver:
+                    log.info(f"Can not find a resolver with the name '{resolver_name}'")
+                    continue
+                user_list = resolver.getUserList(search_dict, requested_user_store_attributes)
+                realm_id = get_realm_id(realm)
+                for user_info in user_list:
+                    user_info["realm"] = realm
+                    if not requested_attributes or "resolver" in requested_pi_user_attributes:
+                        user_info["resolver"] = resolver_name
+                    if not requested_attributes or "editable" in requested_pi_user_attributes:
+                        user_info["editable"] = resolver.editable
+                    if include_custom_attributes and realm_id is not None:
+                        # Add the custom attributes, by class method from User
+                        # with uid, resolvername and realm_id, which we need to determine by the realm name
+                        custom_attributes = get_attributes(user_info.get("userid"), resolver_name, realm_id,
+                                                           requested_attributes)
+                        user_info.update(custom_attributes)
+                    if remove_user_id:
+                        # Remove the userid if it is not requested, as it is only needed for the custom attributes
+                        user_info.pop("userid", None)
+                    # Add user to users_dict, if it is not contained, yet
+                    user_tuple = (user_info.get("username"), realm)
+                    if user_tuple not in users_dict:
+                        users_dict[user_tuple] = user_info
+                log.debug(f"Found this userlist: {user_list!r}")
+
+            except (ResolverError, ParameterError) as ex:
+                # In case of wrong search parameters or broken resolver we continue
+                # All other errors will be passed down.
+                # TODO: Reflect the broken resolver/query in the result data
+                log.warning(f"Unable to get user list for resolver '{resolver_name}': {ex!r}")
+                log.debug(f"{traceback.format_exc()!s}")
+                continue
 
     users = list(users_dict.values())
     return users

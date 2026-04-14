@@ -124,7 +124,7 @@ describe("TokenDetailsComponent", () => {
   });
 
   it("renders the token serial in the header", () => {
-    const header = fixture.nativeElement.querySelector(".details-header h3:nth-child(2)");
+    const header = fixture.nativeElement.querySelector(".details-header .token-serial");
     expect(header.textContent).toContain("Mock serial");
   });
 

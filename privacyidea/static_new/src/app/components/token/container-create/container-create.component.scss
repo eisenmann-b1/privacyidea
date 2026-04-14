@@ -10,3 +10,13 @@
   margin-top: 8px;
   font-size: 1rem;
 }
+
+.type-select {
+  width: 616px;
+}
+
+@media (max-width: 1040px) {
+  .type-select {
+    width: 100%;
+  }
+}

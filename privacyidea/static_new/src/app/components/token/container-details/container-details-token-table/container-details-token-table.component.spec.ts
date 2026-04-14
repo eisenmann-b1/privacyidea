@@ -45,6 +45,7 @@ import { TokenService } from "../../../../services/token/token.service";
 import { UserService } from "../../../../services/user/user.service";
 import { SimpleConfirmationDialogComponent } from "../../../shared/dialog/confirmation-dialog/confirmation-dialog.component";
 import { ContainerDetailsTokenTableComponent } from "./container-details-token-table.component";
+import { DialogService } from "../../../../services/dialog/dialog.service";
 
 const routerEvents$ = new Subject<NavigationEnd>();
 routerEvents$.next(new NavigationEnd(1, "/", "/"));

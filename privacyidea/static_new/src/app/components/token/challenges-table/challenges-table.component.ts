@@ -85,23 +85,16 @@ export class ChallengesTableComponent {
   pageIndex = this.challengesService.pageIndex;
   sort = this.challengesService.sort;
   length = linkedSignal({
-    source: () => {},
-    computation: (_, prev) => {
-      let total = prev?.value ?? 0
-      if (this.challengesService.challengesResource.hasValue()) {
-        total = this.challengesService.challengesResource.value()?.result?.value?.count ?? total;
-      }
-      return total;
+    source: () => this.challengesService.challengesResource.hasValue() ? this.challengesService.challengesResource.value() : undefined,
+    computation: (challengesResource, prev) => {
+      return challengesResource?.result?.value?.count ?? prev?.value ?? 0;
     }
   });
   challengesDataSource: WritableSignal<MatTableDataSource<Challenge>> = linkedSignal({
-    source: () => {},
-    computation: (_, previous) => {
-      let challenges: Challenge[] = [];
-      if (this.challengesService.challengesResource.hasValue()) {
-        challenges = this.challengesService.challengesResource.value()?.result?.value?.challenges ?? [];
-      }
-      if (challenges && challenges.length > 0) {
+    source: () => this.challengesService.challengesResource.hasValue() ? this.challengesService.challengesResource.value() : undefined,
+    computation: (challengesResource, previous) => {
+      const challenges = challengesResource?.result?.value?.challenges ?? [];
+      if (challenges.length > 0) {
         return new MatTableDataSource(challenges);
       }
       return previous?.value ?? new MatTableDataSource<Challenge>([]);

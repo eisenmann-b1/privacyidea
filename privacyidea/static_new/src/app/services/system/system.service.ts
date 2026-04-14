@@ -116,13 +116,11 @@ export class SystemService implements SystemServiceInterface {
   });
 
   caConnectors: WritableSignal<CaConnectors> = linkedSignal({
-    source: () => {},
-    computation: (_, previous) => {
-      let caConnectors = undefined;
-      if (this.caConnectorResource.hasValue()) {
-        caConnectors = this.caConnectorResource.value()?.result?.value;
-      }
-      return caConnectors ?? previous?.value ?? [];}
+    source: () => this.caConnectorResource.hasValue() ? this.caConnectorResource.value() : undefined,
+    computation: (caConnectorResource, previous) => {
+      const caConnectors = caConnectorResource?.result?.value;
+      return caConnectors ?? previous?.value ?? [];
+    }
   });
   nodesResource = httpResource<PiResponse<NodeInfo[]>>(() => {
     if (

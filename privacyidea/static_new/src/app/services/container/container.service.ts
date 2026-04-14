@@ -386,25 +386,29 @@ export class ContainerService implements ContainerServiceInterface {
     };
   });
 
-  containerOptions = linkedSignal(() => {
-      if (!this.containerResource.hasValue()) return [];
-      return this.containerResource.value()?.result?.value?.containers.map((container) => container.serial) ?? [];
+  containerOptions = linkedSignal({
+    source: () => this.containerResource.hasValue() ? this.containerResource.value() : undefined,
+    computation: (containerResource) => {
+      if (!containerResource) return [];
+      return containerResource.result?.value?.containers.map((container) => container.serial) ?? [];
     }
-  );
+  });
 
   filteredContainerOptions = computed(() => {
     const filter = (this.selectedContainer() || "").toLowerCase();
     return this.containerOptions().filter((option) => option.toLowerCase().includes(filter));
   });
 
-  containersForTokenType = linkedSignal(
-    () => {
-      if (!this.containerResource.hasValue()) return [];
-      return (
-        this.containerResource.value()?.result?.value?.containers
-          .filter((container) => this.compatibleTypes().includes(container.type))
-          .map((container) => container.serial) ?? []
-      );
+  containersForTokenType = linkedSignal({
+      source: () => this.containerResource.hasValue() ? this.containerResource.value() : undefined,
+      computation: (containerResource) => {
+        if (!containerResource) return [];
+        return (
+          containerResource.result?.value?.containers
+            .filter((container) => this.compatibleTypes().includes(container.type))
+            .map((container) => container.serial) ?? []
+        );
+      }
     }
   );
 
@@ -492,13 +496,11 @@ export class ContainerService implements ContainerServiceInterface {
   });
 
   containerDetail: WritableSignal<ContainerDetails> = linkedSignal({
-    source: () => {},
-    computation: (_, previous) => {
-      if (this.containerDetailResource.hasValue()) {
-        const containerDetail = this.containerDetailResource.value()?.result?.value;
-        if (containerDetail) {
-          return containerDetail;
-        }
+    source: () => this.containerDetailResource.hasValue() ? this.containerDetailResource.value() : undefined,
+    computation: (containerDetailResource, previous) => {
+      const containerDetail = containerDetailResource?.result?.value;
+      if (containerDetail) {
+        return containerDetail;
       }
       return (
         previous?.value ?? {

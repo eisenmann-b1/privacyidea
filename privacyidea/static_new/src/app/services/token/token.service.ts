@@ -597,11 +597,13 @@ export class TokenService implements TokenServiceInterface {
 
   selectedToken: WritableSignal<string | null> = signal(null);
 
-  tokenOptions = linkedSignal(
-    () => {
-      if (!this.tokenSerialResource.hasValue()) return [];
-      return this.tokenSerialResource.value()?.result?.value?.tokens?.map((token) => token.serial) ?? [];
-    });
+  tokenOptions = linkedSignal({
+    source: () => this.tokenSerialResource.hasValue() ? this.tokenSerialResource.value() : undefined,
+    computation: (tokenSerialResource) => {
+      if (!tokenSerialResource) return [];
+      return tokenSerialResource.result?.value?.tokens?.map((token) => token.serial) ?? [];
+    }
+  });
 
   filteredTokenOptions = computed(() => {
     const filter = (this.selectedToken() || "").toLowerCase();

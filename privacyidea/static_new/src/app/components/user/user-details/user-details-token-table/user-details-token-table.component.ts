@@ -100,12 +100,9 @@ export class UserDetailsTokenTableComponent {
   apiFilter = this.tokenService.apiFilter;
   @ViewChild("filterInput", { static: false }) filterInput!: ElementRef<HTMLInputElement>;
   userTokenData: WritableSignal<MatTableDataSource<any, MatPaginator>> = linkedSignal({
-    source: this.tokenService.userTokenResource.value,
-    computation: (_, previous) => {
-      let userTokens: TokenDetails[] = [];
-      if (this.tokenService.userTokenResource.hasValue()) {
-        userTokens = this.tokenService.userTokenResource.value()?.result?.value?.tokens ?? [];
-      }
+    source: () => this.tokenService.userTokenResource.hasValue() ? this.tokenService.userTokenResource.value() : undefined,
+    computation: (userTokenResource, previous) => {
+      const userTokens = userTokenResource?.result?.value?.tokens ?? [];
       if (!userTokens || userTokens.length === 0) {
         return previous?.value ?? new MatTableDataSource<any, MatPaginator>([]);
       }

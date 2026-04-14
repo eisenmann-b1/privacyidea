@@ -153,35 +153,35 @@ export class TokenDetailsComponent {
     return true;
   });
   tokenDetailResource = this.tokenService.tokenDetailResource;
-  tokenDetails: WritableSignal<TokenDetails> = linkedSignal(() => {
-    let tokenDetail: TokenDetails | null = null;
-    if (this.tokenDetailResource.hasValue()) {
-      tokenDetail = this.tokenDetailResource.value().result?.value?.tokens[0] as TokenDetails;
+  tokenDetails: WritableSignal<TokenDetails> = linkedSignal({
+    source: () => this.tokenDetailResource.hasValue() ? this.tokenDetailResource.value() : undefined,
+    computation: (tokenDetailResource) => {
+      const tokenDetail = tokenDetailResource?.result?.value?.tokens[0] as TokenDetails | undefined;
+      return tokenDetail ?? {
+        active: false,
+        container_serial: "",
+        count: 0,
+        count_window: 0,
+        description: "",
+        failcount: 0,
+        id: 0,
+        info: {},
+        locked: false,
+        maxfail: 0,
+        otplen: 0,
+        realms: [],
+        resolver: "",
+        revoked: false,
+        rollout_state: "",
+        serial: "",
+        sync_window: 0,
+        tokengroup: [],
+        tokentype: "hotp",
+        user_id: "",
+        user_realm: "",
+        username: ""
+      };
     }
-    return tokenDetail ?? {
-      active: false,
-      container_serial: "",
-      count: 0,
-      count_window: 0,
-      description: "",
-      failcount: 0,
-      id: 0,
-      info: {},
-      locked: false,
-      maxfail: 0,
-      otplen: 0,
-      realms: [],
-      resolver: "",
-      revoked: false,
-      rollout_state: "",
-      serial: "",
-      sync_window: 0,
-      tokengroup: [],
-      tokentype: "hotp",
-      user_id: "",
-      user_realm: "",
-      username: ""
-    };
   });
   tokenDetailData = linkedSignal({
     source: this.tokenDetails,

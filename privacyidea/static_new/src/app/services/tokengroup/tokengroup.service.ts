@@ -70,12 +70,9 @@ export class TokengroupService implements TokengroupServiceInterface {
   });
 
   tokengroups: WritableSignal<Tokengroup[]> = linkedSignal({
-    source: () => {},
-    computation: (source, previous) => {
-      let value: Tokengroups | undefined = undefined;
-      if (this.tokengroupResource.hasValue()) {
-        value = this.tokengroupResource.value()?.result?.value;
-      }
+    source: () => this.tokengroupResource.hasValue() ? this.tokengroupResource.value() : undefined,
+    computation: (tokengroupResource, previous) => {
+      const value = tokengroupResource?.result?.value;
       if (!value) {
         return previous?.value ?? [];
       }

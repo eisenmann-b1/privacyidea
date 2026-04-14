@@ -305,9 +305,10 @@ export class UserService implements UserServiceInterface {
 
   user: WritableSignal<UserData> = linkedSignal({
     source: () => ({
+      userRes: this.userResource.hasValue() ? this.userResource.value() : undefined,
       detailsUsername: this.detailsUsername()
     }),
-    computation: (source, previous) => {
+    computation: (source) => {
       const emptyDetails: UserData = {
         description: "",
         editable: false,
@@ -320,8 +321,7 @@ export class UserService implements UserServiceInterface {
         userid: "",
         username: ""
       };
-      if (!this.userResource.hasValue()) return emptyDetails;
-      return this.userResource.value()?.result?.value?.[0] ?? emptyDetails;
+      return source.userRes?.result?.value?.[0] ?? emptyDetails;
     }
   });
 
@@ -367,13 +367,11 @@ export class UserService implements UserServiceInterface {
 
   users: WritableSignal<UserData[]> = linkedSignal({
     source: () => ({
+      userRes: this.usersResource.hasValue() ? this.usersResource.value() : undefined,
       realm: this.selectedUserRealm()
     }),
     computation: (source, previous) => {
-      let users: UserData[] | undefined = [];
-      if (this.usersResource.hasValue()) {
-        users = this.usersResource.value()?.result?.value;
-      }
+      const users = source.userRes?.result?.value;
       if (!users && source.realm !== previous?.source.realm) {
         // If the realm changed we do not fall back on the previous user list
         return [];

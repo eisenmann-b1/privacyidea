@@ -18,7 +18,7 @@
  **/
 
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { provideExperimentalZonelessChangeDetection } from "@angular/core";
+import { provideZonelessChangeDetection } from "@angular/core";
 
 import { UserUtilsPanelComponent } from "./user-utils-panel.component";
 import { ActivatedRoute, provideRouter, Router } from "@angular/router";
@@ -111,7 +111,7 @@ describe("UserUtilsPanelComponent", () => {
         { provide: PendingChangesService, useClass: MockPendingChangesService },
         { provide: DialogService, useClass: MockDialogService },
         { provide: MatSnackBar, useValue: { open: jest.fn() } },
-        provideExperimentalZonelessChangeDetection(),
+        provideZonelessChangeDetection(),
         MockLocalService,
         MockNotificationService
       ]

@@ -18,7 +18,7 @@
  **/
 
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { provideExperimentalZonelessChangeDetection } from "@angular/core";
+import { provideZonelessChangeDetection } from "@angular/core";
 import { PolicyPanelEditComponent } from "./policy-panel-edit.component";
 import { DialogService } from "../../../../../../services/dialog/dialog.service";
 import { PolicyService } from "../../../../../../services/policies/policies.service";
@@ -77,7 +77,7 @@ describe("PolicyPanelEditComponent - Extended Tests", () => {
       providers: [
         { provide: PolicyService, useClass: MockPolicyService },
         { provide: DialogService, useClass: MockDialogService },
-        provideExperimentalZonelessChangeDetection()
+        provideZonelessChangeDetection()
       ]
     })
       .overrideComponent(PolicyPanelEditComponent, {

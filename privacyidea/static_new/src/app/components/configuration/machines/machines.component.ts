@@ -88,7 +88,8 @@ export class MachinesComponent {
     this.dialog.open(MachineDetailsDialogComponent, {
       data: { ...machine },
       width: "auto",
-      maxWidth: "100vw"
+      maxWidth: "65vw",
+      maxHeight: "90vh"
     });
   }
 

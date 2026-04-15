@@ -53,3 +53,9 @@
     padding: 0 !important;
   }
 }
+
+.responsive-margin-bottom-1090 {
+  @media (max-width: 1090px) {
+    margin-bottom: 16px;
+  }
+}

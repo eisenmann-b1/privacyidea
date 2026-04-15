@@ -108,21 +108,21 @@ CSP = {
     'style-src': [
         '\'self\'',
         "'unsafe-hashes'",
-        "'sha256-1PxuDsPyGK6n+LZsMv0gG4lMX3i3XigG6h0CzPIjwrE='",
-        "'sha256-PDYg/vkWbGnl+ya8uasRQlyo8wGc+3ANz5x3d3aNWUI='",
-        "'sha256-UtUbbZ5pLwzvjGTHwLTsbIxr5p5bX60ndOEI8wF3bo4='",
-        "'sha256-QG3Eg3DGi8tPwqt0K2eUwBqB1GNl19PjW/3Ex5i5mPk='",
-        "'sha256-pSJ3mKkpKCRMub/4VC+QXgZS+y+3+5w9EMRavXs3s38='",
-        "'sha256-j3gGPuXMDPpU+BxRYg+qUVF0TSGtFEKcp1muBBATanE='",
-        "'sha256-3RgHoWfZTUIYaaqXpyMi4osn0e3W0oyKtFnPAFo1uvI='",
-        "'sha256-n9t4cSjdGHb1Hj8yhaCQy3nxaXjPnaDbPkrwYo97sdI='",
         "'sha256-biLFinpqYMtWHmXfkA1BPeCY0/fNt46SAZ+BBk5YUog='",
         "'sha256-7Pu3hinXdj8VFYmteOTmNXWMU+7rB6e//vfADReF/io='",
+        "'sha256-YwVkay1kjkGiuRM9oW8JUzwK2yXE5Dz412KzI4K7I9w='",
+        "'sha256-pV4RJPLWGu90gKQ1iZ+Ocf8wsPJFysB4EeJ6ulMffC8='",
+        "'sha256-sGXdRWRfaXoi2w7oxblURTZe2bZUow+NA6vowwlqX90='",
+        "'sha256-YurW9RNmdGYOW4E845uslV8U8DB3kRoDIp23Yfx2Aag='",
+        "'sha256-YYETf3tpBMRzy6KyGXJts2MStBC0P8LURMg9MhNXEJ0='",
+        "'sha256-PpZyeb/uN2vEHgWDQLqD6Fz17C0qk8EdQCN3u3ngch0='",
+        "'sha256-oTBIxtioa8VM5xoYrlusFzgFpFG1NzQ+kLPiOX3bKW4='",
+        "'sha256-AkGc/9SiOd74zk72UnCdLs+k10sM4iy2uKmgoXkaHe0='",
+        "'sha256-O2+tCymNJNXAt1PNeGpUdjx9tYTHtsUHA3yHgvt0o98='",
+        "'sha256-GAz6lAgGT4GObhjzk+HFLtlANWYun7Clm7Df+db5ka8='",
         "'sha256-KpSV7LuPYEu58+3u9LJr9v5Drm0uIKEv0h3u/+NVNm8='",
         "'sha256-N90MKmRow2DpYEVeqcc3uc8pOUsS4Rg4sNmkau1k0xQ='",
         "'sha256-Vois/bpqZahvBcyohHpVvTSyXN1GBToEOBP1fnFv8OQ='",
-        "'sha256-YwVkay1kjkGiuRM9oW8JUzwK2yXE5Dz412KzI4K7I9w='",
-        "'sha256-QdXSwG0lFVqEzH3nNnFcjWceQ68gfeuFj6C0DdxGekE='"
     ]
 }
 
@@ -175,7 +175,7 @@ def _register_blueprints(app):
 def _setup_logging(app, logging_config=DEFAULT_LOGGING_CONFIG):
     # Setup logging
     log_read_func = {
-        'yaml': lambda x: logging.config.dictConfig(yaml.safe_load(open(x, 'r').read())),
+        'yaml': lambda x: logging.config.dictConfig(yaml.safe_load(open(x).read())),
         'cfg': lambda x: logging.config.fileConfig(x)
     }
     have_config = False
@@ -254,7 +254,7 @@ def _setup_node_configuration(app: Flask):
                         with open(pi_uuid_file, 'w') as f:  # pragma: no cover
                             f.write(f"{str(pi_uuid)}\n")
                             log.info(f"Successfully wrote current UUID to file '{pi_uuid_file}'")
-                    except IOError as exx:
+                    except OSError as exx:
                         log.warning(f"Could not write UUID to file '{pi_uuid_file}': {exx}")
 
             app.config[ConfigKey.NODE_UUID] = str(pi_uuid)
@@ -318,7 +318,7 @@ def create_app(config_name="development",
     # Overwrite default config with environment setting
     config_name = os.environ.get(ConfigKey.CONFIG_NAME, config_name)
     if app.config.get(ConfigKey.VERBOSE):
-        print("The configuration name is: {0!s}".format(config_name))
+        print(f"The configuration name is: {config_name!s}")
     app.config.from_object(config[config_name])
 
     # Load configuration from environment variables prefixed with PRIVACYIDEA_
@@ -327,12 +327,12 @@ def create_app(config_name="development",
     if ENV_KEY in os.environ:
         config_file = os.environ[ENV_KEY]
     if app.config.get(ConfigKey.VERBOSE):
-        print("Additional configuration will be read from the file {0!s}".format(config_file))
+        print(f"Additional configuration will be read from the file {config_file!s}")
 
     try:
         # Try to load the given config_file.
         app.config.from_pyfile(config_file, silent=False)
-    except IOError as e:
+    except OSError as e:
         if config_name != "docker" or ENV_KEY in os.environ:
             sys.stderr.write("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
             sys.stderr.write("  WARNING: Unable to load additional configuration\n")
@@ -435,7 +435,7 @@ def create_docker_app():
         app.config.from_pyfile(DefaultConfigValues.CFG_PATH, silent=False)
         if app.debug:
             sys.stderr.write(f"Read configuration from file: '{DefaultConfigValues.CFG_PATH}'\n")
-    except IOError as _e:
+    except OSError as _e:
         pass
     # Then we update the configuration with stuff from the environment
     if app.debug:

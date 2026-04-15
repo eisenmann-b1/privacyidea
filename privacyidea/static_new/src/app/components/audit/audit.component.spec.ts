@@ -16,27 +16,27 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
+
+import { provideHttpClient } from "@angular/common/http";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { MatTableDataSource } from "@angular/material/table";
+import { provideNoopAnimations } from "@angular/platform-browser/animations";
+import { ActivatedRoute } from "@angular/router";
+import { of } from "rxjs";
+import { AuditService } from "src/app/services/audit/audit.service";
+import { AuthService } from "src/app/services/auth/auth.service";
+import { ContentService } from "src/app/services/content/content.service";
+import { TableUtilsService } from "src/app/services/table-utils/table-utils.service";
 import {
   MockAuditService,
   MockContentService,
   MockLocalService,
-  MockNotificationService,
-  MockTableUtilsService
-} from "../../../testing/mock-services";
-
-import { ActivatedRoute } from "@angular/router";
+  MockNotificationService
+} from "src/testing/mock-services";
+import { MockAuthService } from "src/testing/mock-services/mock-auth-service";
+import { MockTableUtilsService } from "src/testing/mock-services/mock-table-utils-service";
 import { AuditComponent } from "./audit.component";
-import { AuditService } from "../../services/audit/audit.service";
-import { AuthService } from "../../services/auth/auth.service";
-import { ContentService } from "../../services/content/content.service";
-import { MatTableDataSource } from "@angular/material/table";
-import { TableUtilsService } from "../../services/table-utils/table-utils.service";
-import { of } from "rxjs";
-import { provideHttpClient } from "@angular/common/http";
 import { AuditSelfServiceComponent } from "./audit.self-service.component";
-import { provideNoopAnimations } from "@angular/platform-browser/animations";
-import { MockAuthService } from "../../../testing/mock-services/mock-auth-service";
 
 describe("AuditComponent (unit)", () => {
   let fixture: ComponentFixture<AuditComponent>;
@@ -135,6 +135,22 @@ describe("AuditComponent (unit)", () => {
       expect(component.totalLength()).toBe(count);
       expect(component.pageSizeOptions()).toEqual(expectedOptions);
     });
+  });
+
+  it("pageSizeOptions should add custom page size if not included in default options", () => {
+    const defaultOptions = [5, 10, 25, 50];
+    mockTableUtilsService.pageSizeOptions.set(defaultOptions);
+    expect(component.pageSizeOptions()).toEqual(defaultOptions);
+
+    // Check custom page size is added but does not mutate the options from the service
+    const customOptions = [5, 10, 15, 25, 50];
+    mockAuditService.pageSize.set(15);
+    expect(component.pageSizeOptions()).toEqual(customOptions);
+    expect(mockTableUtilsService.pageSizeOptions()).toEqual(defaultOptions);
+
+    // custom page size should still be included if selected pageSize changes
+    mockAuditService.pageSize.set(10);
+    expect(component.pageSizeOptions()).toEqual(customOptions);
   });
 
   it("emptyResource mirrors pageSize", () => {

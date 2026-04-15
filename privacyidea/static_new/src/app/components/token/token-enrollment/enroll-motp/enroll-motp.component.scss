@@ -1,9 +1,11 @@
-@use "../../../../../styles";
+@use "styles";
+@use "inputs";
+@use "table";
 
 .motp-pin-input {
   display: flex;
   gap: 16px;
-  margin: 16px 0 16px 0;
+  margin-top: 16px;
 }
 
 .motp-input {
@@ -13,14 +15,6 @@
   outline: none;
 
   &:focus {
-    outline: styles.$focus-outline;
+    outline: inputs.$input-focus-outline;
   }
-}
-
-.motp-description-form {
-  width: 66%;
-}
-
-.hidden-input {
-  display: none;
 }

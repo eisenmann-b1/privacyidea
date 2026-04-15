@@ -17,18 +17,14 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
-import { httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { computed, inject, Injectable, linkedSignal, Signal, WritableSignal } from "@angular/core";
 
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
 import { CaConnectors } from "../ca-connector/ca-connector.service";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
-
-export type PiNode = {
-  name: string;
-  uuid: string;
-};
+import { Observable } from "rxjs";
 
 export interface NodeInfo {
   name: string;
@@ -42,7 +38,18 @@ export interface SystemServiceInterface {
   caConnectors?: WritableSignal<CaConnectors>;
   nodesResource: HttpResourceRef<any>;
   systemConfig: Signal<any>;
-  nodes: Signal<PiNode[]>;
+  systemConfigInit: Signal<any>;
+  nodes: Signal<NodeInfo[]>;
+
+  saveSystemConfig(config: any): Observable<PiResponse<any>>;
+
+  deleteSystemConfig(key: string): Observable<PiResponse<any>>;
+
+  deleteUserCache(): Observable<PiResponse<any>>;
+
+  loadSmtpIdentifiers(): Observable<PiResponse<any>>;
+
+  getDocumentation(): Observable<string>;
 }
 
 @Injectable({
@@ -53,8 +60,13 @@ export class SystemService implements SystemServiceInterface {
 
   private readonly authService: AuthServiceInterface = inject(AuthService);
   private readonly contentService: ContentServiceInterface = inject(ContentService);
+  private readonly http: HttpClient = inject(HttpClient);
   private onAllowedRoutes = computed(() => {
-    return this.contentService.onTokensEnrollment() || this.contentService.onTokensWizard();
+    return (
+      this.contentService.onTokenEnrollmentLikely() ||
+      this.contentService.onConfigurationSystem() ||
+      this.contentService.onConfigurationTokenTypes()
+    );
   });
 
   systemConfigResource = httpResource<any>(() => {
@@ -80,7 +92,7 @@ export class SystemService implements SystemServiceInterface {
     }
 
     return {
-      url: this.systemBaseUrl + "/names/radius",
+      url: this.systemBaseUrl + "names/radius",
       method: "GET",
       headers: this.authService.getHeaders()
     };
@@ -106,15 +118,56 @@ export class SystemService implements SystemServiceInterface {
     source: this.caConnectorResource?.value,
     computation: (source, previous) => source?.result?.value ?? previous?.value ?? []
   });
-  nodesResource = httpResource<PiResponse<PiNode[]>>({
-    url: this.systemBaseUrl + "nodes",
-    method: "GET",
-    headers: this.authService.getHeaders()
+  nodesResource = httpResource<PiResponse<NodeInfo[]>>(() => {
+    if (
+      !this.contentService.onConfigurationPeriodicTasks() &&
+      !this.contentService.onConfigurationSystem() &&
+      !this.contentService.onUserRealms()
+    ) {
+      return undefined;
+    }
+    return {
+      url: this.systemBaseUrl + "nodes",
+      method: "GET",
+      headers: this.authService.getHeaders()
+    };
   });
   systemConfig = computed<any>(() => {
     return this.systemConfigResource.value()?.result?.value ?? {};
   });
-  nodes = computed<PiNode[]>(() => {
+  systemConfigInit = computed<any>(() => {
+    return this.systemConfigResource.value()?.result?.init ?? {};
+  });
+  nodes = computed<NodeInfo[]>(() => {
     return this.nodesResource.value()?.result?.value ?? [];
   });
+
+  saveSystemConfig(config: any): Observable<PiResponse<any>> {
+    return this.http.post<PiResponse<any>>(this.systemBaseUrl + "setConfig", config, {
+      headers: this.authService.getHeaders()
+    });
+  }
+
+  deleteSystemConfig(key: string): Observable<PiResponse<any>> {
+    return this.http.delete<PiResponse<any>>(`${this.systemBaseUrl}${key}`, { headers: this.authService.getHeaders() });
+  }
+
+  deleteUserCache(): Observable<PiResponse<any>> {
+    return this.http.delete<PiResponse<any>>(`${this.systemBaseUrl}user-cache`, {
+      headers: this.authService.getHeaders()
+    });
+  }
+
+  loadSmtpIdentifiers(): Observable<PiResponse<any>> {
+    return this.http.get<PiResponse<any>>(`${this.systemBaseUrl}names/smtp`, {
+      headers: this.authService.getHeaders()
+    });
+  }
+
+  getDocumentation(): Observable<string> {
+    return this.http.get(`${this.systemBaseUrl}documentation`, {
+      headers: this.authService.getHeaders(),
+      responseType: "text"
+    });
+  }
 }

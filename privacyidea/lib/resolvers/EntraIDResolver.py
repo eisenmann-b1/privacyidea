@@ -19,13 +19,12 @@
 import copy
 import json
 import logging
-import msal
 from enum import Enum
-from typing import Union, Optional
 
+import msal
 from requests import Response
 
-from privacyidea.api.lib.utils import get_required, get_optional
+from privacyidea.lib.params import get_required, get_optional
 from privacyidea.lib.error import ResolverError, ParameterError
 from privacyidea.lib.log import log_with
 from privacyidea.lib.resolvers.HTTPResolver import (HTTPResolver, METHOD, ENDPOINT,
@@ -33,7 +32,7 @@ from privacyidea.lib.resolvers.HTTPResolver import (HTTPResolver, METHOD, ENDPOI
                                                     CONFIG_GET_USER_BY_ID, RequestConfig, ADVANCED,
                                                     CONFIG_CREATE_USER, CONFIG_EDIT_USER,
                                                     CONFIG_DELETE_USER, REQUEST_MAPPING, HEADERS, CONFIG_USER_AUTH,
-                                                    Error)
+                                                    Error, USER_GROUPS_ATTRIBUTE, ACTIVE, PI_USER_GROUPS_KEY)
 from privacyidea.lib.resolvers.util import delete_user_error_handling_no_content
 
 CLIENT_ID = "client_id"
@@ -58,7 +57,7 @@ class EntraIDResolver(HTTPResolver):
 
     @log_with(log)
     def __init__(self):
-        super(EntraIDResolver, self).__init__()
+        super().__init__()
         self.base_url = "https://graph.microsoft.com/v1.0"
         self.attribute_mapping_pi_to_user_store = {"username": "userPrincipalName",
                                                    "userid": "id",
@@ -87,6 +86,8 @@ class EntraIDResolver(HTTPResolver):
                                                REQUEST_MAPPING: "client_id={client_id}&scope=https://graph.microsoft.com"
                                                                 "/.default&username={username}&password={password}&"
                                                                 "grant_type=password&client_secret={client_credential}"}})
+        self.config_get_user_groups = {ACTIVE: True, USER_GROUPS_ATTRIBUTE: "displayName",
+                                       PI_USER_GROUPS_KEY: self.pi_user_groups_key}
         self.wildcard = ""  # No wildcards supported
 
         # Custom attributes
@@ -203,7 +204,7 @@ class EntraIDResolver(HTTPResolver):
         return EntraIDResolver.getResolverClassDescriptor()
 
     @log_with(log, hide_args=[2])
-    def checkPass(self, uid: str, password: str, username: Optional[str] = None) -> bool:
+    def checkPass(self, uid: str, password: str, username: str | None = None) -> bool:
         """
         This function checks the password for a given user. The user can either be identified by the uid or the
         username. EntraID provides the OAuth 2.0 ROPC flow to check the password. This flow only supports using
@@ -220,6 +221,17 @@ class EntraIDResolver(HTTPResolver):
                                 "client!")
         else:
             return super().checkPass(uid, password, username)
+
+    def get_user_groups(self, user: dict) -> list:
+        """
+        Gets all groups of a user
+
+        :param user: user representation from the user store as dict
+        """
+        group_attribute = self.config_get_user_groups.get(USER_GROUPS_ATTRIBUTE, "displayName")
+        member_of = user.get("memberOf", [])
+        groups = [group.get(group_attribute, "") for group in member_of]
+        return groups
 
     def _get_auth_header(self) -> dict:
         """
@@ -238,7 +250,15 @@ class EntraIDResolver(HTTPResolver):
         header = {"Authorization": f"Bearer {access_token}"}
         return header
 
-    def _get_search_params(self, search_dict: dict) -> dict:
+    @staticmethod
+    def _escape_filter_values(filter_value: str) -> str:
+        """
+        Escape single quotes according to the OData specification.
+        """
+        escaped_filter = filter_value.replace("'", "''")
+        return escaped_filter
+
+    def _get_search_params(self, search_dict: dict, allow_endswith: bool = True) -> dict:
         """
         Returns a dictionary containing the search parameters in the format expected by the user store API.
         All search parameters are mapped to the EntraID attributes according to the attribute mapping and concatenated
@@ -246,7 +266,8 @@ class EntraIDResolver(HTTPResolver):
         ``<entra_key> eq '<value>'``. If wildcards are contained in the value, we use the syntax
         ``startswith(<entra_key>, '<value>')`` where all '*' characters are removed from the value as entraID does not
         support advanced wildcard searches. If advanced query capabilities are activated, it also searches for values
-        that ends with the substring. Syntax: ``(startswith(<entra_key>, '<value>') or endswith(<entra_key>, '<value>'))``
+        that ends with the substring.
+        Syntax: ``(startswith(<entra_key>, '<value>') or endswith(<entra_key>, '<value>'))``
         Multiple search attributes are concatenated with `` and ``.
         The complete search query is stored und the key ``$filer`` in the request parameters dictionary.
         """
@@ -261,30 +282,31 @@ class EntraIDResolver(HTTPResolver):
                 log.debug(f"Search parameter '{key}' not found in attribute mapping. Search without this parameter.")
                 continue
 
-            if value == "*":
+            escaped_value = self._escape_filter_values(value)
+            if escaped_value == "*":
                 # If the value is "*", we do not filter by this attribute
                 continue
-            elif "*" in value:
+            elif "*" in escaped_value:
                 # Advanced query capabilities (endswith) can only be used if the Consistency Header is set
                 # If it is not configured we use basic queries (only startswith)
                 user_list_config = self.config.get(CONFIG_GET_USER_LIST, {})
                 headers = user_list_config.get(HEADERS, "{}")
                 try:
                     headers = json.loads(headers)
-                    advanced_query = headers.get("ConsistencyLevel", "") == "eventual"
+                    advanced_query = headers.get("ConsistencyLevel", "") == "eventual" and allow_endswith
                 except json.JSONDecodeError:
                     advanced_query = False
 
                 # EntraID does not support advanced wildcard searches. We can only filter for attributes
                 # that start (or end) with the given value.
-                value = value.replace("*", self.wildcard)
+                escaped_value = value.replace("*", self.wildcard)
                 if advanced_query:
                     filter_values.append(
-                        f"(startswith({entra_key}, '{value}') or endswith({entra_key}, '{value}'))")
+                        f"(startswith({entra_key}, '{escaped_value}') or endswith({entra_key}, '{escaped_value}'))")
                 else:
-                    filter_values.append(f"startswith({entra_key}, '{value}')")
+                    filter_values.append(f"startswith({entra_key}, '{escaped_value}')")
             else:
-                filter_values.append(f"{entra_key} eq '{value.replace('*', self.wildcard)}'")
+                filter_values.append(f"({entra_key} eq '{escaped_value}')")
 
         if filter_values:
             request_parameters["$filter"] = " and ".join(filter_values)
@@ -304,7 +326,7 @@ class EntraIDResolver(HTTPResolver):
             user["businessPhones"] = [user["businessPhones"]]
         return user
 
-    def _get_user_list_from_response(self, response: Union[dict, list]) -> list[dict]:
+    def _get_user_list_from_response(self, response: dict | list) -> list[dict]:
         """
         Extracts the user attributes dictionary from the response body.
 
@@ -351,7 +373,7 @@ class EntraIDResolver(HTTPResolver):
             success = self._custom_error_handling(response, config)
 
         if not success:
-            raise ResolverError(f"Failed to get the user list!")
+            raise ResolverError("Failed to get the user list!")
 
     def _get_user_error_handling(self, response: Response, config: RequestConfig, user_identifier: str) -> bool:
         """
@@ -459,3 +481,76 @@ class EntraIDResolver(HTTPResolver):
             # Custom errors can also occur in successful responses
             success = self._custom_error_handling(response, config)
         return success
+
+    def _get_user_list(self, search_dict: dict, config: RequestConfig, attributes: list[str] = None) -> list[dict]:
+        """
+        Fetches a list of users from the user store.
+
+        :param search_dict: Dictionary containing search parameters that are added as query to the endpoint url
+        :param config: Configuration contains all information of the api endpoint to fetch the users.
+        :return: List of dictionaries containing pi conform user attributes
+        """
+        request_params = config.request_mapping if config.request_mapping else {}
+        search_for_groups = self.config_get_user_groups.get(ACTIVE) and (
+                    not attributes or self.pi_user_groups_key in attributes)
+        request_params.update(self._get_search_params(search_dict, allow_endswith=search_for_groups))
+        config.headers.update(self._get_auth_header())
+
+        if search_for_groups:
+            # If groups are requested, we need to expand the memberOf relationship
+            if "$expand" in request_params:
+                if "memberOf" not in request_params["$expand"]:
+                    request_params["$expand"] += ",memberOf"
+            else:
+                request_params["$expand"] = "memberOf"
+
+        response = self._do_request(config, request_params)
+
+        self._get_user_list_error_handling(response, config)
+
+        # Map user store attributes to pi attributes
+        json_result = response.json()
+        json_result = self._apply_response_mapping(config, json_result)
+        user_store_users = self._get_user_list_from_response(json_result)
+        users = [self._user_store_user_to_pi_user(user, attributes) for user in user_store_users]
+
+        return users
+
+    def _get_user(self, user_identifier: str, config: RequestConfig, attributes: list[str] = None) -> dict:
+        """
+        Fetches a single user from the user store
+
+        :param user_identifier: Either the UID or the username
+        :param config: Configuration to fetch the user
+        :param attributes: list of attributes to be returned for the user
+        :return: Dictionary containing pi conform user attributes
+        """
+        # Request
+        config.headers.update(self._get_auth_header())
+        request_params = config.request_mapping if config.request_mapping else {}
+
+        if self.config_get_user_groups.get(ACTIVE) and (not attributes or self.pi_user_groups_key in attributes):
+            # If groups are requested, we need to expand the memberOf relationship
+            if "$expand" in request_params:
+                if "memberOf" not in request_params["$expand"]:
+                    request_params["$expand"] += ",memberOf"
+            else:
+                request_params["$expand"] = "memberOf"
+
+        response = self._do_request(config, request_params)
+
+        # Error handling
+        success = self._get_user_error_handling(response, config, user_identifier)
+
+        # Map user store attributes to pi attributes
+        user_info = {}
+        if success:
+            user_info = response.json()
+            if config.response_mapping:
+                # Apply custom response mapping
+                user_info = self._apply_response_mapping(config, user_info)
+            if self.attribute_mapping_user_store_to_pi:
+                # Apply general attribute mapping
+                user_info = self._user_store_user_to_pi_user(user_info, attributes)
+
+        return user_info

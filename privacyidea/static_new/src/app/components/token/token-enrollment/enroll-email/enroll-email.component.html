@@ -17,14 +17,29 @@
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <div class="flex-column">
-  <h4 class="enroll-h4">Token Configuration</h4>
   @if (!defaultSmtpIsSet()) {
-    <span
-      i18n
-      class="inline-warning">
-      For Email tokens to work properly you need to set the <a href="#">Email Token Config</a>!
-    </span>
-    <!-- TODO: Link -->
+    @if (authService.role() === "admin") {
+      <span
+        i18n
+        class="inline-warning">
+        For E-Mail tokens to work properly you need to set the
+        <a
+          role="button"
+          tabindex="0"
+          aria-label="Go to Email token configuration"
+          i18n-aria-label
+          (click)="goToEmailConfig()"
+          (keydown)="onEmailConfigKeydown($event)">
+          Email Token Configuration
+        </a>!
+      </span>
+    } @else {
+      <span
+        i18n
+        class="inline-warning">
+        The E-Mail token enrollment is not completely configured. Please contact your administrator.
+      </span>
+    }
   }
   <mat-checkbox
     [formControl]="readEmailDynamicallyControl"
@@ -33,7 +48,7 @@
   </mat-checkbox>
   <div class="flex-row gap-16">
     @if (!readEmailDynamicallyControl.value) {
-      <mat-form-field class="input-height width-33">
+      <mat-form-field class="input-width-l">
         <mat-label i18n>Email Address</mat-label>
         <input
           [formControl]="emailAddressControl"
@@ -42,7 +57,7 @@
         <mat-error i18n>Email Address is <strong>required</strong></mat-error>
       </mat-form-field>
     } @else {
-      <span class="width-33"></span>
+      <span class="input-width-l"></span>
     }
   </div>
 </div>

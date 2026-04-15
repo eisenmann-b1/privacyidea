@@ -1,5 +1,5 @@
 /**
- * (c) NetKnights GmbH 2025,  https://netknights.it
+ * (c) NetKnights GmbH 2026,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -34,18 +34,21 @@ import {
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
 import {
+  BaseApiPayloadMapper,
   EnrollmentResponse,
+  EnrollmentResponseDetail,
   TokenApiPayloadMapper,
   TokenEnrollmentData
 } from "../../mappers/token-api-payload/_token-api-payload.mapper";
 import { NotificationService, NotificationServiceInterface } from "../notification/notification.service";
 import { tokenTypes } from "../../utils/token.utils";
-import { FilterValue } from "../../core/models/filter_value";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
+import { RealmService, RealmServiceInterface } from "../realm/realm.service";
 import { StringUtils } from "../../utils/string.utils";
-import { ConfirmationDialogComponent } from "../../components/shared/confirmation-dialog/confirmation-dialog.component";
-import { DialogReturnData } from "../dialog/dialog.service";
+import { DialogService, DialogServiceInterface } from "../dialog/dialog.service";
+import { SimpleConfirmationDialogComponent } from "../../components/shared/dialog/confirmation-dialog/confirmation-dialog.component";
+import { FilterValue } from "src/app/core/models/filter_value/filter_value";
 
 export type TokenTypeKey =
   | "hotp"
@@ -75,15 +78,7 @@ export type TokenTypeKey =
   | "webauthn"
   | "passkey";
 
-const apiFilter = [
-  "serial",
-  "type",
-  "active",
-  "description",
-  "rollout_state",
-  "tokenrealm",
-  "container_serial"
-];
+const apiFilter = ["serial", "type", "active", "user", "realm", "description", "rollout_state", "tokenrealm", "container_serial"];
 
 const advancedApiFilter = ["infokey & infovalue", "userid", "resolver", "assigned"];
 
@@ -95,6 +90,7 @@ const apiFilterKeyMap: Record<string, string> = {
   rollout_state: "rollout_state",
   username: "user",
   realms: "tokenrealm",
+  user_realm: "realm",
   container_serial: "container_serial"
 };
 
@@ -145,6 +141,7 @@ export interface TokenType {
   name: string;
   info: string;
   text: string;
+  rollover?: boolean;
 }
 
 export interface WebAuthnRegisterRequest {
@@ -172,6 +169,19 @@ export interface WebAuthnRegisterRequest {
 }
 
 export type LostTokenResponse = PiResponse<LostTokenData>;
+
+export type EnrollTokenArguments = { data: TokenEnrollmentData, mapper: BaseApiPayloadMapper };
+
+export type TokenEnrollmentDialogData = {
+  tokenType: string;
+  response: EnrollmentResponse | null;
+  enrollParameters: EnrollTokenArguments;
+  username?: string;
+  userRealm?: string;
+  onlyAddToRealm?: boolean;
+  rollover?: boolean;
+  showEnrollData?: boolean;
+}
 
 export interface LostTokenData {
   disable: number;
@@ -201,7 +211,7 @@ export interface TokenServiceInterface {
   tokenBaseUrl: string;
   eventPageSize: number;
   tokenSerial: WritableSignal<string>;
-  selectedTokenType: Signal<TokenType>;
+  selectedTokenType: WritableSignal<TokenType>;
   showOnlyTokenNotInContainer: WritableSignal<boolean>;
   tokenFilter: WritableSignal<FilterValue>;
   tokenDetailResource: HttpResourceRef<PiResponse<Tokens> | undefined>;
@@ -219,7 +229,11 @@ export interface TokenServiceInterface {
   sort: WritableSignal<Sort>;
   pageIndex: WritableSignal<number>;
   tokenResource: HttpResourceRef<PiResponse<Tokens> | undefined>;
+  tokenSerialResource: HttpResourceRef<PiResponse<Tokens> | undefined>;
   tokenSelection: WritableSignal<TokenDetails[]>;
+  selectedToken: WritableSignal<string | null>;
+  tokenOptions: Signal<string[]>;
+  filteredTokenOptions: Signal<string[]>;
 
   clearFilter(): void;
 
@@ -239,7 +253,7 @@ export interface TokenServiceInterface {
 
   bulkDeleteTokens(selectedTokens: string[]): Observable<PiResponse<BulkResult, any>>;
 
-  bulkDeleteWithConfirmDialog(serialList: string[], dialog: any, afterDelete?: () => void): void;
+  bulkDeleteWithConfirmDialog(serialList: string[], afterDelete?: () => void): void;
 
   revokeToken(tokenSerial: string): Observable<any>;
 
@@ -267,7 +281,7 @@ export interface TokenServiceInterface {
 
   setPin(tokenSerial: string, userPin: string): Observable<any>;
 
-  setRandomPin(tokenSerial: string): Observable<any>;
+  setRandomPin(tokenSerial: string): Observable<any>; // TODO: Specify return type
 
   resyncOTPToken(tokenSerial: string, firstOTPValue: string, secondOTPValue: string): Observable<Object>;
 
@@ -277,6 +291,8 @@ export interface TokenServiceInterface {
     data: T;
     mapper: TokenApiPayloadMapper<T>;
   }): Observable<R>;
+
+  verifyToken(verifyData: TokenEnrollmentData): Observable<PiResponse<boolean, EnrollmentResponseDetail>>;
 
   lostToken(tokenSerial: string): Observable<LostTokenResponse>;
 
@@ -301,6 +317,8 @@ export class TokenService implements TokenServiceInterface {
   private readonly authService: AuthServiceInterface = inject(AuthService);
   private readonly notificationService: NotificationServiceInterface = inject(NotificationService);
   private readonly contentService: ContentServiceInterface = inject(ContentService);
+  private readonly dialogService: DialogServiceInterface = inject(DialogService);
+  private readonly realmService: RealmServiceInterface = inject(RealmService);
 
   readonly hiddenApiFilter = hiddenApiFilter;
   readonly apiFilterKeyMap = apiFilterKeyMap;
@@ -311,22 +329,9 @@ export class TokenService implements TokenServiceInterface {
   tokenSerial = this.contentService.tokenSerial;
   detailsUsername = this.contentService.detailsUsername;
   filterParams = computed<Record<string, string>>(() => {
-    const allowed = [
-      ...this.apiFilter,
-      ...this.advancedApiFilter,
-      ...this.hiddenApiFilter,
-      "infokey",
-      "infovalue"
-    ];
+    const allowed = [...this.apiFilter, ...this.advancedApiFilter, ...this.hiddenApiFilter, "infokey", "infovalue"];
 
-    const plainKeys = new Set([
-      "user",
-      "infokey",
-      "infovalue",
-      "active",
-      "assigned",
-      "container_serial"
-    ]);
+    const plainKeys = new Set(["user", "infokey", "infovalue", "active", "assigned", "container_serial", "realm"]);
 
     const entries = [
       ...Array.from(this.tokenFilter().filterMap.entries()),
@@ -334,24 +339,37 @@ export class TokenService implements TokenServiceInterface {
     ]
       .filter(([key]) => allowed.includes(key))
       .map(([key, value]) => [key, (value ?? "").toString().trim()] as const)
-      .filter(([key, v]) => key === "container_serial" ? true : StringUtils.validFilterValue(v))
+      .filter(([key, v]) => (key === "container_serial" ? true : StringUtils.validFilterValue(v)))
       .map(([key, v]) => [key, plainKeys.has(key) ? v : `*${v}*`] as const);
     return Object.fromEntries(entries) as Record<string, string>;
+  });
+
+  tokenSerialResource = httpResource<PiResponse<Tokens>>(() => {
+    const filter = this.selectedToken();
+    if (!filter || filter.length < 1) {
+      return undefined;
+    }
+    return {
+      url: this.tokenBaseUrl,
+      method: "GET",
+      headers: this.authService.getHeaders(),
+      params: { serial: `*${filter}*` }
+    };
   });
 
   constructor() {
     effect(() => {
       if (this.tokenResource.error()) {
         const tokensResourceError = this.tokenResource.error() as HttpErrorResponse;
-        console.error("Failed to get token data.", tokensResourceError.message);
-        this.notificationService.openSnackBar(tokensResourceError.message);
+        console.error("Failed to get token data.", tokensResourceError.error.result.error.message);
+        this.notificationService.openSnackBar(tokensResourceError.error.result.error.message);
       }
     });
     effect(() => {
       if (this.tokenTypesResource.error()) {
         const tokenTypesResourceError = this.tokenTypesResource.error() as HttpErrorResponse;
-        console.error("Failed to get token type data.", tokenTypesResourceError.message);
-        this.notificationService.openSnackBar(tokenTypesResourceError.message);
+        console.error("Failed to get token type data.", tokenTypesResourceError.error.result.error.message);
+        this.notificationService.openSnackBar(tokenTypesResourceError.error.result.error.message);
       }
     });
   }
@@ -366,7 +384,6 @@ export class TokenService implements TokenServiceInterface {
       source.tokenTypeOptions[0] ||
       ({ key: "hotp", info: "", text: "" } as TokenType)
   });
-
 
   showOnlyTokenNotInContainer = linkedSignal({
     source: this.contentService.routeUrl,
@@ -389,8 +406,11 @@ export class TokenService implements TokenServiceInterface {
       // Initialize filter when the route changes.
       if (!previous || source.routeUrl !== previous.source.routeUrl) {
         let filterValue = new FilterValue({
-          hiddenValue: this.contentService.onTokensContainersDetails() ?
-            (source.showOnlyTokenNotInContainer ? "container_serial:" : " ") : ""
+          hiddenValue: this.contentService.onTokensContainersDetails()
+            ? source.showOnlyTokenNotInContainer
+              ? "container_serial:"
+              : " "
+            : ""
         });
 
         if (this.contentService.onUserDetails()) {
@@ -424,7 +444,15 @@ export class TokenService implements TokenServiceInterface {
 
   handleFilterInput($event: Event): void {
     const input = $event.target as HTMLInputElement;
-    const newFilter = this.tokenFilter().copyWith({ value: input.value.trim() });
+    let newFilter = this.tokenFilter().copyWith({ value: input.value.trim() });
+
+    if (newFilter.hasKey("user") && !newFilter.hasKey("realm")) {
+      const defaultRealm = this.realmService.defaultRealm();
+      if (defaultRealm) {
+        newFilter = newFilter.addEntry("realm", defaultRealm);
+      }
+    }
+
     this.tokenFilter.set(newFilter);
   }
 
@@ -445,9 +473,12 @@ export class TokenService implements TokenServiceInterface {
   tokenTypesResource = httpResource<PiResponse<{}>>(() => {
     // Only load token types on routes with a tokentype list or selection.
     const onAllowedRoute =
+      this.contentService.onTokens() ||
       this.contentService.onTokensEnrollment() ||
       this.contentService.onTokensGetSerial() ||
-      this.contentService.onTokensContainersCreate();
+      this.contentService.onTokensContainersCreate() ||
+      this.contentService.onTokensContainersDetails() ||
+      this.contentService.onUserDetails();
 
     if (!onAllowedRoute) {
       return undefined;
@@ -551,6 +582,20 @@ export class TokenService implements TokenServiceInterface {
     computation: () => []
   });
 
+  selectedToken: WritableSignal<string | null> = signal(null);
+
+  tokenOptions = linkedSignal({
+    source: this.tokenSerialResource.value,
+    computation: (tokenSerialResource) => {
+      return tokenSerialResource?.result?.value?.tokens?.map((token) => token.serial) ?? [];
+    }
+  });
+
+  filteredTokenOptions = computed(() => {
+    const filter = (this.selectedToken() || "").toLowerCase();
+    return this.tokenOptions().filter((option) => option.toLowerCase().includes(filter));
+  });
+
   bulkUnassignTokens(tokenDetails: TokenDetails[]): Observable<PiResponse<BulkResult, any>> {
     const headers = this.authService.getHeaders();
     return this.http
@@ -585,58 +630,63 @@ export class TokenService implements TokenServiceInterface {
     );
   }
 
-  bulkDeleteWithConfirmDialog(serialList: string[], dialog: any, afterDelete?: () => void) {
-    dialog
-      .open(ConfirmationDialogComponent, {
+  bulkDeleteWithConfirmDialog(serialList: string[], afterDelete?: () => void) {
+    this.dialogService
+      .openDialog({
+        component: SimpleConfirmationDialogComponent,
         data: {
-          serialList: serialList,
           title: "Delete Selected Tokens",
-          type: "token",
-          action: "delete",
-          numberOfTokens: serialList.length
+          items: serialList,
+          itemType: "token",
+          confirmAction: {
+            type: "destruct",
+            label: $localize`Delete`,
+            value: true
+          }
         }
       })
       .afterClosed()
       .subscribe({
-        next: (result: DialogReturnData) => {
-          if (result) {
-            this.bulkDeleteTokens(serialList).subscribe({
-              next: (response: PiResponse<BulkResult, any>) => {
-                const failedTokens = response.result?.value?.failed || [];
-                const unauthorizedTokens = response.result?.value?.unauthorized || [];
-                const count_success = response.result?.value?.count_success || 0;
-                const messages: string[] = [];
-                if (count_success) {
-                  messages.push(`Successfully deleted ${count_success} token${count_success === 1 ? "" : "s"}.`);
-                }
-
-                if (failedTokens.length > 0) {
-                  messages.push(`The following tokens failed to delete: ${failedTokens.join(", ")}`);
-                }
-
-                if (unauthorizedTokens.length > 0) {
-                  messages.push(
-                    `You are not authorized to delete the following tokens: ${unauthorizedTokens.join(", ")}`
-                  );
-                }
-
-                if (messages.length > 0) {
-                  this.notificationService.openSnackBar(messages.join("\n"));
-                }
-
-                if (afterDelete) {
-                  afterDelete();
-                }
-              },
-              error: (err) => {
-                let message = "An error occurred while deleting tokens.";
-                if (err.error?.result?.error?.message) {
-                  message = err.error.result.error.message;
-                }
-                this.notificationService.openSnackBar(message);
-              }
-            });
+        next: (result) => {
+          if (!result) {
+            return;
           }
+          this.bulkDeleteTokens(serialList).subscribe({
+            next: (response: PiResponse<BulkResult, any>) => {
+              const failedTokens = response.result?.value?.failed || [];
+              const unauthorizedTokens = response.result?.value?.unauthorized || [];
+              const count_success = response.result?.value?.count_success || 0;
+              const messages: string[] = [];
+              if (count_success) {
+                messages.push(`Successfully deleted ${count_success} token${count_success === 1 ? "" : "s"}.`);
+              }
+
+              if (failedTokens.length > 0) {
+                messages.push(`The following tokens failed to delete: ${failedTokens.join(", ")}`);
+              }
+
+              if (unauthorizedTokens.length > 0) {
+                messages.push(
+                  `You are not authorized to delete the following tokens: ${unauthorizedTokens.join(", ")}`
+                );
+              }
+
+              if (messages.length > 0) {
+                this.notificationService.openSnackBar(messages.join("\n"));
+              }
+
+              if (afterDelete) {
+                afterDelete();
+              }
+            },
+            error: (err) => {
+              let message = "An error occurred while deleting tokens.";
+              if (err.error?.result?.error?.message) {
+                message = err.error.result.error.message;
+              }
+              this.notificationService.openSnackBar(message);
+            }
+          });
         }
       });
   }
@@ -951,6 +1001,19 @@ export class TokenService implements TokenServiceInterface {
           console.error("Failed to enroll token.", error);
           const message = error.error?.result?.error?.message || "";
           this.notificationService.openSnackBar("Failed to enroll token. " + message);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  verifyToken(verifyData: TokenEnrollmentData): Observable<PiResponse<boolean, EnrollmentResponseDetail>> {
+    const headers = this.authService.getHeaders();
+    return this.http.post<PiResponse<boolean, EnrollmentResponseDetail>>(`${this.tokenBaseUrl}init`, verifyData, { headers })
+      .pipe(
+        catchError((error) => {
+          console.error("Failed to verify token.", error);
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar("Failed to verify token. " + message);
           return throwError(() => error);
         })
       );

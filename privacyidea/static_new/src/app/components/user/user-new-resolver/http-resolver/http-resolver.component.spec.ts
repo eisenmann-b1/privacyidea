@@ -1,5 +1,5 @@
 /**
- * (c) NetKnights GmbH 2025,  https://netknights.it
+ * (c) NetKnights GmbH 2026,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -20,17 +20,23 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { HttpResolverComponent } from "./http-resolver.component";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
 import { ComponentRef } from "@angular/core";
+import { MockResolverService } from "../../../../../testing/mock-services/mock-resolver-service";
+import { ResolverService } from "../../../../services/resolver/resolver.service";
+import { of } from "rxjs";
+import { MockPiResponse } from "../../../../../testing/mock-services";
 
 describe("HttpResolverComponent", () => {
   let component: HttpResolverComponent;
   let componentRef: ComponentRef<HttpResolverComponent>;
   let fixture: ComponentFixture<HttpResolverComponent>;
+  let mockResolverService: MockResolverService;
 
   beforeEach(async () => {
+    mockResolverService = new MockResolverService();
     await TestBed.configureTestingModule({
-      imports: [HttpResolverComponent, NoopAnimationsModule]
-    })
-      .compileComponents();
+      imports: [HttpResolverComponent, NoopAnimationsModule],
+      providers: [{ provide: ResolverService, useValue: mockResolverService }]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(HttpResolverComponent);
     component = fixture.componentInstance;
@@ -42,19 +48,43 @@ describe("HttpResolverComponent", () => {
     expect(component).toBeTruthy();
   });
 
+  it("should fetch defaults when data is empty", () => {
+    expect(mockResolverService.getDefaultResolverConfig).toHaveBeenCalledWith("httpresolver");
+  });
+
+  it("should apply defaults from server", () => {
+    const defaults = {
+      endpoint: "http://default-endpoint",
+      method: "POST",
+      verify_tls: false
+    };
+    mockResolverService.getDefaultResolverConfig.mockReturnValue(of(MockPiResponse.fromValue(defaults)));
+
+    // Trigger effect by changing type or just re-initializing if possible
+    // Since it's already initialized in beforeEach, let's manually call or trigger
+    componentRef.setInput("data", {}); // Ensure it's empty
+    fixture.detectChanges();
+
+    expect(component.endpointControl.value).toBe("http://default-endpoint");
+    expect(component.methodControl.value).toBe("POST");
+    expect(component.verifyTlsControl.value).toBe(false);
+  });
+
   it("should expose controls via signal", () => {
     const controls = component.controls();
-    expect(controls).toEqual(expect.objectContaining({
-      endpoint: component.endpointControl,
-      method: component.methodControl
-    }));
+    expect(controls).toEqual(
+      expect.objectContaining({
+        endpoint: component.endpointControl,
+        method: component.methodControl
+      })
+    );
   });
 
   it("should update controls when data input changes", () => {
     componentRef.setInput("data", {
       endpoint: "http://test",
       method: "POST",
-      attribute_mapping: { "username": "user" }
+      attribute_mapping: { username: "user" }
     });
 
     fixture.detectChanges();
@@ -98,7 +128,6 @@ describe("HttpResolverComponent", () => {
     expect(component["mappingRows"]().length).toBe(initialCount);
   });
 
-
   it("should add a new empty row when the last row's attribute is set", () => {
     const rows = component["mappingRows"]();
     const lastIndex = rows.length - 1;
@@ -111,7 +140,6 @@ describe("HttpResolverComponent", () => {
     expect(newRows.length).toBe(rows.length + 1);
     expect(newRows[newRows.length - 1].privacyideaAttr).toBeNull();
   });
-
 
   it("should handle privacyidea custom attribute selection", () => {
     const rows = component["mappingRows"]();
@@ -133,7 +161,9 @@ describe("HttpResolverComponent", () => {
     // EntraID type
     componentRef.setInput("type", "entraidresolver");
     fixture.detectChanges();
-    expect(component.checkUserPasswordHint()).toBe("Possible tags: {userid} {username} {password} {client_id} {client_credential} {tenant}");
+    expect(component.checkUserPasswordHint()).toBe(
+      "Possible tags: {userid} {username} {password} {client_id} {client_credential} {tenant}"
+    );
 
     // Switch back
     componentRef.setInput("type", "httpresolver");
@@ -150,19 +180,18 @@ describe("HttpResolverComponent", () => {
     component["basicSettings"].set(false);
     fixture.detectChanges();
 
-    expect(component.responseMappingControl.value).toBe("{\"username\":\"{username}\", \"userid\":\"{userid}\"}");
+    expect(component.responseMappingControl.value).toBe('{"username":"{username}", "userid":"{userid}"}');
   });
 
   it("should NOT overwrite responseMapping when switching to Advanced mode if it is already set", () => {
     // Initially in Basic mode
     expect(component["basicSettings"]()).toBe(true);
-    component.responseMappingControl.setValue("{\"custom\":\"mapping\"}");
+    component.responseMappingControl.setValue('{"custom":"mapping"}');
 
     // Switch to Advanced mode
     component["basicSettings"].set(false);
     fixture.detectChanges();
 
-    expect(component.responseMappingControl.value).toBe("{\"custom\":\"mapping\"}");
+    expect(component.responseMappingControl.value).toBe('{"custom":"mapping"}');
   });
-
 });

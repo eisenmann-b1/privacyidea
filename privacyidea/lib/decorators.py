@@ -19,7 +19,7 @@
 import functools
 import logging
 
-from privacyidea.api.lib.utils import get_optional_one_of, get_optional
+from privacyidea.lib.params import get_optional_one_of, get_optional
 from privacyidea.lib import _
 from privacyidea.lib.error import ParameterError
 from privacyidea.lib.error import TokenAdminError
@@ -41,8 +41,7 @@ def check_token_locked(func):
         # The token object
         token = args[0]
         if token.is_locked():
-            raise TokenAdminError(_("This action is not possible, since the "
-                                    "token is locked"), id=1007)
+            raise TokenAdminError(_("This action is not possible, since the token is locked"), id=1007)
         f_result = func(*args, **kwds)
         return f_result
 
@@ -96,7 +95,7 @@ def check_user_or_serial(func):
     return user_or_serial_wrapper
 
 
-class check_user_serial_or_cred_id_in_request(object):
+class check_user_serial_or_cred_id_in_request:
     """
     Decorator to check user and serial in a request.
     If the request does not contain a serial number (serial) or a user

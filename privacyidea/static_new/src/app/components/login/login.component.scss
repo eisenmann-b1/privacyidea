@@ -1,4 +1,5 @@
-@use "../../../styles";
+@use "styles";
+@use "table";
 @use "@angular/material" as mat;
 
 $btn-bg: var(--background-blue);
@@ -34,16 +35,18 @@ $border-radius: var(--border-radius);
     height: auto;
   }
 
+  .custom-logo {
+    max-width: 300px;
+    max-height: 25vh;
+    width: auto;
+    height: auto;
+  }
+
   .login-form {
     display: flex;
     flex-direction: column;
     margin-top: 32px;
     width: 300px;
-
-    mat-form-field {
-      width: 100%;
-      margin-bottom: 16px;
-    }
   }
 
   .passkey-form {

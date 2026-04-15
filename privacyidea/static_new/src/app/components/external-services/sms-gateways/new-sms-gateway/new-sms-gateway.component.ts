@@ -22,7 +22,7 @@ import { toSignal } from "@angular/core/rxjs-interop";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatOptionModule } from "@angular/material/core";
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
@@ -38,16 +38,19 @@ import {
 } from "../../../../services/sms-gateway/sms-gateway.service";
 import { PendingChangesService } from "../../../../services/pending-changes/pending-changes.service";
 import { ROUTE_PATHS } from "../../../../route_paths";
-import {
-  ConfirmationDialogComponent,
-  ConfirmationDialogResult
-} from "../../../shared/confirmation-dialog/confirmation-dialog.component";
+import { SaveAndExitDialogComponent } from "../../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
+import { DialogService, DialogServiceInterface } from "../../../../services/dialog/dialog.service";
+import { ClearableInputComponent } from "../../../shared/clearable-input/clearable-input.component";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "../../../../constants/global.constants";
 
 type KeyValueRow = { key: string; value: string };
 
 @Component({
   selector: "app-sms-edit-dialog",
   standalone: true,
+  host: {
+    class: NAVIGATION_ACCESSIBLE_DIALOG_CLASS
+  },
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -59,7 +62,8 @@ type KeyValueRow = { key: string; value: string };
     MatIconModule,
     MatSelectModule,
     MatOptionModule,
-    MatTableModule
+    MatTableModule,
+    ClearableInputComponent
   ],
   templateUrl: "./new-sms-gateway.component.html",
   styleUrl: "./new-sms-gateway.component.scss"
@@ -69,7 +73,7 @@ export class NewSmsGatewayComponent implements OnInit, OnDestroy {
   private readonly dialogRef = inject(MatDialogRef<NewSmsGatewayComponent>);
   protected readonly data = inject<SmsGateway | null>(MAT_DIALOG_DATA);
   protected readonly smsGatewayService: SmsGatewayServiceInterface = inject(SmsGatewayService);
-  private readonly dialog = inject(MatDialog);
+  private readonly dialogService: DialogServiceInterface = inject(DialogService);
   private readonly router = inject(Router);
   private readonly contentService: ContentServiceInterface = inject(ContentService);
   private readonly pendingChangesService = inject(PendingChangesService);
@@ -115,7 +119,7 @@ export class NewSmsGatewayComponent implements OnInit, OnDestroy {
         this.onCancel();
       });
 
-      this.dialogRef.keydownEvents().subscribe(event => {
+      this.dialogRef.keydownEvents().subscribe((event) => {
         if (event.key === "Escape") {
           this.onCancel();
         }
@@ -124,6 +128,7 @@ export class NewSmsGatewayComponent implements OnInit, OnDestroy {
 
     this.pendingChangesService.registerHasChanges(() => this.hasChanges);
     this.pendingChangesService.registerSave(() => this.save());
+    this.pendingChangesService.registerValidChanges(() => this.canSave);
 
     effect(() => {
       if (!this.contentService.routeUrl().startsWith(ROUTE_PATHS.EXTERNAL_SERVICES_SMS)) {
@@ -225,68 +230,73 @@ export class NewSmsGatewayComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.pendingChangesService.unregisterHasChanges();
+    this.pendingChangesService.clearAllRegistrations();
   }
 
-  save(): Promise<void> | void {
-    if (this.smsForm.valid && this.parametersForm.valid) {
-      const formValue = this.smsForm.getRawValue();
-      const paramValue = this.parametersForm.getRawValue();
+  async save(): Promise<boolean> {
+    if (this.smsForm.invalid || this.parametersForm.invalid) {
+      return false;
+    }
+    const formValue = this.smsForm.getRawValue();
+    const paramValue = this.parametersForm.getRawValue();
 
-      const payload: any = {
-        name: formValue.name,
-        description: formValue.description,
-        module: formValue.providermodule
-      };
+    const payload: any = {
+      name: formValue.name,
+      description: formValue.description,
+      module: formValue.providermodule
+    };
 
-      if (this.isEditMode) {
-        payload.id = this.data?.id;
-      }
+    if (this.isEditMode) {
+      payload.id = this.data?.id;
+    }
 
-      Object.entries(paramValue).forEach(([key, value]) => {
-        payload[`option.${key}`] = value;
-      });
+    Object.entries(paramValue).forEach(([key, value]) => {
+      payload[`option.${key}`] = value;
+    });
 
-      Object.entries(this.customOptions).forEach(([key, value]) => {
-        payload[`option.${key}`] = value;
-      });
+    Object.entries(this.customOptions).forEach(([key, value]) => {
+      payload[`option.${key}`] = value;
+    });
 
-      Object.entries(this.customHeaders).forEach(([key, value]) => {
-        payload[`header.${key}`] = value;
-      });
+    Object.entries(this.customHeaders).forEach(([key, value]) => {
+      payload[`header.${key}`] = value;
+    });
 
-      return this.smsGatewayService.postSmsGateway(payload).then(() => {
-        this.dialogRef.close(true);
-      });
+    try {
+      await this.smsGatewayService.postSmsGateway(payload);
+      this.dialogRef.close(true);
+      return true;
+    } catch (error) {
+      return false;
     }
   }
 
   onCancel(): void {
     if (this.hasChanges) {
-      this.dialog
-        .open(ConfirmationDialogComponent, {
+      this.dialogService
+        .openDialog({
+          component: SaveAndExitDialogComponent,
           data: {
-            title: $localize`Discard changes`,
-            action: "discard",
-            type: "sms-gateway",
             allowSaveExit: true,
             saveExitDisabled: !this.canSave
           }
         })
         .afterClosed()
-        .subscribe((result: ConfirmationDialogResult | undefined) => {
+        .subscribe((result) => {
           if (result === "discard") {
-            this.pendingChangesService.unregisterHasChanges();
-            this.closeActual();
+            this.pendingChangesService.clearAllRegistrations();
+            this.closeCurrent();
           } else if (result === "save-exit") {
-            Promise.resolve(this.pendingChangesService.save()).then(() => {
-              this.pendingChangesService.unregisterHasChanges();
-              this.closeActual();
+            if (!this.canSave) return;
+            Promise.resolve(this.pendingChangesService.save()).then((success) => {
+              if (!success) return;
+              this.pendingChangesService.clearAllRegistrations();
+              this.closeCurrent();
             });
           }
         });
     } else {
-      this.closeActual();
+      this.closeCurrent();
     }
   }
 
@@ -324,7 +334,7 @@ export class NewSmsGatewayComponent implements OnInit, OnDestroy {
     this.customHeaders = rest;
   }
 
-  private closeActual(): void {
+  private closeCurrent(): void {
     if (this.dialogRef) {
       this.dialogRef.close();
     } else {

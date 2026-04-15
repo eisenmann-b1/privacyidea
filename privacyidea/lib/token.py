@@ -70,16 +70,13 @@ import string
 import traceback
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Union
 
 from dateutil.tz import tzlocal
 from flask import Request
 from flask_sqlalchemy.session import Session
 from sqlalchemy import and_, func, or_, select
-from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql import Select
 from sqlalchemy.sql.expression import delete
-from sqlalchemy.sql.functions import FunctionElement
 
 from privacyidea.api.lib.utils import send_result
 from privacyidea.lib import _
@@ -94,7 +91,7 @@ from privacyidea.lib.decorators import (check_user_or_serial,
                                         check_copy_serials)
 from privacyidea.lib.error import (TokenAdminError,
                                    ParameterError,
-                                   privacyIDEAError, ResourceNotFoundError, PolicyError)
+                                   PrivacyIDEAError, ResourceNotFoundError, PolicyError, UserError)
 from privacyidea.lib.framework import get_app_config_value
 from privacyidea.lib.log import log_with
 from privacyidea.lib.policies.actions import PolicyAction
@@ -109,18 +106,17 @@ from privacyidea.lib.policydecorators import (libpolicy,
                                               reset_all_user_tokens, force_challenge_response)
 from privacyidea.lib.realm import realm_is_defined, get_realms
 from privacyidea.lib.resolver import get_resolver_object
-from privacyidea.lib.tokenclass import DATE_FORMAT, TOKENKIND, TokenClass
+from privacyidea.lib.tokenclass import DATE_FORMAT, Tokenkind, TokenClass
 from privacyidea.lib.user import User
 from privacyidea.lib.utils import (is_true, BASE58, hexlify_and_unicode, check_serial_valid, create_tag_dict,
                                    redacted_phone_number, redacted_email)
 from privacyidea.models import (db, Token, Realm, TokenRealm, Challenge,
                                 TokenInfo, TokenOwner, TokenTokengroup, Tokengroup, TokenContainer,
                                 TokenContainerToken)
+from privacyidea.models.utils import clob_to_varchar
 
 log = logging.getLogger(__name__)
 
-optional = True
-required = False
 
 ENCODING = "utf-8"
 
@@ -128,20 +124,6 @@ ENCODING = "utf-8"
 PI_TOKEN_SERIAL_RANDOM = "PI_TOKEN_SERIAL_RANDOM"  # nosec B105
 
 B32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
-
-
-# Define a function to convert Oracle CLOBs to VARCHAR before using them in a
-# compare operation.
-# By using <https://docs.sqlalchemy.org/en/13/core/compiler.html> we can
-# differentiate between different dialects.
-class clob_to_varchar(FunctionElement):
-    name = 'clob_to_varchar'
-    inherit_cache = True
-
-
-@compiles(clob_to_varchar)
-def fn_clob_to_varchar_default(element, compiler, **kw):
-    return compiler.process(element.clauses, **kw)
 
 
 @dataclass(frozen=True)
@@ -155,11 +137,6 @@ class TokenImportResult:
 class TokenExportResult:
     successful_tokens: list[str]  # The serialized tokens for which the export succeeded
     failed_tokens: list[str]  # The serial of tokens for which the export failed
-
-
-@compiles(clob_to_varchar, 'oracle')
-def fn_clob_to_varchar_oracle(element, compiler, **kw):
-    return "to_char(%s)" % compiler.process(element.clauses, **kw)
 
 
 @log_with(log)
@@ -186,7 +163,7 @@ def create_tokenclass_object(db_token):
             raise TokenAdminError(_("create_tokenclass_object failed: {0!r}").format(e),
                                   id=1609)
     else:
-        log.error('type {0!r} not found in tokenclasses'.format(tokentype))
+        log.error(f'type {tokentype!r} not found in tokenclasses')
 
     return token_object
 
@@ -315,22 +292,29 @@ def _create_token_query(tokentype=None, token_type_list=None, realm=None, assign
     if serial_list:
         sql_query = sql_query.where(Token.serial.in_(serial_list))
 
+
+
     # Filtering by user object
     if user and not user.is_empty():
-        if user.realm:
-            realm_db = select(Realm).where(func.lower(Realm.name) == user.realm.lower())
-            # Execute the subquery using the provided session
-            realm_db_result = session.execute(realm_db).scalars().first()
-            if realm_db_result:
-                sql_query = sql_query.where(TokenOwner.realm_id == realm_db_result.id)
-            else:
-                raise ResourceNotFoundError(f"Realm '{user.realm}' does not exist.")
-        if user.resolver:
-            sql_query = sql_query.where(TokenOwner.resolver == user.resolver)
-        (uid, _rtype, _resolver) = user.get_user_identifiers()
-        if uid:
-            uid_str = str(uid) if isinstance(uid, int) else uid
-            sql_query = sql_query.where(TokenOwner.user_id == uid_str)
+        if user.login and not user.resolver:
+            # A specific username was requested but could not be found in any
+            # resolver. Raise the user error here instead of in the user class. The condition is the same.
+            raise UserError("The user can not be found in any resolver in this realm!")
+        else:
+            if user.realm:
+                realm_db = select(Realm).where(func.lower(Realm.name) == user.realm.lower())
+                # Execute the subquery using the provided session
+                realm_db_result = session.execute(realm_db).scalars().first()
+                if realm_db_result:
+                    sql_query = sql_query.where(TokenOwner.realm_id == realm_db_result.id)
+                else:
+                    raise ResourceNotFoundError(f"Realm '{user.realm}' does not exist.")
+            if user.resolver:
+                sql_query = sql_query.where(TokenOwner.resolver == user.resolver)
+                (uid, _rtype, _resolver) = user.get_user_identifiers()
+                if uid:
+                    uid_str = str(uid) if isinstance(uid, int) else uid
+                    sql_query = sql_query.where(TokenOwner.user_id == uid_str)
 
     # Filtering by token status flags
     if active is not None:
@@ -361,7 +345,7 @@ def _create_token_query(tokentype=None, token_type_list=None, realm=None, assign
     # Filtering by tokeninfo
     if tokeninfo is not None:
         if len(tokeninfo) != 1:
-            raise privacyIDEAError(_("I can only create SQL filters from tokeninfo of length 1."))
+            raise PrivacyIDEAError(_("I can only create SQL filters from tokeninfo of length 1."))
         key, value = list(tokeninfo.items())[0]
         sql_query = sql_query.join(TokenInfo, TokenInfo.token_id == Token.id)
         sql_query = sql_query.where(TokenInfo.Key == key)
@@ -507,7 +491,7 @@ def convert_token_objects_to_dicts(tokens, user, user_role="user", allowed_realm
                     token_dict["user_realm"] = token_owner.realm
                     token_dict["user_editable"] = get_resolver_object(token_owner.resolver).editable
             except Exception as exx:
-                log.error("User information can not be retrieved: {0!s}".format(exx))
+                log.error(f"User information can not be retrieved: {exx!s}")
                 log.debug(traceback.format_exc())
                 token_dict["username"] = "**resolver error**"
 
@@ -611,10 +595,10 @@ def get_tokens(tokentype=None, token_type_list=None, realm=None, assigned=None, 
 
     # Warning for unintentional exact serial matches
     if serial is not None and "*" in serial:
-        log.info("Exact match on a serial containing a wildcard: {!r}".format(serial))
+        log.info(f"Exact match on a serial containing a wildcard: {serial!r}")
     # Warning for unintentional wildcard serial matches
     if serial_wildcard is not None and "*" not in serial_wildcard:
-        log.info("Wildcard match on serial without a wildcard: {!r}".format(serial_wildcard))
+        log.info(f"Wildcard match on serial without a wildcard: {serial_wildcard!r}")
 
     session: Session = db.session
 
@@ -856,7 +840,7 @@ def check_serial(serial):
         # as long as we find a token, modify the serial:
         i += 1
         result = False
-        new_serial = "{0!s}_{1:02d}".format(serial, i)
+        new_serial = f"{serial!s}_{i:02d}"
 
     return result, new_serial
 
@@ -1211,11 +1195,11 @@ def gen_serial(tokentype: str, prefix: str = None) -> str:
     else:
         def _gen_serial(_tokennum):
             h_serial = ''
-            num_str = '{:04d}'.format(_tokennum)
+            num_str = f'{_tokennum:04d}'
             h_len = serial_len - len(num_str)
             if h_len > 0:
                 h_serial = hexlify_and_unicode(os.urandom(h_len)).upper()[0:h_len]
-            return "{0!s}{1!s}{2!s}".format(prefix, num_str, h_serial)
+            return f"{prefix!s}{num_str!s}{h_serial!s}"
 
     # now search the number of tokens of tokenytype in the token database
     session = db.session
@@ -1279,7 +1263,7 @@ def import_token(serial, token_dict, tokenrealms=None):
     # Imported tokens are usually hardware tokens
     token = init_token(init_param, user=user_obj,
                        tokenrealms=tokenrealms,
-                       tokenkind=TOKENKIND.HARDWARE)
+                       tokenkind=Tokenkind.HARDWARE)
     if token_dict.get("counter"):
         token.set_otp_count(token_dict.get("counter"))
     if token_dict.get("timeShift"):
@@ -1540,7 +1524,7 @@ def assign_token(serial, user, pin=None, encrypt_pin=False, error_message=None):
         raise TokenAdminError(_("Token assign failed for {0!r}/{1!s} : {2!r}").format(user, serial, e), id=1105)
 
     log.debug("successfully assigned token with serial "
-              "{0!r} to user {1!r}".format(serial, user))
+              f"{serial!r} to user {user!r}")
     return True
 
 
@@ -2196,18 +2180,17 @@ def lost_token(serial, new_serial=None, password=None,
     :rtype: dict
     """
     res = {}
-    new_serial = new_serial or "lost{0!s}".format(serial)
+    new_serial = new_serial or f"lost{serial!s}"
     user = get_token_owner(serial)
 
-    log.debug("doing lost token for serial {0!r} and user {1!r}".format(serial, user))
+    log.debug(f"doing lost token for serial {serial!r} and user {user!r}")
 
     if user is None or user.is_empty():
         err = _("You can only define a lost token for an assigned token.")
-        log.warning("{0!s}".format(err))
+        log.warning(f"{err!s}")
         raise TokenAdminError(err, id=2012)
 
-    character_pool = "{0!s}{1!s}{2!s}".format(string.ascii_lowercase,
-                                              string.ascii_uppercase, string.digits)
+    character_pool = f"{string.ascii_lowercase!s}{string.ascii_uppercase!s}{string.digits!s}"
     if contents != "":
         character_pool = ""
         if "c" in contents:
@@ -2438,15 +2421,15 @@ def create_challenges_from_tokens(token_list, reply_dict, options=None):
                 challenge_info["serial"] = token.token.serial
                 token_type = token.get_tokentype()
                 challenge_info["type"] = token_type
-                challenge_info["client_mode"] = token.client_mode
+                # Only set client_mode if it has not been returned by the tokenclass creating the challenge
+                challenge_info["client_mode"] = challenge_info.get("client_mode") or token.client_mode
                 challenge_info["message"] = message
                 # If they exist, add next pin and next password change
                 next_pin = token.get_tokeninfo("next_pin_change")
                 if next_pin:
                     challenge_info["next_pin_change"] = next_pin
                     challenge_info["pin_change"] = token.is_pin_change()
-                next_passw = token.get_tokeninfo(
-                    "next_password_change")
+                next_passw = token.get_tokeninfo("next_password_change")
                 if next_passw:
                     challenge_info["next_password_change"] = next_passw
                     challenge_info["password_change"] = token.is_pin_change(password=True)
@@ -2681,7 +2664,7 @@ def check_token_list(token_object_list, passw, user=None, options=None, allow_re
                     messages.insert(0, _("Challenge matches, but token is not fit for challenge"))
                     reply_dict["message"] = ". ".join(messages)
                     log.info("Received a valid response to a "
-                             "challenge for a non-fit token {0!s}. {1!s}".format(token_object.token.serial,
+                             "challenge for a non-fit token {!s}. {!s}".format(token_object.token.serial,
                                                                                  reply_dict["message"]))
                 else:
                     # Challenge matches, token is active and token is fit for challenge
@@ -2845,7 +2828,7 @@ def get_dynamic_policy_definitions(scope: str = None) -> dict:
                 for pol_def in pol_entry:
                     set_def = pol_def
                     if pol_def.startswith(ttype) is not True:
-                        set_def = '{0!s}_{1!s}'.format(ttype, pol_def)
+                        set_def = f'{ttype!s}_{pol_def!s}'
 
                     pol[pol_section][set_def] = pol_entry.get(pol_def)
 
@@ -2976,7 +2959,7 @@ def challenge_text_replace(message, user, token_obj, additional_tags: dict = Non
 
     if token_type == "email":
         if is_true(TokenClass.get_tokeninfo(token_obj, "dynamic_email")):
-            email = token_obj.user.info.get(token_obj.EMAIL_ADDRESS_KEY)
+            email = token_obj.user.get_specific_info([token_obj.EMAIL_ADDRESS_KEY]).get(token_obj.EMAIL_ADDRESS_KEY)
             if isinstance(email, list) and email:
                 # If there is a non-empty list, we use the first entry
                 email = email[0]
@@ -2991,14 +2974,14 @@ def challenge_text_replace(message, user, token_obj, additional_tags: dict = Non
     presence_answer = tags.get("presence_answer", None)
     if presence_answer and token_type == "push" and "{presence_answer}" not in message:
         # PyBabel gettext and f-strings don't like each other
-        message += _(" Please press: {presence_answer}".format(presence_answer=presence_answer))
+        message += _(f" Please press: {presence_answer}")
 
     message = message.format_map(defaultdict(str, tags))
 
     return message
 
 
-def regenerate_enroll_url(serial: str, request: Request, g) -> Union[str, None]:
+def regenerate_enroll_url(serial: str, request: Request, g) -> str | None:
     """
     Returns the enroll URL for a token with the given serial number that is already enrolled.
     Loads the configurations from the policies.

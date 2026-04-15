@@ -1,5 +1,5 @@
 /**
- * (c) NetKnights GmbH 2025,  https://netknights.it
+ * (c) NetKnights GmbH 2026,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -51,7 +51,7 @@ import { OverflowService, OverflowServiceInterface } from "../../../../services/
 import { TableUtilsService, TableUtilsServiceInterface } from "../../../../services/table-utils/table-utils.service";
 import { TokenService, TokenServiceInterface } from "../../../../services/token/token.service";
 
-import { ConfirmationDialogComponent } from "../../../shared/confirmation-dialog/confirmation-dialog.component";
+import { SimpleConfirmationDialogComponent } from "../../../shared/dialog/confirmation-dialog/confirmation-dialog.component";
 import { CopyButtonComponent } from "../../../shared/copy-button/copy-button.component";
 import { MatDialog } from "@angular/material/dialog";
 import { MatPaginator, MatPaginatorModule } from "@angular/material/paginator";
@@ -63,7 +63,9 @@ import {
   NotificationService,
   NotificationServiceInterface
 } from "../../../../services/notification/notification.service";
+import { DialogService, DialogServiceInterface } from "../../../../services/dialog/dialog.service";
 import { Sort } from "@angular/material/sort";
+import { ClearableInputComponent } from "@components/shared/clearable-input/clearable-input.component";
 
 @Component({
   selector: "app-container-details-token-table",
@@ -84,13 +86,14 @@ import { Sort } from "@angular/material/sort";
     NgClass,
     MatIconModule,
     MatTooltipModule,
-    MatInput
+    MatInput,
+    ClearableInputComponent
   ],
   templateUrl: "./container-details-token-table.component.html",
   styleUrl: "./container-details-token-table.component.scss"
 })
 export class ContainerDetailsTokenTableComponent {
-  protected readonly dialog: MatDialog = inject(MatDialog);
+  protected readonly dialogService: DialogServiceInterface = inject(DialogService);
   protected readonly containerService: ContainerServiceInterface = inject(ContainerService);
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   protected readonly tableUtilsService: TableUtilsServiceInterface = inject(TableUtilsService);
@@ -101,8 +104,8 @@ export class ContainerDetailsTokenTableComponent {
 
   readonly columnsKeyMap = this.tableUtilsService.pickColumns("serial", "tokentype", "active", "username");
   readonly columnKeys = [...this.tableUtilsService.getColumnKeys(this.columnsKeyMap)];
-  displayedColumns: string[] = [...this.columnsKeyMap.map((column) => column.key)];
-  pageSize = 10;
+  displayedColumns: string[] = [...this.columnKeys, "actions"];
+  pageSize = 5;
   pageSizeOptions = this.tableUtilsService.pageSizeOptions;
   pageIndex = this.tokenService.pageIndex;
   @Input() containerTokenData!: WritableSignal<MatTableDataSource<ContainerDetailToken, MatPaginator>>;
@@ -128,7 +131,7 @@ export class ContainerDetailsTokenTableComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   sort = signal({ active: "serial", direction: "asc" } as Sort);
   apiFilter = this.tokenService.apiFilter;
-  @ViewChild('filterInput', { static: false }) filterInput!: ElementRef<HTMLInputElement>;
+  @ViewChild("filterInput", { static: false }) filterInput!: ElementRef<HTMLInputElement>;
 
   isAssignableToAllToken = computed<boolean>(() => {
     const assignedUser = this.assignedUser();
@@ -145,12 +148,6 @@ export class ContainerDetailsTokenTableComponent {
   });
 
   constructor() {
-    if (this.authService.actionAllowed("container_remove_token")) {
-      this.displayedColumns.push("remove");
-    }
-    if (this.authService.actionAllowed("delete")) {
-      this.displayedColumns.push("delete");
-    }
     effect(() => {
       if (!this.containerTokenData) {
         return;
@@ -177,14 +174,7 @@ export class ContainerDetailsTokenTableComponent {
     (this.dataSource as any)._sort = this.sort;
 
     this.dataSource.filterPredicate = (row: ContainerDetailToken, filter: string) => {
-      const haystack = [
-        row.serial,
-        row.tokentype,
-        row.username,
-        String(row.active)
-      ]
-        .join(" ")
-        .toLowerCase();
+      const haystack = [row.serial, row.tokentype, row.username, String(row.active)].join(" ").toLowerCase();
       return haystack.includes(filter);
     };
   }
@@ -201,21 +191,30 @@ export class ContainerDetailsTokenTableComponent {
     }
   }
 
+  clearFilter(): void {
+    this.filterValue.set("");
+    this.dataSource.filter = "";
+
+    if (this.containerTokenData) {
+      this.containerTokenData().filter = "";
+    }
+  }
+
   removeTokenFromContainer(containerSerial: string, tokenSerial: string) {
-    this.dialog
-      .open(ConfirmationDialogComponent, {
+    this.dialogService
+      .openDialog({
+        component: SimpleConfirmationDialogComponent,
         data: {
-          serialList: [tokenSerial],
           title: "Remove Token",
-          type: "token",
-          action: "remove",
-          numberOfTokens: [tokenSerial].length
+          items: [tokenSerial],
+          itemType: "token",
+          confirmAction: { label: "Remove", value: true, type: "destruct" }
         }
       })
       .afterClosed()
       .subscribe({
         next: (result) => {
-          if (result?.confirmed) {
+          if (result) {
             this.containerService.removeTokenFromContainer(containerSerial, tokenSerial).subscribe({
               next: () => {
                 this.containerService.containerDetailResource.reload();
@@ -242,28 +241,24 @@ export class ContainerDetailsTokenTableComponent {
 
   deleteAllTokens() {
     const serialList = this.containerTokenData().data.map((token) => token.serial);
-    this.tokenService.bulkDeleteWithConfirmDialog(
-      serialList,
-      this.dialog,
-      this.containerService.containerDetailResource.reload
-    );
+    this.tokenService.bulkDeleteWithConfirmDialog(serialList, this.containerService.containerDetailResource.reload);
   }
 
   deleteTokenFromContainer(tokenSerial: string) {
-    this.dialog
-      .open(ConfirmationDialogComponent, {
+    this.dialogService
+      .openDialog({
+        component: SimpleConfirmationDialogComponent,
         data: {
-          serialList: [tokenSerial],
           title: "Delete Token",
-          type: "token",
-          action: "delete",
-          numberOfTokens: [tokenSerial].length
+          items: [tokenSerial],
+          itemType: "token",
+          confirmAction: { label: "Delete", value: true, type: "destruct" }
         }
       })
       .afterClosed()
       .subscribe({
         next: (result) => {
-          if (result?.confirmed) {
+          if (result) {
             this.tokenService.deleteToken(tokenSerial).subscribe({
               next: () => {
                 this.containerService.containerDetailResource.reload();

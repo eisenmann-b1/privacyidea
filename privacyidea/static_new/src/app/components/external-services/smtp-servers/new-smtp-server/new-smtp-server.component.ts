@@ -18,7 +18,7 @@
  **/
 
 import { Component, effect, inject, OnDestroy, OnInit, signal } from "@angular/core";
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { SmtpServer, SmtpService, SmtpServiceInterface } from "../../../../services/smtp/smtp.service";
 import { MatFormFieldModule } from "@angular/material/form-field";
@@ -28,18 +28,22 @@ import { MatButtonModule } from "@angular/material/button";
 import { CommonModule } from "@angular/common";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTooltip } from "@angular/material/tooltip";
-import {
-  ConfirmationDialogComponent,
-  ConfirmationDialogResult
-} from "../../../shared/confirmation-dialog/confirmation-dialog.component";
 import { ROUTE_PATHS } from "../../../../route_paths";
 import { Router } from "@angular/router";
 import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
 import { PendingChangesService } from "../../../../services/pending-changes/pending-changes.service";
+import { DialogService, DialogServiceInterface } from "../../../../services/dialog/dialog.service";
+import { SaveAndExitDialogComponent } from "../../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
+import { ClearableInputComponent } from "../../../shared/clearable-input/clearable-input.component";
+import { MatDivider } from "@angular/material/list";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "../../../../constants/global.constants";
 
 @Component({
   selector: "app-smtp-edit-dialog",
   standalone: true,
+  host: {
+    class: NAVIGATION_ACCESSIBLE_DIALOG_CLASS
+  },
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -49,7 +53,9 @@ import { PendingChangesService } from "../../../../services/pending-changes/pend
     MatCheckboxModule,
     MatButtonModule,
     MatIconModule,
-    MatTooltip
+    MatTooltip,
+    ClearableInputComponent,
+    MatDivider
   ],
   templateUrl: "./new-smtp-server.component.html",
   styleUrl: "./new-smtp-server.component.scss"
@@ -59,7 +65,7 @@ export class NewSmtpServerComponent implements OnInit, OnDestroy {
   private readonly dialogRef = inject(MatDialogRef<NewSmtpServerComponent>);
   protected readonly data = inject<SmtpServer | null>(MAT_DIALOG_DATA);
   protected readonly smtpService: SmtpServiceInterface = inject(SmtpService);
-  private readonly dialog = inject(MatDialog);
+  private readonly dialogService: DialogServiceInterface = inject(DialogService);
   private readonly router = inject(Router);
   private readonly contentService: ContentServiceInterface = inject(ContentService);
   private readonly pendingChangesService = inject(PendingChangesService);
@@ -74,7 +80,7 @@ export class NewSmtpServerComponent implements OnInit, OnDestroy {
       this.dialogRef.backdropClick().subscribe(() => {
         this.onCancel();
       });
-      this.dialogRef.keydownEvents().subscribe(event => {
+      this.dialogRef.keydownEvents().subscribe((event) => {
         if (event.key === "Escape") {
           this.onCancel();
         }
@@ -83,6 +89,7 @@ export class NewSmtpServerComponent implements OnInit, OnDestroy {
 
     this.pendingChangesService.registerHasChanges(() => this.hasChanges);
     this.pendingChangesService.registerSave(() => this.save());
+    this.pendingChangesService.registerValidChanges(() => this.canSave);
 
     effect(() => {
       if (!this.contentService.routeUrl().startsWith(ROUTE_PATHS.EXTERNAL_SERVICES_SMTP)) {
@@ -99,6 +106,12 @@ export class NewSmtpServerComponent implements OnInit, OnDestroy {
     return this.smtpForm.valid;
   }
 
+  get showTLS(): boolean {
+    return !this.smtpForm.get("server")?.value?.toLowerCase().startsWith("smtps:");
+  }
+
+  initialPrivateKeyPassword = this.data?.private_key_password || "";
+
   ngOnInit(): void {
     this.isEditMode = !!this.data;
     this.smtpForm = this.formBuilder.group({
@@ -112,6 +125,11 @@ export class NewSmtpServerComponent implements OnInit, OnDestroy {
       description: [this.data?.description || ""],
       tls: [this.data?.tls ?? true],
       enqueue_job: [this.data?.enqueue_job ?? false],
+      certificate: [this.data?.certificate || ""],
+      private_key: [this.data?.private_key || ""],
+      private_key_password: [this.data?.private_key_password || ""],
+      smime: [this.data?.smime ?? false],
+      dont_send_on_error: [this.data?.dont_send_on_error ?? false],
       recipient: [""]
     });
 
@@ -121,61 +139,68 @@ export class NewSmtpServerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.pendingChangesService.unregisterHasChanges();
+    this.pendingChangesService.clearAllRegistrations();
   }
 
-  save(): Promise<void> | void {
-    if (this.smtpForm.valid) {
-      const server: SmtpServer = {
-        ...this.smtpForm.getRawValue()
-      };
-      return this.smtpService.postSmtpServer(server).then(() => {
-        this.dialogRef.close(true);
-      });
+  async save(): Promise<boolean> {
+    if (this.smtpForm.invalid) {
+      return false;
+    }
+    const server: SmtpServer = {
+      ...this.smtpForm.getRawValue()
+    };
+
+    if (server.private_key_password === this.initialPrivateKeyPassword) {
+      delete server.private_key_password;
+    }
+
+    try {
+      await this.smtpService.postSmtpServer(server);
+      this.dialogRef.close(true);
+      return true;
+    } catch (error) {
+      return false;
     }
   }
 
-  test(): void {
+  async test(): Promise<void> {
     if (this.smtpForm.valid) {
       this.isTesting.set(true);
       const params = this.smtpForm.getRawValue();
-      this.smtpService.testSmtpServer(params).then(() => {
-        this.isTesting.set(false);
-      });
+      await this.smtpService.testSmtpServer(params);
+      this.isTesting.set(false);
     }
   }
 
   onCancel(): void {
     if (this.hasChanges) {
-      this.dialog
-        .open(ConfirmationDialogComponent, {
+      this.dialogService
+        .openDialog({
+          component: SaveAndExitDialogComponent,
           data: {
-            title: $localize`Discard changes`,
-            action: "discard",
-            type: "smtp-server",
             allowSaveExit: true,
             saveExitDisabled: !this.canSave
           }
         })
         .afterClosed()
-        .subscribe((result: ConfirmationDialogResult | undefined) => {
+        .subscribe(async (result) => {
           if (result === "discard") {
-            this.pendingChangesService.unregisterHasChanges();
-            this.closeActual();
+            this.pendingChangesService.clearAllRegistrations();
+            this.closeCurrent();
           } else if (result === "save-exit") {
             if (!this.canSave) return;
-            Promise.resolve(this.pendingChangesService.save()).then(() => {
-              this.pendingChangesService.unregisterHasChanges();
-              this.closeActual();
-            });
+            const success = await this.pendingChangesService.save();
+            if (!success) return;
+            this.pendingChangesService.clearAllRegistrations();
+            this.closeCurrent();
           }
         });
     } else {
-      this.closeActual();
+      this.closeCurrent();
     }
   }
 
-  private closeActual(): void {
+  private closeCurrent(): void {
     if (this.dialogRef) {
       this.dialogRef.close();
     } else {

@@ -19,16 +19,11 @@
 <div
   appScrollToTop
   class="challenges-table-container">
-  <h3
-    class="margin-left-1"
-    i18n>
-    Challenges
-  </h3>
   <div class="filter-paginator-container">
     <mat-form-field
+      subscriptSizing="dynamic"
       appearance="fill"
-      class="challenges-table-filter"
-      subscriptSizing="dynamic">
+      class="challenges-table-filter">
       <mat-label i18n>Filter Challenges...</mat-label>
       <app-clearable-input
         (onClick)="challengesService.clearFilter()"
@@ -50,6 +45,9 @@
       [pageSize]="pageSize()"
       showFirstLastButtons></mat-paginator>
   </div>
+  <div class="margin-bottom-16">
+    <app-challenges-table-actions />
+  </div>
   <table
     [dataSource]="challengesDataSource()"
     aria-label="Token Challenges Table"
@@ -64,8 +62,8 @@
           mat-header-cell>
           <div class="flex ali-center">
             {{ column.label }}
-            <div class="margin-left-1 flex">
-            @if (apiFilter.includes(column.key)) {
+            <div class="margin-left-16 flex">
+              @if (apiFilter.includes(column.key)) {
                 <button
                   (click)="onKeywordClick(column.key)"
                   class="filter-button"
@@ -75,14 +73,14 @@
                     {{ getFilterIconName(column.key) }}
                   </mat-icon>
                 </button>
-            }
-            <button
-              (click)="tableUtilsService.onSortButtonClick(column.key, sort)"
-              class="sort-button"
-              mat-icon-button
-              type="button">
-              <mat-icon>{{ tableUtilsService.getSortIcon(column.key, sort()) }}</mat-icon>
-            </button>
+              }
+              <button
+                (click)="tableUtilsService.onSortButtonClick(column.key, sort)"
+                class="sort-button"
+                mat-icon-button
+                type="button">
+                <mat-icon>{{ tableUtilsService.getSortIcon(column.key, sort()) }}</mat-icon>
+              </button>
             </div>
           </div>
         </th>
@@ -95,8 +93,8 @@
               @case ("serial") {
                 <div class="flex-row">
                   <a
-                    class="flex ali-center"
-                    (click)="serialClicked(element)">
+                    (click)="serialClicked(element)"
+                    class="flex ali-center">
                     {{ element.serial }}
                   </a>
                   @if (element.serial) {
@@ -105,9 +103,11 @@
                 </div>
               }
               @case ("otp_received") {
-                <span [ngClass]="[element[column.key] ? 'highlight-true' : 'highlight-false']">
-                  {{ element[column.key] }}
-                </span>
+                <div class="flex just-center width-100">
+                  <span [ngClass]="[element[column.key] ? 'highlight-true' : 'highlight-false']">
+                    {{ element[column.key] }}
+                  </span>
+                </div>
               }
               @default {
                 <span>{{ element[column.key] }}</span>

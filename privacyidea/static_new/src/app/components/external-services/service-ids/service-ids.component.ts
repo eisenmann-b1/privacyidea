@@ -40,6 +40,7 @@ import { TableUtilsService, TableUtilsServiceInterface } from "../../../services
 import { CopyButtonComponent } from "../../shared/copy-button/copy-button.component";
 import { ROUTE_PATHS } from "../../../route_paths";
 import { RouterLink } from "@angular/router";
+import { SimpleConfirmationDialogComponent } from "../../shared/dialog/confirmation-dialog/confirmation-dialog.component";
 
 @Component({
   selector: "app-service-ids",
@@ -91,23 +92,28 @@ export class ServiceIdsComponent {
   openEditDialog(serviceId?: ServiceId): void {
     this.dialog.open(NewServiceIdComponent, {
       data: serviceId ? { ...serviceId } : null,
-      width: "800px"
+      width: "auto",
+      maxWidth: "100vw"
     });
   }
 
   deleteServiceId(serviceId: ServiceId): void {
-    this.dialogService.confirm({
-      data: {
-        title: $localize`Delete Service ID`,
-        serialList: [serviceId.servicename],
-        type: "service-id",
-        action: "delete"
-      }
-    }).then(result => {
-      if (result) {
-        this.serviceIdService.deleteServiceId(serviceId.servicename);
-      }
-    });
+    this.dialogService
+      .openDialog({
+        component: SimpleConfirmationDialogComponent,
+        data: {
+          title: $localize`Delete Service ID`,
+          items: [serviceId.servicename],
+          itemType: "service-id",
+          confirmAction: { label: $localize`Delete`, value: true, type: "destruct" }
+        }
+      })
+      .afterClosed()
+      .subscribe({
+        next: (result) => {
+          if (result) this.serviceIdService.deleteServiceId(serviceId.servicename);
+        }
+      });
   }
 
   onFilterInput(value: string): void {

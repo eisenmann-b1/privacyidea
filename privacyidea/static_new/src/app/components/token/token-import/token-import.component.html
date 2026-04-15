@@ -22,53 +22,50 @@
   aria-label="Import Tokens"
   class="token-import-container"
   i18n-aria-label>
-  <div class="margin-left-1">
-    <h3 i18n>
-      Import Tokens
-    </h3>
-  </div>
+  <h3
+    class="margin-8"
+    i18n>
+    Import Tokens
+  </h3>
   <div #stickySentinel></div>
   <div
     #stickyHeader
     class="sticky-header">
     <div class="sticky-controls">
-      <div class="select-type">
-        <mat-form-field subscriptSizing="dynamic">
-          <mat-label i18n>File Type</mat-label>
-          <mat-select
-            [(ngModel)]="fileType"
-            [value]="fileType()"
-            [ngModelOptions]="{ standalone: true }"
-            [panelClass]="'single-column-panel'">
-            @for (type of Object.keys(fileTypes); track type) {
-              <mat-option
-                class="select-option"
-                [value]="type">{{ fileTypes[type] }}
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <div>
-        <button
-          mat-stroked-button
-          class="action-button-1 width-238"
-          [disabled]="!inputForm.valid"
-          (click)="importTokens()">
-          <mat-icon>input</mat-icon>
-          Import
-        </button>
-      </div>
+      <mat-form-field
+        class="input-width-xl">
+        <mat-label i18n>File Type</mat-label>
+        <mat-select
+          [(ngModel)]="fileType"
+          [ngModelOptions]="{ standalone: true }"
+          [panelClass]="'single-column-panel'"
+          [value]="fileType()">
+          @for (type of Object.keys(fileTypes); track type) {
+            <mat-option
+              [value]="type"
+              class="select-option">{{ fileTypes[type] }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <button
+        (click)="importTokens()"
+        [disabled]="!inputForm.valid"
+        class="action-button-primary button-width-m margin-left-auto"
+        mat-stroked-button>
+        <mat-icon>input</mat-icon>
+        Import File
+      </button>
     </div>
   </div>
 
-  <div class="margin-top-1 margin-bottom-32">
+  <div class="margin-top-16 margin-left-16">
     @switch (fileType()) {
       @case ("aladdin-xml") {
         Here you can upload an XML file from Aladdin or SafeNet as it was used with Aladdin TMS or SafeNet SAM.
       }
       @case ("OATH CSV") {
-        <div class="margin-bottom-1">
+        <div class="margin-bottom-16">
           The file is supposed to contain one token per line. At least the serial number and the seed are required.
           Other parameters are optional. If not defined, the following default values are used:
           <ul>
@@ -79,7 +76,7 @@
         </div>
 
         <div>HOTP and TOTP tokens:</div>
-        <div class="italic margin-bottom-1">serial number, seed, type, otp length, time step</div>
+        <div class="italic margin-bottom-16">serial number, seed, type, otp length, time step</div>
 
         <div>OCRA tokens:</div>
         <div class="italic">serial number, seed, type, ocrasuite</div>
@@ -97,35 +94,33 @@
           format or the password.
         </div>
         <div>
-          <mat-form-field class="width-100 margin-bottom-1">
+          <mat-form-field class="input-width-xl margin-bottom-16">
             <mat-label>Pre Shared Key</mat-label>
             <input
-              matInput
               [formControl]="preSharedKey"
+              matInput
               placeholder="Pre Shared Key in hex format" />
             <mat-hint>As the values are encrypted with AES128-CBC, you need to give a 32 characters long hex string.
             </mat-hint>
             @if (!preSharedKey.valid) {
-              <mat-error>As the values are encrypted with AES128-CBC, you need to give a 32 characters long hex
-                         string.
+              <mat-error>As the values are encrypted with AES128-CBC, you need to give a 32 characters long hex string.
               </mat-error>
             }
           </mat-form-field>
         </div>
         <div>
-          <mat-form-field class="width-100">
+          <mat-form-field class="input-width-xl">
             <mat-label>Password</mat-label>
             <input
-              matInput
               [(ngModel)]="pskPassword"
               [value]="pskPassword()"
+              matInput
               placeholder="Password" />
           </mat-form-field>
         </div>
         <div>
           <mat-form-field
-            class="width-100"
-            subscriptSizing="dynamic">
+            class="input-width-xl">
             <mat-label>Verification Method for the Authenticity of Imported Tokens</mat-label>
             <mat-select
               [(ngModel)]="pskValidation"
@@ -140,14 +135,15 @@
     }
   </div>
 
-  <div class="margin-bottom-1">
-    <h4 class="sub-headings">Realm</h4>
-    <mat-form-field class="width-50 input-height margin-bottom-1">
+  <div class="margin-bottom-16 margin-left-16">
+    <h4>Realm</h4>
+    <mat-form-field
+      class="input-width-l">
       <mat-label>Select Realm for Tokens</mat-label>
       <mat-select
-        multiple
         [(ngModel)]="selectedRealms"
-        [value]="selectedRealms()">
+        [value]="selectedRealms()"
+        multiple>
         <!--                <mat-option [value]="'-'"> -</mat-option>-->
         @for (option of realmService.realmOptions(); track option) {
           <mat-option [value]="option">{{ option }}</mat-option>
@@ -159,16 +155,16 @@
     </mat-form-field>
   </div>
 
-  <div>
-    <h4 class="sub-headings">Select File</h4>
+  <div class="margin-left-16">
+    <h4>Select File</h4>
 
     <div class="input-container file-input-container">
       @if (fileName()) {
         <span class="file-name">{{ fileName() }}</span>
         <button
           (click)="clearFileSelection()"
-          type="button"
-          mat-icon-button>
+          mat-icon-button
+          type="button">
           <mat-icon>add_circle</mat-icon>
         </button>
       } @else {
@@ -176,25 +172,25 @@
       }
     </div>
 
-    <div class="drag-and-drop-zone margin-bottom-1">
-      <div class="margin-top-1 margin-bottom-1">
-        <div>
+    <div class="drag-and-drop-zone margin-bottom-16">
+      <div class="margin-top-16 margin-bottom-16">
+        <div class="flex just-center margin-bottom-8">
           <mat-icon>upload_file</mat-icon>
         </div>
         Drag and Drop file here or
       </div>
 
       <input
-        type="file"
-        class="file-input"
+        #fileUpload
         (change)="onFileSelected($event)"
-        #fileUpload>
+        class="file-input"
+        type="file">
 
       <div>
         <button
-          mat-stroked-button
-          class="action-button-1 text-center just-center"
-          (click)="fileUpload.click()">
+          (click)="fileUpload.click()"
+          class="action-button-secondary text-center just-center button-width-m"
+          mat-stroked-button>
           <mat-icon>folder_open</mat-icon>
           Browse Files
         </button>

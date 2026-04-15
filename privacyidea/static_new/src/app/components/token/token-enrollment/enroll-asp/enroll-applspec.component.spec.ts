@@ -41,4 +41,40 @@ describe("EnrollAspComponent", () => {
   it("should create", () => {
     expect(component).toBeTruthy();
   });
+
+  it("should initialize form controls with default values", () => {
+    expect(component.serviceIdControl.value).toBe("");
+    expect(component.serviceIdControl.enabled).toBe(true);
+    expect(component.generateOnServerControl.value).toBe(true);
+    expect(component.generateOnServerControl.enabled).toBe(true);
+    expect(component.otpKeyFormControl.value).toBe("");
+    expect(component.otpKeyFormControl.disabled).toBe(true);
+  });
+
+  describe("ngOnInit with enrollmentData input", () => {
+    it("should set initial values from enrollmentData", () => {
+      fixture.componentRef.setInput("enrollmentData", {
+        type: "applspec",
+        serviceId: "service-123",
+        generateOnServer: false
+      });
+      component.ngOnInit();
+      expect(component.serviceIdControl.value).toBe("service-123");
+      expect(component.generateOnServerControl.value).toBe(false);
+      expect(component.otpKeyFormControl.value).toBe("");
+    });
+
+    it("should ignore values from enrollmentData if they are undefined", () => {
+      fixture.componentRef.setInput("enrollmentData", {
+        type: "applspec",
+        serviceId: undefined,
+        generateOnServer: undefined,
+        otpKey: undefined
+      });
+      component.ngOnInit();
+      expect(component.serviceIdControl.value).toBe("");
+      expect(component.generateOnServerControl.value).toBe(true);
+      expect(component.otpKeyFormControl.value).toBe("");
+    });
+  });
 });

@@ -39,7 +39,7 @@
             i18n-placeholder
             id="container-filter-input"
             matInput
-            placeholder="Example query: 'type: generic user: admin'" />
+            placeholder="Example query: 'type: generic'" />
         </app-clearable-input>
       </mat-form-field>
       <mat-paginator
@@ -50,7 +50,6 @@
         [pageSize]="pageSize()"
         showFirstLastButtons />
     </div>
-
     <app-container-table-actions />
     <div class="table-container">
       <table
@@ -80,22 +79,39 @@
                 mat-header-cell>
                 <div class="flex ali-center">
                   {{ column.label }}
-                  <div class="margin-left-1 flex">
-                    @if (apiFilterKeyMap[column.key] && containerService.apiFilter.includes(column.key)) {
-                      <button
-                        (click)="onKeywordClick(apiFilterKeyMap[column.key])"
-                        class="filter-button"
-                        mat-icon-button
-                        type="button">
-                        <mat-icon class="keyword-button-icon margin-left-0">
-                          {{ getFilterIconName(apiFilterKeyMap[column.key]) }}
-                        </mat-icon>
-                      </button>
+                  <div class="margin-left-16 flex">
+                    @if (apiFilterKeyMap[column.key] && containerService.apiFilter.includes(apiFilterKeyMap[column.key])) {
+                      @if (apiFilterKeyMap[column.key] === "type") {
+                        <button
+                          [matMenuTriggerData]="{ keyword: apiFilterKeyMap[column.key] }"
+                          [matMenuTriggerFor]="typeMenu"
+                          class="filter-button"
+                          i18n-matTooltip
+                          mat-icon-button
+                          matTooltip="Filter by type"
+                          type="button">
+                          <mat-icon class="keyword-button-icon margin-left-0"> filter_list</mat-icon>
+                        </button>
+                      } @else {
+                        <button
+                          (click)="onKeywordClick(apiFilterKeyMap[column.key])"
+                          class="filter-button"
+                          i18n-matTooltip
+                          mat-icon-button
+                          matTooltip="Toggle filter"
+                          type="button">
+                          <mat-icon class="keyword-button-icon margin-left-0">
+                            {{ getFilterIconName(apiFilterKeyMap[column.key]) }}
+                          </mat-icon>
+                        </button>
+                      }
                     }
                     <button
                       (click)="tableUtilsService.onSortButtonClick(column.key, sort)"
                       class="sort-button"
+                      i18n-matTooltip
                       mat-icon-button
+                      matTooltip="Sort by column"
                       type="button">
                       <mat-icon>{{ tableUtilsService.getSortIcon(column.key, sort()) }}</mat-icon>
                     </button>
@@ -106,7 +122,7 @@
             <td
               *matCellDef="let element; let row"
               [ngClass]="{
-                'width-18rem': column.key === 'description',
+                'input-width-l': column.key === 'description',
                 'table-checkbox': column.key === 'select'
               }"
               attr.aria-label="{{ column.label }} Cell"
@@ -184,6 +200,7 @@
                 @for (token of element.tokens; track token) {
                   <div class="token-item">
                     <a (click)="contentService.tokenSelected(token.serial)"> {{ token.serial }}</a>
+                    <app-copy-button [copyText]="token.serial"></app-copy-button>
                     [{{ token.tokentype }}]
                   </div>
                 }
@@ -206,7 +223,6 @@
         <tr
           (click)="expandedElement = expandedElement === row ? null : row"
           *matRowDef="let row; columns: columnKeys"
-          [class.example-expanded-row]="expandedElement === row"
           class="example-element-row"
           mat-row></tr>
 
@@ -228,3 +244,26 @@
     <div i18n>You do not have the permission to view the container list.</div>
   }
 </div>
+
+<mat-menu
+  #typeMenu="matMenu"
+  class="token-table-filter-menu">
+  <ng-template
+    let-keyword="keyword"
+    matMenuContent>
+    <button
+      (click)="onItemSelected(keyword, undefined)"
+      mat-menu-item>
+      <mat-icon>filter_alt_off</mat-icon>
+      <span i18n>Clear Filter</span>
+    </button>
+    <mat-divider />
+    @for (type of containerService.containerTypeOptions(); track type.containerType) {
+      <button
+        (click)="onItemSelected(keyword, type.containerType)"
+        mat-menu-item>
+        {{ type.containerType }}
+      </button>
+    }
+  </ng-template>
+</mat-menu>

@@ -1,5 +1,5 @@
 /**
- * (c) NetKnights GmbH 2025,  https://netknights.it
+ * (c) NetKnights GmbH 2026,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -22,7 +22,8 @@ import {
   effect,
   ElementRef,
   inject,
-  linkedSignal, Signal,
+  linkedSignal,
+  Signal,
   signal,
   ViewChild,
   WritableSignal
@@ -42,15 +43,19 @@ import { MatTableDataSource } from "@angular/material/table";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { UserDetailsContainerTableComponent } from "./user-details-container-table/user-details-container-table.component";
 import { UserDetailsPinDialogComponent } from "./user-details-pin-dialog/user-details-pin-dialog.component";
-import { MatDialog } from "@angular/material/dialog";
 import { filter } from "rxjs";
 import { FormsModule } from "@angular/forms";
 import { MatSelectModule } from "@angular/material/select";
-import { FilterValue } from "../../../core/models/filter_value";
+import { FilterValue } from "../../../core/models/filter_value/filter_value";
 import { AuditService, AuditServiceInterface } from "../../../services/audit/audit.service";
 import { MatTooltip } from "@angular/material/tooltip";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { CopyButtonComponent } from "../../shared/copy-button/copy-button.component";
+import { DialogService, DialogServiceInterface } from "../../../services/dialog/dialog.service";
+import { SimpleConfirmationDialogComponent } from "@components/shared/dialog/confirmation-dialog/confirmation-dialog.component";
+import { EditUserDialogComponent } from "@components/user/edit-user-dialog/edit-user-dialog.component";
+import { AuthService, AuthServiceInterface } from "../../../services/auth/auth.service";
+import { TableUtilsService, TableUtilsServiceInterface } from "../../../services/table-utils/table-utils.service";
 
 @Component({
   selector: "app-user-details",
@@ -84,19 +89,23 @@ export class UserDetailsComponent {
   protected readonly userService: UserServiceInterface = inject(UserService);
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   private readonly auditService: AuditServiceInterface = inject(AuditService);
-  protected readonly dialog: MatDialog = inject(MatDialog);
+  protected readonly dialogService: DialogServiceInterface = inject(DialogService);
+  protected readonly authService: AuthServiceInterface = inject(AuthService);
+  protected readonly tableUtilsService: TableUtilsServiceInterface = inject(TableUtilsService);
+  private router = inject(Router);
+
   readonly labels: Record<string, string> = {
-    username: 'Username',
-    givenname: 'Given name',
-    surname: 'Surname',
-    email: 'Email',
-    phone: 'Phone',
-    mobile: 'Mobile',
-    description: 'Description',
-    userid: 'User ID',
-    resolver: 'Resolver'
+    username: $localize`Username`,
+    givenname: $localize`Given name`,
+    surname: $localize`Surname`,
+    email: $localize`Email`,
+    phone: $localize`Phone`,
+    mobile: $localize`Mobile`,
+    description: $localize`Description`,
+    userid: $localize`User ID`,
+    resolver: $localize`Resolver`
   };
-  readonly excludedKeys = new Set(['editable']);
+  readonly excludedKeys = new Set(["editable"]);
   customAttributeKeys: Signal<Set<string>> = computed(() => {
     const attributeKeys = Object.entries(this.userService.userAttributesList()).map(([_, attribute]) => attribute.key);
     return new Set(attributeKeys);
@@ -106,6 +115,7 @@ export class UserDetailsComponent {
   tokenResource = this.tokenService.tokenResource;
   pageIndex = this.tokenService.pageIndex;
   pageSize = this.tokenService.pageSize;
+  pageSizeOptions = this.tableUtilsService.pageSizeOptions;
 
   total: WritableSignal<number> = linkedSignal({
     source: this.tokenResource.value,
@@ -156,11 +166,8 @@ export class UserDetailsComponent {
     return opts.length === 0;
   });
   canAddAttribute = computed<boolean>(() => {
-    const key =
-      this.keyMode() === "input" ? this.addKeyInput().trim() : (this.selectedKey() ?? "").trim();
-    const value = this.isValueInput()
-      ? this.addValueInput().trim()
-      : (this.selectedValue() ?? "").trim();
+    const key = this.keyMode() === "input" ? this.addKeyInput().trim() : (this.selectedKey() ?? "").trim();
+    const value = this.isValueInput() ? this.addValueInput().trim() : (this.selectedValue() ?? "").trim();
     return key.length > 0 && value.length > 0;
   });
 
@@ -182,7 +189,7 @@ export class UserDetailsComponent {
       .map(([key, value]) => ({
         key,
         label: this.labels[key] ?? key,
-        value: value ?? '-'
+        value: value ?? "-"
       }))
   );
 
@@ -190,9 +197,14 @@ export class UserDetailsComponent {
     const entries = this.detailsEntries();
     const colCount = 3;
     const perCol = Math.ceil(entries.length / colCount);
-    return Array.from({ length: colCount }, (_, i) =>
-      entries.slice(i * perCol, (i + 1) * perCol)
-    );
+    return Array.from({ length: colCount }, (_, i) => entries.slice(i * perCol, (i + 1) * perCol));
+  });
+
+  customAttributeColumns = computed(() => {
+    const attributes = this.userService.userAttributesList();
+    const colCount = 2;
+    const perCol = Math.ceil(attributes.length / colCount);
+    return Array.from({ length: colCount }, (_, i) => attributes.slice(i * perCol, (i + 1) * perCol));
   });
 
   switchToCustomKey() {
@@ -206,11 +218,8 @@ export class UserDetailsComponent {
   }
 
   addCustomAttribute() {
-    const key =
-      this.keyMode() === "input" ? this.addKeyInput().trim() : (this.selectedKey() ?? "").trim();
-    const value = this.isValueInput()
-      ? this.addValueInput().trim()
-      : (this.selectedValue() ?? "").trim();
+    const key = this.keyMode() === "input" ? this.addKeyInput().trim() : (this.selectedKey() ?? "").trim();
+    const value = this.isValueInput() ? this.addValueInput().trim() : (this.selectedValue() ?? "").trim();
 
     if (!key || !value) return;
 
@@ -232,8 +241,8 @@ export class UserDetailsComponent {
   }
 
   assignUserToToken(option: TokenDetails) {
-    this.dialog
-      .open(UserDetailsPinDialogComponent)
+    this.dialogService
+      .openDialog({ component: UserDetailsPinDialogComponent })
       .afterClosed()
       .pipe(filter((pin): pin is string => pin != null))
       .subscribe((pin: string) => {
@@ -264,6 +273,41 @@ export class UserDetailsComponent {
 
   showUserAuditLog() {
     this.auditService.auditFilter.set(new FilterValue({ value: `user: ${this.userService.detailsUsername()}` }));
+  }
+
+  editUser() {
+    this.dialogService.openDialog({
+      component: EditUserDialogComponent,
+      data: this.userData()
+    });
+  }
+
+  deleteUser() {
+    this.dialogService
+      .openDialog({
+        component: SimpleConfirmationDialogComponent,
+        data: {
+          title: "Delete User",
+          items: [this.userData().username],
+          itemType: "user",
+          confirmAction: { label: "Delete", value: true, type: "destruct" }
+        }
+      })
+      .afterClosed()
+      .subscribe({
+        next: (result) => {
+          if (result) {
+            this.userService.deleteUser(this.userData().resolver, this.userData().username).subscribe({
+              next: (success) => {
+                if (success) {
+                  this.router.navigateByUrl(ROUTE_PATHS.USERS).then();
+                  this.userService.usersResource.reload();
+                }
+              }
+            });
+          }
+        }
+      });
   }
 
   protected readonly Array = Array;

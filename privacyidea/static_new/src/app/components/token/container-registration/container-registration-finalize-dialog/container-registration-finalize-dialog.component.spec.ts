@@ -1,5 +1,5 @@
 /**
- * (c) NetKnights GmbH 2025,  https://netknights.it
+ * (c) NetKnights GmbH 2026,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -18,10 +18,11 @@
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { ContainerRegistrationFinalizeDialogComponent } from "./container-registration-finalize-dialog.component";
-import { MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { By } from "@angular/platform-browser";
 import { NO_ERRORS_SCHEMA, signal } from "@angular/core";
 import { provideHttpClient } from "@angular/common/http";
+import { MockMatDialogRef } from "../../../../../testing/mock-mat-dialog-ref";
 
 const detectChangesStable = async (fixture: ComponentFixture<any>) => {
   fixture.detectChanges();
@@ -53,7 +54,11 @@ describe("ContainerRegistrationFinalizeDialogComponent", () => {
     await TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [ContainerRegistrationFinalizeDialogComponent],
-      providers: [provideHttpClient(), { provide: MAT_DIALOG_DATA, useValue: mockData }],
+      providers: [
+        provideHttpClient(),
+        { provide: MAT_DIALOG_DATA, useValue: mockData },
+        { provide: MatDialogRef, useClass: MockMatDialogRef }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
@@ -68,22 +73,26 @@ describe("ContainerRegistrationFinalizeDialogComponent", () => {
   });
 
   it("should render 'Register Container' title when not rollover", () => {
-    const title = fixture.nativeElement.querySelector("h2");
+    const title = fixture.nativeElement.querySelector("h3");
     expect(title.textContent).toContain("Register Container");
   });
 
   it("should render 'Container Rollover' title when rollover is true", async () => {
     const rolloverData = signal({ ...mockData(), rollover: true });
-    await TestBed.resetTestingModule();
+    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [ContainerRegistrationFinalizeDialogComponent],
-      providers: [provideHttpClient(), { provide: MAT_DIALOG_DATA, useValue: rolloverData }],
+      providers: [
+        provideHttpClient(),
+        { provide: MAT_DIALOG_DATA, useValue: rolloverData },
+        { provide: MatDialogRef, useClass: MockMatDialogRef }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     fixture = TestBed.createComponent(ContainerRegistrationFinalizeDialogComponent);
     component = fixture.componentInstance;
     await detectChangesStable(fixture);
-    const titles = fixture.nativeElement.querySelectorAll("h2");
+    const titles = fixture.nativeElement.querySelectorAll("h3");
     const titleText = Array.from(titles)
       .map((el: any) => el.textContent.trim())
       .join(" ");
@@ -108,7 +117,7 @@ describe("ContainerRegistrationFinalizeDialogComponent", () => {
   });
 
   it("should call regenerateQRCode when button is clicked", () => {
-    const button = fixture.debugElement.query(By.css("button.action-button-1"));
+    const button = fixture.debugElement.query(By.css("button.action-button-secondary"));
     button.triggerEventHandler("click");
     expect(mockRegisterContainer).toHaveBeenCalled();
   });

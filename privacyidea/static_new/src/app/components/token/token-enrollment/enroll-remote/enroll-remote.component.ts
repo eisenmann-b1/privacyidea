@@ -20,9 +20,9 @@ import { Component, effect, EventEmitter, inject, input, OnInit, Output } from "
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatCheckbox } from "@angular/material/checkbox";
 import { ErrorStateMatcher, MatOption } from "@angular/material/core";
-import { MatFormField, MatLabel } from "@angular/material/form-field";
+import { MatFormField, MatLabel, MatError } from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
-import { MatError, MatSelect } from "@angular/material/select";
+import { MatSelect } from "@angular/material/select";
 import {
   PrivacyideaServerService,
   PrivacyideaServerServiceInterface,
@@ -41,8 +41,7 @@ import {
 
 export class RemoteErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): boolean {
-    const invalid = control && control.value ? control.value.id === "" : true;
-    return !!(control && invalid && (control.dirty || control.touched));
+    return !!(control && control.invalid && (control.dirty || control.touched));
   }
 }
 
@@ -60,14 +59,13 @@ export class RemoteErrorStateMatcher implements ErrorStateMatcher {
     MatCheckbox,
     MatError
   ],
-  templateUrl: "./enroll-remote.component.html",
-  styleUrl: "./enroll-remote.component.scss"
+  templateUrl: "./enroll-remote.component.html"
 })
 export class EnrollRemoteComponent implements OnInit {
   protected readonly enrollmentMapper: RemoteApiPayloadMapper = inject(RemoteApiPayloadMapper);
   protected readonly privacyideaServerService: PrivacyideaServerServiceInterface = inject(PrivacyideaServerService);
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);
-
+  enrollmentData = input<RemoteEnrollmentData>();
   @Output() additionalFormFieldsChange = new EventEmitter<{
     [key: string]: FormControl<any>;
   }>();
@@ -79,12 +77,12 @@ export class EnrollRemoteComponent implements OnInit {
   >();
   disabled = input<boolean>(false);
 
-  checkPinLocallyControl = new FormControl<boolean>(false, [Validators.required]);
-  remoteServerControl = new FormControl<RemoteServer | null>(null, [Validators.required]);
-  remoteSerialControl = new FormControl<string>("");
-  remoteUserControl = new FormControl<string>("");
-  remoteRealmControl = new FormControl<string>("");
-  remoteResolverControl = new FormControl<string>("");
+  checkPinLocallyControl = new FormControl<boolean>(false, { nonNullable: true, validators: [Validators.required] });
+  remoteServerControl = new FormControl<RemoteServer | null>(null, { validators: [Validators.required] });
+  remoteSerialControl = new FormControl<string>("", { nonNullable: true, validators: [Validators.required] });
+  remoteUserControl = new FormControl<string>("", { nonNullable: true, validators: [Validators.required] });
+  remoteRealmControl = new FormControl<string>("", { nonNullable: true });
+  remoteResolverControl = new FormControl<string>("", { nonNullable: true, validators: [Validators.required] });
 
   remoteForm = new FormGroup({
     checkPinLocally: this.checkPinLocallyControl,
@@ -105,6 +103,7 @@ export class EnrollRemoteComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this._setInitialFormValues();
     this.additionalFormFieldsChange.emit({
       checkPinLocally: this.checkPinLocallyControl,
       remoteServer: this.remoteServerControl,
@@ -116,24 +115,23 @@ export class EnrollRemoteComponent implements OnInit {
     this.enrollmentArgsGetterChange.emit(this.enrollmentArgsGetter);
   }
 
+  private _setInitialFormValues() {
+    if (!!this.enrollmentData()) {
+      this.checkPinLocallyControl.setValue(this.enrollmentData()?.checkPinLocally ?? false, { emitEvent: false });
+      this.remoteServerControl.setValue(this.enrollmentData()?.remoteServer ?? null, { emitEvent: false });
+      this.remoteSerialControl.setValue(this.enrollmentData()?.remoteSerial ?? "", { emitEvent: false });
+      this.remoteUserControl.setValue(this.enrollmentData()?.remoteUser ?? "", { emitEvent: false });
+      this.remoteRealmControl.setValue(this.enrollmentData()?.remoteRealm ?? "", { emitEvent: false });
+      this.remoteResolverControl.setValue(this.enrollmentData()?.remoteResolver ?? "", { emitEvent: false });
+    }
+  }
+
   enrollmentArgsGetter = (
     basicOptions: TokenEnrollmentData
   ): {
     data: RemoteEnrollmentData;
     mapper: TokenApiPayloadMapper<RemoteEnrollmentData>;
   } | null => {
-    if (
-      this.remoteServerControl.invalid ||
-      this.remoteSerialControl.invalid ||
-      this.remoteUserControl.invalid ||
-      this.remoteRealmControl.invalid ||
-      this.remoteResolverControl.invalid ||
-      this.checkPinLocallyControl.invalid
-    ) {
-      this.remoteForm.markAllAsTouched();
-      return null;
-    }
-
     const enrollmentData: RemoteEnrollmentData = {
       ...basicOptions,
       type: "remote",

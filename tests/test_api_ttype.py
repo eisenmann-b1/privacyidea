@@ -21,15 +21,14 @@ from privacyidea.lib.policy import (SCOPE, PolicyAction, set_policy, delete_poli
 from privacyidea.lib.smsprovider.FirebaseProvider import FirebaseConfig
 from privacyidea.lib.smsprovider.SMSProvider import set_smsgateway
 from privacyidea.lib.token import (get_tokens, init_token, remove_token)
-from privacyidea.lib.tokenclass import CHALLENGE_SESSION
-from privacyidea.lib.tokens.pushtoken import (PUSH_ACTION,
-                                              strip_key,
+from privacyidea.lib.tokenclass import ChallengeSession
+from privacyidea.lib.tokens.pushtoken import (PushAction,
+                                              strip_pem_headers,
                                               PUBLIC_KEY_SMARTPHONE, PRIVATE_KEY_SERVER,
                                               PUBLIC_KEY_SERVER,
                                               POLL_ONLY)
 from privacyidea.lib.user import (User)
-from privacyidea.lib.utils import b32encode_and_unicode
-from privacyidea.lib.utils import to_bytes, to_unicode
+from privacyidea.lib.utils import b32encode_and_unicode, to_bytes, to_unicode
 from .base import MyApiTestCase
 from .test_lib_tokens_push import _check_firebase_params, _create_credential_mock
 
@@ -171,7 +170,7 @@ class TtypePushAPITestCase(MyApiTestCase):
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo))
     # The smartphone sends the public key in URLsafe and without the ----BEGIN header
-    smartphone_public_key_pem_urlsafe = strip_key(smartphone_public_key_pem).replace("+", "-").replace("/", "_")
+    smartphone_public_key_pem_urlsafe = strip_pem_headers(smartphone_public_key_pem).replace("+", "-").replace("/", "_")
     serial_push = "PIPU001"
 
     def _resend_and_check_unspecific_error(self, status_code: int):
@@ -189,7 +188,7 @@ class TtypePushAPITestCase(MyApiTestCase):
         tparams = {'type': 'push', 'genkey': 1}
         tparams.update(FB_CONFIG_VALS)
         tok = init_token(param=tparams)
-        tok.add_tokeninfo(PUSH_ACTION.FIREBASE_CONFIG, self.firebase_config_name)
+        tok.add_tokeninfo(PushAction.FIREBASE_CONFIG, self.firebase_config_name)
         tok.add_tokeninfo(PUBLIC_KEY_SMARTPHONE, self.smartphone_public_key_pem_urlsafe)
         tok.add_tokeninfo('firebase_token', 'firebaseT')
         tok.add_tokeninfo(PUBLIC_KEY_SERVER, self.server_public_key_pem)
@@ -224,9 +223,9 @@ class TtypePushAPITestCase(MyApiTestCase):
         self.assertTrue(r > 0)
         set_policy("push1", scope=SCOPE.ENROLL,
                    action="{0!s}={1!s},{2!s}={3!s},{4!s}={5!s}".format(
-                       PUSH_ACTION.FIREBASE_CONFIG, self.firebase_config_name,
-                       PUSH_ACTION.REGISTRATION_URL, REGISTRATION_URL,
-                       PUSH_ACTION.TTL, TTL))
+                       PushAction.FIREBASE_CONFIG, self.firebase_config_name,
+                       PushAction.REGISTRATION_URL, REGISTRATION_URL,
+                       PushAction.TTL, TTL))
 
         # 1st step
         with self.app.test_request_context('/token/init',
@@ -312,7 +311,7 @@ class TtypePushAPITestCase(MyApiTestCase):
             self.assertEqual(tokeninfo.get("public_key_server").strip().strip("-BEGIN END RSA PUBLIC KEY-").strip(),
                              pubkey)
             # The token should also contain the firebase config
-            self.assertEqual(tokeninfo.get(PUSH_ACTION.FIREBASE_CONFIG), self.firebase_config_name)
+            self.assertEqual(tokeninfo.get(PushAction.FIREBASE_CONFIG), self.firebase_config_name)
             # remove the token
             remove_token(serial)
 
@@ -406,9 +405,9 @@ class TtypePushAPITestCase(MyApiTestCase):
         # Set policy for poll only
         set_policy("push1", scope=SCOPE.ENROLL,
                    action="{0!s}={1!s},{2!s}={3!s},{4!s}={5!s}".format(
-                       PUSH_ACTION.FIREBASE_CONFIG, POLL_ONLY,
-                       PUSH_ACTION.REGISTRATION_URL, REGISTRATION_URL,
-                       PUSH_ACTION.TTL, TTL))
+                       PushAction.FIREBASE_CONFIG, POLL_ONLY,
+                       PushAction.REGISTRATION_URL, REGISTRATION_URL,
+                       PushAction.TTL, TTL))
 
         # 1st step
         with self.app.test_request_context('/token/init',
@@ -467,7 +466,7 @@ class TtypePushAPITestCase(MyApiTestCase):
             self.assertEqual(tokeninfo.get("public_key_server").strip().strip("-BEGIN END RSA PUBLIC KEY-").strip(),
                              pubkey)
             # The token should also contain the firebase config
-            self.assertEqual(tokeninfo.get(PUSH_ACTION.FIREBASE_CONFIG), POLL_ONLY)
+            self.assertEqual(tokeninfo.get(PushAction.FIREBASE_CONFIG), POLL_ONLY)
 
         # remove the token
         remove_token(serial)
@@ -481,9 +480,9 @@ class TtypePushAPITestCase(MyApiTestCase):
                        'privacyidea.lib.smsprovider.FirebaseProvider.FirebaseProvider',
                        "myFB", FB_CONFIG_VALS)
         set_policy("push_config", scope=SCOPE.ENROLL,
-                   action=f"{PUSH_ACTION.FIREBASE_CONFIG}={self.firebase_config_name}")
+                   action=f"{PushAction.FIREBASE_CONFIG}={self.firebase_config_name}")
         set_policy("PUSH_ACTION.REGISTRATION_URL", scope=SCOPE.ENROLL,
-                   action=f"{PUSH_ACTION.REGISTRATION_URL}={REGISTRATION_URL}")
+                   action=f"{PushAction.REGISTRATION_URL}={REGISTRATION_URL}")
         # create push token
         tokenobj = self._create_push_token()
         serial = tokenobj.get_serial()
@@ -586,7 +585,7 @@ class TtypePushAPITestCase(MyApiTestCase):
         challengeobject_list = get_challenges(serial=tokenobj.token.serial,
                                               transaction_id=transaction_id)
         challenge = challengeobject_list[0]
-        challenge.set_session(CHALLENGE_SESSION.DECLINED)
+        challenge.set_session(ChallengeSession.DECLINED)
         challenge.save()
 
         # If the challenge is successfully declined, the /ttype/push endpoint

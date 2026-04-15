@@ -24,9 +24,8 @@ import { NotificationService, NotificationServiceInterface } from "../notificati
 import { catchError, forkJoin, Observable, of, Subject, throwError } from "rxjs";
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
-import { ContainerTypeOption } from "../../components/token/container-create/container-create.component";
-import { EnrollmentUrl } from "../../mappers/token-api-payload/_token-api-payload.mapper";
-import { FilterValue } from "../../core/models/filter_value";
+import { EnrollmentUrl, TokenEnrollmentPayload } from "../../mappers/token-api-payload/_token-api-payload.mapper";
+import { FilterValue } from "../../core/models/filter_value/filter_value";
 import { Sort } from "@angular/material/sort";
 import { TokenService, TokenServiceInterface } from "../token/token.service";
 import { StringUtils } from "../../utils/string.utils";
@@ -94,7 +93,7 @@ export interface ContainerDetailUser {
   user_id: string;
 }
 
-export type ContainerTypes = Map<ContainerTypeOption, _ContainerType>;
+export type ContainerTypes = Map<string, _ContainerType>;
 
 interface _ContainerType {
   description: string;
@@ -102,13 +101,13 @@ interface _ContainerType {
 }
 
 export interface ContainerType {
-  containerType: ContainerTypeOption;
+  containerType: string;
   description: string;
   token_types: string[];
 }
 
 export interface ContainerCreateData {
-  container_type: ContainerTypeOption;
+  container_type: string;
   description?: string;
   user?: string;
   realm?: string;
@@ -116,12 +115,11 @@ export interface ContainerCreateData {
 }
 
 export interface ContainerTemplate {
-  container_type: ContainerTypeOption | "";
+  container_type: string;
   default: boolean;
   name: string;
   template_options: {
-    options: any;
-    tokens: Array<any>;
+    tokens: Array<TokenEnrollmentPayload>;
   };
 }
 
@@ -162,6 +160,7 @@ export interface ContainerServiceInterface {
   containerResource: HttpResourceRef<PiResponse<ContainerDetails> | undefined>;
   containerOptions: Signal<string[]>;
   filteredContainerOptions: Signal<string[]>;
+  containersForTokenType: Signal<string[]>;
   containerSelection: WritableSignal<ContainerDetailData[]>;
   containerTypesResource: HttpResourceRef<PiResponse<ContainerTypes> | undefined>;
   containerTypeOptions: Signal<ContainerType[]>;
@@ -253,7 +252,7 @@ export class ContainerService implements ContainerServiceInterface {
 
   filterParams = computed<Record<string, string>>(() => {
     const allowed = [...this.apiFilter, ...this.advancedApiFilter];
-    const plainKeys = new Set(["user"]);
+    const plainKeys = new Set(["user", "type"]);
 
     const entries = Array.from(this.containerFilter().filterMap.entries())
       .filter(([key]) => allowed.includes(key))
@@ -290,9 +289,12 @@ export class ContainerService implements ContainerServiceInterface {
     computation: () => 0
   });
 
-  loadAllContainers = computed(() => this.contentService.onTokensEnrollment() ||
-    this.contentService.onTokenDetails() ||
-    this.contentService.onUserDetails());
+  loadAllContainers = computed(
+    () =>
+      this.contentService.onTokensEnrollment() ||
+      this.contentService.onTokenDetails() ||
+      this.contentService.onUserDetails()
+  );
 
   private readonly uniqueCompatibleType = computed<string | null>(() => {
     const tt = this.compatibleWithSelectedTokenType();
@@ -302,6 +304,14 @@ export class ContainerService implements ContainerServiceInterface {
     const compatible = types.filter((t) => (t.token_types ?? []).includes(tt));
 
     return compatible.length === 1 ? String(compatible[0].containerType) : null;
+  });
+
+  private readonly compatibleTypes = computed<string[]>(() => {
+    const tt = this.compatibleWithSelectedTokenType();
+    if (!tt) return [];
+    const types = this.containerTypeOptions();
+    const compatible = types.filter((t) => (t.token_types ?? []).includes(tt)).map((t) => String(t.containerType));
+    return compatible;
   });
 
   private readonly tokenInContainer = computed<boolean>(() => {
@@ -351,8 +361,9 @@ export class ContainerService implements ContainerServiceInterface {
       }),
       ...(this.loadAllContainers() && {
         no_token: 1,
-        user: this.userService.selectedUser()?.username ?? "",
-        realm: this.userService.selectedUserRealm() ?? ""
+        ...(this.userService.selectedUser()?.username && { user: this.userService.selectedUser()?.username }),
+        ...(this.userService.selectedUser()?.username &&
+          this.userService.selectedUserRealm() && { realm: this.userService.selectedUserRealm() })
       }),
       sortby: this.sort().active,
       sortdir: this.sort().direction,
@@ -363,7 +374,6 @@ export class ContainerService implements ContainerServiceInterface {
     if (compatibleType && !("type" in baseParams) && !("type_list" in baseParams)) {
       baseParams["type"] = compatibleType;
     }
-
     return {
       url: this.containerBaseUrl,
       method: "GET",
@@ -384,6 +394,17 @@ export class ContainerService implements ContainerServiceInterface {
     return this.containerOptions().filter((option) => option.toLowerCase().includes(filter));
   });
 
+  containersForTokenType = linkedSignal({
+    source: this.containerResource.value,
+    computation: (containerResource) => {
+      return (
+        containerResource?.result?.value?.containers
+          .filter((container) => this.compatibleTypes().includes(container.type))
+          .map((container) => container.serial) ?? []
+      );
+    }
+  });
+
   containerSelection: WritableSignal<ContainerDetailData[]> = linkedSignal({
     source: () => ({
       pageIndex: this.pageIndex(),
@@ -397,6 +418,7 @@ export class ContainerService implements ContainerServiceInterface {
   containerTypesResource = httpResource<PiResponse<ContainerTypes>>(() => {
     // Only load container types on routes with a container type list or selection.
     const onAllowedRoute =
+      this.contentService.onTokensContainers() ||
       this.contentService.onTokensContainersCreate() ||
       this.contentService.onTokensContainersWizard() ||
       this.contentService.onTokensEnrollment() ||
@@ -419,7 +441,7 @@ export class ContainerService implements ContainerServiceInterface {
       return [];
     }
     return Array.from(Object.entries(value)).map(([key, containerType]) => ({
-      containerType: key as ContainerTypeOption,
+      containerType: key,
       description: containerType?.description ?? "",
       token_types: containerType?.token_types ?? []
     }));
@@ -776,8 +798,9 @@ export class ContainerService implements ContainerServiceInterface {
     this.stopPolling();
     const headers = this.authService.getHeaders();
     return this.http
-      .post<PiResponse<ContainerUnregisterData>>(
-        `${this.containerBaseUrl}register/${containerSerial}/terminate`, {}, { headers })
+      .post<
+        PiResponse<ContainerUnregisterData>
+      >(`${this.containerBaseUrl}register/${containerSerial}/terminate`, {}, { headers })
       .pipe(
         catchError((error) => {
           console.error("Failed to unregister container.", error);

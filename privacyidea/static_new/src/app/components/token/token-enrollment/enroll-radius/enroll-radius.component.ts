@@ -20,9 +20,9 @@ import { Component, computed, effect, EventEmitter, inject, input, Input, OnInit
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatCheckbox } from "@angular/material/checkbox";
 import { MatOption } from "@angular/material/core";
-import { MatFormField, MatHint, MatLabel } from "@angular/material/form-field";
+import { MatFormField, MatHint, MatLabel, MatError } from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
-import { MatError, MatSelect } from "@angular/material/select";
+import { MatSelect } from "@angular/material/select";
 import { SystemService, SystemServiceInterface } from "../../../../services/system/system.service";
 import { TokenService, TokenServiceInterface } from "../../../../services/token/token.service";
 
@@ -35,6 +35,9 @@ import {
   TokenApiPayloadMapper,
   TokenEnrollmentData
 } from "../../../../mappers/token-api-payload/_token-api-payload.mapper";
+import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
+import { ROUTE_PATHS } from "../../../../route_paths";
+import { RADIUS_SERVER } from "../../../../constants/token.constants";
 
 export interface RadiusEnrollmentOptions extends TokenEnrollmentData {
   type: "radius";
@@ -66,7 +69,9 @@ export class EnrollRadiusComponent implements OnInit {
   protected readonly systemService: SystemServiceInterface = inject(SystemService);
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   protected readonly authService: AuthServiceInterface = inject(AuthService);
+  protected readonly contentService: ContentServiceInterface = inject(ContentService);
 
+  enrollmentData = input<RadiusEnrollmentData>();
   @Input() wizard: boolean = false;
   @Output() additionalFormFieldsChange = new EventEmitter<{
     [key: string]: FormControl<any>;
@@ -93,7 +98,7 @@ export class EnrollRadiusComponent implements OnInit {
 
   defaultRadiusServerIsSet = computed(() => {
     const cfg = this.systemService.systemConfigResource.value()?.result?.value;
-    return !!cfg?.["radius.identifier"];
+    return !!cfg?.[RADIUS_SERVER];
   });
 
   constructor() {
@@ -101,7 +106,7 @@ export class EnrollRadiusComponent implements OnInit {
       this.disabled() ? this.radiusForm.disable({ emitEvent: false }) : this.radiusForm.enable({ emitEvent: false })
     );
     effect(() => {
-      const id = this.systemService.systemConfigResource.value()?.result?.value?.["radius.identifier"];
+      const id = this.systemService.systemConfigResource.value()?.result?.value?.[RADIUS_SERVER];
       if (id && this.radiusServerConfigurationControl.pristine) {
         this.radiusServerConfigurationControl.setValue(id);
       }
@@ -109,12 +114,20 @@ export class EnrollRadiusComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this._setInitialFormValues();
     this.additionalFormFieldsChange.emit({
       radiusUser: this.radiusUserControl,
       radiusServerConfiguration: this.radiusServerConfigurationControl,
       checkPinLocally: this.checkPinLocallyControl
     });
     this.enrollmentArgsGetterChange.emit(this.enrollmentArgsGetter);
+  }
+
+  private _setInitialFormValues() {
+    if (!!this.enrollmentData()) {
+      this.radiusUserControl.setValue(this.enrollmentData()?.radiusUser ?? "", { emitEvent: false });
+      this.radiusServerConfigurationControl.setValue(this.enrollmentData()?.radiusServerConfiguration ?? "", { emitEvent: false });
+    }
   }
 
   enrollmentArgsGetter = (
@@ -145,4 +158,14 @@ export class EnrollRadiusComponent implements OnInit {
       mapper: this.enrollmentMapper
     };
   };
+
+  goToRadiusConfig() {
+    this.contentService.router.navigate([ROUTE_PATHS.CONFIGURATION_TOKENTYPES], { fragment: 'radius' });
+  }
+
+  onRadiusConfigKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      this.goToRadiusConfig();
+    }
+  }
 }

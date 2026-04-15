@@ -20,6 +20,7 @@
 import { assert } from "./assert";
 
 export function parseBooleanValue(initialValue: string | number | boolean): boolean {
+  if (initialValue === null || initialValue === undefined) return false;
   const typeofInitialValue = typeof initialValue;
   if (typeofInitialValue === "boolean") {
     return !!initialValue;
@@ -43,4 +44,8 @@ export function parseBooleanValue(initialValue: string | number | boolean): bool
     `Initial value for parseBooleanValue must be boolean, 0, 1, "true", "false", "1" or "0", but was ${initialValue}`
   );
   return false;
+}
+
+export function isChecked(val: any): boolean {
+  return val === "True" || val === true || val === "1" || val === 1;
 }

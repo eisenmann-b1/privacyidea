@@ -16,11 +16,12 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Component, effect, EventEmitter, inject, input, Input, OnInit, Output } from "@angular/core";
+import { Component, computed, effect, EventEmitter, inject, input, Input, OnInit, Output } from "@angular/core";
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatCheckbox } from "@angular/material/checkbox";
 import { MatInput } from "@angular/material/input";
-import { MatError, MatFormField, MatHint, MatLabel, MatOption, MatSelect } from "@angular/material/select";
+import { MatFormField, MatHint, MatLabel, MatError } from "@angular/material/form-field";
+import { MatOption, MatSelect } from "@angular/material/select";
 import { TokenService, TokenServiceInterface } from "../../../../services/token/token.service";
 import {
   TokenApiPayloadMapper,
@@ -31,6 +32,12 @@ import {
   HotpEnrollmentData
 } from "../../../../mappers/token-api-payload/hotp-token-api-payload.mapper";
 import { AuthService, AuthServiceInterface } from "../../../../services/auth/auth.service";
+import {
+  NotificationService,
+  NotificationServiceInterface
+} from "../../../../services/notification/notification.service";
+import { SystemService, SystemServiceInterface } from "../../../../services/system/system.service";
+import { HOTP_HASHLIB, HOTP_OTP_LENGTH } from "../../../../constants/token.constants";
 
 export interface HotpEnrollmentOptions extends TokenEnrollmentData {
   type: "hotp";
@@ -38,6 +45,7 @@ export interface HotpEnrollmentOptions extends TokenEnrollmentData {
   otpLength: number;
   otpKey?: string;
   hashAlgorithm: string;
+  twoStepInit?: boolean;
 }
 
 @Component({
@@ -62,12 +70,15 @@ export class EnrollHotpComponent implements OnInit {
   protected readonly enrollmentMapper: HotpApiPayloadMapper = inject(HotpApiPayloadMapper);
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   protected readonly authService: AuthServiceInterface = inject(AuthService);
+  protected readonly notificationService: NotificationServiceInterface = inject(NotificationService);
+  protected readonly systemService: SystemServiceInterface = inject(SystemService);
   readonly otpLengthOptions = [6, 8];
   readonly hashAlgorithmOptions = [
     { value: "sha1", viewValue: "SHA1" },
     { value: "sha256", viewValue: "SHA256" },
     { value: "sha512", viewValue: "SHA512" }
   ];
+  enrollmentData = input<HotpEnrollmentData | null>();
   @Input() wizard: boolean = false;
   @Output() enrollmentArgsGetterChange = new EventEmitter<
     (basicOptions: TokenEnrollmentData) => {
@@ -79,17 +90,27 @@ export class EnrollHotpComponent implements OnInit {
     [key: string]: FormControl<any>;
   }>();
   disabled = input<boolean>(false);
+  twoStep = computed(() => this.authService.check2Step("hotp"));
+  twoStepControl = new FormControl<boolean>(this.twoStep() === "force");
   generateOnServerFormControl = new FormControl<boolean>(true, [Validators.required]);
   otpLengthFormControl = new FormControl<number>(6, [Validators.required]);
   otpKeyFormControl = new FormControl<string>({ value: "", disabled: true });
-  hashAlgorithmFormControl = new FormControl<string>("sha1", [Validators.required]);
+  defaultHashlib = computed(() => this.systemService.systemConfig()[HOTP_HASHLIB] || "sha1");
+  hashAlgorithmFormControl = new FormControl<string>(this.defaultHashlib(), [Validators.required]);
 
   constructor() {
     effect(() => (this.disabled() ? this._disableFormControls() : this._enableFormControls()));
+    effect(() => {
+      if (this.enrollmentData()) {
+        this._setInitialFormValues({ enrollmentData: this.enrollmentData(), eventEmit: false });
+      }
+    });
   }
 
   ngOnInit(): void {
+    this._setInitialFormValues({ enrollmentData: this.enrollmentData() });
     this.additionalFormFieldsChange.emit({
+      twoStep: this.twoStepControl,
       generateOnServer: this.generateOnServerFormControl,
       otpLength: this.otpLengthFormControl,
       otpKey: this.otpKeyFormControl,
@@ -99,7 +120,42 @@ export class EnrollHotpComponent implements OnInit {
     this._applyPolicies();
   }
 
+  private _setInitialFormValues(args: { enrollmentData?: HotpEnrollmentData | null; eventEmit?: boolean }): void {
+    const { enrollmentData, eventEmit } = args;
+    if (enrollmentData) {
+      this.generateOnServerFormControl.setValue(enrollmentData.generateOnServer ?? true, {
+        emitEvent: eventEmit
+      });
+      if (enrollmentData.generateOnServer) {
+        this.otpKeyFormControl.disable({ emitEvent: eventEmit });
+        this.twoStepControl.disable({ emitEvent: eventEmit });
+      } else {
+        this.otpKeyFormControl.enable({ emitEvent: eventEmit });
+        this.otpKeyFormControl.disable({ emitEvent: eventEmit });
+      }
+      this.twoStepControl.setValue(enrollmentData.twoStepInit ?? false, { emitEvent: eventEmit });
+      this.otpLengthFormControl.setValue(enrollmentData.otpLength ?? 6, { emitEvent: eventEmit });
+      this.otpKeyFormControl.setValue(enrollmentData.otpKey ?? "", { emitEvent: eventEmit });
+      this.hashAlgorithmFormControl.setValue(enrollmentData.hashAlgorithm ?? "sha1", { emitEvent: eventEmit });
+    }
+  }
+
   private _applyPolicies() {
+    if (this.twoStep() === "force") {
+      this.twoStepControl.setValue(true, { emitEvent: false });
+      this.twoStepControl.disable({ emitEvent: false });
+      this.generateOnServerFormControl.disable({ emitEvent: false });
+    } else if (this.twoStep() === "allow") {
+      this.twoStepControl.valueChanges.subscribe((twoStepEnabled) => {
+        if (twoStepEnabled) {
+          this.generateOnServerFormControl.disable({ emitEvent: false });
+          this.generateOnServerFormControl.setValue(true);
+        } else if (!this.authService.checkForceServerGenerateOTPKey("hotp")) {
+          this.generateOnServerFormControl.enable({ emitEvent: false });
+        }
+      });
+    }
+
     if (this.authService.checkForceServerGenerateOTPKey("hotp")) {
       this.generateOnServerFormControl.disable({ emitEvent: false });
     } else {
@@ -110,9 +166,24 @@ export class EnrollHotpComponent implements OnInit {
         } else {
           this.otpKeyFormControl.disable({ emitEvent: false });
           this.otpKeyFormControl.clearValidators();
+          this.otpKeyFormControl.setValue("");
         }
         this.otpKeyFormControl.updateValueAndValidity();
       });
+    }
+
+    const hashlib = this.authService.rightsWithValues()[HOTP_HASHLIB];
+    if (hashlib) {
+      this.hashAlgorithmFormControl.setValue(hashlib, { emitEvent: false });
+      this.hashAlgorithmFormControl.disable({ emitEvent: false });
+    }
+    const otpLength = this.authService.rightsWithValues()[HOTP_OTP_LENGTH];
+    if (otpLength) {
+      const otpLengthNumber = parseInt(otpLength, 10);
+      if (!isNaN(otpLengthNumber)) {
+        this.otpLengthFormControl.setValue(otpLengthNumber, { emitEvent: false });
+        this.otpLengthFormControl.disable({ emitEvent: false });
+      }
     }
   }
 
@@ -122,27 +193,13 @@ export class EnrollHotpComponent implements OnInit {
     data: HotpEnrollmentData;
     mapper: TokenApiPayloadMapper<HotpEnrollmentData>;
   } | null => {
-    if (
-      this.generateOnServerFormControl.invalid ||
-      this.otpLengthFormControl.invalid ||
-      this.hashAlgorithmFormControl.invalid ||
-      (!this.generateOnServerFormControl.value && this.otpKeyFormControl.invalid)
-    ) {
-      this.generateOnServerFormControl.markAsTouched();
-      this.otpLengthFormControl.markAsTouched();
-      this.hashAlgorithmFormControl.markAsTouched();
-      if (!this.generateOnServerFormControl.value) {
-        this.otpKeyFormControl.markAsTouched();
-      }
-      return null;
-    }
-
     const enrollmentData: HotpEnrollmentOptions = {
       ...basicOptions,
       type: "hotp",
       generateOnServer: !!this.generateOnServerFormControl.value,
       otpLength: this.otpLengthFormControl.value ?? 6,
-      hashAlgorithm: this.hashAlgorithmFormControl.value ?? "sha1"
+      hashAlgorithm: this.hashAlgorithmFormControl.value ?? "sha1",
+      twoStepInit: !!this.twoStepControl.value
     };
 
     if (!enrollmentData.generateOnServer) {

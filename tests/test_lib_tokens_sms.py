@@ -13,7 +13,7 @@ from privacyidea.lib.policy import set_policy, SCOPE, PolicyClass
 from privacyidea.lib.realm import set_realm
 from privacyidea.lib.resolver import save_resolver
 from privacyidea.lib.token import init_token, remove_token, import_tokens, get_tokens
-from privacyidea.lib.tokens.smstoken import SmsTokenClass, SMSACTION
+from privacyidea.lib.tokens.smstoken import SmsTokenClass, SMSAction
 from privacyidea.lib.user import User
 from privacyidea.lib.utils import is_true
 from privacyidea.models import Token, Config
@@ -404,7 +404,7 @@ class SMSTokenTestCase(MyTestCase):
         # if the email is a multi-value attribute, the first address should be chosen
         new_user_info = token.user.info.copy()
         new_user_info['mobile'] = ['1234', '5678']
-        with mock.patch('privacyidea.lib.resolvers.PasswdIdResolver.IdResolver.getUserInfo') as mock_user_info:
+        with mock.patch('privacyidea.lib.resolvers.PasswdIdResolver.IdResolver.get_user_info') as mock_user_info:
             mock_user_info.return_value = new_user_info
             c = token.create_challenge(transactionid)
             self.assertTrue(c[0], c)
@@ -421,7 +421,7 @@ class SMSTokenTestCase(MyTestCase):
         for pol_text, result_text in smstext_tests.items():
             # create a SMSTEXT policy:
             p = set_policy(name="smstext",
-                           action="{0!s}={1!s}".format(SMSACTION.SMSTEXT, pol_text),
+                           action="{0!s}={1!s}".format(SMSAction.SMSTEXT, pol_text),
                            scope=SCOPE.AUTH)
             self.assertTrue(p > 0)
 
@@ -451,7 +451,7 @@ class SMSTokenTestCase(MyTestCase):
 
         # Test AUTOSMS
         p = set_policy(name="autosms",
-                       action=SMSACTION.SMSAUTO,
+                       action=SMSAction.SMSAUTO,
                        scope=SCOPE.AUTH)
         self.assertTrue(p > 0)
 
@@ -564,6 +564,40 @@ class SMSTokenTestCase(MyTestCase):
 
         # Clean up
         remove_token(smstoken.token.serial)
+
+    def test_24_update_dynamic_phone_replaces_static_phone(self):
+        """
+        Test that updating a token with dynamic_phone removes the static phone
+        number and vice versa.
+        """
+        # 1. Create a token with a static phone number
+        token = init_token(param={'serial': "PISM_DYN_TEST1", 'type': 'sms', 'otpkey': '12345',
+                                  "phone": "+49 111111111"})
+
+        # Verify the static phone is set and dynamic_phone is not
+        self.assertEqual("+49 111111111", token.get_tokeninfo("phone"))
+        self.assertIsNone(token.get_tokeninfo("dynamic_phone"))
+
+        # Now update the token to use dynamic_phone
+        token.update({"dynamic_phone": True})
+        token.save()
+
+        # Verify that the static phone number has been removed
+        # and dynamic_phone is set
+        self.assertTrue(is_true(token.get_tokeninfo("dynamic_phone")))
+        self.assertIsNone(token.get_tokeninfo("phone"))
+
+        # 2. Now update back to a static phone number
+        token.update({"phone": "+49 222222222"})
+        token.save()
+
+        # Verify that dynamic_phone has been removed
+        # and the static phone number is set
+        self.assertEqual("+49 222222222", token.get_tokeninfo("phone"))
+        self.assertIsNone(token.get_tokeninfo("dynamic_phone"))
+
+        # Clean up
+        remove_token("PISM_DYN_TEST1")
 
     def test_99_delete_token(self):
         db_token = Token.query.filter_by(serial=self.serial1).first()

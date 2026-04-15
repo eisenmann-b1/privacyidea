@@ -38,7 +38,7 @@ import re
 from privacyidea.lib.resolvers.UserIdResolver import UserIdResolver
 
 from sqlalchemy import (Integer, cast, String, MetaData, Table, and_,
-                        create_engine, select, insert, delete, update)
+                        create_engine, select, insert, delete, update, RowMapping)
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 import traceback
@@ -49,15 +49,34 @@ from privacyidea.lib.utils import (is_true, censor_connect_string,
                                    convert_column_to_unicode)
 from privacyidea.lib.error import ParameterError, ResolverError
 
-from passlib.context import CryptContext
-from passlib.utils import h64
-from passlib.utils.compat import uascii_to_str
-from passlib.utils.compat import unicode as pl_unicode
-from passlib.utils import to_unicode
-import passlib.utils.handlers as uh
-import passlib.exc as exc
-from passlib.registry import register_crypt_handler
-from passlib.handlers.ldap_digests import _SaltedBase64DigestHelper
+# TODO passlib has to be replaced before the next release, this is just a workaround that can not stay
+# passlib 1.7.4 compatibility with modern bcrypt. Two breaking changes:
+# 1. bcrypt 4.1.0 removed __about__.__version__ — passlib uses it for version detection.
+#    https://github.com/pyca/bcrypt/issues/684
+# 2. bcrypt 5.0.0 raises ValueError for passwords > 72 bytes instead of silently
+#    truncating. passlib's wrap-bug detection passes a long password to hashpw during
+#    backend initialization, which crashes and causes all bcrypt verification to silently
+#    return False.
+import bcrypt as _bcrypt
+if not hasattr(_bcrypt, '__about__'):
+    _bcrypt.__about__ = type('__about__', (), {'__version__': _bcrypt.__version__})()
+_orig_hashpw = _bcrypt.hashpw
+def _hashpw_compat(password, salt):
+    if isinstance(password, bytes) and len(password) > 72:
+        password = password[:72]
+    return _orig_hashpw(password, salt)
+_bcrypt.hashpw = _hashpw_compat
+
+# passlib imports must stay below the bcrypt monkey-patch above (E402 suppressed).
+from passlib.context import CryptContext  # noqa: E402
+from passlib.utils import h64  # noqa: E402
+from passlib.utils.compat import uascii_to_str  # noqa: E402
+from passlib.utils.compat import unicode as pl_unicode  # noqa: E402
+from passlib.utils import to_unicode  # noqa: E402
+import passlib.utils.handlers as uh  # noqa: E402
+import passlib.exc as exc  # noqa: E402
+from passlib.registry import register_crypt_handler  # noqa: E402
+from passlib.handlers.ldap_digests import _SaltedBase64DigestHelper  # noqa: E402
 
 
 class phpass_drupal(uh.HasRounds, uh.HasSalt, uh.GenericHandler):  # pragma: no cover
@@ -93,7 +112,7 @@ class phpass_drupal(uh.HasRounds, uh.HasSalt, uh.GenericHandler):  # pragma: no 
         )
 
     def to_string(self):
-        hash = "%s%s%s%s" % (self.ident,
+        hash = "{}{}{}{}".format(self.ident,
                               h64.encode_int6(self.rounds).decode("ascii"),
                               self.salt,
                               self.checksum or '')
@@ -240,7 +259,7 @@ class IdResolver (UserIdResolver):
         """
 
         res = False
-        userinfo = self.getUserInfo(uid)
+        userinfo = self.get_user_info(uid)
 
         database_pw = userinfo.get("password", "XXXXXXX")
 
@@ -249,7 +268,7 @@ class IdResolver (UserIdResolver):
 
         # translate lower case hash identifier to uppercase
         database_pw = re.sub(r'^{([a-z0-9]+)}',
-                             lambda match: '{{{}}}'.format(match.group(1).upper()),
+                             lambda match: f'{{{match.group(1).upper()}}}',
                              database_pw)
 
         try:
@@ -260,19 +279,18 @@ class IdResolver (UserIdResolver):
 
         return res
 
-    def getUserInfo(self, userId):
+    def get_user_info(self, user_id: int or str, attributes: list[str] = None) -> dict:
         """
         This function returns all user info for a given userid/object.
 
-        :param userId: The userid of the object
-        :type userId: string
+        :param user_id: The userid of the object
+        :param attributes: list of attribute names to be returned for the user. If None, all attributes are returned.
         :return: A dictionary with the keys defined in self.map
-        :rtype: dict
         """
         userinfo = {}
 
         try:
-            conditions = [self._get_userid_filter(userId)]
+            conditions = [self._get_userid_filter(user_id)]
             conditions = self._append_where_filter(conditions, self.TABLE,
                                                    self.where)
             filter_condition = and_(*conditions)
@@ -280,12 +298,23 @@ class IdResolver (UserIdResolver):
 
             for r in result.mappings():
                 if userinfo:  # pragma: no cover
-                    raise Exception("More than one user with userid {0!s} found!".format(userId))
-                userinfo = self._get_user_from_mapped_object(r)
+                    raise Exception(f"More than one user with userid {user_id!s} found!")
+                userinfo = self._get_user_from_mapped_object(r, attributes)
         except Exception as exx:  # pragma: no cover
-            log.error("Could not get the user information: {0!r}".format(exx))
+            log.error(f"Could not get the user information: {exx!r}")
 
         return userinfo
+
+    def get_available_info_keys(self) -> list[str]:
+        """
+        This function returns a list of known privacyIDEA user attributes which can be used, e.g. for getUserList or
+        get_user_info
+
+        :return: list of possible keys for searching users
+        """
+        info_keys = list(self.map.keys())
+        info_keys.append("id")  # id is always added
+        return info_keys
 
     def _get_userid_filter(self, userId):
         column = self.TABLE.columns[self.map.get("userid")]
@@ -307,7 +336,7 @@ class IdResolver (UserIdResolver):
         :return: username
         :rtype: string
         """
-        info = self.getUserInfo(userId)
+        info = self.get_user_info(userId)
         return info.get('username', "")
 
     def getUserId(self, LoginName):
@@ -333,32 +362,36 @@ class IdResolver (UserIdResolver):
             for r in result.mappings():
                 if userid != "":    # pragma: no cover
                     raise Exception("More than one user with loginname"
-                                    " %s found!" % LoginName)
+                                    f" {LoginName} found!")
                 user = self._get_user_from_mapped_object(r)
                 userid = convert_column_to_unicode(user["userid"])
         except Exception as exx:    # pragma: no cover
-            log.error("Could not get the user ID: {0!r}".format(exx))
+            log.error(f"Could not get the user ID: {exx!r}")
 
         return userid
 
-    def _get_user_from_mapped_object(self, ro):
+    def _get_user_from_mapped_object(self, row: RowMapping, attributes: list[str] = None) -> dict:
         """
-        :param ro: row
-        :type ro: Mapped Object
-        :return: User
-        :rtype: dict
+        :param row: row
+        :param attributes: list of attribute names to be returned for the user. If None or an empty list, all
+            attributes are returned.
+        :return: user info as dictionary
         """
         user = {}
         try:
-            if self.map.get("userid") in ro:
-                user["id"] = ro[self.map.get("userid")]
+            if self.map.get("userid") in row:
+                user["id"] = row[self.map.get("userid")]
         except UnicodeEncodeError:  # pragma: no cover
-            log.error("Failed to convert user: {0!r}".format(ro))
-            log.debug("{0!s}".format(traceback.format_exc()))
+            log.error(f"Failed to convert user: {row!r}")
+            log.debug(f"{traceback.format_exc()!s}")
+
 
         for key in self.map.keys():
+            if attributes and key not in attributes:
+                # only include the requested attributes
+                continue
             try:
-                raw_value = ro.get(self.map.get(key))
+                raw_value = row.get(self.map.get(key))
                 if raw_value:
                     if key == 'userid':
                         val = convert_column_to_unicode(raw_value)
@@ -370,15 +403,17 @@ class IdResolver (UserIdResolver):
 
             except UnicodeDecodeError:  # pragma: no cover
                 user[key] = "decoding_error"
-                log.error("Failed to convert user: {0!r}".format(ro))
-                log.debug("{0!s}".format(traceback.format_exc()))
+                log.error(f"Failed to convert user: {row!r}")
+                log.debug(f"{traceback.format_exc()!s}")
 
         return user
 
-    def getUserList(self, search_dict=None):
+    def getUserList(self, search_dict: dict = None, attributes: list[str] = None) -> list[dict]:
         """
         :param search_dict: A dictionary with search parameters
         :type search_dict: dict
+        :param attributes: list of attributes to be returned for each user (id and userid are always returned).
+            If None or an empty list, all attributes are returned.
         :return: list of users, where each user is a dictionary
         :raises ParameterError: when the search key does not exist in the
           mapping or database
@@ -416,8 +451,10 @@ class IdResolver (UserIdResolver):
                                       filter(filter_condition).
                                       limit(self.limit))
 
+        if attributes and "userid" not in attributes:
+            attributes.append("userid")
         for r in result.mappings():
-            user = self._get_user_from_mapped_object(r)
+            user = self._get_user_from_mapped_object(r, attributes)
             if "userid" in user:
                 # Remove the "password" attribute
                 user.pop("password", None)
@@ -504,15 +541,15 @@ class IdResolver (UserIdResolver):
         table_parts = self.table.split(".")
         schema = table_parts[0] if len(table_parts) > 1 else None
         self.table = table_parts[-1]
-        log.debug("Loading table {0!s} from schema {1!s}".format(self.table, schema))
+        log.debug(f"Loading table {self.table!s} from schema {schema!s}")
         self.TABLE = Table(self.table, MetaData(), autoload_with=self.engine, schema=schema)
         return self
 
     def _create_engine(self):
         log.debug("using the connect string "
-                  "{0!s}".format(censor_connect_string(self.connect_string)))
-        log.debug("using pool_size={0!s}, pool_timeout={1!s}, pool_recycle={2!s}".format(
-            self.pool_size, self.pool_timeout, self.pool_recycle))
+                  f"{censor_connect_string(self.connect_string)!s}")
+        log.debug(f"using pool_size={self.pool_size!s}, pool_timeout={self.pool_timeout!s}, "
+                  f"pool_recycle={self.pool_recycle!s}")
         try:
             engine = create_engine(self.connect_string,
                                    pool_size=self.pool_size,
@@ -564,12 +601,12 @@ class IdResolver (UserIdResolver):
         password = "" # nosec B105 # default parameter
         conParams = ""
         if param.get("Port"):
-            port = ":{0!s}".format(param.get("Port"))
+            port = ":{!s}".format(param.get("Port"))
         if param.get("Password"):
-            password = ":{0!s}".format(param.get("Password"))
+            password = ":{!s}".format(param.get("Password"))
         if param.get("conParams"):
-            conParams = "?{0!s}".format(param.get("conParams"))
-        connect_string = "{0!s}://{1!s}{2!s}{3!s}{4!s}{5!s}/{6!s}{7!s}".format(param.get("Driver") or "",
+            conParams = "?{!s}".format(param.get("conParams"))
+        connect_string = "{!s}://{!s}{!s}{!s}{!s}{!s}/{!s}{!s}".format(param.get("Driver") or "",
                                                    param.get("User") or "",
                                                    password,
                                                    "@" if (param.get("User")
@@ -600,7 +637,7 @@ class IdResolver (UserIdResolver):
         num = -1
         try:
             connect_string = cls._create_connect_string(param)
-            log.info("using the connect string {0!s}".format(censor_connect_string(connect_string)))
+            log.info(f"using the connect string {censor_connect_string(connect_string)!s}")
             engine = create_engine(connect_string)
             # create a configured "Session" class
             session = scoped_session(sessionmaker(bind=engine))()
@@ -611,7 +648,7 @@ class IdResolver (UserIdResolver):
         table_parts = param.get("Table").split(".")
         schema = table_parts[0] if len(table_parts) > 1 else None
         table_name = table_parts[-1]
-        log.debug("Loading table {0!s} from schema {1!s}".format(table_name, schema))
+        log.debug(f"Loading table {table_name!s} from schema {schema!s}")
 
         try:
             TABLE = Table(table_name, MetaData(), autoload_with=engine, schema=schema)
@@ -624,7 +661,7 @@ class IdResolver (UserIdResolver):
             result = session.query(TABLE).filter(filter_condition).count()
 
             num = result
-            desc = "Found {0:d} users.".format(num)
+            desc = f"Found {num:d} users."
         except Exception as e:
             log.warning(f"Failed to retrieve users: {e!r}")
             desc = "Failed to retrieve users."
@@ -653,7 +690,7 @@ class IdResolver (UserIdResolver):
         attributes = attributes or {}
         # TODO: add try/except
         kwargs = self.prepare_attributes_for_db(attributes)
-        log.info("Insert new user with attributes {0!s}".format(kwargs))
+        log.info(f"Insert new user with attributes {kwargs!s}")
         r = self.session.execute(insert(self.TABLE).values(**kwargs))
         self.session.commit()
         # Return the UID of the new object
@@ -698,9 +735,9 @@ class IdResolver (UserIdResolver):
             filter_condition = and_(*conditions)
             self.session.execute(delete(self.TABLE).where(filter_condition))
             self.session.commit()
-            log.info('Deleted user with uid: {0!s}'.format(uid))
+            log.info(f'Deleted user with uid: {uid!s}')
         except Exception as exx:
-            log.error("Error deleting user: {0!s}".format(exx))
+            log.error(f"Error deleting user: {exx!s}")
             res = False
         return res
 
@@ -729,11 +766,11 @@ class IdResolver (UserIdResolver):
             result = self.session.execute(stmt)
             success = result.rowcount > 0
             self.session.commit()
-            log.info('Updated user attributes for user with uid {0!s}'.format(uid))
+            log.info(f'Updated user attributes for user with uid {uid!s}')
         except Exception as exx:
-            log.error('Error updating user attributes for user with uid {0!s}: '
-                      '{1!s}'.format(uid, exx))
-            log.debug('Error updating attributes {0!s}'.format(attributes), exc_info=True)
+            log.error(f'Error updating user attributes for user with uid {uid!s}: '
+                      f'{exx!s}')
+            log.debug(f'Error updating attributes {attributes!s}', exc_info=True)
 
         return success
 
@@ -765,7 +802,7 @@ def hash_password(password, hashtype):
     try:
         password = pw_ctx.handler(hash_type_dict[hashtype]).hash(password)
     except KeyError as _e:  # pragma: no cover
-        raise Exception("Unsupported password hashtype '{0!s}'. "
-                        "Use one of {1!s}.".format(hashtype, hash_type_dict.keys()))
+        raise Exception(f"Unsupported password hashtype '{hashtype!s}'. "
+                        f"Use one of {hash_type_dict.keys()!s}.")
 
     return password

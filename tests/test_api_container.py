@@ -21,7 +21,7 @@ from privacyidea.lib.containers.container_info import PI_INTERNAL, TokenContaine
 from privacyidea.lib.containers.container_states import ContainerStates
 from privacyidea.lib.containers.smartphone import SmartphoneOptions
 from privacyidea.lib.crypto import generate_keypair_ecc, decrypt_aes
-from privacyidea.lib.error import ERROR
+from privacyidea.lib.error import Error
 from privacyidea.lib.machine import attach_token
 from privacyidea.lib.policies.actions import PolicyAction
 from privacyidea.lib.policies.conditions import ConditionSection, ConditionHandleMissingData
@@ -36,14 +36,13 @@ from privacyidea.lib.token import (get_one_token, get_tokens_from_serial_or_user
                                    get_tokeninfo, get_tokens)
 from privacyidea.lib.token import init_token, get_tokens_paginate, unassign_token
 from privacyidea.lib.tokens.papertoken import PAPERACTION
-from privacyidea.lib.tokens.pushtoken import PUSH_ACTION
-from privacyidea.lib.tokens.tantoken import TANACTION
+from privacyidea.lib.tokens.pushtoken import PushAction
+from privacyidea.lib.tokens.tantoken import TANAction
 from privacyidea.lib.user import User
 from privacyidea.lib.utils.compare import PrimaryComparators
 from privacyidea.models import Realm
 from tests.base import MyApiTestCase
 from tests.test_lib_tokencontainer import MockSmartphone
-
 
 UNSPECIFIC_ERROR_MESSAGES: dict[str, str] = {
     "container/rollover": "Failed container rollover",
@@ -94,10 +93,11 @@ class APIContainerTest(MyApiTestCase):
         self.clear_flask_g()
 
         if try_unspecific:
-            set_policy(name="hide_specific_error_message", scope=SCOPE.CONTAINER, action=f"{PolicyAction.HIDE_SPECIFIC_ERROR_MESSAGE}=true")
+            set_policy(name="hide_specific_error_message", scope=SCOPE.CONTAINER,
+                       action=f"{PolicyAction.HIDE_SPECIFIC_ERROR_MESSAGE}=true")
             try:
                 return self.request_assert_error(status_code, url, data, auth_token,
-                                                 method=method, error_code=ERROR.CONTAINER,
+                                                 method=method, error_code=Error.CONTAINER,
                                                  error_message=UNSPECIFIC_ERROR_MESSAGES[url])
             finally:
                 delete_policy("hide_specific_error_message")
@@ -2639,7 +2639,7 @@ class APIContainer(APIContainerTest):
         self.request_assert_error(400, f'/container/{container_serial}/assign',
                                   payload, self.at, 'POST',
                                   error_code=905,
-                                  error_message="ERR905: Missing parameter: 'user'")
+                                  error_message="ERR905: Missing parameter: user")
 
         delete_container_by_serial(container_serial)
 
@@ -2920,7 +2920,7 @@ class APIContainer(APIContainerTest):
         payload = {"realms": self.realm2}
         result = self.request_assert_success(f'/container/{container_serial}/realms', payload, self.at, 'POST')
         # TODO: Should we also add the result for the users realm even if they are not in the requested realms?
-        #self.assertTrue(result["result"]["value"][self.realm1])
+        # self.assertTrue(result["result"]["value"][self.realm1])
         self.assertTrue(result["result"]["value"][self.realm2])
 
         delete_container_by_serial(container_serial)
@@ -2935,7 +2935,7 @@ class APIContainer(APIContainerTest):
         self.request_assert_error(400, f'/container/{container_serial}/realms',
                                   {}, self.at, 'POST',
                                   error_code=905,
-                                  error_message="ERR905: Missing parameter: 'realms'")
+                                  error_message="ERR905: Missing parameter: realms")
 
         # Set non-existing realm
         payload = {"realms": "nonexistingrealm"}
@@ -2974,13 +2974,13 @@ class APIContainer(APIContainerTest):
         self.request_assert_error(400, f'/container/{container_serial}/description',
                                   {}, self.at, 'POST',
                                   error_code=905,
-                                  error_message="ERR905: Missing parameter: 'description'")
+                                  error_message="ERR905: Missing parameter: description")
 
         # Description parameter is None
         self.request_assert_error(400, f'/container/{container_serial}/description',
                                   {"description": None}, self.at, 'POST',
                                   error_code=905,
-                                  error_message="ERR905: Missing parameter: 'description'")
+                                  error_message="ERR905: Missing parameter: description")
 
         # Missing container serial
         self.request_assert_405('/container/description', {"description": "new description"},
@@ -3011,7 +3011,7 @@ class APIContainer(APIContainerTest):
         self.request_assert_error(400, f'/container/{container_serial}/states',
                                   {}, self.at, 'POST',
                                   error_code=905,
-                                  error_message="ERR905: Missing parameter: 'states'")
+                                  error_message="ERR905: Missing parameter: states")
 
         # Missing container serial
         self.request_assert_405('/container/states', {"states": "active,damaged,lost"},
@@ -3044,7 +3044,7 @@ class APIContainer(APIContainerTest):
         self.request_assert_error(400, f'/container/{container_serial}/info/key1',
                                   {}, self.at, 'POST',
                                   error_code=905,
-                                  error_message="ERR905: Missing parameter: 'value'")
+                                  error_message="ERR905: Missing parameter: value")
 
         # Missing container serial
         self.request_assert_404_no_result('/container/info/key1', {"value": "value1"}, self.at, 'POST')
@@ -3537,7 +3537,7 @@ class APIContainerSynchronization(APIContainerTest):
         self.request_assert_error(400, 'container/register/initialize',
                                   {}, self.at, 'POST',
                                   error_code=905,
-                                  error_message="ERR905: Missing parameter: 'container_serial'")
+                                  error_message="ERR905: Missing parameter: container_serial")
 
         # Invalid container serial
         self.request_assert_error(404, 'container/register/initialize',
@@ -3551,7 +3551,7 @@ class APIContainerSynchronization(APIContainerTest):
         self.request_assert_error(400, 'container/register/finalize',
                                   {"device_brand": "LG", "device_model": "ABC123"}, None, 'POST',
                                   error_code=905,
-                                  error_message="ERR905: Missing parameter: 'container_serial'",
+                                  error_message="ERR905: Missing parameter: container_serial",
                                   try_unspecific=False)
 
         # Invalid container serial
@@ -4116,8 +4116,8 @@ class APIContainerSynchronization(APIContainerTest):
                      FirebaseConfig.TTL: 10}
         set_smsgateway("fb1", 'privacyidea.lib.smsprovider.FirebaseProvider.FirebaseProvider', "myFB",
                        fb_config)
-        set_policy("push", scope=SCOPE.ENROLL, action={PUSH_ACTION.FIREBASE_CONFIG: "fb1",
-                                                       PUSH_ACTION.REGISTRATION_URL: "http://test/ttype/push"})
+        set_policy("push", scope=SCOPE.ENROLL, action={PushAction.FIREBASE_CONFIG: "fb1",
+                                                       PushAction.REGISTRATION_URL: "http://test/ttype/push"})
 
         # Challenge
         scope = "https://pi.net/container/synchronize"
@@ -4164,8 +4164,8 @@ class APIContainerSynchronization(APIContainerTest):
         smartphone.add_token(push_fb)
 
         # policies: push config is spread over multiple policies
-        set_policy("push_1", scope=SCOPE.ENROLL, action={PUSH_ACTION.FIREBASE_CONFIG: "poll only"})
-        set_policy("push_2", scope=SCOPE.ENROLL, action={PUSH_ACTION.REGISTRATION_URL: "http://test/ttype/push"})
+        set_policy("push_1", scope=SCOPE.ENROLL, action={PushAction.FIREBASE_CONFIG: "poll only"})
+        set_policy("push_2", scope=SCOPE.ENROLL, action={PushAction.REGISTRATION_URL: "http://test/ttype/push"})
 
         # Challenge
         scope = "https://pi.net/container/synchronize"
@@ -4337,7 +4337,7 @@ class APIContainerSynchronization(APIContainerTest):
                        "user": "hans"}
         result = self.request_assert_success("/token/init", hotp_params, self.at, "POST")
         initial_enroll_url = result["detail"]["googleurl"]["value"]
-        self.assertIn("force_app_pin=True", initial_enroll_url)
+        self.assertIn("pin=True", initial_enroll_url)
         self.assertIn("app_force_unlock=pin", initial_enroll_url)
         self.assertIn(f"issuer={self.realm1}", initial_enroll_url)
         self.assertIn("hans", initial_enroll_url)
@@ -4381,7 +4381,7 @@ class APIContainerSynchronization(APIContainerTest):
                 hotp_enroll_url = token
                 break
         self.assertNotEqual(initial_enroll_url, hotp_enroll_url)
-        self.assertIn("force_app_pin=True", hotp_enroll_url)
+        self.assertIn("pin=True", hotp_enroll_url)
         self.assertIn("app_force_unlock=pin", hotp_enroll_url)
         self.assertIn(f"issuer={self.realm1}", hotp_enroll_url)
         self.assertIn("hans", hotp_enroll_url)
@@ -4959,8 +4959,8 @@ class APIContainerSynchronization(APIContainerTest):
         # tokens
         self.setUp_user_realms()
 
-        push = init_token({"genkey": "1", "type": "push", PUSH_ACTION.FIREBASE_CONFIG: "poll only"})
-        self.assertEqual("poll only", push.get_tokeninfo()[PUSH_ACTION.FIREBASE_CONFIG])
+        push = init_token({"genkey": "1", "type": "push", PushAction.FIREBASE_CONFIG: "poll only"})
+        self.assertEqual("poll only", push.get_tokeninfo()[PushAction.FIREBASE_CONFIG])
         smartphone.add_token(push)
 
         hotp_params = {"type": "hotp",
@@ -4997,8 +4997,8 @@ class APIContainerSynchronization(APIContainerTest):
                      FirebaseConfig.TTL: 10}
         set_smsgateway("firebase", 'privacyidea.lib.smsprovider.FirebaseProvider.FirebaseProvider', "myFB",
                        fb_config)
-        set_policy("push", scope=SCOPE.ENROLL, action={PUSH_ACTION.FIREBASE_CONFIG: "firebase",
-                                                       PUSH_ACTION.REGISTRATION_URL: "http://test/ttype/push"})
+        set_policy("push", scope=SCOPE.ENROLL, action={PushAction.FIREBASE_CONFIG: "firebase",
+                                                       PushAction.REGISTRATION_URL: "http://test/ttype/push"})
 
         # Rollover init
         data = {"container_serial": mock_smph.container_serial, "rollover": True,
@@ -5085,7 +5085,7 @@ class APIContainerSynchronization(APIContainerTest):
         self.assertEqual("sha256", daypassword.hashlib)
         self.assertEqual(30, daypassword.timestep)
         # due to new policy push token config changed to firebase
-        self.assertEqual("firebase", push.get_tokeninfo()[PUSH_ACTION.FIREBASE_CONFIG])
+        self.assertEqual("firebase", push.get_tokeninfo()[PushAction.FIREBASE_CONFIG])
 
         # smartphone got new token secrets: rollover completed
         self.assertEqual(RegistrationState.REGISTERED, smartphone.registration_state)
@@ -5759,8 +5759,8 @@ class APIContainerTemplate(APIContainerTest):
     def test_09_create_container_with_template_all_tokens_success(self):
         self.setUp_user_realm3()
         # Policies
-        set_policy("push", scope=SCOPE.ENROLL, action={PUSH_ACTION.FIREBASE_CONFIG: "poll only",
-                                                       PUSH_ACTION.REGISTRATION_URL: "http://test/ttype/push",
+        set_policy("push", scope=SCOPE.ENROLL, action={PushAction.FIREBASE_CONFIG: "poll only",
+                                                       PushAction.REGISTRATION_URL: "http://test/ttype/push",
                                                        PolicyAction.TOKENISSUER: "{realm}",
                                                        PolicyAction.TOKENLABEL: "serial_{serial}"})
         set_policy("admin", SCOPE.ADMIN, action={PolicyAction.CONTAINER_CREATE: True,
@@ -5966,7 +5966,7 @@ class APIContainerTemplate(APIContainerTest):
     def test_11_create_container_with_template_max_token_policies(self):
         # Limit number of tokens per user and type
         set_policy("max_token", scope=SCOPE.ENROLL, action={PolicyAction.MAXTOKENUSER: 6,
-                                                            TANACTION.TANTOKEN_COUNT: 2,
+                                                            TANAction.TANTOKEN_COUNT: 2,
                                                             PAPERACTION.PAPERTOKEN_COUNT: 2,
                                                             PolicyAction.MAXTOKENREALM: 7})
         self.setUp_user_realms()
@@ -6074,7 +6074,7 @@ class APIContainerTemplate(APIContainerTest):
         tokens = container.get_tokens()
         self.assertEqual(0, len(tokens))
 
-        # Not allowed to set the pin
+        # Not allowed to set the PIN. This will cause the token to not be enrolled at all
         delete_policy("otp_pin")
         delete_policy("enrollPIN")
         template_params = {"name": "test",
@@ -6088,9 +6088,7 @@ class APIContainerTemplate(APIContainerTest):
         container_serial = result["result"]["value"]["container_serial"]
         container = find_container_by_serial(container_serial)
         tokens = container.get_tokens()
-        self.assertEqual(1, len(tokens))
-        self.assertEqual("hotp", tokens[0].get_type())
-        self.assertEqual(-1, tokens[0].token.get_pin())
+        self.assertEqual(0, len(tokens))
 
         # random pin
         set_policy("random_pin", scope=SCOPE.ENROLL, action={PolicyAction.OTPPINRANDOM: 8})

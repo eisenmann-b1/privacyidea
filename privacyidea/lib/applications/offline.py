@@ -98,7 +98,7 @@ class MachineApplication(MachineApplicationBase):
         :return: dictionary
         """
         if amount < 0:
-            raise ParameterError("Invalid refill amount: {!r}".format(amount))
+            raise ParameterError(f"Invalid refill amount: {amount!r}")
         (res, err, otp_dict) = token.get_multi_otp(count=amount, counter_index=True)
         otps = otp_dict.get("otp")
         prepend_pin = get_prepend_pin()
@@ -180,7 +180,7 @@ class MachineApplication(MachineApplicationBase):
             token = get_one_token(serial=serial)
             user = token.user
             if user:
-                user_info = user.info
+                user_info = user.get_specific_info(["username", FIDO2TokenInfo.USER_ID])
                 if "username" in user_info:
                     ret["user"] = ret["username"] = user_info.get("username")
                 if token_type in ["webauthn", "passkey"] and FIDO2TokenInfo.USER_ID in user_info:

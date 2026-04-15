@@ -42,7 +42,6 @@ import re
 import os
 import logging
 import codecs
-from typing import List
 
 from passlib.context import CryptContext
 
@@ -128,8 +127,7 @@ class IdResolver (UserIdResolver):
         if not self.file_name:
             self.file_name = "/etc/passwd"
 
-        log.info('loading users from file {0!s} from within {1!r}'.format(self.file_name,
-                                                                          os.getcwd()))
+        log.info(f'loading users from file {self.file_name!s} from within {os.getcwd()!r}')
         with codecs.open(self.file_name, "r", ENCODING) as file_handle:
             ID = self.search_field_indices["userid"]
             NAME = self.search_field_indices["username"]
@@ -194,55 +192,73 @@ class IdResolver (UserIdResolver):
         :return: True or False
         :rtype: bool
         """
-        log.info("checking password for user uid {0!s}".format(uid))
+        log.info(f"checking password for user uid {uid!s}")
         cryptedpasswd = self.pass_dict.get(uid)
-        log.debug("We found the encrypted pass {0!s} for uid {1!s}".format(cryptedpasswd, uid))
+        log.debug(f"We found the encrypted pass {cryptedpasswd!s} for uid {uid!s}")
         if cryptedpasswd:
             if cryptedpasswd in ['x', '*']:
                 err = "Sorry, currently no support for shadow passwords"
-                log.error("{0!s}".format(err))
+                log.error(f"{err!s}")
                 raise NotImplementedError(err)
             if crypt_ctx.verify(password, cryptedpasswd):
-                log.info("successfully authenticated user uid {0!s}".format(uid))
+                log.info(f"successfully authenticated user uid {uid!s}")
                 return True
             else:
-                log.warning("user uid {0!s} failed to authenticate".format(uid))
+                log.warning(f"user uid {uid!s} failed to authenticate")
                 return False
         else:
             log.warning("Failed to verify password. No encrypted password "
                         "found in file")
             return False
 
-    def getUserInfo(self, userId, no_passwd=False):
+    def get_user_info(self, user_id: int or str, attributes: list[str] = None, no_passwd: bool = False) -> dict:
         """
         get some info about the user
         as we only have the loginId, we have to traverse the dict for the value
 
-        :param userId: the to be searched user
+        :param user_id: the to be searched user
+        :param attributes: list of attribute names to be returned for the user. If None or an empty list, all
+            attributes are returned.
         :param no_passwd: return no password
         :return: dict of user info
         """
         ret = {}
 
-        if userId in self.reverse_dict:
-            fields = self.description_dict.get(userId, [])
+        if user_id in self.reverse_dict:
+            fields = self.description_dict.get(user_id, [])
 
             for key in self.search_field_indices:
-                if no_passwd and key == "cryptpass":
+                if (no_passwd and key == "cryptpass") or (attributes and key not in attributes):
                     continue
                 index = self.search_field_indices[key]
                 if index < len(fields):
                     ret[key] = fields[index]
 
-            ret['givenname'] = self.given_name_dict.get(userId)
-            ret['surname'] = self.surname_dict.get(userId)
-            ret['phone'] = self.home_phone_dict.get(userId)
-            ret['mobile'] = self.office_phone_dict.get(userId)
-            ret['email'] = self.email_dict.get(userId)
+            if not attributes or "givenname" in attributes:
+                ret['givenname'] = self.given_name_dict.get(user_id)
+            if not attributes or "surname" in attributes:
+                ret['surname'] = self.surname_dict.get(user_id)
+            if not attributes or "phone" in attributes:
+                ret['phone'] = self.home_phone_dict.get(user_id)
+            if not attributes or "mobile" in attributes:
+                ret['mobile'] = self.office_phone_dict.get(user_id)
+            if not attributes or "email" in attributes:
+                ret['email'] = self.email_dict.get(user_id)
         else:
-            log.debug("User with user ID %s could not be found.", userId)
+            log.debug("User with user ID %s could not be found.", user_id)
 
         return ret
+
+    def get_available_info_keys(self) -> list[str]:
+        """
+        This function returns a list of known privacyIDEA user attributes which can be used, e.g. for getUserList or
+        get_user_info
+
+        :return: list of possible keys for searching users
+        """
+        attributes = ["givenname", "surname", "phone", "mobile", "email"]
+        attributes.extend(self.search_field_indices.keys())
+        return attributes
 
     def getUsername(self, userId):
         '''
@@ -296,13 +312,15 @@ class IdResolver (UserIdResolver):
 
         return self.search_fields
 
-    def getUserList(self, search_dict=None):
+    def getUserList(self, search_dict: dict = None, attributes: list[str] = None) -> list[dict]:
         """
         get a list of all users matching the search criteria of the searchdict
 
         :param search_dict: dict of search expressions
+        :param attributes: list of attributes to be returned for each user
         """
         ret = []
+        search_dict = search_dict or {}
 
         #  first check if the searches are in the searchDict
         for _id, line in self.description_dict.items():
@@ -331,12 +349,12 @@ class IdResolver (UserIdResolver):
                 uid = ""
                 if uid_index < len(line):
                     uid = line[self.search_field_indices["userid"]]
-                info = self.getUserInfo(uid, no_passwd=True)
+                info = self.get_user_info(uid, attributes=attributes, no_passwd=True)
                 ret.append(info)
 
         return ret
 
-    def check_attribute(self, line: List[str], pattern: str, attribute_name: str) -> bool:
+    def check_attribute(self, line: list[str], pattern: str, attribute_name: str) -> bool:
         """
         Checks if a given attribute matches a pattern.
 
@@ -407,7 +425,7 @@ class IdResolver (UserIdResolver):
 
         try:
             cUserId = int(line[self.search_field_indices["userid"]])
-        except:  # pragma: no cover
+        except ValueError:  # pragma: no cover
             return ret
 
         (op, val) = tokenise(">=|<=|>|<|=|between")(pattern)
@@ -421,7 +439,7 @@ class IdResolver (UserIdResolver):
                     v = ihVal
                     ihVal = ilVal
                     ilVal = v
-            except:  # pragma: no cover
+            except ValueError:  # pragma: no cover
                 return ret
 
             if ilVal <= cUserId <= ihVal:
@@ -429,7 +447,7 @@ class IdResolver (UserIdResolver):
         else:
             try:
                 ival = int(val)
-            except:  # pragma: no cover
+            except ValueError:  # pragma: no cover
                 return ret
 
             if op == "=" and cUserId == ival:

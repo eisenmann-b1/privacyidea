@@ -24,7 +24,11 @@ import { MatSort, MatSortModule } from "@angular/material/sort";
 import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
-import { PrivacyideaServer, PrivacyideaServerService, PrivacyideaServerServiceInterface } from "../../../services/privacyidea-server/privacyidea-server.service";
+import {
+  PrivacyideaServer,
+  PrivacyideaServerService,
+  PrivacyideaServerServiceInterface
+} from "../../../services/privacyidea-server/privacyidea-server.service";
 import { NewPrivacyideaServerComponent } from "./new-privacyidea-server/new-privacyidea-server.component";
 import { AuthService, AuthServiceInterface } from "../../../services/auth/auth.service";
 import { MatTooltipModule } from "@angular/material/tooltip";
@@ -35,6 +39,7 @@ import { MatFormField, MatInput, MatLabel } from "@angular/material/input";
 import { ClearableInputComponent } from "../../shared/clearable-input/clearable-input.component";
 import { TableUtilsService, TableUtilsServiceInterface } from "../../../services/table-utils/table-utils.service";
 import { CopyButtonComponent } from "../../shared/copy-button/copy-button.component";
+import { SimpleConfirmationDialogComponent } from "../../shared/dialog/confirmation-dialog/confirmation-dialog.component";
 
 @Component({
   selector: "app-privacyidea-servers",
@@ -68,7 +73,7 @@ export class PrivacyideaServersComponent {
   filterString = signal<string>("");
   pageSizeOptions = this.tableUtilsService.pageSizeOptions;
   totalLength: WritableSignal<number> = computed(
-    () => this.privacyideaServerService.privacyideaServers().length
+    () => this.privacyideaServerService.remoteServerOptions().length
   ) as WritableSignal<number>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -78,7 +83,7 @@ export class PrivacyideaServersComponent {
   displayedColumns: string[] = ["identifier", "url", "tls", "description", "actions"];
 
   privacyideaDataSource = computed(() => {
-    const servers = this.privacyideaServerService.privacyideaServers();
+    const servers = this.privacyideaServerService.remoteServerOptions();
     const dataSource = new MatTableDataSource(servers);
     dataSource.paginator = this.paginator;
     dataSource.sort = this.sort;
@@ -88,23 +93,28 @@ export class PrivacyideaServersComponent {
   openEditDialog(server?: PrivacyideaServer): void {
     this.dialog.open(NewPrivacyideaServerComponent, {
       data: server ? { ...server } : null,
-      width: "800px"
+      width: "auto",
+      maxWidth: "100vw"
     });
   }
 
   deleteServer(server: PrivacyideaServer): void {
-    this.dialogService.confirm({
-      data: {
-        title: $localize`Delete privacyIDEA Server`,
-        serialList: [server.identifier],
-        type: "privacyidea-server",
-        action: "delete"
-      }
-    }).then(result => {
-      if (result) {
-        this.privacyideaServerService.deletePrivacyideaServer(server.identifier);
-      }
-    });
+    this.dialogService
+      .openDialog({
+        component: SimpleConfirmationDialogComponent,
+        data: {
+          title: $localize`Delete privacyIDEA Server`,
+          items: [server.identifier],
+          itemType: "privacyidea-server",
+          confirmAction: { label: $localize`Delete`, value: true, type: "destruct" }
+        }
+      })
+      .afterClosed()
+      .subscribe({
+        next: (result) => {
+          if (result) this.privacyideaServerService.deletePrivacyideaServer(server.identifier);
+        }
+      });
   }
 
   onFilterInput(value: string): void {

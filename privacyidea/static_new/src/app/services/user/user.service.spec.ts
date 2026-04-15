@@ -38,6 +38,7 @@ import { ROUTE_PATHS } from "../../route_paths";
 import { PiResponse } from "../../app.component";
 import { MockAuthService } from "../../../testing/mock-services/mock-auth-service";
 import { environment } from "../../../environments/environment";
+import { NotificationService } from "../notification/notification.service";
 
 function buildUser(username: string): UserData {
   return {
@@ -85,6 +86,7 @@ describe("UserService", () => {
   let httpMock: HttpTestingController;
   let contentServiceMock: MockContentService;
   let authServiceMock: MockAuthService;
+  let notificationServiceMock: MockNotificationService;
 
   let users: UserData[];
   let alice: UserData;
@@ -100,8 +102,8 @@ describe("UserService", () => {
         { provide: AuthService, useClass: MockAuthService },
         { provide: ContentService, useClass: MockContentService },
         { provide: TokenService, useClass: MockTokenService },
-        MockLocalService,
-        MockNotificationService
+        { provide: NotificationService, useClass: MockNotificationService },
+        MockLocalService
       ]
     });
 
@@ -110,6 +112,7 @@ describe("UserService", () => {
     httpMock = TestBed.inject(HttpTestingController);
     contentServiceMock = TestBed.inject(ContentService) as unknown as MockContentService;
     authServiceMock = TestBed.inject(AuthService) as unknown as MockAuthService;
+    notificationServiceMock = TestBed.inject(NotificationService) as unknown as MockNotificationService;
 
     alice = buildUser("Alice");
     users = [alice, buildUser("Bob"), buildUser("Charlie")];
@@ -126,9 +129,30 @@ describe("UserService", () => {
   });
 
   it("selectedUserRealm should expose the current defaultRealm", () => {
+    realmService.realmOptions.set(["realm1", "realm2", "someRealm"]);
     expect(userService.selectedUserRealm()).toBe("realm1");
     realmService.setDefaultRealm("someRealm");
     expect(userService.selectedUserRealm()).toBe("someRealm");
+  });
+
+  it("selectedUserRealm should expose first realm if no default realm is set", () => {
+    realmService.realmOptions.set(["realm1", "realm2"]);
+    expect(userService.selectedUserRealm()).toBe("realm1");
+  });
+
+  it("selectedUserRealm should expose empty string if no realmOptions are available", () => {
+    realmService.realmOptions.set([]);
+    expect(userService.selectedUserRealm()).toBe("");
+
+    // even setting the default realm keeps an empty string as the realm is not in the options list
+    realmService.setDefaultRealm("realm1");
+    expect(userService.selectedUserRealm()).toBe("");
+  });
+
+  it("selectedUserRealm should expose first realm if no default realm is not in the realmOptions list", () => {
+    realmService.realmOptions.set(["realm1", "realm2"]);
+    realmService.setDefaultRealm("someRealm");
+    expect(userService.selectedUserRealm()).toBe("realm1");
   });
 
   it("allUsernames exposes every user.username", () => {
@@ -138,6 +162,18 @@ describe("UserService", () => {
   it("displayUser returns the username for objects and echoes raw strings", () => {
     expect(userService.displayUser(alice)).toBe("Alice");
     expect(userService.displayUser("plainString")).toBe("plainString");
+  });
+
+  describe("pageSize", () => {
+    it("pageSize should be initialized with policy value", () => {
+      authServiceMock.userPageSize.set(20);
+      expect(userService.pageSize()).toBe(20);
+    });
+
+    it("pageSize should be 10 if policy value is invalid", () => {
+      authServiceMock.userPageSize.set(0);
+      expect(userService.pageSize()).toBe(10);
+    });
   });
 
   describe("user filtering", () => {
@@ -163,6 +199,7 @@ describe("UserService", () => {
 
   describe("attribute policy + attributes", () => {
     it("setUserAttribute issues POST /user/attribute with params", () => {
+      realmService.realmOptions.set(["realm1", "realm2"]);
       userService.setUserAttribute("department", "finance").subscribe();
 
       const req = httpMock.expectOne((r) => r.method === "POST" && r.url.endsWith("/user/attribute"));
@@ -175,6 +212,7 @@ describe("UserService", () => {
     });
 
     it("deleteUserAttribute issues DELETE /user/attribute/<key>/<user>/<realm> with proper encoding", () => {
+      realmService.realmOptions.set(["realm1", "r 1"]);
       userService.detailsUsername.set("Alice Smith");
       realmService.setDefaultRealm("r 1");
 
@@ -293,6 +331,8 @@ describe("UserService", () => {
 
       // tokenService.tokenDetailResource = new MockHttpResourceRef(undefined as any);
       userService.selectionFilter.set("");
+      userService.selectedUserRealm.set("realm1");
+      userService.usersResource = new MockHttpResourceRef(MockPiResponse.fromValue(users));
     });
 
     it("returns null when no token username, role != user, and selection filter empty", () => {
@@ -318,7 +358,7 @@ describe("UserService", () => {
       expect(userService.selectedUser()).toEqual(users[1]);
     });
 
-    it('when role is "user": returns the authenticated username', () => {
+    it("when role is 'user': returns the authenticated username", () => {
       authService.authData.set({ ...MockAuthService.MOCK_AUTH_DATA, role: "user", username: "Charlie" });
 
       userService.selectionFilter.set("");
@@ -363,6 +403,167 @@ describe("UserService", () => {
 
       expect(userService.userResource.value()).toBeDefined();
       expect(userService.usersResource.value()).toBeUndefined();
+    });
+  });
+
+  describe("users signal (list)", () => {
+    beforeEach(() => {
+      jest.spyOn(authServiceMock, "actionAllowed").mockImplementation((action: string) => action === "userlist");
+    });
+
+    it("should clear users when changing realm even if request fails", async () => {
+      contentServiceMock.routeUrl.set(ROUTE_PATHS.USERS);
+      userService.selectedUserRealm.set("other");
+      TestBed.flushEffects();
+      httpMock.match(() => true).forEach(r => r.flush({ result: { value: [] } }));
+
+      userService.selectedUserRealm.set("realm1");
+      userService.users();
+      TestBed.flushEffects();
+
+      const req1 = httpMock.expectOne((req) => req.url.includes("/user") && req.params.get("realm") === "realm1");
+      req1.flush(MockPiResponse.fromValue([buildUser("user1")]));
+      await Promise.resolve();
+      TestBed.flushEffects();
+
+      expect(userService.users()).toHaveLength(1);
+      expect(userService.users()[0].username).toBe("user1");
+
+      userService.selectedUserRealm.set("realm2");
+      userService.users();
+      TestBed.flushEffects();
+
+      expect(userService.users()).toHaveLength(0);
+
+      const req2 = httpMock.expectOne((req) => req.url.includes("/user") && req.params.get("realm") === "realm2");
+      req2.flush("Error", { status: 500, statusText: "Server Error" });
+      await Promise.resolve();
+      TestBed.flushEffects();
+
+      expect(userService.users()).toHaveLength(0);
+    });
+  });
+
+  describe("UserService createUser", () => {
+    it("should create user successfully", () => {
+      const resolver = "test";
+      const userData = { username: "new-user" } as any;
+      let resultValue: boolean | undefined;
+      userService.createUser(resolver, userData).subscribe(result => {
+        resultValue = result;
+      });
+      const req = httpMock.expectOne(r => r.method === "POST" && r.url.includes("/user/"));
+      req.flush({ result: { value: true, status: true } });
+      expect(resultValue).toBe(true);
+      expect(req.request.body).toEqual({ user: "new-user", resolver });
+    });
+
+    it("should handle shallow failure of creating user", () => {
+      const resolver = "test";
+      const userData = { username: "new-user" } as any;
+      let resultValue: boolean | undefined;
+      userService.createUser(resolver, userData).subscribe(result => {
+        resultValue = result;
+      });
+      const req = httpMock.expectOne(r => r.method === "POST" && r.url.includes("/user/"));
+      req.flush({ result: { value: true, status: false } });
+      expect(resultValue).toBe(false);
+      expect(req.request.body).toEqual({ user: "new-user", resolver });
+    });
+
+    it("should handle create user failure", () => {
+      const resolver = "test";
+      const userData = { username: "fail-user" } as any;
+      let resultValue: boolean | undefined;
+      userService.createUser(resolver, userData).subscribe(result => {
+        resultValue = result;
+      });
+      const req = httpMock.expectOne(r => r.method === "POST" && r.url.includes("/user/"));
+      req.flush({ result: { status: false, error: { message: "fail message" } } },
+        { status: 500, statusText: "Server Error" });
+      expect(resultValue).toBe(false);
+      expect(notificationServiceMock.openSnackBar).toHaveBeenCalledWith("Failed to create user fail-user. fail" +
+        " message");
+    });
+  });
+
+  describe("UserService editUser", () => {
+    it("should edit user successfully", () => {
+      const resolver = "test";
+      const userData = { username: "edit-user" } as any;
+      let resultValue: boolean | undefined;
+      userService.editUser(resolver, userData).subscribe(result => {
+        resultValue = result;
+      });
+      const req = httpMock.expectOne(r => r.method === "PUT" && r.url.includes("/user/"));
+      req.flush({ result: { value: true, status: true } });
+      expect(resultValue).toBe(true);
+      expect(req.request.body).toEqual({ user: "edit-user", resolver });
+    });
+
+    it("should handle shallow edit user failure", () => {
+      const resolver = "test";
+      const userData = { username: "edit-user" } as any;
+      let resultValue: boolean | undefined;
+      userService.editUser(resolver, userData).subscribe(result => {
+        resultValue = result;
+      });
+      const req = httpMock.expectOne(r => r.method === "PUT" && r.url.includes("/user/"));
+      req.flush({ result: { value: true, status: false } });
+      expect(resultValue).toBe(false);
+      expect(req.request.body).toEqual({ user: "edit-user", resolver });
+    });
+
+    it("should handle edit user failure", () => {
+      const resolver = "test";
+      const userData = { username: "fail-user" } as any;
+      let resultValue: boolean | undefined;
+      userService.editUser(resolver, userData).subscribe(result => {
+        resultValue = result;
+      });
+      const req = httpMock.expectOne(r => r.method === "PUT" && r.url.includes("/user/"));
+      req.flush({ result: { status: false, error: { message: "fail" } } }, { status: 500, statusText: "Server Error" });
+      expect(resultValue).toBe(false);
+      expect(notificationServiceMock.openSnackBar).toHaveBeenCalledWith("Failed to update user fail-user. fail");
+    });
+  });
+
+  describe("UserService deleteUser", () => {
+    it("should delete user successfully", () => {
+      const resolver = "test";
+      const username = "deleteuser";
+      let resultValue: boolean | undefined;
+      userService.deleteUser(resolver, username).subscribe(result => {
+        resultValue = result;
+      });
+      const req = httpMock.expectOne(r => r.method === "DELETE" && r.url.includes("/user/"));
+      req.flush({ result: { value: true, status: true } });
+      expect(resultValue).toBe(true);
+    });
+
+    it("should handle shallow failure", () => {
+      const resolver = "test";
+      const username = "deleteuser";
+      let resultValue: boolean | undefined;
+      userService.deleteUser(resolver, username).subscribe(result => {
+        resultValue = result;
+      });
+      const req = httpMock.expectOne(r => r.method === "DELETE" && r.url.includes("/user/"));
+      req.flush({ result: { value: true, status: false } });
+      expect(resultValue).toBe(false);
+    });
+
+    it("should handle delete user failure", () => {
+      const resolver = "test";
+      const username = "fail-user";
+      let resultValue: boolean | undefined;
+      userService.deleteUser(resolver, username).subscribe(result => {
+        resultValue = result;
+      });
+      const req = httpMock.expectOne(r => r.method === "DELETE" && r.url.includes("/user/"));
+      req.flush({ result: { error: { message: "fail" } } }, { status: 500, statusText: "Server Error" });
+      expect(resultValue).toBe(false);
+      expect(notificationServiceMock.openSnackBar).toHaveBeenCalledWith("Failed to delete user fail-user. fail");
     });
   });
 });

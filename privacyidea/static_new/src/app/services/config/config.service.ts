@@ -16,7 +16,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { inject, Injectable, signal } from "@angular/core";
+import { inject, Injectable, signal, WritableSignal } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { catchError } from "rxjs/operators";
 import { of } from "rxjs";
@@ -26,7 +26,7 @@ import { VersioningService, VersioningServiceInterface } from "../version/versio
 
 export interface AppConfig {
   remote_user: string;
-  force_remote_user: string;
+  force_remote_user: boolean;
   password_reset: boolean;
   hsm_ready: boolean;
   customization: string;
@@ -38,17 +38,23 @@ export interface AppConfig {
   login_text: string;
   gdpr_link: string;
   translation_warning: boolean;
+  passkey_login: string;
+}
+
+export interface ConfigServiceInterface {
+  config: WritableSignal<AppConfig>;
+  loadConfig(): void;
 }
 
 @Injectable({
   providedIn: "root"
 })
-export class ConfigService {
+export class ConfigService implements ConfigServiceInterface {
   private readonly versioningService: VersioningServiceInterface = inject(VersioningService);
   http: HttpClient = inject(HttpClient);
   config = signal({
     remote_user: "",
-    force_remote_user: "",
+    force_remote_user: false,
     password_reset: false,
     hsm_ready: false,
     customization: "",
@@ -59,11 +65,12 @@ export class ConfigService {
     has_job_queue: "false",
     login_text: "",
     gdpr_link: "",
-    translation_warning: false
+    translation_warning: false,
+    passkey_login: "show"
   });
 
   loadConfig() {
-    return this.http.get<PiResponse<Record<any, any>>>(environment.proxyUrl + "/config")
+    this.http.get<PiResponse<Record<any, any>>>(environment.proxyUrl + "/config")
       .pipe(
         catchError((error) => {
           console.error("Failed to load config:", error);
@@ -81,7 +88,7 @@ export class ConfigService {
       )
       .subscribe((data) => {
         this.config.set(data.result?.value as AppConfig);
-        this.versioningService.version.set(data.versionnumber);
+        this.versioningService.rawVersion.set(data.versionnumber);
       });
   }
 }

@@ -22,19 +22,31 @@ import { ChallengesTableComponent } from "./challenges-table.component";
 import { provideHttpClient } from "@angular/common/http";
 import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { ChallengesService } from "../../../services/token/challenges/challenges.service";
+import { NotificationService } from "../../../services/notification/notification.service";
+import { MockNotificationService } from "../../../../testing/mock-services";
+import { of, throwError } from "rxjs";
 
 describe("ChallengesTableComponent", () => {
   let component: ChallengesTableComponent;
   let fixture: ComponentFixture<ChallengesTableComponent>;
+  let challengesService: ChallengesService;
+  let mockNotificationService: MockNotificationService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ChallengesTableComponent, BrowserAnimationsModule],
-      providers: [provideHttpClient(), provideHttpClientTesting()]
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: NotificationService, useClass: MockNotificationService }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChallengesTableComponent);
     component = fixture.componentInstance;
+    challengesService = TestBed.inject(ChallengesService);
+    mockNotificationService = TestBed.inject(NotificationService) as unknown as MockNotificationService;
     fixture.detectChanges();
   });
 

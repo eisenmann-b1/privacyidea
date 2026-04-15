@@ -1,9 +1,9 @@
-@use "../../../../styles";
+@use "styles";
+@use "table";
 
 .assign-token-self-service-container {
-  display: grid;
-  @include styles.table-container-styles;
-  width: 49rem;
+  @include table.table-container-styles;
   max-height: var(--max-height);
   overflow: auto;
+  display: grid;
 }

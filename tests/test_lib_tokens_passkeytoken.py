@@ -33,7 +33,7 @@ from privacyidea.lib.fido2.util import get_credential_ids_for_user, get_fido2_to
 from privacyidea.lib.policies.actions import PolicyAction
 from privacyidea.lib.policy import SCOPE
 from privacyidea.lib.token import (init_token, remove_token, unassign_token, import_tokens, get_tokens)
-from privacyidea.lib.tokenclass import ROLLOUTSTATE, TokenClass
+from privacyidea.lib.tokenclass import RolloutState, TokenClass
 from privacyidea.lib.tokens.passkeytoken import PasskeyTokenClass
 from privacyidea.lib.user import User
 from privacyidea.models import TokenCredentialIdHash
@@ -55,7 +55,7 @@ class PasskeyTokenTestCase(PasskeyTestBase, MyTestCase):
         registration_request = self._initialize_registration()
         token = registration_request.token
         token.update(registration_request.registration_response)
-        self.assertEqual(token.token.rollout_state, ROLLOUTSTATE.ENROLLED)
+        self.assertEqual(token.token.rollout_state, RolloutState.ENROLLED)
         return token
 
     @dataclass(frozen=True)
@@ -69,7 +69,7 @@ class PasskeyTokenTestCase(PasskeyTestBase, MyTestCase):
             get_init_detail_options = {}
         token = init_token({"type": "passkey"}, user=self.user)
         self.assertIsInstance(token, PasskeyTokenClass)
-        self.assertEqual(token.rollout_state, ROLLOUTSTATE.CLIENTWAIT)
+        self.assertEqual(token.rollout_state, RolloutState.CLIENTWAIT)
         param = {}
         if get_init_detail_options:
             param.update(get_init_detail_options)
@@ -157,7 +157,7 @@ class PasskeyTokenTestCase(PasskeyTestBase, MyTestCase):
         self.assertIn("details", update_response)
         self.assertEqual(update_response["details"]["serial"], self.first_serial)
         # Verify that the token is enrolled and token info was written
-        self.assertEqual(token.rollout_state, ROLLOUTSTATE.ENROLLED)
+        self.assertEqual(token.rollout_state, RolloutState.ENROLLED)
         token_info = token.get_tokeninfo()
         self.assertTrue(token_info["credential_id_hash"])
         self.assertTrue(token_info["public_key"])
@@ -269,7 +269,7 @@ class PasskeyTokenTestCase(PasskeyTestBase, MyTestCase):
         self.assertIn("User must be provided", ex.exception.message)
 
         # Invalid enrollment state returns empty init detail
-        token.token.rollout_state = ROLLOUTSTATE.PENDING
+        token.token.rollout_state = RolloutState.PENDING
         init_detail = token.get_init_detail(param)
         self.assertFalse(init_detail)
         remove_token(serial=token.get_serial())
@@ -308,6 +308,63 @@ class PasskeyTokenTestCase(PasskeyTestBase, MyTestCase):
         authentication_response["signature"] = authentication_response["signature"].replace("a", "b")
         verification_result = verify_fido2_challenge(challenge["transaction_id"], token, authentication_response)
         self.assertEqual(verification_result.success, -1)
+        remove_token(serial=token.get_serial())
+
+    def test_07b_legacy_challenge_data_key_is_still_enforced(self):
+        """
+        Challenges stored with the old "user_verification" key (before the storage key was changed
+        to FIDO2PolicyAction.USER_VERIFICATION_REQUIREMENT) must still be read correctly by
+        verify_fido2_challenge. The bug was that check_otp only knows the constant, so without
+        the translation the UV requirement would silently fall back to "preferred".
+        """
+        from privacyidea.lib.challenge import get_challenges
+        from unittest.mock import patch
+
+        token = self._create_token()
+
+        # Simulate a challenge written by old code — overwrite the data with the legacy key
+        challenge = self._initialize_authentication()
+        db_challenges = get_challenges(transaction_id=challenge["transaction_id"])
+        self.assertEqual(len(db_challenges), 1)
+        db_challenges[0].set_data({"user_verification": "preferred"})
+        db_challenges[0].save()
+
+        # capture check_otp to confirm the key is translated before being passed on
+        captured_options = {}
+        original_check_otp = token.check_otp
+
+        def capturing_check_otp(otpval, options=None, **kwargs):
+            captured_options.update(options or {})
+            return original_check_otp(otpval, options=options, **kwargs)
+
+        authentication_response = self.authentication_response_no_uv
+        authentication_response["HTTP_ORIGIN"] = self.expected_origin
+
+        with patch.object(token, "check_otp", side_effect=capturing_check_otp):
+            result = verify_fido2_challenge(challenge["transaction_id"], token, authentication_response)
+
+        # check_otp must receive the right key with the value read from the legacy challenge
+        self.assertIn(FIDO2PolicyAction.USER_VERIFICATION_REQUIREMENT, captured_options)
+        self.assertEqual(captured_options[FIDO2PolicyAction.USER_VERIFICATION_REQUIREMENT], "preferred")
+        # and the old key must not leak through
+        self.assertNotIn("user_verification", captured_options)
+
+        # "preferred" + no UV bit -> success
+        self.assertEqual(result.success, 1)
+
+        # "required" + no UV bit -> fail. recreate token since successful auth deletes the challenge
+        token = self._create_token()
+        challenge = self._initialize_authentication()
+        db_challenges = get_challenges(transaction_id=challenge["transaction_id"])
+        self.assertEqual(len(db_challenges), 1)
+        db_challenges[0].set_data({"user_verification": "required"})
+        db_challenges[0].save()
+
+        authentication_response = self.authentication_response_no_uv
+        authentication_response["HTTP_ORIGIN"] = self.expected_origin
+        result = verify_fido2_challenge(challenge["transaction_id"], token, authentication_response)
+        self.assertEqual(result.success, -1)
+
         remove_token(serial=token.get_serial())
 
     def test_08_no_tokencredentialidhash_entry(self):

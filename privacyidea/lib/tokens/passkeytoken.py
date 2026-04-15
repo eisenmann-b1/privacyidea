@@ -36,12 +36,12 @@ from webauthn.helpers.structs import (AttestationConveyancePreference, Authentic
                                       PublicKeyCredentialCreationOptions)
 from webauthn.registration.verify_registration_response import VerifiedRegistration
 
-from privacyidea.api.lib.utils import get_optional, get_required, get_required_one_of, get_optional_one_of
+from privacyidea.lib.params import get_optional, get_required, get_required_one_of, get_optional_one_of
 from privacyidea.lib import _, fido2
 from privacyidea.lib.challenge import get_challenges
 from privacyidea.lib.config import get_from_config
 from privacyidea.lib.decorators import check_token_locked
-from privacyidea.lib.error import EnrollmentError, ParameterError, ERROR
+from privacyidea.lib.error import EnrollmentError, ParameterError, Error
 from privacyidea.lib.fido2.config import FIDO2ConfigOptions
 from privacyidea.lib.fido2.policy_action import FIDO2PolicyAction, PasskeyAction
 from privacyidea.lib.fido2.token_info import FIDO2TokenInfo
@@ -49,7 +49,7 @@ from privacyidea.lib.fido2.util import hash_credential_id, save_credential_id_ha
 from privacyidea.lib.log import log_with
 from privacyidea.lib.policies.actions import PolicyAction
 from privacyidea.lib.policy import SCOPE
-from privacyidea.lib.tokenclass import TokenClass, ROLLOUTSTATE, CLIENTMODE, AUTHENTICATIONMODE
+from privacyidea.lib.tokenclass import TokenClass, RolloutState, ClientMode, AuthenticationMode
 from privacyidea.models import Challenge
 
 log = logging.getLogger(__name__)
@@ -66,8 +66,8 @@ class PasskeyTokenClass(TokenClass):
         - USER_VERIFICATION_REQUIREMENT (default: PREFERRED)
         - PUBLIC_KEY_CREDENTIAL_ALGORITHMS (default: ECDSA_SHA_256, RSASSA_PKCS1_v1_5_SHA_256)
     """
-    mode = [AUTHENTICATIONMODE.CHALLENGE]
-    client_mode = CLIENTMODE.WEBAUTHN
+    mode = [AuthenticationMode.CHALLENGE]
+    client_mode = ClientMode.WEBAUTHN
 
     def __init__(self, db_token):
         super().__init__(db_token)
@@ -140,11 +140,11 @@ class PasskeyTokenClass(TokenClass):
         - FIDO2PolicyAction.USER_VERIFICATION_REQUIREMENT (default: PREFERRED)
         - PasskeyAction.AttestationConveyancePreference (default: NONE)
         """
-        if self.token.rollout_state == ROLLOUTSTATE.CLIENTWAIT:
+        if self.token.rollout_state == RolloutState.CLIENTWAIT:
             token_user = self.user or user
             if not token_user:
                 raise ParameterError("User must be provided for passkey enrollment!",
-                                     id=ERROR.PARAMETER_USER_MISSING)
+                                     id=Error.PARAMETER_USER_MISSING)
 
             rp_id = get_required(params, FIDO2PolicyAction.RELYING_PARTY_ID)
             rp_name = get_required(params, FIDO2PolicyAction.RELYING_PARTY_NAME)
@@ -244,14 +244,14 @@ class PasskeyTokenClass(TokenClass):
         attestation = get_optional(param, "attestationObject")
         client_data = get_optional(param, "clientDataJSON")
 
-        if not (attestation and client_data) and not self.token.rollout_state == ROLLOUTSTATE.CLIENTWAIT:
-            self.token.rollout_state = ROLLOUTSTATE.CLIENTWAIT
+        if not (attestation and client_data) and not self.token.rollout_state == RolloutState.CLIENTWAIT:
+            self.token.rollout_state = RolloutState.CLIENTWAIT
             self.token.active = False
             # Set the description in the first enrollment step
             if "description" in param:
                 self.set_description(param["description"])
 
-        elif attestation and client_data and self.token.rollout_state == ROLLOUTSTATE.CLIENTWAIT:
+        elif attestation and client_data and self.token.rollout_state == RolloutState.CLIENTWAIT:
             # Finalize the registration by verifying the registration data from the authenticator
             credential_id = get_required(param, "credential_id")
             credential_id_raw = get_required(param, "rawId")
@@ -298,7 +298,7 @@ class PasskeyTokenClass(TokenClass):
             response_detail.update({PolicyAction.ENROLL_VIA_MULTICHALLENGE: evm_value})
 
             # Verification successful, set the token to enrolled and save information returned by the authenticator
-            self.token.rollout_state = ROLLOUTSTATE.ENROLLED
+            self.token.rollout_state = RolloutState.ENROLLED
             # Protect the credential_id by setting it as the token secret
             self.set_otpkey(bytes_to_base64url(registration_verification.credential_id))
 
@@ -356,7 +356,8 @@ class PasskeyTokenClass(TokenClass):
                         - "userHandle" or "userhandle"
                         - "HTTP_ORIGIN"
                         The following keys are optional:
-                        - "webauthn_user_verification_requirement", defaults to preferred
+                        - "webauthn_user_verification_requirement" (FIDO2PolicyAction.USER_VERIFICATION_REQUIREMENT),
+                          defaults to preferred
 
         :type options: dict
         :return: A numerical value where values larger than zero indicate success.
@@ -368,8 +369,7 @@ class PasskeyTokenClass(TokenClass):
         user_handle = get_optional_one_of(options, ["userHandle", "userhandle"])
         expected_challenge = get_required(options, "challenge").encode("utf-8")
         expected_origin = get_required(options, "HTTP_ORIGIN")
-        user_verification = get_optional(options, "user_verification", "preferred")
-
+        user_verification = get_optional(options, FIDO2PolicyAction.USER_VERIFICATION_REQUIREMENT, "preferred")
         credential_id = self.token.get_otpkey().getKey().decode("utf-8")
         rp_id = self.get_tokeninfo(FIDO2TokenInfo.RELYING_PARTY_ID)
 
@@ -463,13 +463,13 @@ class PasskeyTokenClass(TokenClass):
         authentication could be made.
         """
         try:
-            authenticator_data = get_required_one_of(options, ["authenticatorData", "authenticatordata"])
-            client_data_json = get_required_one_of(options, ["clientDataJSON", "clientdata"])
-            signature = get_required_one_of(options, ["signature", "signaturedata"])
-            user_handle = get_optional_one_of(options, ["userHandle", "userhandle"])
-            expected_challenge = get_required(options, "challenge").encode("utf-8")
-            expected_origin = get_required(options, "HTTP_ORIGIN")
-            user_verification = get_optional(options, "user_verification", "preferred")
+            get_required_one_of(options, ["authenticatorData", "authenticatordata"])
+            get_required_one_of(options, ["clientDataJSON", "clientdata"])
+            get_required_one_of(options, ["signature", "signaturedata"])
+            get_optional_one_of(options, ["userHandle", "userhandle"])
+            get_required(options, "challenge")
+            get_required(options, "HTTP_ORIGIN")
+            get_optional(options, FIDO2PolicyAction.USER_VERIFICATION_REQUIREMENT, "preferred")
         except ParameterError as e:
             log.debug(f"Missing parameter for authentication with passkey: {e}")
             # TODO authenticate has horrible return values

@@ -1,5 +1,5 @@
 /**
- * (c) NetKnights GmbH 2025,  https://netknights.it
+ * (c) NetKnights GmbH 2026,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -17,46 +17,55 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { Injectable } from "@angular/core";
-import { TokenApiPayloadMapper, TokenEnrollmentData, TokenEnrollmentPayload } from "./_token-api-payload.mapper";
+import {
+  BaseApiPayloadMapper,
+  TokenApiPayloadMapper,
+  TokenEnrollmentData,
+  TokenEnrollmentPayload
+} from "./_token-api-payload.mapper";
+import { TokenDetails } from "../../services/token/token.service";
 
 export interface YubikeyEnrollmentData extends TokenEnrollmentData {
   type: "yubikey";
-  otpKey: string | null;
-  otpLength: number | null;
+  otpKey: string;
+  otpLength: number;
 }
 
 export interface YubikeyEnrollmentPayload extends TokenEnrollmentPayload {
-  otpkey: string | null;
-  otplen: number | null;
+  otpkey: string;
+  otplen: number;
 }
 
 @Injectable({ providedIn: "root" })
-export class YubikeyApiPayloadMapper implements TokenApiPayloadMapper<YubikeyEnrollmentData> {
-  toApiPayload(data: YubikeyEnrollmentData): YubikeyEnrollmentPayload {
+export class YubikeyApiPayloadMapper
+  extends BaseApiPayloadMapper
+  implements TokenApiPayloadMapper<YubikeyEnrollmentData>
+{
+  override toApiPayload(data: YubikeyEnrollmentData): YubikeyEnrollmentPayload {
+    const basePayload = super.toApiPayload(data);
     const payload: YubikeyEnrollmentPayload = {
-      type: data.type,
-      description: data.description,
-      container_serial: data.containerSerial,
-      validity_period_start: data.validityPeriodStart,
-      validity_period_end: data.validityPeriodEnd,
-      user: data.user,
-      realm: data.user ? data.realm : null,
-      pin: data.pin,
-      // otpLength from component is number | null. Payload otplen is number | null.
-      otplen: data.otpLength,
-      // otpKey from component is string | null. Payload otpkey is string | null.
+      ...basePayload,
+      otplen: Number(data.otpLength),
       otpkey: data.otpKey
     };
 
     if (data.onlyAddToRealm) {
       payload.realm = data.realm;
-      payload.user = null;
+      delete payload.user;
     }
     return payload;
   }
 
-  fromApiPayload(payload: any): YubikeyEnrollmentData {
-    // Placeholder: Implement transformation from API payload. We will replace this later.
+  override fromApiPayload(payload: any): YubikeyEnrollmentData {
     return payload as YubikeyEnrollmentData;
+  }
+
+  override fromTokenDetailsToEnrollmentData(details: TokenDetails): YubikeyEnrollmentData {
+    return {
+      ...super.fromTokenDetailsToEnrollmentData(details),
+      type: "yubikey",
+      otpKey: "",
+      otpLength: details.otplen !== undefined ? Number(details.otplen) : 0
+    };
   }
 }

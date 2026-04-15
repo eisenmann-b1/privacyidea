@@ -16,34 +16,38 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
+
+import { CommonModule } from "@angular/common";
 import { Component, effect, inject, OnDestroy, OnInit, signal } from "@angular/core";
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { MatButtonModule } from "@angular/material/button";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { Router } from "@angular/router";
+import { SaveAndExitDialogComponent } from "@components/shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
+import { ROUTE_PATHS } from "src/app/route_paths";
+import { AuthService, AuthServiceInterface } from "src/app/services/auth/auth.service";
+import { ContentService, ContentServiceInterface } from "src/app/services/content/content.service";
+import { DialogService, DialogServiceInterface } from "src/app/services/dialog/dialog.service";
+import { PendingChangesService } from "src/app/services/pending-changes/pending-changes.service";
+import { ClearableInputComponent } from "../../../shared/clearable-input/clearable-input.component";
 import {
   PrivacyideaServer,
   PrivacyideaServerService,
   PrivacyideaServerServiceInterface
-} from "../../../../services/privacyidea-server/privacyidea-server.service";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
-import { MatCheckboxModule } from "@angular/material/checkbox";
-import { MatButtonModule } from "@angular/material/button";
-import { CommonModule } from "@angular/common";
-import { MatIconModule } from "@angular/material/icon";
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import {
-  ConfirmationDialogComponent,
-  ConfirmationDialogResult
-} from "../../../shared/confirmation-dialog/confirmation-dialog.component";
-import { ROUTE_PATHS } from "../../../../route_paths";
-import { Router } from "@angular/router";
-import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
-import { PendingChangesService } from "../../../../services/pending-changes/pending-changes.service";
-import { AuthService, AuthServiceInterface } from "../../../../services/auth/auth.service";
+} from "src/app/services/privacyidea-server/privacyidea-server.service";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "../../../../constants/global.constants";
 
 @Component({
   selector: "app-privacyidea-edit-dialog",
   standalone: true,
+  host: {
+    class: NAVIGATION_ACCESSIBLE_DIALOG_CLASS
+  },
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -53,7 +57,8 @@ import { AuthService, AuthServiceInterface } from "../../../../services/auth/aut
     MatCheckboxModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    ClearableInputComponent
   ],
   templateUrl: "./new-privacyidea-server.component.html",
   styleUrl: "./new-privacyidea-server.component.scss"
@@ -63,7 +68,7 @@ export class NewPrivacyideaServerComponent implements OnInit, OnDestroy {
   private readonly dialogRef = inject(MatDialogRef<NewPrivacyideaServerComponent>);
   protected readonly data = inject<PrivacyideaServer | null>(MAT_DIALOG_DATA);
   protected readonly privacyideaServerService: PrivacyideaServerServiceInterface = inject(PrivacyideaServerService);
-  private readonly dialog = inject(MatDialog);
+  private readonly dialogService: DialogServiceInterface = inject(DialogService);
   private readonly router = inject(Router);
   private readonly contentService: ContentServiceInterface = inject(ContentService);
   private readonly pendingChangesService = inject(PendingChangesService);
@@ -79,7 +84,7 @@ export class NewPrivacyideaServerComponent implements OnInit, OnDestroy {
       this.dialogRef.backdropClick().subscribe(() => {
         this.onCancel();
       });
-      this.dialogRef.keydownEvents().subscribe(event => {
+      this.dialogRef.keydownEvents().subscribe((event) => {
         if (event.key === "Escape") {
           this.onCancel();
         }
@@ -88,6 +93,7 @@ export class NewPrivacyideaServerComponent implements OnInit, OnDestroy {
 
     this.pendingChangesService.registerHasChanges(() => this.hasChanges);
     this.pendingChangesService.registerSave(() => this.save());
+    this.pendingChangesService.registerValidChanges(() => this.canSave);
 
     effect(() => {
       if (!this.contentService.routeUrl().startsWith(ROUTE_PATHS.EXTERNAL_SERVICES_PRIVACYIDEA)) {
@@ -101,7 +107,7 @@ export class NewPrivacyideaServerComponent implements OnInit, OnDestroy {
   }
 
   get canSave(): boolean {
-    return this.authService.rights().includes("privacyidea_write") && this.privacyideaForm.valid;
+    return this.authService.actionAllowed("privacyideaserver_write") && this.privacyideaForm.valid;
   }
 
   ngOnInit(): void {
@@ -121,17 +127,23 @@ export class NewPrivacyideaServerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.pendingChangesService.unregisterHasChanges();
+    this.pendingChangesService.clearAllRegistrations();
   }
 
-  save(): Promise<void> | void {
-    if (this.privacyideaForm.valid) {
-      const server: PrivacyideaServer = {
-        ...this.privacyideaForm.getRawValue()
-      };
-      return this.privacyideaServerService.postPrivacyideaServer(server).then(() => {
-        this.dialogRef.close(true);
-      });
+  async save(): Promise<boolean> {
+    if (this.privacyideaForm.invalid) {
+      return false;
+    }
+
+    const server: PrivacyideaServer = {
+      ...this.privacyideaForm.getRawValue()
+    };
+    try {
+      await this.privacyideaServerService.postPrivacyideaServer(server);
+      this.dialogRef.close(true);
+      return true;
+    } catch (error) {
+      return false;
     }
   }
 
@@ -146,36 +158,36 @@ export class NewPrivacyideaServerComponent implements OnInit, OnDestroy {
   }
 
   onCancel(): void {
-    if (this.hasChanges) {
-      this.dialog
-        .open(ConfirmationDialogComponent, {
-          data: {
-            title: $localize`Discard changes`,
-            action: "discard",
-            type: "privacyidea-server",
-            allowSaveExit: true,
-            saveExitDisabled: !this.canSave
-          }
-        })
-        .afterClosed()
-        .subscribe((result: ConfirmationDialogResult | undefined) => {
-          if (result === "discard") {
-            this.pendingChangesService.unregisterHasChanges();
-            this.closeActual();
-          } else if (result === "save-exit") {
-            if (!this.canSave) return;
-            Promise.resolve(this.pendingChangesService.save()).then(() => {
-              this.pendingChangesService.unregisterHasChanges();
-              this.closeActual();
-            });
-          }
-        });
-    } else {
-      this.closeActual();
+    if (!this.hasChanges) {
+      this.closeCurrent();
+      return;
     }
+    this.dialogService
+      .openDialog({
+        component: SaveAndExitDialogComponent,
+        data: {
+          allowSaveExit: true,
+          saveExitDisabled: !this.canSave
+        }
+      })
+      .afterClosed()
+      .subscribe((result) => {
+        if (result === "discard") {
+          this.pendingChangesService.clearAllRegistrations();
+          this.closeCurrent();
+        } else if (result == "save-exit") {
+          if (!this.canSave) return;
+          Promise.resolve(this.pendingChangesService.save()).then((success) => {
+            if (success) {
+              this.pendingChangesService.clearAllRegistrations();
+              this.closeCurrent();
+            }
+          });
+        }
+      });
   }
 
-  private closeActual(): void {
+  private closeCurrent(): void {
     if (this.dialogRef) {
       this.dialogRef.close();
     } else {

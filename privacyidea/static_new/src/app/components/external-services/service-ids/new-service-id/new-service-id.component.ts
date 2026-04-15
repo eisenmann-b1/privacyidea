@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { Component, effect, inject, OnDestroy, OnInit } from "@angular/core";
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import {
   ServiceId,
@@ -29,18 +29,22 @@ import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
 import { CommonModule } from "@angular/common";
 import { MatIconModule } from "@angular/material/icon";
-import {
-  ConfirmationDialogComponent,
-  ConfirmationDialogResult
-} from "../../../shared/confirmation-dialog/confirmation-dialog.component";
+
 import { ROUTE_PATHS } from "../../../../route_paths";
 import { Router } from "@angular/router";
 import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
 import { PendingChangesService } from "../../../../services/pending-changes/pending-changes.service";
+import { SaveAndExitDialogComponent } from "../../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
+import { DialogServiceInterface, DialogService } from "../../../../services/dialog/dialog.service";
+import { ClearableInputComponent } from "../../../shared/clearable-input/clearable-input.component";
+import { NAVIGATION_ACCESSIBLE_DIALOG_CLASS } from "../../../../constants/global.constants";
 
 @Component({
   selector: "app-new-service-id",
   standalone: true,
+  host: {
+    class: NAVIGATION_ACCESSIBLE_DIALOG_CLASS
+  },
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -48,7 +52,8 @@ import { PendingChangesService } from "../../../../services/pending-changes/pend
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    ClearableInputComponent
   ],
   templateUrl: "./new-service-id.component.html",
   styleUrl: "./new-service-id.component.scss"
@@ -58,7 +63,7 @@ export class NewServiceIdComponent implements OnInit, OnDestroy {
   private readonly dialogRef = inject(MatDialogRef<NewServiceIdComponent>);
   protected readonly data = inject<ServiceId | null>(MAT_DIALOG_DATA);
   protected readonly serviceIdService: ServiceIdServiceInterface = inject(ServiceIdService);
-  private readonly dialog = inject(MatDialog);
+  private readonly dialogService: DialogServiceInterface = inject(DialogService);
   private readonly router = inject(Router);
   private readonly contentService: ContentServiceInterface = inject(ContentService);
   private readonly pendingChangesService = inject(PendingChangesService);
@@ -72,7 +77,7 @@ export class NewServiceIdComponent implements OnInit, OnDestroy {
       this.dialogRef.backdropClick().subscribe(() => {
         this.onCancel();
       });
-      this.dialogRef.keydownEvents().subscribe(event => {
+      this.dialogRef.keydownEvents().subscribe((event) => {
         if (event.key === "Escape") {
           this.onCancel();
         }
@@ -81,6 +86,7 @@ export class NewServiceIdComponent implements OnInit, OnDestroy {
 
     this.pendingChangesService.registerHasChanges(() => this.hasChanges);
     this.pendingChangesService.registerSave(() => this.save());
+    this.pendingChangesService.registerValidChanges(() => this.canSave);
 
     effect(() => {
       if (!this.contentService.routeUrl().startsWith(ROUTE_PATHS.EXTERNAL_SERVICES_SERVICE_IDS)) {
@@ -110,51 +116,56 @@ export class NewServiceIdComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.pendingChangesService.unregisterHasChanges();
+    this.pendingChangesService.clearAllRegistrations();
   }
 
-  save(): Promise<void> | void {
-    if (this.serviceIdForm.valid) {
-      const serviceId: ServiceId = {
-        ...this.serviceIdForm.getRawValue()
-      };
-      return this.serviceIdService.postServiceId(serviceId).then(() => {
-        this.dialogRef.close(true);
-      });
+  async save(): Promise<boolean> {
+    if (this.serviceIdForm.invalid) {
+      return false;
+    }
+    const serviceId: ServiceId = {
+      ...this.serviceIdForm.getRawValue()
+    };
+
+    try {
+      await this.serviceIdService.postServiceId(serviceId);
+      this.dialogRef.close(true);
+      return true;
+    } catch (error) {
+      return false;
     }
   }
 
   onCancel(): void {
     if (this.hasChanges) {
-      this.dialog
-        .open(ConfirmationDialogComponent, {
+      this.dialogService
+        .openDialog({
+          component: SaveAndExitDialogComponent,
           data: {
-            title: $localize`Discard changes`,
-            action: "discard",
-            type: "service-id",
             allowSaveExit: true,
             saveExitDisabled: !this.canSave
           }
         })
         .afterClosed()
-        .subscribe((result: ConfirmationDialogResult | undefined) => {
+        .subscribe((result) => {
           if (result === "discard") {
-            this.pendingChangesService.unregisterHasChanges();
-            this.closeActual();
+            this.pendingChangesService.clearAllRegistrations();
+            this.closeCurrent();
           } else if (result === "save-exit") {
             if (!this.canSave) return;
-            Promise.resolve(this.pendingChangesService.save()).then(() => {
-              this.pendingChangesService.unregisterHasChanges();
-              this.closeActual();
+            Promise.resolve(this.pendingChangesService.save()).then((success) => {
+              if (!success) return;
+              this.pendingChangesService.clearAllRegistrations();
+              this.closeCurrent();
             });
           }
         });
     } else {
-      this.closeActual();
+      this.closeCurrent();
     }
   }
 
-  private closeActual(): void {
+  private closeCurrent(): void {
     if (this.dialogRef) {
       this.dialogRef.close();
     } else {

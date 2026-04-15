@@ -29,9 +29,11 @@ export interface ContentServiceInterface {
   previousUrl: Signal<string>;
   tokenSerial: WritableSignal<string>;
   containerSerial: WritableSignal<string>;
+  machineResolver: WritableSignal<string>;
 
   onLogin: Signal<boolean>;
   onAudit: Signal<boolean>;
+  onClients: Signal<boolean>;
   onTokens: Signal<boolean>;
   onUsers: Signal<boolean>;
   onPolicies: Signal<boolean>;
@@ -39,6 +41,7 @@ export interface ContentServiceInterface {
   onUserDetails: Signal<boolean>;
   onUserRealms: Signal<boolean>;
   onTokensEnrollment: Signal<boolean>;
+  onTokenEnrollmentLikely: Signal<boolean>;
   onTokensChallenges: Signal<boolean>;
   onTokensApplications: Signal<boolean>;
   onTokensGetSerial: Signal<boolean>;
@@ -53,10 +56,26 @@ export interface ContentServiceInterface {
   onAnyUsersRoute: Signal<boolean>;
   onTokensContainersTemplates: Signal<boolean>;
   onEvents: Signal<boolean>;
+  onConfigurationSystem: Signal<boolean>;
+  onConfigurationTokenTypes: Signal<boolean>;
+  onConfigurationMachines: Signal<boolean>;
+
+  onExternalSmtp: Signal<boolean>;
+  onExternalRadius: Signal<boolean>;
+  onExternalSms: Signal<boolean>;
+  onExternalCaConnectors: Signal<boolean>;
+  onExternalPrivacyIdea: Signal<boolean>;
+  onExternalTokenGroups: Signal<boolean>;
+  onExternalServiceIds: Signal<boolean>;
+  onUsersResolvers: Signal<boolean>;
+  onConfigurationPeriodicTasks: Signal<boolean>;
+  onConfigurationSubscription: Signal<boolean>;
+  onMachineResolver: Signal<boolean>;
 
   tokenSelected: (serial: string) => void;
   containerSelected: (containerSerial: string) => void;
   userSelected: (username: string, realm: string) => void;
+  machineResolverSelected: (resolverName: string) => void;
 }
 
 @Injectable({ providedIn: "root" })
@@ -76,8 +95,10 @@ export class ContentService implements ContentServiceInterface {
   readonly previousUrl = computed(() => this._urlPair()[0]);
   tokenSerial = signal("");
   containerSerial = signal("");
+  machineResolver = signal("");
   onLogin = computed(() => this.routeUrl() === ROUTE_PATHS.LOGIN);
   onAudit = computed(() => this.routeUrl() === ROUTE_PATHS.AUDIT);
+  onClients = computed(() => this.routeUrl() === ROUTE_PATHS.CLIENTS);
   onTokens = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS);
   onUsers = computed(() => this.routeUrl() === ROUTE_PATHS.USERS);
   onPolicies = computed(() => this.routeUrl() === ROUTE_PATHS.POLICIES);
@@ -85,6 +106,10 @@ export class ContentService implements ContentServiceInterface {
   onUserDetails = computed(() => this.routeUrl().startsWith(ROUTE_PATHS.USERS_DETAILS + "/"));
   onUserRealms = computed(() => this.routeUrl() === ROUTE_PATHS.USERS_REALMS);
   onTokensEnrollment = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_ENROLLMENT);
+  onTokenEnrollmentLikely = computed(() =>
+    // allow token details for rollover
+    this.onTokensEnrollment() || this.onTokenDetails() || this.onTokensWizard() || this.onTokensContainersTemplates()
+  );
   onTokensChallenges = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_CHALLENGES);
   onTokensApplications = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_APPLICATIONS);
   onTokensGetSerial = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_GET_SERIAL);
@@ -103,6 +128,21 @@ export class ContentService implements ContentServiceInterface {
   );
   onTokensContainersTemplates = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_CONTAINERS_TEMPLATES);
   onEvents = computed(() => this.routeUrl() === ROUTE_PATHS.EVENTS);
+  onConfigurationSystem = computed(() => this.routeUrl() === ROUTE_PATHS.CONFIGURATION_SYSTEM);
+  onConfigurationTokenTypes = computed(() => this.routeUrl() === ROUTE_PATHS.CONFIGURATION_TOKENTYPES);
+  onConfigurationMachines = computed(() => this.routeUrl() === ROUTE_PATHS.CONFIGURATION_MACHINES);
+
+  onExternalSmtp = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SMTP);
+  onExternalRadius = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_RADIUS);
+  onExternalSms = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SMS);
+  onExternalCaConnectors = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_CA_CONNECTORS);
+  onExternalPrivacyIdea = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_PRIVACYIDEA);
+  onExternalTokenGroups = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_TOKENGROUPS);
+  onExternalServiceIds = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SERVICE_IDS);
+  onUsersResolvers = computed(() => this.routeUrl() === ROUTE_PATHS.USERS_RESOLVERS);
+  onConfigurationPeriodicTasks = computed(() => this.routeUrl() === ROUTE_PATHS.CONFIGURATION_PERIODIC_TASKS);
+  onConfigurationSubscription = computed(() => this.routeUrl() === ROUTE_PATHS.SUBSCRIPTION);
+  onMachineResolver = computed(() => this.routeUrl() === ROUTE_PATHS.MACHINE_RESOLVER);
 
   tokenSelected(serial: string): void {
     this.router.navigateByUrl(ROUTE_PATHS.TOKENS_DETAILS + serial);
@@ -117,5 +157,10 @@ export class ContentService implements ContentServiceInterface {
   userSelected(username: string, realm: string): void {
     this.router.navigateByUrl(ROUTE_PATHS.USERS_DETAILS + "/" + username + `?realm=${encodeURIComponent(realm ?? "")}`);
     this.detailsUsername.set(username);
+  }
+
+  machineResolverSelected(resolverName: string): void {
+    this.router.navigateByUrl(ROUTE_PATHS.MACHINE_RESOLVER);
+    this.machineResolver.set(resolverName);
   }
 }

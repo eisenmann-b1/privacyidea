@@ -3,10 +3,10 @@ This tests the file api.lib.utils
 """
 from .base import MyApiTestCase
 
-from privacyidea.api.lib.utils import (getParam,
-                                       check_policy_name,
-                                       verify_auth_token, is_fqdn, attestation_certificate_allowed,
-                                       get_priority_from_param)
+from privacyidea.api.lib.utils import (check_policy_name,
+                                       verify_auth_token, is_fqdn,
+                                       attestation_certificate_allowed, get_priority_from_param,
+                                       get_required_one_of, get_optional_one_of, get_required, get_optional)
 from privacyidea.lib.policy import SCOPE, set_policy, delete_policy
 from privacyidea.lib.policies.actions import PolicyAction
 from privacyidea.lib.user import User
@@ -23,19 +23,23 @@ from privacyidea.lib.token import init_token, remove_token
 class UtilsTestCase(MyApiTestCase):
 
     def test_01_getParam(self):
-        s = getParam({"serial": ""}, "serial", optional=False, allow_empty=True)
+        # allow_empty=True: empty string is returned as-is for required params
+        s = get_required({"serial": ""}, "serial", allow_empty=True)
         self.assertEqual(s, "")
 
-        self.assertRaises(ParameterError, getParam, {"serial": ""}, "serial", optional=False, allow_empty=False)
+        # allow_empty=False (default): empty string raises ParameterError
+        self.assertRaises(ParameterError, get_required, {"serial": ""}, "serial")
 
-        # check for allowed values
-        v = getParam({"sslverify": "0"}, "sslverify", allowed_values=["0", "1"], default="1")
+        # check for allowed_values: value in list is returned
+        v = get_optional({"sslverify": "0"}, "sslverify", allowed_values=["0", "1"], default="1")
         self.assertEqual("0", v)
 
-        v = getParam({"sslverify": "rogue value"}, "sslverify", allowed_values=["0", "1"], default="1")
+        # check for allowed_values: rogue value falls back to default
+        v = get_optional({"sslverify": "rogue value"}, "sslverify", allowed_values=["0", "1"], default="1")
         self.assertEqual("1", v)
 
-        v = getParam({}, "sslverify", allowed_values=["0", "1"], default="1")
+        # check for allowed_values: missing key returns default
+        v = get_optional({}, "sslverify", allowed_values=["0", "1"], default="1")
         self.assertEqual("1", v)
 
     def test_02_check_policy_name(self):
@@ -156,7 +160,7 @@ class UtilsTestCase(MyApiTestCase):
                                 key=key,
                                 algorithm="RS256")
 
-        # The authenticated but non-existing user tries for fetch his tokens
+        # The authenticated but non-existing user tries to fetch his tokens
         with self.app.test_request_context('/token/',
                                            method='GET',
                                            headers={"Authorization": auth_token}):
@@ -372,3 +376,46 @@ class UtilsTestCase(MyApiTestCase):
         remove_token(serial='spass1d')
         delete_policy('otppin')
         # TODO: check if unquoting of url-params (view-args) should be considered as well
+
+
+    def test_10_get_required_one_of(self):
+        params = {"a": "1", "b": "2", "e": ""}
+        self.assertEqual(get_required_one_of(params, ["a", "b"]), "1")
+        self.assertEqual(get_required_one_of(params, ["b", "a"]), "2")
+        self.assertEqual(get_required_one_of(params, ["c", "b"]), "2")
+
+        self.assertRaises(ParameterError, get_required_one_of, params, ["c", "d"])
+
+        # e is empty, so it is skipped
+        self.assertEqual(get_required_one_of(params, ["e", "b"]), "2")
+        # e is empty, but allowed
+        self.assertEqual(get_required_one_of(params, ["e", "b"], allow_empty=True), "")
+        # e is empty, so it is skipped and no other key is found
+        self.assertRaises(ParameterError, get_required_one_of, params, ["e"])
+
+    def test_11_get_optional_one_of(self):
+        params = {"a": "1", "b": "2"}
+        self.assertEqual(get_optional_one_of(params, ["a", "b"]), "1")
+        self.assertEqual(get_optional_one_of(params, ["b", "a"]), "2")
+        self.assertEqual(get_optional_one_of(params, ["c", "b"]), "2")
+
+        self.assertIsNone(get_optional_one_of(params, ["c", "d"]))
+        self.assertEqual(get_optional_one_of(params, ["c", "d"], default="3"), "3")
+
+    def test_12_get_required(self):
+        params = {"a": "1", "b": ""}
+        # Works
+        self.assertEqual(get_required(params, "a"), "1")
+        # c is not in params raises
+        self.assertRaises(ParameterError, get_required, params, "c")
+        # Empty value of b also raises
+        self.assertRaises(ParameterError, get_required, params, "b")
+        # Empty value of b is allowed
+        self.assertEqual(get_required(params, "b", allow_empty=True), "")
+
+    def test_13_get_optional(self):
+        params = {"a": "1", "b": ""}
+        self.assertEqual(get_optional(params, "a"), "1")
+        self.assertEqual(get_optional(params, "b"), "")
+        self.assertIsNone(get_optional(params, "c"))
+        self.assertEqual(get_optional(params, "c", default="default_val"), "default_val")

@@ -16,7 +16,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Component, effect, EventEmitter, inject, input, Input, OnInit, Output } from "@angular/core";
+import { Component, computed, effect, EventEmitter, inject, input, Input, OnInit, Output } from "@angular/core";
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatCheckbox } from "@angular/material/checkbox";
 import { MatOption } from "@angular/material/core";
@@ -30,13 +30,23 @@ import {
 import { TokenService, TokenServiceInterface } from "../../../../services/token/token.service";
 import { AuthService, AuthServiceInterface } from "../../../../services/auth/auth.service";
 import { TokenEnrollmentData } from "../../../../mappers/token-api-payload/_token-api-payload.mapper";
+import {
+  NotificationService,
+  NotificationServiceInterface
+} from "../../../../services/notification/notification.service";
+import { SystemService, SystemServiceInterface } from "../../../../services/system/system.service";
+import {
+  DAYPASSWORD_HASHLIB,
+  DAYPASSWORD_OTP_LENGTH,
+  DAYPASSWORD_TIME_STEP
+} from "../../../../constants/token.constants";
 
 export interface DaypasswordEnrollmentOptions extends TokenEnrollmentData {
   type: "daypassword";
   otpKey?: string;
   otpLength: number;
   hashAlgorithm: string;
-  timeStep: number;
+  timeStep: string;
   generateOnServer: boolean;
 }
 
@@ -59,15 +69,18 @@ export interface DaypasswordEnrollmentOptions extends TokenEnrollmentData {
   styleUrl: "./enroll-daypassword.component.scss"
 })
 export class EnrollDaypasswordComponent implements OnInit {
-  protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   protected readonly enrollmentMapper: DaypasswordApiPayloadMapper = inject(DaypasswordApiPayloadMapper);
+  protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   protected readonly authService: AuthServiceInterface = inject(AuthService);
+  protected readonly notificationService: NotificationServiceInterface = inject(NotificationService);
+  protected readonly systemService: SystemServiceInterface = inject(SystemService);
   readonly otpLengthOptions = [6, 8];
   readonly hashAlgorithmOptions = [
     { value: "sha1", viewValue: "SHA1" },
     { value: "sha256", viewValue: "SHA256" },
     { value: "sha512", viewValue: "SHA512" }
   ];
+  enrollmentData = input<DaypasswordEnrollmentData>();
   @Input() wizard: boolean = false;
   @Output() additionalFormFieldsChange = new EventEmitter<{
     [key: string]: FormControl<any>;
@@ -81,8 +94,10 @@ export class EnrollDaypasswordComponent implements OnInit {
   disabled = input<boolean>(false);
 
   otpKeyFormControl = new FormControl<string>({ value: "", disabled: true });
-  hashAlgorithmControl = new FormControl<string>("sha256", [Validators.required]);
-  timeStepControl = new FormControl<number | string>(86400, [Validators.required]);
+  defaultHashlib = computed(() => this.systemService.systemConfig()[DAYPASSWORD_HASHLIB] || "sha1");
+  hashAlgorithmControl = new FormControl<string>(this.defaultHashlib(), [Validators.required]);
+  defaultTimeStep = computed(() => this.systemService.systemConfig()[DAYPASSWORD_TIME_STEP] || "24h");
+  timeStepControl = new FormControl<string>(this.defaultTimeStep(), [Validators.required]);
   generateOnServerControl = new FormControl(true);
   otpLengthControl = new FormControl<number>(6, [Validators.required]);
 
@@ -98,6 +113,7 @@ export class EnrollDaypasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this._setInitialFormValues();
     this.additionalFormFieldsChange.emit({
       otpKey: this.otpKeyFormControl,
       otpLength: this.otpLengthControl,
@@ -107,6 +123,16 @@ export class EnrollDaypasswordComponent implements OnInit {
     });
     this.enrollmentArgsGetterChange.emit(this.enrollmentArgsGetter);
     this._applyPolicies();
+  }
+
+  private _setInitialFormValues() {
+    if (!!this.enrollmentData()) {
+      this.otpKeyFormControl.setValue(this.enrollmentData()?.otpKey ?? "", { emitEvent: false });
+      this.otpLengthControl.setValue(this.enrollmentData()?.otpLength ?? 6, { emitEvent: false });
+      this.hashAlgorithmControl.setValue(this.enrollmentData()?.hashAlgorithm ?? "sha256", { emitEvent: false });
+      this.timeStepControl.setValue(this.enrollmentData()?.timeStep ?? "24h", { emitEvent: false });
+      this.generateOnServerControl.setValue(this.enrollmentData()?.generateOnServer ?? true, { emitEvent: false });
+    }
   }
 
   private _applyPolicies() {
@@ -119,16 +145,34 @@ export class EnrollDaypasswordComponent implements OnInit {
         this.updateOtpKeyControlState(generateOnServer ?? true);
       });
     }
+
+    const hashlib = this.authService.rightsWithValues()[DAYPASSWORD_HASHLIB];
+    if (hashlib) {
+      this.hashAlgorithmControl.setValue(hashlib, { emitEvent: false });
+      this.hashAlgorithmControl.disable({ emitEvent: false });
+    }
+    const otpLength = this.authService.rightsWithValues()[DAYPASSWORD_OTP_LENGTH];
+    if (otpLength) {
+      const otpLengthNumber = parseInt(otpLength, 10);
+      if (!isNaN(otpLengthNumber)) {
+        this.otpLengthControl.setValue(otpLengthNumber, { emitEvent: false });
+        this.otpLengthControl.disable({ emitEvent: false });
+      }
+    }
+    const timeStep = this.authService.rightsWithValues()[DAYPASSWORD_TIME_STEP];
+    if (timeStep) {
+      this.timeStepControl.setValue(timeStep, { emitEvent: false });
+      this.timeStepControl.disable({ emitEvent: false });
+    }
   }
 
-  enrollmentArgsGetter = (
-    basicOptions: TokenEnrollmentData
-  ): {
+  enrollmentArgsGetter = (basicOptions: TokenEnrollmentData): {
     data: DaypasswordEnrollmentData;
     mapper: DaypasswordApiPayloadMapper;
   } | null => {
     if (this.daypasswordForm.invalid) {
       this.daypasswordForm.markAllAsTouched();
+      this.notificationService.openSnackBar($localize`Invalid enrollment data.`);
       return null;
     }
     const enrollmentData: DaypasswordEnrollmentOptions = {
@@ -136,10 +180,7 @@ export class EnrollDaypasswordComponent implements OnInit {
       type: "daypassword",
       otpLength: this.otpLengthControl.value ?? 10,
       hashAlgorithm: this.hashAlgorithmControl.value ?? "sha256",
-      timeStep:
-        typeof this.timeStepControl.value === "string"
-          ? parseInt(this.timeStepControl.value, 10)
-          : (this.timeStepControl.value ?? 86400),
+      timeStep: this.timeStepControl.value ?? "24h",
       generateOnServer: this.generateOnServerControl.value ?? true
     };
     if (!enrollmentData.generateOnServer) {

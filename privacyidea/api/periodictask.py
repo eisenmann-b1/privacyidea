@@ -20,6 +20,7 @@ periodic tasks.
 
 This module is tested in tests/test_api_periodictask.py"""
 
+from flask_babel import _
 import json
 import logging
 
@@ -28,7 +29,8 @@ from flask import Blueprint, g, request
 from privacyidea.lib.config import get_privacyidea_node_names
 from privacyidea.lib.tokenclass import AUTH_DATE_FORMAT
 from privacyidea.api.lib.prepolicy import prepolicy, check_base_action
-from privacyidea.api.lib.utils import send_result, getParam
+from privacyidea.api.lib.utils import send_result
+from privacyidea.lib.params import get_optional, get_required
 from privacyidea.lib.error import ParameterError
 from privacyidea.lib.policies.actions import PolicyAction
 from privacyidea.lib.log import log_with
@@ -137,29 +139,29 @@ def set_periodic_task_api():
     :return: ID of the periodic task
     """
     param = request.all_data
-    ptask_id = getParam(param, "id", optional=True)
+    ptask_id = get_optional(param, "id")
     if ptask_id is not None:
         ptask_id = int(ptask_id)
-    name = getParam(param, "name", optional=False)
-    active = is_true(getParam(param, "active", default=True))
-    retry_if_failed = is_true(getParam(param, "retry_if_failed", default=True))
-    interval = getParam(param, "interval", optional=False)
-    node_string = getParam(param, "nodes", optional=False)
+    name = get_required(param, "name")
+    active = is_true(get_optional(param, "active", default=True))
+    retry_if_failed = is_true(get_optional(param, "retry_if_failed", default=True))
+    interval = get_required(param, "interval")
+    node_string = get_required(param, "nodes")
     if node_string.strip():
         node_list = [node.strip() for node in node_string.split(",")]
     else:
-        raise ParameterError("nodes: expected at least one node")
-    taskmodule = getParam(param, "taskmodule", optional=False)
+        raise ParameterError(_("nodes: expected at least one node"))
+    taskmodule = get_required(param, "taskmodule")
     if taskmodule not in get_available_taskmodules():
-        raise ParameterError("Unknown task module: {!r}".format(taskmodule))
-    ordering = int(getParam(param, "ordering", optional=False))
-    options = getParam(param, "options", optional=True)
+        raise ParameterError(_("Unknown task module: {!r}").format(taskmodule))
+    ordering = int(get_required(param, "ordering"))
+    options = get_optional(param, "options")
     if options is None:
         options = {}
     elif not isinstance(options, dict):
         options = json.loads(options)
         if not isinstance(options, dict):
-            raise ParameterError("options: expected dictionary, got {!r}".format(options))
+            raise ParameterError(_("options: expected dictionary, got {!r}").format(options))
     result = set_periodic_task(name, interval, node_list, taskmodule, ordering, options, active, ptask_id,
                                retry_if_failed)
     g.audit_object.log({"success": True, "info": result})

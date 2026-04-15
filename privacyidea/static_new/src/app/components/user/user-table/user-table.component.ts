@@ -1,5 +1,5 @@
 /**
- * (c) NetKnights GmbH 2025,  https://netknights.it
+ * (c) NetKnights GmbH 2026,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -16,7 +16,16 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Component, ElementRef, ViewChild, WritableSignal, inject, linkedSignal, signal } from "@angular/core";
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  WritableSignal,
+  inject,
+  linkedSignal,
+  signal,
+  computed
+} from "@angular/core";
 import {
   MatCell,
   MatCellDef,
@@ -46,6 +55,7 @@ import { RouterLink } from "@angular/router";
 import { UserTableActionsComponent } from "./user-table-actions/user-table-actions.component";
 import { MatIcon } from "@angular/material/icon";
 import { MatIconButton } from "@angular/material/button";
+import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatDialog } from "@angular/material/dialog";
 import { Resolver, ResolverService } from "../../../services/resolver/resolver.service";
 import { UserNewResolverComponent } from "../user-new-resolver/user-new-resolver.component";
@@ -88,7 +98,8 @@ const columnKeysMap = [
     ClearableInputComponent,
     RouterLink,
     MatIcon,
-    MatIconButton
+    MatIconButton,
+    MatTooltipModule
   ],
   templateUrl: "./user-table.component.html",
   styleUrl: "./user-table.component.scss"
@@ -102,10 +113,18 @@ export class UserTableComponent {
   protected readonly resolverService = inject(ResolverService);
   protected readonly dialog = inject(MatDialog);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild('filterHTMLInputElement', { static: false }) filterInput!: ElementRef<HTMLInputElement>;
-  sort = signal({ active: '', direction: '' } as Sort);
+  @ViewChild("filterHTMLInputElement", { static: false }) filterInput!: ElementRef<HTMLInputElement>;
+  sort = signal({ active: "", direction: "" } as Sort);
   readonly apiFilter = this.userService.apiFilterOptions;
-  pageSizeOptions = this.tableUtilsService.pageSizeOptions;
+
+  private basePageSizeOptions = [...this.tableUtilsService.pageSizeOptions()];
+  pageSizeOptions = computed(() => {
+    if (!this.basePageSizeOptions.includes(this.userService.pageSize())) {
+      this.basePageSizeOptions.push(this.userService.pageSize());
+      this.basePageSizeOptions.sort((a, b) => a - b);
+    }
+    return this.basePageSizeOptions;
+  });
 
   totalLength: WritableSignal<number> = linkedSignal({
     source: this.userService.usersResource.value,
@@ -139,11 +158,11 @@ export class UserTableComponent {
 
   private clientsideSortUserData(data: UserData[], s: Sort): UserData[] {
     if (!s.direction) return data;
-    const dir = s.direction === 'asc' ? 1 : -1;
+    const dir = s.direction === "asc" ? 1 : -1;
     const key = s.active as keyof UserData;
     return data.sort((a: any, b: any) => {
-      const va = (a?.[key] ?? '').toString().toLowerCase();
-      const vb = (b?.[key] ?? '').toString().toLowerCase();
+      const va = (a?.[key] ?? "").toString().toLowerCase();
+      const vb = (b?.[key] ?? "").toString().toLowerCase();
       if (va < vb) return -1 * dir;
       if (va > vb) return 1 * dir;
       return 0;
@@ -163,7 +182,7 @@ export class UserTableComponent {
   }
 
   getFilterIconName(keyword: string): string {
-    return this.isFilterSelected(keyword) ? 'filter_alt_off' : 'filter_alt';
+    return this.isFilterSelected(keyword) ? "filter_alt_off" : "filter_alt";
   }
 
   onFilterClick(filterKeyword: string): void {
@@ -176,7 +195,7 @@ export class UserTableComponent {
   }
 
   onClickResolver(resolverName: unknown): void {
-    const resolver = this.resolverService.resolvers().find(r => r.resolvername === resolverName);
+    const resolver = this.resolverService.resolvers().find((r) => r.resolvername === resolverName);
     if (resolver) {
       this.dialog.open(UserNewResolverComponent, {
         data: { resolver },

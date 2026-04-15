@@ -19,6 +19,7 @@
 import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { computed, inject, Injectable, Signal } from "@angular/core";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
+import { ContentService, ContentServiceInterface } from "../content/content.service";
 
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
@@ -43,8 +44,6 @@ export type PrivacyideaServers = {
 };
 
 export interface PrivacyideaServerServiceInterface {
-  privacyideaServerResource: HttpResourceRef<PiResponse<PrivacyideaServers> | undefined>;
-  readonly privacyideaServers: Signal<PrivacyideaServer[]>;
   remoteServerResource: HttpResourceRef<PiResponse<PrivacyideaServers> | undefined>;
   readonly remoteServerOptions: Signal<PrivacyideaServer[]>;
 
@@ -60,18 +59,24 @@ export interface PrivacyideaServerServiceInterface {
 })
 export class PrivacyideaServerService implements PrivacyideaServerServiceInterface {
   private readonly authService: AuthServiceInterface = inject(AuthService);
+  private readonly contentService: ContentServiceInterface = inject(ContentService);
   private readonly notificationService: NotificationServiceInterface = inject(NotificationService);
   private readonly http: HttpClient = inject(HttpClient);
 
   readonly privacyideaServerBaseUrl = environment.proxyUrl + "/privacyideaserver/";
 
-  privacyideaServerResource = httpResource<PiResponse<PrivacyideaServers>>(() => ({
-    url: this.privacyideaServerBaseUrl,
-    method: "GET",
-    headers: this.authService.getHeaders()
-  }));
-  privacyideaServers = computed<PrivacyideaServer[]>(() => {
-    const res = this.privacyideaServerResource.value();
+  remoteServerResource = httpResource<PiResponse<PrivacyideaServers>>(() => {
+    if (!this.contentService.onExternalPrivacyIdea() && !this.contentService.onTokenEnrollmentLikely()) {
+      return undefined;
+    }
+    return {
+      url: this.privacyideaServerBaseUrl,
+      method: "GET",
+      headers: this.authService.getHeaders()
+    };
+  });
+  remoteServerOptions = computed<PrivacyideaServer[]>(() => {
+    const res = this.remoteServerResource.value();
     const values = res?.result?.value;
     if (values) {
       return Object.entries(values).map(([identifier, server]) => ({
@@ -84,10 +89,6 @@ export class PrivacyideaServerService implements PrivacyideaServerServiceInterfa
     return [];
   });
 
-  get remoteServerResource() { return this.privacyideaServerResource; }
-
-  get remoteServerOptions() { return this.privacyideaServers; }
-
   async postPrivacyideaServer(server: PrivacyideaServer): Promise<void> {
     const url = `${this.privacyideaServerBaseUrl}${server.identifier}`;
     const request = this.http.post<PiResponse<any>>(url, server, { headers: this.authService.getHeaders() });
@@ -95,7 +96,7 @@ export class PrivacyideaServerService implements PrivacyideaServerServiceInterfa
     return lastValueFrom(request)
       .then(() => {
         this.notificationService.openSnackBar($localize`Successfully saved privacyIDEA server.`);
-        this.privacyideaServerResource.reload();
+        this.remoteServerResource.reload();
       })
       .catch((error) => {
         const message = error.error?.result?.error?.message || "";
@@ -111,7 +112,7 @@ export class PrivacyideaServerService implements PrivacyideaServerServiceInterfa
     return lastValueFrom(request)
       .then(() => {
         this.notificationService.openSnackBar($localize`Successfully deleted privacyIDEA server: ${identifier}.`);
-        this.privacyideaServerResource.reload();
+        this.remoteServerResource.reload();
       })
       .catch((error) => {
         const message = error.error?.result?.error?.message || "";

@@ -1,5 +1,5 @@
 /**
- * (c) NetKnights GmbH 2025,  https://netknights.it
+ * (c) NetKnights GmbH 2026,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -17,7 +17,14 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { Injectable } from "@angular/core";
-import { TokenApiPayloadMapper, TokenEnrollmentData, TokenEnrollmentPayload } from "./_token-api-payload.mapper";
+import {
+  BaseApiPayloadMapper,
+  TokenApiPayloadMapper,
+  TokenEnrollmentData,
+  TokenEnrollmentPayload
+} from "./_token-api-payload.mapper";
+import { TokenDetails } from "../../services/token/token.service";
+import { parseBooleanValue } from "../../utils/parse-boolean-value";
 
 export interface TotpEnrollmentData extends TokenEnrollmentData {
   type: "totp";
@@ -26,51 +33,64 @@ export interface TotpEnrollmentData extends TokenEnrollmentData {
   otpLength?: number;
   hashAlgorithm?: string;
   timeStep?: number;
+  twoStepInit?: boolean;
+  otpKeyFormat?: string;
 }
 
 export interface TotpEnrollmentPayload extends TokenEnrollmentPayload {
-  otpkey: string | null;
+  otpkey: string;
   genkey: 0 | 1;
   otplen?: number;
   hashlib?: string;
-  timeStep?: number;
-  serial?: string | null;
+  timeStep?: number | string;
+  serial?: string;
+  "2stepinit"?: boolean;
+  otpkeyformat?: string;
 }
 
 @Injectable({ providedIn: "root" })
-export class TotpApiPayloadMapper implements TokenApiPayloadMapper<TotpEnrollmentData> {
-  toApiPayload(data: TotpEnrollmentData): TotpEnrollmentPayload {
+export class TotpApiPayloadMapper extends BaseApiPayloadMapper implements TokenApiPayloadMapper<TotpEnrollmentData> {
+  override toApiPayload(data: TotpEnrollmentData): TotpEnrollmentPayload {
+    const basePayload = super.toApiPayload(data);
     const payload: TotpEnrollmentPayload = {
-      type: data.type,
-      description: data.description,
-      container_serial: data.containerSerial,
-      validity_period_start: data.validityPeriodStart,
-      validity_period_end: data.validityPeriodEnd,
-      user: data.user,
-      realm: data.user ? data.realm : null,
-      pin: data.pin,
-      otpkey: data.generateOnServer ? null : (data.otpKey ?? null),
+      ...basePayload,
       genkey: data.generateOnServer ? 1 : 0,
-      otplen: data.otpLength !== undefined ? Number(data.otpLength) : undefined,
-      hashlib: data.hashAlgorithm,
-      timeStep: data.timeStep !== undefined ? Number(data.timeStep) : undefined,
-      serial: data.serial ?? null
+      otpkey: data.generateOnServer === true ? "" : (data.otpKey ?? ""),
+      ...(data.otpLength !== undefined && { otplen: Number(data.otpLength) }),
+      ...(data.hashAlgorithm !== undefined && { hashlib: data.hashAlgorithm }),
+      ...(data.timeStep !== undefined && { timeStep: Number(data.timeStep) }),
+      ...(data.twoStepInit !== undefined && { "2stepinit": data.twoStepInit }),
+      ...(data.otpKey && data.otpKeyFormat && { otpkeyformat: data.otpKeyFormat })
     };
-
     if (data.onlyAddToRealm) {
       payload.realm = data.realm;
-      payload.user = null;
+      delete payload.user;
     }
-    if (payload.otplen === undefined) delete payload.otplen;
-    if (payload.hashlib === undefined) delete payload.hashlib;
-    if (payload.timeStep === undefined) delete payload.timeStep;
-    if (payload.serial === null) delete payload.serial;
-
     return payload;
   }
 
-  fromApiPayload(payload: any): TotpEnrollmentData {
-    // Placeholder: Implement transformation from API payload. We will replace this later.
-    return payload as TotpEnrollmentData;
+  override fromApiPayload(payload: TotpEnrollmentPayload): TotpEnrollmentData {
+    const baseData = super.fromApiPayload(payload);
+    return {
+      ...baseData,
+      type: "totp",
+      ...(payload.genkey !== undefined && { generateOnServer: parseBooleanValue(payload.genkey) }),
+      otpKey: payload.otpkey ?? undefined,
+      otpLength: payload.otplen ? Number(payload.otplen) : undefined,
+      hashAlgorithm: payload.hashlib ?? undefined,
+      timeStep: payload.timeStep !== undefined ? Number(payload.timeStep) : undefined,
+      ...(payload["2stepinit"] !== undefined && { twoStepInit: payload["2stepinit"] }),
+      otpKeyFormat: payload.otpkeyformat ?? undefined
+    };
+  }
+
+  override fromTokenDetailsToEnrollmentData(details: TokenDetails): TotpEnrollmentData {
+    return {
+      ...super.fromTokenDetailsToEnrollmentData(details),
+      type: "totp",
+      otpLength: details.otplen ? Number(details.otplen) : undefined,
+      hashAlgorithm: details.info?.hashlib ?? undefined,
+      timeStep: details.info?.timeStep !== undefined ? Number(details.info.timeStep) : undefined
+    };
   }
 }

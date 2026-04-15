@@ -45,7 +45,7 @@ from privacyidea.lib import _
 from privacyidea.lib.config import get_from_config
 from privacyidea.lib.crypto import (decryptPassword, encryptPassword,
                                     FAILED_TO_DECRYPT_PASSWORD)
-from privacyidea.lib.error import (ConfigAdminError, privacyIDEAError,
+from privacyidea.lib.error import (ConfigAdminError, PrivacyIDEAError,
                                    ResourceNotFoundError)
 from privacyidea.lib.log import log_with
 from privacyidea.lib.resolver import CENSORED
@@ -56,7 +56,7 @@ from privacyidea.models import db, RADIUSServer as RADIUSServerDB
 log = logging.getLogger(__name__)
 
 
-class RADIUSServer(object):
+class RADIUSServer:
     """
     RADIUS Server object with configuration. The RADIUS Server object
     contains a test functionality so that the configuration can be tested.
@@ -101,9 +101,8 @@ class RADIUSServer(object):
         verify_message_authenticator = False
         if self.config.options:
             verify_message_authenticator = self.config.options.get("message_authenticator", False)
-        log.debug("NAS Identifier: %r, Dictionary: %r" % (nas_identifier, radius_dictionary))
-        log.debug("Constructing client object with server: %r, port: %r" %
-                  (self.config.server, self.config.port))
+        log.debug(f"NAS Identifier: {nas_identifier!r}, Dictionary: {radius_dictionary!r}")
+        log.debug(f"Constructing client object with server: {self.config.server!r}, port: {self.config.port!r}")
         log.debug("Using Message-Authenticator: %r", verify_message_authenticator)
 
         srv = Client(server=self.config.server,
@@ -125,14 +124,14 @@ class RADIUSServer(object):
 
         if radius_state:
             req["State"] = radius_state
-            log.debug("Sending Challenge to RADIUS server: %r" % radius_state)
+            log.debug(f"Sending Challenge to RADIUS server: {radius_state!r}")
 
         try:
             # The authenticator is available after the call to PwCrypt
             request_authenticator = req.authenticator
             response = srv.SendPacket(req)
         except Timeout:
-            log.warning("Timeout while contacting remote radius server {0!s}".format(self.config.server))
+            log.warning(f"Timeout while contacting remote radius server {self.config.server!s}")
             return None
 
         # Check the Message-Authenticator attribute in the Response
@@ -140,12 +139,12 @@ class RADIUSServer(object):
             if not response.verify_message_authenticator(original_authenticator=request_authenticator):
                 log.warning("Verification of Message-Authenticator Attribute in response failed!")
                 if verify_message_authenticator:
-                    raise privacyIDEAError("Verification of Message-Authenticator Attribute in response failed!")
+                    raise PrivacyIDEAError("Verification of Message-Authenticator Attribute in response failed!")
         except Exception as e:
             # Either there was no Message-Authenticator Attribute in the response or the secret is missing
             log.warning(f"Unable to verify Message-Authenticator Attribute in response: {e}")
             if verify_message_authenticator:
-                raise privacyIDEAError("Unable to verify Message-Authenticator Attribute in response!")
+                raise PrivacyIDEAError("Unable to verify Message-Authenticator Attribute in response!")
 
         return response
 
@@ -260,7 +259,7 @@ def add_radius(identifier: str, server: str = None, secret: str = None,
         encrypted_secret = existing_server.secret
 
     if len(encrypted_secret) > 255:
-        raise privacyIDEAError(description=_("The RADIUS secret is too long"), id=2234)
+        raise PrivacyIDEAError(description=_("The RADIUS secret is too long"), id=2234)
 
     if existing_server:
         if server is not None:
@@ -327,7 +326,7 @@ def test_radius(identifier, server, secret, user, password, port=1812, descripti
             # Maybe __CENSORED__ is the secret?
             pass
     if len(encrypted_secret) > 255:
-        raise privacyIDEAError("The RADIUS secret is too long")
+        raise PrivacyIDEAError("The RADIUS secret is too long")
     # Create a (temporary) RADIUS Server database object in order to initialize the RADUISServer object
     s = RADIUSServerDB(identifier=identifier, server=server, port=port,
                        secret=encrypted_secret, dictionary=dictionary,
@@ -342,7 +341,7 @@ def test_radius(identifier, server, secret, user, password, port=1812, descripti
             result = True
         elif response.code == pyrad.packet.AccessChallenge:
             log.info("RADIUS Server test failed! Server requires "
-                     "Challenge-Response (Answer: %r)" % response["Reply-Message"])
+                     "Challenge-Response (Answer: {!r})".format(response["Reply-Message"]))
             result = False
         else:
             log.info("RADIUS Server test failed! Server rejected authentication.")
@@ -371,11 +370,11 @@ def export_radiusserver(name=None):
 @register_import('radiusserver')
 def import_radiusserver(data, name=None):
     """Import radiusserver configuration"""
-    log.debug('Import radiusserver config: {0!s}'.format(data))
+    log.debug(f'Import radiusserver config: {data!s}')
     for res_name, res_data in data.items():
         if name and name != res_name:
             continue
         res_data['secret'] = res_data.pop('password')
         rid = add_radius(res_name, **res_data)
-        log.info('Import of smtpserver "{0!s}" finished,'
-                 ' id: {1!s}'.format(res_name, rid))
+        log.info(f'Import of smtpserver "{res_name!s}" finished,'
+                 f' id: {rid!s}')

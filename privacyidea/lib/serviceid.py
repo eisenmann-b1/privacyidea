@@ -27,7 +27,7 @@ import logging
 from sqlalchemy import select
 
 from privacyidea.lib.utils import fetch_one_resource
-from privacyidea.lib.error import privacyIDEAError, ResourceNotFoundError
+from privacyidea.lib.error import PrivacyIDEAError, ResourceNotFoundError
 from privacyidea.models import Serviceid, db
 
 log = logging.getLogger(__name__)
@@ -72,8 +72,8 @@ def delete_serviceid(name=None, sid=None):
     if sid:
         if si:
             if si.id != sid:
-                raise privacyIDEAError('ID of the serviceid with name {0!s} does not '
-                                       'match given ID ({1:d}).'.format(name, sid))
+                raise PrivacyIDEAError(f'ID of the serviceid with name {name!s} does not '
+                                       f'match given ID ({sid:d}).')
         else:
             si = fetch_one_resource(Serviceid, id=sid)
     if si:

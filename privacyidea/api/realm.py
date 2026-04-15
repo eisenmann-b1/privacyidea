@@ -39,11 +39,11 @@ You will only be able to see and use user object, that are contained in a realm.
 
 The code of this module is tested in tests/test_api_system.py
 """
+from flask_babel import _
 from flask import Blueprint, request, current_app, g
-from .lib.utils import (getParam,
-                        required,
-                        send_result,
+from .lib.utils import (send_result,
                         get_priority_from_param)
+from ..lib.params import get_required
 from ..lib.log import log_with
 from ..lib.realm import (set_default_realm,
                          get_default_realm,
@@ -52,7 +52,6 @@ from ..lib.realm import (set_default_realm,
                          delete_realm)
 from ..api.lib.prepolicy import prepolicy, check_base_action
 from ..lib.utils import reduce_realms
-from privacyidea.lib import _
 from privacyidea.lib.auth import ROLE
 from privacyidea.lib.config import check_node_uuid_exists
 from privacyidea.lib.error import ParameterError
@@ -129,7 +128,7 @@ def set_realm_api(realm=None):
        }
     """
     param = request.all_data
-    resolvers = getParam(param, "resolvers", required)
+    resolvers = get_required(param, "resolvers")
     priority = get_priority_from_param(param)
 
     if isinstance(resolvers, list):
@@ -150,8 +149,7 @@ def set_realm_api(realm=None):
                               "node": res.get("node")})
     (added, failed) = set_realm(realm, resolvers=resolvers)
     g.audit_object.log({'success': not failed,
-                        'info':  "realm: {0!r}, resolvers: {1!r}".format(realm,
-                                                                         resolvers)})
+                        'info':  f"realm: {realm!r}, resolvers: {resolvers!r}"})
     return send_result({"added": added,
                         "failed": failed})
 
@@ -560,7 +558,7 @@ def set_realm_node_api(realm, nodeid):
         'success': not failed,
         # Overwrite resolver entry in audit log since `before_after` added a dict
         'resolver': ", ".join([r["name"] for r in resolvers]),
-        'info': "realm: {0!r}, resolvers: {1!r}".format(realm,
+        'info': "realm: {!r}, resolvers: {!r}".format(realm,
                                                         [r["name"] for r in resolvers])})
     return send_result({"added": added,
                         "failed": failed})

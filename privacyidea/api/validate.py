@@ -71,7 +71,7 @@ import logging
 import threading
 
 from flask import (Blueprint, request, g, current_app, Response)
-from flask_babel import gettext
+from flask_babel import _
 
 from privacyidea.api.auth import admin_required
 from privacyidea.api.lib.decorators import add_serial_from_response_to_g
@@ -103,7 +103,7 @@ from privacyidea.lib.config import (return_saml_attributes, get_from_config,
                                     return_saml_attributes_on_fail,
                                     SYSCONF, ensure_no_config_object, get_privacyidea_node)
 from privacyidea.lib.container import find_container_for_token, find_container_by_serial, check_container_challenge
-from privacyidea.lib.error import ParameterError, PolicyError, ResourceNotFoundError, ERROR
+from privacyidea.lib.error import ParameterError, PolicyError, ResourceNotFoundError, Error
 from privacyidea.lib.event import EventConfiguration
 from privacyidea.lib.event import event
 from privacyidea.lib.machine import list_machine_tokens, get_auth_items, attach_token
@@ -113,13 +113,12 @@ from privacyidea.lib.subscriptions import CheckSubscription
 from privacyidea.lib.token import (check_user_pass, check_serial_pass,
                                    check_otp, create_challenges_from_tokens, get_one_token)
 from privacyidea.lib.token import get_tokens
-from privacyidea.lib.tokenclass import CHALLENGE_SESSION
+from privacyidea.lib.tokenclass import ChallengeSession
 from privacyidea.lib.user import log_used_user, User, split_user
 from privacyidea.lib.utils import get_client_ip, get_plugin_info_from_useragent, AUTH_RESPONSE
 from privacyidea.lib.utils import is_true, get_computer_name_from_user_agent
 from .lib.policyhelper import check_last_auth_policy, get_realm_for_authentication
-from .lib.utils import getParam, get_required, map_error_to_code, send_error, send_result
-from .lib.utils import required
+from .lib.utils import get_required, map_error_to_code, send_error, send_result
 from ..lib.decorators import (check_user_serial_or_cred_id_in_request)
 from ..lib.fido2.challenge import create_fido2_challenge, verify_fido2_challenge
 from ..lib.fido2.policy_action import FIDO2PolicyAction
@@ -160,7 +159,7 @@ def before_request():
     g.client_ip = get_client_ip(request, get_from_config(SYSCONF.OVERRIDECLIENT))
     # Save the HTTP header in the localproxy object
     g.request_headers = request.headers
-    g.serial = getParam(request.all_data, "serial", default=None)
+    g.serial = get_optional(request.all_data, "serial", default=None)
     ua_name, ua_version, _ua_comment = get_plugin_info_from_useragent(request.user_agent.string)
     g.user_agent = ua_name
 
@@ -182,8 +181,8 @@ def before_request():
                         "user_agent": ua_name,
                         "user_agent_version": ua_version,
                         "privacyidea_server": privacyidea_server,
-                        "action": "{0!s} {1!s}".format(request.method, request.url_rule),
-                        "thread_id": "{0!s}".format(threading.current_thread().ident),
+                        "action": f"{request.method!s} {request.url_rule!s}",
+                        "thread_id": f"{threading.current_thread().ident!s}",
                         "info": ""})
     # Add preliminary user to audit in case we fail with an error
     g.audit_object.log({
@@ -210,20 +209,20 @@ def offlinerefill():
     :return: Hashed OTP values (HOTP) or nothing (WebAuthn/Passkey). Returns an error in case the token has been
      unmarked for offline use or if the refilltoken is incorrect (out of sync).
     """
-    serial = getParam(request.all_data, "serial", required)
-    refilltoken_request = getParam(request.all_data, "refilltoken", required)
-    password = getParam(request.all_data, "pass", required)
+    serial = get_required(request.all_data, "serial")
+    refilltoken_request = get_required(request.all_data, "refilltoken")
+    password = get_required(request.all_data, "pass", allow_empty=True)
     try:
         tokens = get_tokens(serial=serial)
         if len(tokens) != 1:
-            raise ParameterError("The token does not exist")
+            raise ParameterError(_("The token does not exist"))
 
         token = tokens[0]
         # check if token is disabled or otherwise not fit for auth
         message_list = []
         if not token.check_all(message_list):
             log.info(f"Failed to offline refill: {message_list}")
-            raise ParameterError("The token is not valid.")
+            raise ParameterError(_("The token is not valid."))
         token_attachments = list_machine_tokens(serial=serial, application="offline")
         if token_attachments:
             # TODO: Currently we do not distinguish, if a token had more than one offline attachment
@@ -236,7 +235,7 @@ def offlinerefill():
                 if not computer_name:
                     log.warning(f"Unable to refill because user agent does not contain a valid machine name: "
                                 f"{request.user_agent.string}")
-                    raise ParameterError("Machine can not be identified by user agent!")
+                    raise ParameterError(_("Machine can not be identified by user agent!"))
                 refilltoken_stored = token.get_tokeninfo("refilltoken_" + computer_name)
 
             if refilltoken_stored and refilltoken_stored == refilltoken_request:
@@ -252,16 +251,15 @@ def offlinerefill():
                                                       "serial": serial}]}
                 response.set_data(json.dumps(content))
                 return response
-        raise ParameterError("Token is not an offline token or refill token is incorrect")
+        raise ParameterError(_("Token is not an offline token or refill token is incorrect"))
 
     except Exception as e:
         if Match.user(
                 g,
                 scope=SCOPE.TOKEN,
                 action=PolicyAction.HIDE_SPECIFIC_ERROR_MESSAGE_FOR_OFFLINE_REFILL,
-                user_object=request.User if hasattr(request, "User") else None,
-        ).any():
-            return send_error("Failed offline token refill", error_code=ERROR.VALIDATE), map_error_to_code(e)
+                user_object=request.User if hasattr(request, "User") else None).any():
+            return send_error("Failed offline token refill", error_code=Error.VALIDATE), map_error_to_code(e)
         raise
 
 
@@ -492,11 +490,11 @@ def _handle_enrollment_cancellation(data: dict) -> Response:
 
     details = {}
     if success:
-        details["message"] = gettext("Cancelled enrollment via multichallenge")
-        message = gettext("Cancelled enrollment via multichallenge for transaction_id ") + f"{transaction_id}"
+        details["message"] = _("Cancelled enrollment via multichallenge")
+        message = _("Cancelled enrollment via multichallenge for transaction_id ") + f"{transaction_id}"
     else:
-        details["message"] = gettext("Failed to cancel enrollment via multichallenge")
-        message = gettext("Failed to cancel enrollment via multichallenge for transaction_id ") + f"{transaction_id}"
+        details["message"] = _("Failed to cancel enrollment via multichallenge")
+        message = _("Failed to cancel enrollment via multichallenge for transaction_id ") + f"{transaction_id}"
 
     ret = send_result(success, rid=2, details=details)
 
@@ -533,7 +531,7 @@ def _handle_fido2_auth(context: dict, credential_id: str):
     # Policy Checks
     if (PolicyAction.DISABLED_TOKEN_TYPES in request.all_data and
             token.get_type() in request.all_data[PolicyAction.DISABLED_TOKEN_TYPES]):
-        raise PolicyError("The authentication method is not available.")
+        raise PolicyError(_("The authentication method is not available."))
 
     if not token.user:
         context["details"]["message"] = "No user found for the token with the given credential ID!"
@@ -559,7 +557,7 @@ def _handle_fido2_auth(context: dict, credential_id: str):
             if evm and Match.user(g, scope=SCOPE.AUTH,
                                   action=PolicyAction.ENROLL_VIA_MULTICHALLENGE_PASSKEY_OFFLINE,
                                   user_object=user).any():
-                _ = attach_token(token.get_serial(), "offline")
+                __ = attach_token(token.get_serial(), "offline")
                 offline_data = get_auth_items(serial=token.get_serial(), application="offline",
                                               user_agent=request.user_agent.string)
                 if offline_data:
@@ -573,7 +571,7 @@ def _handle_fido2_auth(context: dict, credential_id: str):
         # Actual Authentication
         if not check_last_auth_policy(g, token):
             log.debug(f"Last authentication policy check failed for token {token.get_serial()}.")
-            context["details"]["message"] = gettext(
+            context["details"]["message"] = _(
                 "Last authentication policy check failed for token {serial}").format(
                 serial=token.get_serial())
             return
@@ -598,12 +596,12 @@ def _handle_fido2_auth(context: dict, credential_id: str):
     if context["result"]:
         context["details"].update({
             "username": token.user.login,
-            "message": gettext("Found matching challenge"),
+            "message": _("Found matching challenge"),
             "serial": token.get_serial()
         })
         context["serial_list"].append(token.get_serial())
     else:
-        context["details"]["message"] = gettext("Authentication failed.")
+        context["details"]["message"] = _("Authentication failed.")
 
 
 def _handle_serial_auth(context: dict, serial: str):
@@ -619,9 +617,9 @@ def _handle_serial_auth(context: dict, serial: str):
         try:
             tokens = get_tokens(user=user, serial=serial, count=True)
             if not tokens:
-                raise ParameterError("Given serial does not belong to given user!")
+                raise ParameterError(_("Given serial does not belong to given user!"))
         except ResourceNotFoundError:
-            raise ParameterError("Given serial does not belong to given user!")
+            raise ParameterError(_("Given serial does not belong to given user!"))
 
     # Perform Check
     if not otp_only:
@@ -715,7 +713,7 @@ def _finalize_auth_response(context):
                           user_object=user).allowed():
                 token = get_one_token(serial=serial, silent_fail=True)
                 if token:
-                    user_agent, _, _ = get_plugin_info_from_useragent(request.user_agent.string)
+                    user_agent, __, __ = get_plugin_info_from_useragent(request.user_agent.string)
                     if user.exist():
                         user.set_attribute(f"{InternalCustomUserAttributes.LAST_USED_TOKEN}_{user_agent}",
                                            token.get_tokentype(), INTERNAL_USAGE)
@@ -864,8 +862,8 @@ def trigger_challenge():
 
     """
     user = request.User
-    serial = getParam(request.all_data, "serial")
-    token_type = getParam(request.all_data, "type")
+    serial = get_optional(request.all_data, "serial")
+    token_type = get_optional(request.all_data, "type")
     details = {"messages": [], "transaction_ids": []}
 
     # Add all params to the options
@@ -890,7 +888,7 @@ def trigger_challenge():
         "realm": user.realm,
         "success": result_obj > 0,
         "authentication": r.json.get("result").get("authentication"),
-        "info": log_used_user(user, "triggered {0!s} challenges".format(result_obj)),
+        "info": log_used_user(user, f"triggered {result_obj!s} challenges"),
         "serial": ",".join(challenge_serials),
     })
 
@@ -916,7 +914,7 @@ def poll_transaction(transaction_id=None):
     """
 
     if transaction_id is None:
-        transaction_id = getParam(request.all_data, "transaction_id", required)
+        transaction_id = get_required(request.all_data, "transaction_id")
     # Fetch a list of challenges that are not expired with the given transaction ID
     # and determine whether it contains at least one non-expired answered challenge.
     matching_challenges = [challenge for challenge in get_challenges(transaction_id=transaction_id)
@@ -930,7 +928,7 @@ def poll_transaction(transaction_id=None):
     else:
         result = False
         for challenge in matching_challenges:
-            if challenge.session == CHALLENGE_SESSION.DECLINED:
+            if challenge.session == ChallengeSession.DECLINED:
                 declined_challenges.append(challenge)
         if declined_challenges:
             log_challenges = declined_challenges
@@ -993,7 +991,7 @@ def initialize():
     details = {}
     if PolicyAction.DISABLED_TOKEN_TYPES in request.all_data:
         if token_type in request.all_data[PolicyAction.DISABLED_TOKEN_TYPES]:
-            raise PolicyError(f"The authentication method is not available.")
+            raise PolicyError(_("The authentication method is not available."))
 
     if token_type.lower() == "passkey":
         rp_id = request.all_data[FIDO2PolicyAction.RELYING_PARTY_ID]
@@ -1009,7 +1007,11 @@ def initialize():
         details["passkey"] = challenge
         details["transaction_id"] = challenge["transaction_id"]
     else:
-        raise ParameterError(f"Unsupported token type '{token_type}' for authentication initialization!")
+        raise ParameterError(
+            _("Unsupported token type '{token_type}' for authentication initialization!").format(
+                token_type=token_type
+            )
+        )
 
     g.audit_object.log({"success": True})
     response = send_result(False, rid=2, details=details)

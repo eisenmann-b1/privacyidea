@@ -26,7 +26,7 @@ import logging
 
 from sqlalchemy import select
 
-from privacyidea.lib.error import privacyIDEAError, ResourceNotFoundError
+from privacyidea.lib.error import PrivacyIDEAError, ResourceNotFoundError
 from privacyidea.models import Tokengroup, db
 
 log = logging.getLogger(__name__)
@@ -81,9 +81,8 @@ def delete_tokengroup(name: str = None, tokengroup_id: int = None):
         raise ResourceNotFoundError(error_msg)
 
     if len(token_group.tokens) > 0:
-        raise privacyIDEAError(
-            "The token group with name '{0!s}' still has {1:d} tokens assigned.".format(token_group.name,
-                                                                                        len(token_group.tokens)))
+        raise PrivacyIDEAError(
+            f"The token group with name '{token_group.name!s}' still has {len(token_group.tokens):d} tokens assigned.")
 
     db.session.delete(token_group)
     db.session.commit()

@@ -55,7 +55,7 @@ from privacyidea.api.lib.prepolicy import (check_token_upload,
                                            check_token_action, check_user_params,
                                            check_client_container_action, container_registration_config,
                                            smartphone_config, check_client_container_disabled_action, rss_age,
-                                           hide_container_info, force_server_generate_key)
+                                           hide_container_info, force_server_generate_key, verify_enrollment)
 from privacyidea.lib.auth import ROLE
 from privacyidea.lib.config import set_privacyidea_config, SYSCONF
 from privacyidea.lib.container import (init_container, find_container_by_serial, create_container_template,
@@ -81,10 +81,10 @@ from privacyidea.lib.tokenclass import DATE_FORMAT
 from privacyidea.lib.tokens.certificatetoken import ACTION as CERTIFICATE_ACTION
 from privacyidea.lib.tokens.indexedsecrettoken import PIIXACTION
 from privacyidea.lib.tokens.papertoken import PAPERACTION
-from privacyidea.lib.tokens.pushtoken import PUSH_ACTION
+from privacyidea.lib.tokens.pushtoken import PushAction
 from privacyidea.lib.tokens.registrationtoken import DEFAULT_LENGTH, DEFAULT_CONTENTS
-from privacyidea.lib.tokens.smstoken import SMSACTION
-from privacyidea.lib.tokens.tantoken import TANACTION
+from privacyidea.lib.tokens.smstoken import SMSAction
+from privacyidea.lib.tokens.tantoken import TANAction
 from privacyidea.lib.tokens.webauthn import (webauthn_b64_decode, AuthenticatorAttachmentType,
                                              AttestationLevel, AttestationForm,
                                              UserVerificationLevel)
@@ -920,14 +920,15 @@ class PrePolicyDecoratorTestCase(MyApiTestCase):
                    action="enrollHOTP")
         g.policy_object = PolicyClass()
 
-        # request, that matches the policy
+        # Trying to enroll a token with a pin but without enrollpin right will result in a policy error.
+        # checked by enroll_pin
         req.all_data = {"pin": "test",
                         "user": "cornelius",
                         "realm": self.realm1}
-        enroll_pin(req)
 
-        # Check, if the PIN was removed
-        self.assertTrue("pin" not in req.all_data)
+        with self.assertRaises(PolicyError):
+            enroll_pin(req)
+
         # finally delete policy
         delete_policy("pol1")
 
@@ -1738,7 +1739,7 @@ class PrePolicyDecoratorTestCase(MyApiTestCase):
         req = Request(env)
         set_policy(name="tanpol",
                    scope=SCOPE.ENROLL,
-                   action="{0!s}=10".format(TANACTION.TANTOKEN_COUNT))
+                   action="{0!s}=10".format(TANAction.TANTOKEN_COUNT))
         g.policy_object = PolicyClass()
 
         # request, that matches the policy
@@ -1753,8 +1754,8 @@ class PrePolicyDecoratorTestCase(MyApiTestCase):
 
     def test_01_sms_identifier(self):
         # every admin is allowed to enroll sms token with gw1 or gw2
-        set_policy("sms1", scope=SCOPE.ADMIN, action="{0!s}=gw1 gw2".format(SMSACTION.GATEWAYS))
-        set_policy("sms2", scope=SCOPE.ADMIN, action="{0!s}=gw3".format(SMSACTION.GATEWAYS))
+        set_policy("sms1", scope=SCOPE.ADMIN, action="{0!s}=gw1 gw2".format(SMSAction.GATEWAYS))
+        set_policy("sms2", scope=SCOPE.ADMIN, action="{0!s}=gw3".format(SMSAction.GATEWAYS))
 
         g.logged_in_user = {"username": "admin1",
                             "realm": "",
@@ -1777,7 +1778,7 @@ class PrePolicyDecoratorTestCase(MyApiTestCase):
         self.assertRaises(PolicyError, sms_identifiers, req)
 
         # Users are allowed to choose gw4
-        set_policy("sms1", scope=SCOPE.USER, action="{0!s}=gw4".format(SMSACTION.GATEWAYS))
+        set_policy("sms1", scope=SCOPE.USER, action="{0!s}=gw4".format(SMSAction.GATEWAYS))
 
         g.logged_in_user = {"username": "root",
                             "realm": "",
@@ -1800,7 +1801,7 @@ class PrePolicyDecoratorTestCase(MyApiTestCase):
         delete_policy("sms1")
 
     def test_22_push_firebase_config(self):
-        from privacyidea.lib.tokens.pushtoken import PUSH_ACTION
+        from privacyidea.lib.tokens.pushtoken import PushAction
         g.logged_in_user = {"username": "user1",
                             "realm": "",
                             "role": "user"}
@@ -1821,7 +1822,7 @@ class PrePolicyDecoratorTestCase(MyApiTestCase):
         # if we have a non existing firebase config, we will raise an exception
         req.all_data = {
             "type": "push",
-            PUSH_ACTION.FIREBASE_CONFIG: "non-existing"}
+            PushAction.FIREBASE_CONFIG: "non-existing"}
         self.assertRaises(PolicyError, pushtoken_add_config, req, "init")
 
         # Set a policy for the firebase config to use.
@@ -1829,19 +1830,19 @@ class PrePolicyDecoratorTestCase(MyApiTestCase):
                    scope=SCOPE.ENROLL,
                    action="{0!s}=some-fb-config,"
                           "{1!s}=https://privacyidea.com/enroll,"
-                          "{2!s}=10".format(PUSH_ACTION.FIREBASE_CONFIG,
-                                            PUSH_ACTION.REGISTRATION_URL,
-                                            PUSH_ACTION.TTL))
+                          "{2!s}=10".format(PushAction.FIREBASE_CONFIG,
+                                            PushAction.REGISTRATION_URL,
+                                            PushAction.TTL))
         g.policy_object = PolicyClass()
         g.policies = {}
         req.all_data = {"type": "push"}
         pushtoken_add_config(req, "init")
         policies = g.policies
-        self.assertEqual("some-fb-config", policies.get(PUSH_ACTION.FIREBASE_CONFIG))
-        self.assertEqual("https://privacyidea.com/enroll", policies.get(PUSH_ACTION.REGISTRATION_URL))
-        self.assertEqual("10", policies.get(PUSH_ACTION.TTL))
-        self.assertEqual("1", policies.get(PUSH_ACTION.SSL_VERIFY))
-        self.assertFalse(policies.get(PUSH_ACTION.USE_PIA_SCHEME))
+        self.assertEqual("some-fb-config", policies.get(PushAction.FIREBASE_CONFIG))
+        self.assertEqual("https://privacyidea.com/enroll", policies.get(PushAction.REGISTRATION_URL))
+        self.assertEqual("10", policies.get(PushAction.TTL))
+        self.assertEqual("1", policies.get(PushAction.SSL_VERIFY))
+        self.assertFalse(policies.get(PushAction.USE_PIA_SCHEME))
 
         # the request tries to inject a rogue value, but we assure sslverify=1
         g.policy_object = PolicyClass()
@@ -1850,25 +1851,25 @@ class PrePolicyDecoratorTestCase(MyApiTestCase):
             "type": "push",
             "sslverify": "rogue"}
         pushtoken_add_config(req, "init")
-        self.assertEqual("1", g.policies.get(PUSH_ACTION.SSL_VERIFY))
+        self.assertEqual("1", g.policies.get(PushAction.SSL_VERIFY))
 
         # set sslverify="0"
         set_policy(name="push_pol2",
                    scope=SCOPE.ENROLL,
-                   action="{0!s}=0".format(PUSH_ACTION.SSL_VERIFY))
+                   action="{0!s}=0".format(PushAction.SSL_VERIFY))
         g.policy_object = PolicyClass()
         g.policies = {}
         req.all_data = {"type": "push"}
         pushtoken_add_config(req, "init")
-        self.assertEqual("some-fb-config", g.policies.get(PUSH_ACTION.FIREBASE_CONFIG))
-        self.assertEqual("0", g.policies.get(PUSH_ACTION.SSL_VERIFY))
+        self.assertEqual("some-fb-config", g.policies.get(PushAction.FIREBASE_CONFIG))
+        self.assertEqual("0", g.policies.get(PushAction.SSL_VERIFY))
 
         # Set policy to use pia scheme
-        set_policy("pia_scheme", scope=SCOPE.ENROLL, action=PUSH_ACTION.USE_PIA_SCHEME)
+        set_policy("pia_scheme", scope=SCOPE.ENROLL, action=PushAction.USE_PIA_SCHEME)
         req.all_data = {"type": "push"}
         g.policies = {}
         pushtoken_add_config(req, "init")
-        self.assertTrue(g.policies.get(PUSH_ACTION.USE_PIA_SCHEME))
+        self.assertTrue(g.policies.get(PushAction.USE_PIA_SCHEME))
 
         # finally delete policy
         delete_policy("push_pol")
@@ -1966,14 +1967,14 @@ class PrePolicyDecoratorTestCase(MyApiTestCase):
         req.all_data = {"push_wait": "120"}
         g.policy_object = PolicyClass()
         pushtoken_validate(req, None)
-        self.assertEqual(req.all_data.get(PUSH_ACTION.WAIT), False)
+        self.assertEqual(req.all_data.get(PushAction.WAIT), False)
 
         # Now we use the policy, to set the push_wait seconds
-        set_policy(name="push1", scope=SCOPE.AUTH, action="{0!s}=10".format(PUSH_ACTION.WAIT))
+        set_policy(name="push1", scope=SCOPE.AUTH, action="{0!s}=10".format(PushAction.WAIT))
         req.all_data = {}
         g.policy_object = PolicyClass()
         pushtoken_validate(req, None)
-        self.assertEqual(req.all_data.get(PUSH_ACTION.WAIT), 10)
+        self.assertEqual(req.all_data.get(PushAction.WAIT), 10)
 
         delete_policy("push1")
 
@@ -1985,14 +1986,14 @@ class PrePolicyDecoratorTestCase(MyApiTestCase):
         req = RequestMock()
         req.all_data = {"push_wait": "120"}
         pushtoken_disable_wait(req, None)
-        self.assertEqual(req.all_data.get(PUSH_ACTION.WAIT), False)
+        self.assertEqual(req.all_data.get(PushAction.WAIT), False)
 
         # But even with a policy, the function still sets PUSH_ACTION.WAIT to False
-        set_policy(name="push1", scope=SCOPE.AUTH, action="{0!s}=10".format(PUSH_ACTION.WAIT))
+        set_policy(name="push1", scope=SCOPE.AUTH, action="{0!s}=10".format(PushAction.WAIT))
         req = RequestMock()
         req.all_data = {"push_wait": "120"}
         pushtoken_disable_wait(req, None)
-        self.assertEqual(req.all_data.get(PUSH_ACTION.WAIT), False)
+        self.assertEqual(req.all_data.get(PushAction.WAIT), False)
 
         delete_policy("push1")
 
@@ -6061,7 +6062,7 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
         req.User = User("autoassignuser", self.realm1)
         # The response contains the token type HOTP, enrollment
         from privacyidea.lib.tokens.hotptoken import VERIFY_ENROLLMENT_MESSAGE
-        from privacyidea.lib.tokenclass import ROLLOUTSTATE
+        from privacyidea.lib.tokenclass import RolloutState
         res = {"jsonrpc": "2.0",
                "result": {"status": True,
                           "value": True},
@@ -6082,10 +6083,157 @@ class PostPolicyDecoratorTestCase(MyApiTestCase):
         new_resp = check_verify_enrollment(req, resp)
         detail = new_resp.json.get("detail")
         self.assertEqual(detail.get("verify").get("message"), VERIFY_ENROLLMENT_MESSAGE)
-        self.assertEqual(detail.get("rollout_state"), ROLLOUTSTATE.VERIFYPENDING)
+        self.assertEqual(detail.get("rollout_state"), RolloutState.VERIFY_PENDING)
         # Also check the token object.
-        self.assertEqual(tok.token.rollout_state, ROLLOUTSTATE.VERIFYPENDING)
+        self.assertEqual(tok.token.rollout_state, RolloutState.VERIFY_PENDING)
         delete_policy("verify_toks")
+
+    def test_20a_verify_enrollment_no_serial(self):
+        """Test verify_enrollment prepolicy with no serial - should return early"""
+        builder = EnvironBuilder(method='POST', data={}, headers={})
+        env = builder.get_environ()
+        req = Request(env)
+        req.all_data = {"verify": "123456"}  # verify present but no serial
+
+        # Should return None without error (early exit)
+        result = verify_enrollment(req, None)
+        self.assertIsNone(result)
+
+    def test_20b_verify_enrollment_token_not_found(self):
+        """Test verify_enrollment prepolicy with non-existent serial - should return early
+
+        This tests the early exit when len(token_list) != 1 (specifically when len == 0).
+        The case where len > 1 cannot occur because serial is a unique database constraint.
+        """
+        builder = EnvironBuilder(method='POST', data={}, headers={})
+        env = builder.get_environ()
+        req = Request(env)
+        req.all_data = {"serial": "NONEXISTENT", "verify": "123456"}
+
+        # Should return None without error (early exit - token not found, len(token_list) == 0)
+        result = verify_enrollment(req, None)
+        self.assertIsNone(result)
+
+    def test_20c_verify_enrollment_missing_verify_param(self):
+        """Test verify_enrollment prepolicy with token in verify_pending but no verify param - should raise an error"""
+        from privacyidea.lib.tokenclass import RolloutState
+        from privacyidea.lib.error import ParameterError
+
+        serial = "HOTP_VERIFY_PENDING"
+        tok = init_token({"serial": serial,
+                          "type": "hotp",
+                          "otpkey": "31323334353637383940"})
+        # Set token to VERIFY_PENDING state
+        tok.token.rollout_state = RolloutState.VERIFY_PENDING
+        tok.save()
+
+        builder = EnvironBuilder(method='POST', data={}, headers={})
+        env = builder.get_environ()
+        req = Request(env)
+        req.all_data = {"serial": serial}  # No verify parameter
+
+        # Should raise ParameterError
+        with self.assertRaises(ParameterError) as cm:
+            verify_enrollment(req, None)
+
+        self.assertIn("verify_pending", str(cm.exception))
+        self.assertIn("verify", str(cm.exception).lower())
+
+        # Token should still be in verify_pending state
+        tok = get_tokens(serial=serial)[0]
+        self.assertEqual(tok.token.rollout_state, RolloutState.VERIFY_PENDING)
+        remove_token(serial)
+
+    def test_20d_verify_enrollment_wrong_verify_value(self):
+        """Test verify_enrollment prepolicy with wrong verify value - should raise error"""
+        from privacyidea.lib.tokenclass import RolloutState
+        from privacyidea.lib.error import ParameterError
+
+        serial = "HOTP_VERIFY_WRONG"
+        tok = init_token({"serial": serial,
+                          "type": "hotp",
+                          "otpkey": "31323334353637383940"})
+        # Set token to VERIFY_PENDING state
+        tok.token.rollout_state = RolloutState.VERIFY_PENDING
+        tok.save()
+
+        builder = EnvironBuilder(method='POST', data={}, headers={})
+        env = builder.get_environ()
+        req = Request(env)
+        req.all_data = {"serial": serial, "verify": "wrong_value"}
+
+        # Should raise ParameterError for wrong verification
+        with self.assertRaises(ParameterError) as cm:
+            verify_enrollment(req, None)
+
+        self.assertIn("Verification of the new token failed", str(cm.exception))
+
+        # Token should still be in verify_pending state
+        tok = get_tokens(serial=serial)[0]
+        self.assertEqual(tok.token.rollout_state, RolloutState.VERIFY_PENDING)
+        remove_token(serial)
+
+    def test_20e_verify_enrollment_not_in_verify_pending_state(self):
+        """Test verify_enrollment prepolicy with token not in verify_pending state - should exit early"""
+        from privacyidea.lib.tokenclass import RolloutState
+
+        serial = "HOTP_NOT_VERIFY_PENDING"
+        tok = init_token({"serial": serial,
+                          "type": "hotp",
+                          "otpkey": "31323334353637383940"})
+        # Token that are enrolled directly without verify or 2step have the empty enrollment state
+        # TODO should be unified
+        self.assertEqual(tok.token.rollout_state, "")
+
+        builder = EnvironBuilder(method='POST', data={}, headers={})
+        env = builder.get_environ()
+        req = Request(env)
+        req.all_data = {"serial": serial, "verify": "123456"}
+
+        # Should return None without error (early exit - not in verify_pending state)
+        result = verify_enrollment(req, None)
+        self.assertIsNone(result)
+
+        # Token should still be empty (unchanged)
+        tok = get_tokens(serial=serial)[0]
+        self.assertEqual(tok.token.rollout_state, "")
+        remove_token(serial)
+
+    def test_20f_verify_enrollment_success(self):
+        """Test verify_enrollment prepolicy happy path - successful verification"""
+        from privacyidea.lib.tokenclass import RolloutState
+
+        otpkey_hex = ("5287c8247735148e48cc66412e8510de0414eb996da86edf18d944dd9844d13f9b804fce48a4c6d3f43f27788f70122b"
+                      "457dffc12563e8d319c23c8b6fac5395")
+        first_otp = "148752"
+
+        serial = "HOTP_VERIFY_SUCCESS"
+        tok = init_token({"serial": serial,
+                          "type": "hotp",
+                          "otpkey": otpkey_hex})
+        # Set token to VERIFY_PENDING state
+        tok.token.rollout_state = RolloutState.VERIFY_PENDING
+        tok.save()
+
+        builder = EnvironBuilder(method='POST', data={}, headers={})
+        env = builder.get_environ()
+        req = Request(env)
+        req.all_data = {"serial": serial, "verify": first_otp, "type": "hotp"}
+
+        # Should succeed without raising an error
+        result = verify_enrollment(req, None)
+        self.assertIsNone(result)  # prepolicy returns None on success
+
+        # Token should now be in ENROLLED state
+        tok = get_tokens(serial=serial)[0]
+        self.assertEqual(tok.token.rollout_state, RolloutState.ENROLLED)
+
+        # Verify that the OTP counter was incremented (token consumed the OTP)
+        # The same OTP should not work again
+        r = tok.check_otp(first_otp)
+        self.assertEqual(r, -1)  # -1 means OTP already used
+
+        remove_token(serial)
 
     def test_21_preferred_client_mode_for_user_allowed(self):
         """

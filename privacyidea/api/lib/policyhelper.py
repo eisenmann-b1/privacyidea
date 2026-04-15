@@ -25,7 +25,6 @@ Like policies, that are supposed to read and pass parameters during enrollment o
 import logging
 from dataclasses import dataclass
 from datetime import timedelta, datetime, timezone
-from typing import Union
 
 from privacyidea.lib.container import find_container_for_token, find_container_by_serial
 from privacyidea.lib.error import PolicyError, ResourceNotFoundError
@@ -34,6 +33,7 @@ from privacyidea.lib.policies.actions import PolicyAction
 from privacyidea.lib.policies.conditions import ConditionSection
 from privacyidea.lib.policy import Match, SCOPE
 from privacyidea.lib.realm import realm_is_defined
+from privacyidea.lib.tokens.push_types import PushAction
 from privacyidea.lib.token import get_tokens_from_serial_or_user, get_token_owner
 from privacyidea.lib.tokenclass import TokenClass
 from privacyidea.lib.user import User
@@ -44,14 +44,14 @@ log = logging.getLogger(__name__)
 
 @dataclass
 class UserAttributes:
-    role: Union[str, None] = None
-    username: Union[str, None] = None
-    realm: Union[str, None] = None
-    resolver: Union[str, None] = None
-    adminuser: Union[str, None] = None
-    adminrealm: Union[str, None] = None
-    additional_realms: Union[list, None] = None
-    user: Union[User, None] = None
+    role: str | None = None
+    username: str | None = None
+    realm: str | None = None
+    resolver: str | None = None
+    adminuser: str | None = None
+    adminrealm: str | None = None
+    additional_realms: list | None = None
+    user: User | None = None
 
 
 @log_with(log)
@@ -83,7 +83,7 @@ def get_init_tokenlabel_parameters(g, params=None, token_type="hotp", user_objec
 
     # check the force_app_pin policy
     app_pin_pols = Match.user(g, scope=SCOPE.ENROLL,
-                              action='{0!s}_{1!s}'.format(token_type, PolicyAction.FORCE_APP_PIN),
+                              action=f'{token_type!s}_{PolicyAction.FORCE_APP_PIN!s}',
                               user_object=user_object).any()
 
     if app_pin_pols:
@@ -91,7 +91,7 @@ def get_init_tokenlabel_parameters(g, params=None, token_type="hotp", user_objec
         params[PolicyAction.APP_FORCE_UNLOCK] = "pin"
 
     app_force_unlock = Match.user(g, scope=SCOPE.ENROLL,
-                                  action='{0!s}_{1!s}'.format(token_type, PolicyAction.APP_FORCE_UNLOCK),
+                                  action=f'{token_type!s}_{PolicyAction.APP_FORCE_UNLOCK!s}',
                                   user_object=user_object).action_values(unique=True)
     if app_force_unlock:
         params[PolicyAction.APP_FORCE_UNLOCK] = list(app_force_unlock)[0]
@@ -109,44 +109,43 @@ def get_pushtoken_add_config(g, params=None, user_obj=None):
     :return: modified request parameters
     """
     params = params or {}
-    from privacyidea.lib.tokens.pushtoken import PUSH_ACTION
 
     user = user_obj or None
 
     # Get the firebase configuration from the policies
-    firebase_config = Match.user(g, scope=SCOPE.ENROLL, action=PUSH_ACTION.FIREBASE_CONFIG,
+    firebase_config = Match.user(g, scope=SCOPE.ENROLL, action=PushAction.FIREBASE_CONFIG,
                                  user_object=user).action_values(unique=True, allow_white_space_in_action=True)
     if len(firebase_config) == 1:
-        params[PUSH_ACTION.FIREBASE_CONFIG] = list(firebase_config)[0]
+        params[PushAction.FIREBASE_CONFIG] = list(firebase_config)[0]
     else:
-        raise PolicyError(f"Missing enrollment policy for push token: {PUSH_ACTION.FIREBASE_CONFIG}")
+        raise PolicyError(f"Missing enrollment policy for push token: {PushAction.FIREBASE_CONFIG}")
 
     # Get the sslverify definition from the policies
-    ssl_verify = Match.user(g, scope=SCOPE.ENROLL, action=PUSH_ACTION.SSL_VERIFY,
+    ssl_verify = Match.user(g, scope=SCOPE.ENROLL, action=PushAction.SSL_VERIFY,
                             user_object=user).action_values(unique=True)
     if len(ssl_verify) == 1:
-        params[PUSH_ACTION.SSL_VERIFY] = list(ssl_verify)[0]
+        params[PushAction.SSL_VERIFY] = list(ssl_verify)[0]
     else:
-        params[PUSH_ACTION.SSL_VERIFY] = "1"
+        params[PushAction.SSL_VERIFY] = "1"
 
     # Get the TTL and the registration URL from the policies
-    registration_url = Match.user(g, scope=SCOPE.ENROLL, action=PUSH_ACTION.REGISTRATION_URL,
+    registration_url = Match.user(g, scope=SCOPE.ENROLL, action=PushAction.REGISTRATION_URL,
                                   user_object=user).action_values(unique=True, allow_white_space_in_action=True)
     if len(registration_url) == 1:
-        params[PUSH_ACTION.REGISTRATION_URL] = list(registration_url)[0]
+        params[PushAction.REGISTRATION_URL] = list(registration_url)[0]
     else:
-        raise PolicyError(f"Missing enrollment policy for push token: {PUSH_ACTION.REGISTRATION_URL}")
-    ttl = Match.user(g, scope=SCOPE.ENROLL, action=PUSH_ACTION.TTL,
+        raise PolicyError(f"Missing enrollment policy for push token: {PushAction.REGISTRATION_URL}")
+    ttl = Match.user(g, scope=SCOPE.ENROLL, action=PushAction.TTL,
                      user_object=user).action_values(unique=True, allow_white_space_in_action=True)
     if len(ttl) == 1:
-        params[PUSH_ACTION.TTL] = list(ttl)[0]
+        params[PushAction.TTL] = list(ttl)[0]
     else:
-        params[PUSH_ACTION.TTL] = "10"
+        params[PushAction.TTL] = "10"
 
     # check which scheme to use
-    use_pia_scheme = Match.user(g, scope=SCOPE.ENROLL, action=PUSH_ACTION.USE_PIA_SCHEME,
+    use_pia_scheme = Match.user(g, scope=SCOPE.ENROLL, action=PushAction.USE_PIA_SCHEME,
                                 user_object=user).allowed()
-    params[PUSH_ACTION.USE_PIA_SCHEME] = use_pia_scheme
+    params[PushAction.USE_PIA_SCHEME] = use_pia_scheme
     return params
 
 

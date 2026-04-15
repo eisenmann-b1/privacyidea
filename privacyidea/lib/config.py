@@ -57,7 +57,6 @@ from .log import log_with
 from .machines.base import BaseMachineResolver
 from .resolvers.UserIdResolver import UserIdResolver
 # We need these imports to return the list of CA connector types. Bummer: New import for each new Class anyway.
-from .caconnectors import localca, msca
 from .utils import reload_db, is_true
 from ..models import (Config, db, Resolver, Realm, PRIVACYIDEA_TIMESTAMP,
                       save_config_timestamp, Policy, EventHandler, CAConnector,
@@ -73,7 +72,7 @@ this = sys.modules[__name__]
 this.config = {}
 
 
-class SharedConfigClass(object):
+class SharedConfigClass:
     """
     A shared config class object is shared between threads and is supposed
     to store the current configuration with resolvers, realms, policies
@@ -106,7 +105,6 @@ class SharedConfigClass(object):
         the internal timestamp, then read the complete data
         :return:
         """
-        from .resolvers.HTTPResolver import ADVANCED, HEADERS
         from .resolver import get_resolver_class
         check_reload_config = get_app_config_value("PI_CHECK_RELOAD_CONFIG", 0)
         if not self.timestamp or self.timestamp + datetime.timedelta(
@@ -162,10 +160,6 @@ class SharedConfigClass(object):
                         else:
                             value = rconf.Value
                         data[rconf.Key] = value
-                    if data.get(ADVANCED, False) and HEADERS in data:
-                        # For advanced HTTP resolvers, the headers config is loaded as dict
-                        if data.get(HEADERS):
-                            data[HEADERS] = json.loads(data.get(HEADERS, "{}"))
                     resolverdef["data"] = data
                     resolverconfig[resolver.name] = resolverdef
                 # Load realm configuration
@@ -200,7 +194,7 @@ class SharedConfigClass(object):
                                              "data": ca_obj.config,
                                              "templates": ca_obj.get_templates()})
                     except Exception as exx:  # pragma: no cover
-                        log.debug("{0!s}".format(traceback.format_exc()))
+                        log.debug(f"{traceback.format_exc()!s}")
                         log.error(exx)
 
                 # Finally, set the current timestamp
@@ -241,7 +235,7 @@ class SharedConfigClass(object):
         return self._clone()
 
 
-class LocalConfigClass(object):
+class LocalConfigClass:
     """
     The Config_Object will contain all database configuration of system
     config, resolvers, realms, policies and event handler definitions.
@@ -314,7 +308,7 @@ class LocalConfigClass(object):
         return r_config
 
 
-class SYSCONF(object):
+class SYSCONF:
     __doc__ = """This is a list of system config attributes"""
     OVERRIDECLIENT = "OverrideAuthorizationClient"
     PREPENDPIN = "PrependPin"
@@ -483,12 +477,12 @@ def get_token_class_dict():
             if (inspect.isclass(obj) and issubclass(obj, TokenClass) and
                     obj.__module__ == module.__name__):
                 try:
-                    class_name = "{0!s}.{1!s}".format(module.__name__, obj.__name__)
+                    class_name = f"{module.__name__!s}.{obj.__name__!s}"
                     tokenclass_dict[class_name] = obj
                     if hasattr(obj, 'get_class_type'):
                         tokentype_dict[class_name] = obj.get_class_type()
                 except Exception as e:  # pragma: no cover
-                    log.error("error constructing token_class_dict: {0!r}".format(e))
+                    log.error(f"error constructing token_class_dict: {e!r}")
 
     return tokenclass_dict, tokentype_dict
 
@@ -609,20 +603,20 @@ def get_machine_resolver_class_dict():
 
     modules = get_machine_resolver_module_list()
     for module in modules:
-        log.debug("module: {0!s}".format(module))
+        log.debug(f"module: {module!s}")
         for name in dir(module):
             obj = getattr(module, name)
             if inspect.isclass(obj) and \
                     (issubclass(obj, BaseMachineResolver)) and \
                     (obj != BaseMachineResolver):
                 try:
-                    class_name = "{0!s}.{1!s}".format(module.__name__, obj.__name__)
+                    class_name = f"{module.__name__!s}.{obj.__name__!s}"
                     resolverclass_dict[class_name] = obj
                     resolvertype_dict[class_name] = obj.type
 
                 except Exception as e:  # pragma: no cover
                     log.error("error constructing machine resolver "
-                              "class_list: %r" % e)
+                              f"class_list: {e!r}")
 
     return resolverclass_dict, resolvertype_dict
 
@@ -644,20 +638,20 @@ def get_caconnector_class_dict():
 
     modules = get_caconnector_module_list()
     for module in modules:
-        log.debug("module: {0!s}".format(module))
+        log.debug(f"module: {module!s}")
         for name in dir(module):
             obj = getattr(module, name)
             if inspect.isclass(obj) and \
                     (issubclass(obj, BaseCAConnector)) and \
                     (obj != BaseCAConnector):
                 try:
-                    class_name = "{0!s}.{1!s}".format(module.__name__, obj.__name__)
+                    class_name = f"{module.__name__!s}.{obj.__name__!s}"
                     class_dict[class_name] = obj
                     type_dict[class_name] = obj.connector_type
 
                 except Exception as e:  # pragma: no cover
                     log.error("error constructing CA connector "
-                              "class_list: %r" % e)
+                              f"class_list: {e!r}")
 
     return class_dict, type_dict
 
@@ -685,7 +679,7 @@ def get_resolver_class_dict():
 
     modules = get_resolver_module_list()
     for module in modules:
-        log.debug("module: {0!s}".format(module))
+        log.debug(f"module: {module!s}")
         for name in dir(module):
             obj = getattr(module, name)
             # There are other classes like HMAC in the lib.tokens module,
@@ -695,7 +689,7 @@ def get_resolver_class_dict():
                 # We must not process imported classes!
                 # if obj.__module__ == module.__name__:
                 try:
-                    class_name = "{0!s}.{1!s}".format(module.__name__, obj.__name__)
+                    class_name = f"{module.__name__!s}.{obj.__name__!s}"
                     resolverclass_dict[class_name] = obj
 
                     prefix = class_name.split('.')[1]
@@ -705,7 +699,7 @@ def get_resolver_class_dict():
                     resolverprefix_dict[class_name] = prefix
 
                 except Exception as e:  # pragma: no cover
-                    log.error("error constructing resolverclass_list: {0!r}".format(e))
+                    log.error(f"error constructing resolverclass_list: {e!r}")
 
     return resolverclass_dict, resolverprefix_dict
 
@@ -734,7 +728,7 @@ def get_resolver_list():
     # TODO: Migration
     # config_modules = config.get("privacyideaResolverModules", '')
     config_modules = None
-    log.debug("{0!s}".format(config_modules))
+    log.debug(f"{config_modules!s}")
     if config_modules:
         # in the config *.ini files we have some line continuation slashes,
         # which will result in ugly module names, but as they are followed by
@@ -840,12 +834,12 @@ def get_email_validators():
             if mod_name == '\\' or len(mod_name.strip()) == 0:
                 continue
             try:
-                log.debug("import module: {0!s}".format(mod_name))
+                log.debug(f"import module: {mod_name!s}")
                 module = importlib.import_module(mod_name)
                 validator_dict[mod_name] = module.validate_email
             except Exception as exx:  # pragma: no cover
                 log.warning('unable to load validate module with function "validate_email": '
-                            '{0!r} ({1!r})'.format(mod_name, exx))
+                            f'{mod_name!r} ({exx!r})')
         this.config["pi_email_validators"] = validator_dict
 
     return this.config["pi_email_validators"]
@@ -861,7 +855,7 @@ def get_token_module_list():
     """
     # def load_resolver_modules
     module_list = get_token_list()
-    log.debug("using the module list: {0!s}".format(module_list))
+    log.debug(f"using the module list: {module_list!s}")
 
     modules = []
     for mod_name in module_list:
@@ -869,11 +863,11 @@ def get_token_module_list():
             continue
 
         try:
-            log.debug("import module: {0!s}".format(mod_name))
+            log.debug(f"import module: {mod_name!s}")
             module = importlib.import_module(mod_name)
             modules.append(module)
         except Exception as exx:  # pragma: no cover
-            log.warning('unable to load token module : {0!r} ({1!r})'.format(mod_name, exx))
+            log.warning(f'unable to load token module : {mod_name!r} ({exx!r})')
 
     return modules
 
@@ -889,7 +883,7 @@ def get_resolver_module_list():
 
     # def load_resolver_modules
     module_list = get_resolver_list()
-    log.debug("using the module list: {0!s}".format(module_list))
+    log.debug(f"using the module list: {module_list!s}")
 
     modules = []
     for mod_name in module_list:
@@ -897,12 +891,12 @@ def get_resolver_module_list():
             continue
 
         try:
-            log.debug("import module: {0!s}".format(mod_name))
+            log.debug(f"import module: {mod_name!s}")
             module = importlib.import_module(mod_name)
 
         except Exception as exx:  # pragma: no cover
             module = None
-            log.warning('unable to load resolver module : {0!r} ({1!r})'.format(mod_name, exx))
+            log.warning(f'unable to load resolver module : {mod_name!r} ({exx!r})')
 
         if module is not None:
             modules.append(module)
@@ -924,12 +918,12 @@ def get_caconnector_module_list():
     for mod_name in module_list:
         mod_name = ".".join(mod_name.split(".")[:-1])
         try:
-            log.debug("import module: {0!s}".format(mod_name))
+            log.debug(f"import module: {mod_name!s}")
             module = importlib.import_module(mod_name)
 
         except Exception as exx:  # pragma: no cover
             module = None
-            log.warning('unable to load ca connector module : {0!r} ({1!r})'.format(mod_name, exx))
+            log.warning(f'unable to load ca connector module : {mod_name!r} ({exx!r})')
 
         if module is not None:
             modules.append(module)
@@ -948,18 +942,18 @@ def get_machine_resolver_module_list():
 
     # def load_resolver_modules
     class_list = get_machine_resolver_class_list()
-    log.debug("using the class list: {0!s}".format(class_list))
+    log.debug(f"using the class list: {class_list!s}")
 
     modules = []
     for class_name in class_list:
         try:
             module_name = ".".join(class_name.split(".")[:-1])
-            log.debug("import module: {0!s}".format(module_name))
+            log.debug(f"import module: {module_name!s}")
             module = importlib.import_module(module_name)
 
         except Exception as exx:  # pragma: no cover
             module = None
-            log.warning('unable to load machine resolver module : {0!r} ({1!r})'.format(module_name, exx))
+            log.warning(f'unable to load machine resolver module : {module_name!r} ({exx!r})')
 
         if module is not None:
             modules.append(module)
@@ -1134,7 +1128,7 @@ def export_config(name=None):
 @register_import()
 def import_config(data, name=None):
     """Import given server configuration"""
-    log.debug('Import server config: {0!s}'.format(data))
+    log.debug(f'Import server config: {data!s}')
     res = {}
     data.pop('__timestamp__', None)
     for key, values in data.items():
@@ -1144,9 +1138,9 @@ def import_config(data, name=None):
                                    desc=values['Description'] if 'Description' in values else None,
                                    typ=values['Type'] if 'Type' in values else None)
         res[key] = r
-    log.info('Added configuration: {0!s}'.format(
+    log.info('Added configuration: {!s}'.format(
         ', '.join([k for k, v in res.items() if v == 'insert'])))
-    log.info('Updated configuration: {0!s}'.format(
+    log.info('Updated configuration: {!s}'.format(
         ', '.join([k for k, v in res.items() if v == 'update'])))
 
 

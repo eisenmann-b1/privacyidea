@@ -60,6 +60,10 @@ Example::
 
 This returns all orphaned tokens for later processing.
 
+``--orphaned-on-error True``
+
+Add this parameter to additionally check, if there is an error when finding tokens, due to a connection error with the resolver. Set this to True, to display tokens that are orphaned, due to a resolver error. Set this to False to exclude Tokens that are orphaned, due to a resolver error.
+
 Active
 ******
 
@@ -484,7 +488,7 @@ You can use several options to filter the tokens.
 
     Search for all tokens which have the tokeninfo-key ``import_time``.
 
-``--tokenower``
+``--tokenowner``
     Find tokens from a specific token owner(user). You can use user attributes
     like the username, the realm or the resolver.
     This option can be used multiple times.
@@ -527,7 +531,7 @@ You can use several options to filter the tokens.
 
 ``--orphaned-on-error``
     When searching for orphaned tokens, mark the token as orphaned if the user
-    can not be found due to a resolver error.
+    can not be found due to a resolver error. By default this parameter is set to False.
 
 ``--range-of-serials``
     Find tokens with serials in a specific range.
@@ -548,7 +552,7 @@ Example::
 
 .. note:: This command is the default command if no action is specified.
 
-``-u``, ``--show-user-attributes``
+``-u``, ``--show-user-attribute``
     You can use this option to extend the output with user attributes.
     This option can be used multiple times.
 
@@ -565,14 +569,14 @@ Example::
 
         pi-tokenjanitor find --tokenattribute 'serial=OATH0004C934' list -t tokenkind
 
-``--sum``
+``--summarize``
     You can use this option to group the token output by user.
 
     Example::
 
-        pi-tokenjanitor find --tokenattribute 'serial=OATH0004C934' list --sum
+        pi-tokenjanitor find --tokenattribute 'serial=OATH0004C934' list --summarize
 
-    .. note:: The option ``--sum`` only works with the option ``--show-user-attributes``.
+    .. note:: The option ``--summarize`` only works with the option ``--show-user-attribute``.
 
 export
 ******

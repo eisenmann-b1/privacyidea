@@ -1,5 +1,5 @@
 /**
- * (c) NetKnights GmbH 2025,  https://netknights.it
+ * (c) NetKnights GmbH 2026,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -17,7 +17,14 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { Injectable } from "@angular/core";
-import { TokenApiPayloadMapper, TokenEnrollmentData, TokenEnrollmentPayload } from "./_token-api-payload.mapper";
+import {
+  BaseApiPayloadMapper,
+  TokenApiPayloadMapper,
+  TokenEnrollmentData,
+  TokenEnrollmentPayload
+} from "./_token-api-payload.mapper";
+import { TokenDetails } from "../../services/token/token.service";
+import { parseBooleanValue } from "src/app/utils/parse-boolean-value";
 
 export interface EmailEnrollmentData extends TokenEnrollmentData {
   type: "email";
@@ -27,28 +34,21 @@ export interface EmailEnrollmentData extends TokenEnrollmentData {
 
 export interface EmailEnrollmentPayload extends TokenEnrollmentPayload {
   email?: string;
-  dynamic_email: boolean;
+  dynamic_email?: boolean;
 }
 
 @Injectable({ providedIn: "root" })
-export class EmailApiPayloadMapper implements TokenApiPayloadMapper<EmailEnrollmentData> {
-  toApiPayload(data: EmailEnrollmentData): EmailEnrollmentPayload {
+export class EmailApiPayloadMapper extends BaseApiPayloadMapper implements TokenApiPayloadMapper<EmailEnrollmentData> {
+  override toApiPayload(data: EmailEnrollmentData): EmailEnrollmentPayload {
+    const basePayload = super.toApiPayload(data);
     const payload: EmailEnrollmentPayload = {
-      type: data.type,
-      description: data.description,
-      container_serial: data.containerSerial,
-      validity_period_start: data.validityPeriodStart,
-      validity_period_end: data.validityPeriodEnd,
-      user: data.user,
-      realm: data.user ? data.realm : null,
-      pin: data.pin,
-      email: data.emailAddress,
+      ...basePayload,
+      ...(data.emailAddress !== undefined && { email: data.emailAddress }),
       dynamic_email: !!data.readEmailDynamically
     };
-
     if (data.onlyAddToRealm) {
       payload.realm = data.realm;
-      payload.user = null;
+      delete payload.user;
     }
     if (payload.email === undefined) {
       delete payload.email;
@@ -56,8 +56,22 @@ export class EmailApiPayloadMapper implements TokenApiPayloadMapper<EmailEnrollm
     return payload;
   }
 
-  fromApiPayload(payload: any): EmailEnrollmentData {
-    // Placeholder: Implement transformation from API payload. We will replace this later.
-    return payload as EmailEnrollmentData;
+  override fromApiPayload(payload: EmailEnrollmentPayload): EmailEnrollmentData {
+    const baseData = super.fromApiPayload(payload);
+    return {
+      ...baseData,
+      type: "email",
+      emailAddress: payload.email,
+      readEmailDynamically: parseBooleanValue(payload.dynamic_email ?? false)
+    };
+  }
+
+  override fromTokenDetailsToEnrollmentData(details: TokenDetails): EmailEnrollmentData {
+    return {
+      ...super.fromTokenDetailsToEnrollmentData(details),
+      type: "email",
+      emailAddress: details.info?.email ?? undefined,
+      readEmailDynamically: parseBooleanValue(details.info?.dynamic_email ?? false)
+    };
   }
 }

@@ -21,7 +21,7 @@ import { TableUtilsService } from "./table-utils.service";
 import { provideHttpClient } from "@angular/common/http";
 import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { MatTableDataSource } from "@angular/material/table";
-import { FilterValue } from "../../core/models/filter_value";
+import { FilterValue } from "../../core/models/filter_value/filter_value";
 import { AuthService, JwtData } from "../auth/auth.service";
 
 describe("TableUtilsService", () => {
@@ -265,10 +265,10 @@ describe("TableUtilsService", () => {
   });
 
   it.each([
-    ["description", "height-104"],
+    ["description", "height-127"],
     ["realms", "height-78"],
     ["tokengroup", "height-78"],
-    ["id", "height-52"]
+    ["id", "height-53"]
   ])('getTdClassForKey("%s") includes %s', (key, expectedPart) => {
     expect(service.getTdClassForKey(key)).toContain(expectedPart);
   });

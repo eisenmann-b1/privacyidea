@@ -1,5 +1,5 @@
 /**
- * (c) NetKnights GmbH 2025,  https://netknights.it
+ * (c) NetKnights GmbH 2026,  https://netknights.it
  *
  * This code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -18,43 +18,40 @@
  **/
 
 import { DialogServiceInterface } from "../../app/services/dialog/dialog.service";
-import { signal } from "@angular/core";
-import { of, Subject } from "rxjs";
+import { MockMatDialogRef } from "../mock-mat-dialog-ref";
 
 export class MockDialogService implements DialogServiceInterface {
-  isSelfServing = signal<boolean>(false);
-  tokenEnrollmentFirstStepRef = null;
-  isTokenEnrollmentFirstStepDialogOpen = false;
-  tokenEnrollmentLastStepRef = null;
-  isTokenEnrollmentLastStepDialogOpen = false;
+  private lastDialogRef: any = null;
 
-  private _firstStepAfterClosed$?: Subject<any>;
-
-  openTokenEnrollmentFirstStepDialog = jest.fn().mockImplementation((config?: any) => {
-    this.isTokenEnrollmentFirstStepDialogOpen = true;
-    this._firstStepAfterClosed$ = new Subject<any>();
-    return {
-      afterClosed: () => this._firstStepAfterClosed$!.asObservable()
-    } as any;
+  closeDialog = jest.fn().mockImplementation((dialogRef) => {
+    if (this.lastDialogRef === dialogRef) {
+      this.lastDialogRef = null;
+    }
+    return true;
   });
 
-  closeTokenEnrollmentFirstStepDialog = jest.fn().mockImplementation(() => {
-    this.isTokenEnrollmentFirstStepDialogOpen = false;
-    this._firstStepAfterClosed$?.next(true);
-    this._firstStepAfterClosed$?.complete();
+  openDialog = jest.fn().mockImplementation(() => {
+    this.lastDialogRef = new MockMatDialogRef();
+    return this.lastDialogRef;
   });
 
-  openTokenEnrollmentLastStepDialog = jest.fn().mockImplementation((config?: any) => {
-    this.isTokenEnrollmentLastStepDialogOpen = true;
-    return {
-      afterClosed: () => of(true)
-    } as any;
+  openDialogAsync = jest.fn().mockResolvedValue(true);
+
+  closeLatestDialog = jest.fn().mockImplementation(() => {
+    this.lastDialogRef = null;
   });
 
-  closeTokenEnrollmentLastStepDialog = jest.fn().mockImplementation(() => {
-    this.isTokenEnrollmentLastStepDialogOpen = false;
+  closeAllDialogs = jest.fn().mockImplementation(() => {
+    this.lastDialogRef = null;
+  });
+
+  isDialogOpen = jest.fn().mockImplementation((dialogRef) => {
+    return this.lastDialogRef === dialogRef && this.lastDialogRef !== null;
+  });
+
+  isAnyDialogOpen = jest.fn().mockImplementation(() => {
+    return this.lastDialogRef !== null;
   });
 
   confirm = jest.fn().mockResolvedValue(true);
-  isAnyDialogOpen = jest.fn().mockReturnValue(false);
 }

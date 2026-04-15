@@ -4,6 +4,7 @@
 .tokengroups-container {
   @include styles.main-component-style;
   @include styles.base-table-structure(".tokengroups-table", ".table-filter", ".table-scroll-container");
+  width: 664px;
 }
 
 .actions-container {

@@ -82,5 +82,9 @@
 .subscriptions-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: auto auto;
+  grid-template-columns: 1fr 1fr;
+
+  @media (max-width: 1040px) {
+    grid-template-columns: 1fr;
+  }
 }

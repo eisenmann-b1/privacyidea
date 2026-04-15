@@ -93,7 +93,8 @@ export class SmsGatewaysComponent {
     this.dialog.open(NewSmsGatewayComponent, {
       data: gateway ? { ...gateway } : null,
       width: "auto",
-      maxWidth: "100vw"
+      maxWidth: "65vw",
+      maxHeight: "90vh"
     });
   }
 

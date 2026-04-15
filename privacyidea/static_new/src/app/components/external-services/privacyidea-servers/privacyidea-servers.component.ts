@@ -93,7 +93,8 @@ export class PrivacyideaServersComponent {
     this.dialog.open(NewPrivacyideaServerComponent, {
       data: server ? { ...server } : null,
       width: "auto",
-      maxWidth: "100vw"
+      maxWidth: "65vw",
+      maxHeight: "90vh"
     });
   }
 

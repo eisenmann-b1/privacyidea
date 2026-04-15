@@ -92,7 +92,8 @@ export class TokengroupsComponent {
     this.dialog.open(NewTokengroupComponent, {
       data: group ? { ...group } : null,
       width: "auto",
-      maxWidth: "100vw"
+      maxWidth: "65vw",
+      maxHeight: "90vh"
     });
   }
 

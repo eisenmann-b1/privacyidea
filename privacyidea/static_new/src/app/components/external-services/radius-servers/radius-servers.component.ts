@@ -89,7 +89,8 @@ export class RadiusServersComponent {
     this.dialog.open(NewRadiusServerComponent, {
       data: server ? { ...server } : null,
       width: "auto",
-      maxWidth: "100vw"
+      maxWidth: "65vw",
+      maxHeight: "90vh"
     });
   }
 

@@ -84,6 +84,11 @@
   gap: 1rem;
   grid-template-columns: 1fr 1fr;
 
+  // single subscription should take full width
+  > *:only-child {
+    grid-column: 1 / -1;
+  }
+
   @media (max-width: 1040px) {
     grid-template-columns: 1fr;
   }

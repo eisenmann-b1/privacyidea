@@ -16,7 +16,8 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { ComponentFixture, TestBed, fakeAsync, tick } from "@angular/core/testing";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { provideZonelessChangeDetection } from "@angular/core";
 import { HorizontalWheelComponent } from "./horizontal-wheel.component";
 
 import { Component, ViewChild, signal } from "@angular/core";
@@ -44,7 +45,8 @@ describe("HorizontalWheelComponent", () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TestHostComponent]
+      imports: [TestHostComponent],
+      providers: [provideZonelessChangeDetection()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestHostComponent);

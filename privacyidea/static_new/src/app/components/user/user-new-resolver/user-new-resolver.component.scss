@@ -10,6 +10,7 @@
 .user-new-resolver-container {
   @include dialog.dialog-container-styles;
   @include table.base-table-structure(".token-table", ".token-table-filter", ".table-scroll-container");
+  min-width: 632px;
 }
 
 :host ::ng-deep .mat-mdc-form-field-infix {

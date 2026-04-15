@@ -1074,8 +1074,8 @@ class WebAuthnTokenClass(TokenClass):
                     )
                     if not _attestation_certificate_allowed(attestation_cert, allowed_certs_pols):
                         log.warning(
-                            "The WebAuthn token {0!s} is not allowed to be registered due to policy restriction {1!s}"
-                            .format(serial, FIDO2PolicyAction.REQ))
+                            f"The WebAuthn token {serial!s} is not allowed to be registered "
+                            f"due to policy restriction {FIDO2PolicyAction.REQ!s}")
                         raise PolicyError(
                             "The WebAuthn token is not allowed to be registered due to a policy restriction.")
 
@@ -1084,8 +1084,8 @@ class WebAuthnTokenClass(TokenClass):
                 if allowed_aaguids_pols:
                     if registration_verification.aaguid not in allowed_aaguids_pols:
                         log.warning(
-                            "The WebAuthn token {0!s} is not allowed to be registered due to policy restriction {1!s}"
-                            .format(serial, FIDO2PolicyAction.AUTHENTICATOR_SELECTION_LIST))
+                            f"The WebAuthn token {serial!s} is not allowed to be registered "
+                            f"due to policy restriction {FIDO2PolicyAction.AUTHENTICATOR_SELECTION_LIST!s}")
                         raise PolicyError(
                             "The WebAuthn token is not allowed to be registered due to a policy restriction.")
 

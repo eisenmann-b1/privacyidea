@@ -335,8 +335,7 @@ class WebAuthnUser:
         self.rp_id = rp_id
 
     def __str__(self):
-        return '{!r} ({}, {}, {})'.format(self.user_id, self.user_name,
-                                          self.user_display_name, self.sign_count)
+        return f'{self.user_id!r} ({self.user_name}, {self.user_display_name}, {self.sign_count})'
 
 
 def webauthn_b64_decode(encoded):

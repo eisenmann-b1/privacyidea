@@ -104,7 +104,7 @@ from .policydecorators import libpolicy, auth_otppin, challenge_response_allowed
 from .user import (User)
 from privacyidea.lib.params import get_optional, get_required
 from ..models import (TokenOwner, TokenTokengroup, Challenge, cleanup_challenges, TokenInfo, db, TokenRealm, Realm,
-                      Tokengroup, TokenCredentialIdHash, Token)
+                      Tokengroup, TokenCredentialIdHash)
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M%z'
 AUTH_DATE_FORMAT = "%Y-%m-%d %H:%M:%S.%f%z"

@@ -102,7 +102,7 @@ class SubscriptionError(PrivacyIDEAError):
         return self.__repr__()
 
     def __repr__(self):
-        ret = '{0!s}({1!r}, application={2!s})'.format(type(
+        ret = '{!s}({!r}, application={!s})'.format(type(
             self).__name__, self.message, self.application)
         return ret
 

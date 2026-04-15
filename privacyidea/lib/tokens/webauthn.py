@@ -467,20 +467,20 @@ class WebAuthnMakeCredentialOptions:
 
         attestation = str(attestation).lower()
         if attestation not in ATTESTATION_FORMS:
-            raise ValueError('Attestation string must be one of {0!s}'.format(', '.join(ATTESTATION_FORMS)))
+            raise ValueError('Attestation string must be one of {!s}'.format(', '.join(ATTESTATION_FORMS)))
         self.attestation = attestation
 
         if user_verification is not None:
             user_verification = str(user_verification).lower()
             if user_verification not in USER_VERIFICATION_LEVELS:
-                raise ValueError('user_verification must be one of {0!s}'.format(', '.join(USER_VERIFICATION_LEVELS)))
+                raise ValueError('user_verification must be one of {!s}'.format(', '.join(USER_VERIFICATION_LEVELS)))
         self.user_verification = user_verification
 
         if authenticator_attachment is not None:
             authenticator_attachment = str(authenticator_attachment).lower()
             if authenticator_attachment not in AUTHENTICATOR_ATTACHMENT_TYPES:
                 raise ValueError(
-                    'authenticator_attachment must be one of {0!s}'.format(', '.join(AUTHENTICATOR_ATTACHMENT_TYPES)))
+                    'authenticator_attachment must be one of {!s}'.format(', '.join(AUTHENTICATOR_ATTACHMENT_TYPES)))
         self.authenticator_attachment = authenticator_attachment
 
         if int(timeout) < 1:
@@ -607,7 +607,7 @@ class WebAuthnAssertionOptions:
         self.user_verification_requirement = str(user_verification_requirement).lower()
         if self.user_verification_requirement not in USER_VERIFICATION_LEVELS:
             raise ValueError(
-                'user_verification_requirement must be one of {0!s}'.format(', '.join(USER_VERIFICATION_LEVELS)))
+                'user_verification_requirement must be one of {!s}'.format(', '.join(USER_VERIFICATION_LEVELS)))
 
     @property
     def assertion_dict(self):
@@ -695,8 +695,7 @@ class WebAuthnUser:
         self.rp_id = rp_id
 
     def __str__(self):
-        return '{!r} ({}, {}, {})'.format(self.user_id, self.user_name,
-                                          self.user_display_name, self.sign_count)
+        return f'{self.user_id!r} ({self.user_name}, {self.user_display_name}, {self.sign_count})'
 
 
 class WebAuthnCredential:
@@ -746,7 +745,7 @@ class WebAuthnCredential:
 
         attestation_level = str(attestation_level).lower()
         if attestation_level not in ATTESTATION_LEVELS:
-            raise ValueError('Attestation level must be one of {0!s}'.format(', '.join(ATTESTATION_LEVELS)))
+            raise ValueError('Attestation level must be one of {!s}'.format(', '.join(ATTESTATION_LEVELS)))
         self.attestation_level = attestation_level
 
     @property
@@ -768,8 +767,7 @@ class WebAuthnCredential:
         return not ATTESTATION_REQUIREMENT_LEVEL[self.attestation_level]['self_attestation_permitted']
 
     def __str__(self):
-        return '{!r} ({}, {}, {})'.format(self.credential_id, self.rp_id,
-                                          self.origin, self.sign_count)
+        return f'{self.credential_id!r} ({self.rp_id}, {self.origin}, {self.sign_count})'
 
 
 class WebAuthnRegistrationResponse:
@@ -1173,9 +1171,9 @@ class WebAuthnRegistrationResponse:
                 except COSEKeyException as e:
                     raise RegistrationRejectedException(str(e))
                 if alg != public_key_alg:
-                    raise RegistrationRejectedException('credentialPublicKey algorithm {0!s} does '
+                    raise RegistrationRejectedException(f'credentialPublicKey algorithm {public_key_alg!s} does '
                                                         'not match algorithm from attestation '
-                                                        'statement {1!s}'.format(public_key_alg, alg))
+                                                        f'statement {alg!s}')
                 # Step 2:
                 # Verify that sig is a valid signature over the concatenation of authenticatorData
                 # and clientDataHash using the credential public key with alg.
@@ -1184,8 +1182,8 @@ class WebAuthnRegistrationResponse:
                 except InvalidSignature:
                     raise RegistrationRejectedException('Invalid signature received.')
                 except NotImplementedError:  # pragma: no cover
-                    log.warning('Unsupported algorithm ({0!s}) for signature '
-                                'verification'.format(alg))
+                    log.warning(f'Unsupported algorithm ({alg!s}) for signature '
+                                'verification')
                     # We do not support this algorithm. Treat as none attestation, if acceptable.
                     if none_attestation_permitted:
                         return (
@@ -1197,7 +1195,7 @@ class WebAuthnRegistrationResponse:
                         )
                     else:
                         raise RegistrationRejectedException('Unsupported algorithm '
-                                                            '({0!s}).'.format(alg))
+                                                            f'({alg!s}).')
                 return (
                     AttestationType.SELF_ATTESTATION,
                     [],
@@ -1212,7 +1210,7 @@ class WebAuthnRegistrationResponse:
                     raise RegistrationRejectedException('Authenticator attestation is required.')
                 else:
                     raise RegistrationRejectedException(
-                        'Unsupported authenticator attestation format ({0!s})!'.format(fmt))
+                        f'Unsupported authenticator attestation format ({fmt!s})!')
 
             # Treat as none attestation.
             #
@@ -1478,7 +1476,7 @@ class WebAuthnRegistrationResponse:
             return credential
 
         except Exception as e:
-            raise RegistrationRejectedException('Registration rejected. Error: {}'.format(e))
+            raise RegistrationRejectedException(f'Registration rejected. Error: {e}')
 
 
 class WebAuthnAssertionResponse:
@@ -1736,7 +1734,7 @@ class WebAuthnAssertionResponse:
             return sign_count
 
         except Exception as e:
-            raise AuthenticationRejectedException('Authentication rejected. Error: {}'.format(e))
+            raise AuthenticationRejectedException(f'Authentication rejected. Error: {e}')
 
 
 def webauthn_b64_decode(encoded):
@@ -1784,7 +1782,7 @@ def _encode_public_key(public_key):
     :return: The coordinates packed into a standard byte string representation.
     """
     numbers = public_key.public_numbers()
-    return b'\x04' + binascii.unhexlify('{:064x}{:064x}'.format(numbers.x, numbers.y))
+    return b'\x04' + binascii.unhexlify(f'{numbers.x:064x}{numbers.y:064x}')
 
 
 def _load_cose_public_key(key_bytes):
@@ -1834,7 +1832,7 @@ def _load_cose_public_key(key_bytes):
 
         return alg, RSAPublicNumbers(e, n).public_key(backend=default_backend())
     else:
-        log.warning('Unsupported webAuthn COSE algorithm: {0!s}'.format(alg))
+        log.warning(f'Unsupported webAuthn COSE algorithm: {alg!s}')
         raise COSEKeyException('Unsupported algorithm.')
 
 
@@ -1859,8 +1857,8 @@ def _get_trust_anchors(attestation_type, attestation_fmt, trust_anchor_dir):
 
     if attestation_type not in SUPPORTED_ATTESTATION_TYPES \
             or attestation_fmt not in SUPPORTED_ATTESTATION_FORMATS:
-        log.debug('Unsupported attestation type ({0!s}) or attestation format '
-                  '({1!s}).'.format(attestation_type, attestation_fmt))
+        log.debug(f'Unsupported attestation type ({attestation_type!s}) or attestation format '
+                  f'({attestation_fmt!s}).')
         return []
 
     trust_anchors = []
@@ -1875,10 +1873,10 @@ def _get_trust_anchors(attestation_type, attestation_fmt, trust_anchor_dir):
                         pem = cryptography.x509.load_pem_x509_certificate(pem_data.strip())
                         trust_anchors.append(pem)
                 except Exception as e:
-                    log.info('Could not load certificate {0!s}: '
-                             '{1!s}'.format(trust_anchor_path, e))
+                    log.info(f'Could not load certificate {trust_anchor_path!s}: '
+                             f'{e!s}')
     else:
-        log.debug('Trust anchor directory ({0!s}) not available.'.format(trust_anchor_dir))
+        log.debug(f'Trust anchor directory ({trust_anchor_dir!s}) not available.')
 
     return trust_anchors
 
@@ -1900,7 +1898,7 @@ def _is_trusted_x509_attestation_cert(trust_path, trust_anchors):
         store_ctx.verify_certificate()
         return True
     except Exception as e:
-        log.info('Unable to verify certificate: {}'.format(e))
+        log.info(f'Unable to verify certificate: {e}')
 
     return False
 

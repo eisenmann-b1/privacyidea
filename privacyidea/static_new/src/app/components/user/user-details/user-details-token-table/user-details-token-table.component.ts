@@ -16,7 +16,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Component, effect, inject, linkedSignal, ViewChild, WritableSignal, ElementRef, signal } from "@angular/core";
+import { Component, effect, ElementRef, inject, linkedSignal, signal, ViewChild, WritableSignal } from "@angular/core";
 import { CopyButtonComponent } from "../../../shared/copy-button/copy-button.component";
 import {
   MatCell,
@@ -98,9 +98,9 @@ export class UserDetailsTokenTableComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   sort = signal({ active: "serial", direction: "asc" } as Sort);
   apiFilter = this.tokenService.apiFilter;
-  @ViewChild('filterInput', { static: false }) filterInput!: ElementRef<HTMLInputElement>;
+  @ViewChild("filterInput", { static: false }) filterInput!: ElementRef<HTMLInputElement>;
   userTokenData: WritableSignal<MatTableDataSource<any, MatPaginator>> = linkedSignal({
-    source: this.tokenService.userTokenResource.value,
+    source: () => this.tokenService.userTokenResource.hasValue() ? this.tokenService.userTokenResource.value() : undefined,
     computation: (userTokenResource, previous) => {
       if (!userTokenResource) {
         return previous?.value ?? new MatTableDataSource<any, MatPaginator>([]);

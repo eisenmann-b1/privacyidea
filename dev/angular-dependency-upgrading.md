@@ -77,7 +77,7 @@ While angular should always be updated first using the `ng update` command, othe
 With `ncu -u` versions in the `package.json` will be updated to the latest versions. Running `npm install` afterward 
 updates `package-lock.json` and installs new dependencies.
 
-Usefull options for `ncu`:
+Useful options for `ncu`:
 - `-u` - Update `package.json` with new versions (without this option, ncu only checks for new versions and prints them to the console)
 - `--target semver` - Only update according to semver rules (e.g. minor updates only)
 - `-c 7d`- Only packages with a minimum age of 7 days are updated to reduce the risk of supply chain attacks

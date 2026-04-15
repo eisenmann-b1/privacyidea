@@ -18,7 +18,7 @@
  **/
 
 import { Component, inject, computed, linkedSignal, effect } from "@angular/core";
-import { CommonModule } from "@angular/common";
+
 import { FormsModule } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
@@ -49,7 +49,6 @@ import { ContentService, ContentServiceInterface } from "../../../../../services
   selector: "app-container-template-edit-dialog",
   standalone: true,
   imports: [
-    CommonModule,
     MatInputModule,
     MatCardModule,
     MatIconModule,

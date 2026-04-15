@@ -16,8 +16,8 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Component, effect, inject, Renderer2, signal } from "@angular/core";
-import { DOCUMENT } from "@angular/common";
+import { Component, effect, inject, Renderer2, signal, DOCUMENT } from "@angular/core";
+
 import { MatProgressBar } from "@angular/material/progress-bar";
 import { RouterOutlet } from "@angular/router";
 import { AuthService, AuthServiceInterface } from "../../services/auth/auth.service";

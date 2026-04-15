@@ -77,6 +77,7 @@ export class TokenDetailsUserComponent {
   @Input() isEditingInfo!: WritableSignal<boolean>;
   @Input() isAnyEditingOrRevoked!: Signal<boolean>;
   tokenType = computed(() => {
+    if (!this.tokenService.tokenDetailResource.hasValue()) return undefined;
     const tokenDetail = this.tokenService.tokenDetailResource.value();
     return tokenDetail?.result?.value?.tokens?.[0].tokentype;
   });

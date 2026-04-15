@@ -4107,7 +4107,7 @@ class RegistrationAndPasswordToken(MyApiTestCase):
             data = res.json
             error = data.get("result").get("error")
             self.assertEqual(905, error.get("code"))
-            self.assertEqual("ERR905: Missing parameter: 'service_id'", error.get("message"), data)
+            self.assertEqual("ERR905: Missing parameter: service_id", error.get("message"), data)
 
         # Now pass all necessary parameters
         with self.app.test_request_context('/token/init',
@@ -5615,7 +5615,7 @@ class AChallengeResponse(MyApiTestCase):
             res = self.app.full_dispatch_request()
             self.assertEqual(400, res.status_code)
             self.assertFalse(res.json["result"]["status"])
-            self.assertIn("Missing parameter: 'transaction_id'", res.json["result"]["error"]["message"])
+            self.assertIn("Missing parameter: transaction_id", res.json["result"]["error"]["message"])
 
         # wildcards do not work
         with self.app.test_request_context("/validate/polltransaction", method="GET",

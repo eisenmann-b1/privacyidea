@@ -26,10 +26,10 @@
 .resolver-link {
   cursor: pointer;
   text-decoration: underline;
-  color: var(--mdc-theme-primary);
+  color: var(--mat-theme-primary);
 
   &:hover {
-    color: var(--mdc-theme-secondary);
+    color: var(--mat-theme-secondary);
   }
 }
 

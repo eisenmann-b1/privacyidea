@@ -118,10 +118,10 @@ export class UserDetailsComponent {
   pageSizeOptions = this.tableUtilsService.pageSizeOptions;
 
   total: WritableSignal<number> = linkedSignal({
-    source: this.tokenResource.value,
-    computation: (tokenResource, previous) => {
-      if (tokenResource && tokenResource.result?.value) {
-        return tokenResource.result?.value.count;
+    source: this.tokenService.tokenResourceValue,
+    computation: (tokenResourceValue, previous) => {
+      if (tokenResourceValue) {
+        return tokenResourceValue.count;
       }
       return previous?.value ?? 0;
     }
@@ -134,10 +134,10 @@ export class UserDetailsComponent {
   tokenAutoTrigger!: MatAutocompleteTrigger;
 
   tokenDataSource: WritableSignal<MatTableDataSource<TokenDetails>> = linkedSignal({
-    source: this.tokenResource.value,
-    computation: (tokenResource, previous) => {
-      if (tokenResource && tokenResource.result?.value) {
-        return new MatTableDataSource(tokenResource.result?.value.tokens);
+    source: this.tokenService.tokenResourceValue,
+    computation: (tokenResourceValue, previous) => {
+      if (tokenResourceValue) {
+        return new MatTableDataSource(tokenResourceValue.tokens);
       }
       return previous?.value ?? new MatTableDataSource();
     }

@@ -31,7 +31,6 @@ import { TokenDetails, TokenService, TokenServiceInterface } from "../../../serv
 
 import { ClearableInputComponent } from "../../shared/clearable-input/clearable-input.component";
 import { CopyButtonComponent } from "../../shared/copy-button/copy-button.component";
-import { MatDialog } from "@angular/material/dialog";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIcon } from "@angular/material/icon";
 import { MatIconButton } from "@angular/material/button";
@@ -155,34 +154,33 @@ export class TokenDetailsComponent {
   });
   tokenDetailResource = this.tokenService.tokenDetailResource;
   tokenDetails: WritableSignal<TokenDetails> = linkedSignal({
-    source: this.tokenDetailResource.value,
-    computation: (res) => {
-      return res && res.result?.value?.tokens[0]
-        ? (res.result?.value.tokens[0] as TokenDetails)
-        : {
-            active: false,
-            container_serial: "",
-            count: 0,
-            count_window: 0,
-            description: "",
-            failcount: 0,
-            id: 0,
-            info: {},
-            locked: false,
-            maxfail: 0,
-            otplen: 0,
-            realms: [],
-            resolver: "",
-            revoked: false,
-            rollout_state: "",
-            serial: "",
-            sync_window: 0,
-            tokengroup: [],
-            tokentype: "hotp",
-            user_id: "",
-            user_realm: "",
-            username: ""
-          };
+    source: () => this.tokenDetailResource.hasValue() ? this.tokenDetailResource.value() : undefined,
+    computation: (tokenDetailResource) => {
+      const tokenDetail = tokenDetailResource?.result?.value?.tokens[0] as TokenDetails | undefined;
+      return tokenDetail ?? {
+        active: false,
+        container_serial: "",
+        count: 0,
+        count_window: 0,
+        description: "",
+        failcount: 0,
+        id: 0,
+        info: {},
+        locked: false,
+        maxfail: 0,
+        otplen: 0,
+        realms: [],
+        resolver: "",
+        revoked: false,
+        rollout_state: "",
+        serial: "",
+        sync_window: 0,
+        tokengroup: [],
+        tokentype: "hotp",
+        user_id: "",
+        user_realm: "",
+        username: ""
+      };
     }
   });
   tokenDetailData = linkedSignal({

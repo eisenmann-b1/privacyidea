@@ -19,7 +19,7 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { provideExperimentalZonelessChangeDetection } from "@angular/core";
 import { HorizontalWheelComponent } from "./horizontal-wheel.component";
-import { CommonModule } from "@angular/common";
+
 import { Component, ViewChild, signal } from "@angular/core";
 
 @Component({
@@ -27,7 +27,7 @@ import { Component, ViewChild, signal } from "@angular/core";
     [values]="values"
     (onSelect)="onSelect($event)"></app-horizontal-wheel>`,
   standalone: true,
-  imports: [CommonModule, HorizontalWheelComponent]
+  imports: [HorizontalWheelComponent]
 })
 class TestHostComponent {
   values = signal(["A", "B", "C"]);

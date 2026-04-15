@@ -18,6 +18,8 @@ import logging
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy import Boolean, Integer, Unicode, UnicodeText, case, func, select
+from sqlalchemy.sql import column, insert, table
 
 
 # revision identifiers, used by Alembic.
@@ -29,12 +31,54 @@ depends_on = None
 log = logging.getLogger("alembic.runtime.migration")
 
 
+# Lightweight reflections of the columns we touch. Using ``table`` /
+# ``column`` constructs lets SQLAlchemy emit dialect-appropriate
+# identifier quoting ("Key" on postgres, `Key` on mariadb, etc.).
+_token = table(
+    "token",
+    column("id", Integer),
+    column("tokentype", Unicode(30)),
+    column("active", Boolean),
+)
+
+_tokeninfo = table(
+    "tokeninfo",
+    column("id", Integer),
+    column("token_id", Integer),
+    column("Key", Unicode(255)),
+    column("Value", UnicodeText),
+    column("Type", Unicode(100)),
+    column("Description", Unicode(2000)),
+)
+
+
+def _stash_marker(bind, marker_key: str, marker_value_expr) -> None:
+    """
+    Insert one marker tokeninfo row per u2f token.
+
+    ``marker_value_expr`` may be a plain literal (for ``'u2f'``,
+    ``'3.14'``) or a SQLAlchemy expression (for the ``CASE WHEN active``
+    used by ``original_active``).
+    """
+    stmt = insert(_tokeninfo).from_select(
+        ["token_id", "Key", "Value", "Type", "Description"],
+        select(
+            _token.c.id.label("token_id"),
+            sa.literal(marker_key).label("Key"),
+            sa.type_coerce(marker_value_expr, UnicodeText()).label("Value"),
+            sa.literal("").label("Type"),
+            sa.literal("").label("Description"),
+        ).where(_token.c.tokentype == "u2f"),
+    )
+    bind.execute(stmt)
+
+
 def upgrade():
     bind = op.get_bind()
 
-    count = bind.execute(sa.text(
-        "SELECT COUNT(*) FROM token WHERE tokentype = 'u2f'"
-    )).scalar() or 0
+    count = bind.execute(
+        select(func.count()).select_from(_token).where(_token.c.tokentype == "u2f")
+    ).scalar() or 0
 
     if count == 0:
         log.info("No u2f tokens found. Nothing to migrate.")
@@ -50,69 +94,62 @@ def upgrade():
         + "=" * 70
     )
 
-    bind.execute(sa.text(
-        'INSERT INTO tokeninfo (token_id, "Key", "Value", "Type", "Description") '
-        "SELECT id, 'original_tokentype', 'u2f', '', '' "
-        "FROM token WHERE tokentype = 'u2f'"
-    ))
-    bind.execute(sa.text(
-        'INSERT INTO tokeninfo (token_id, "Key", "Value", "Type", "Description") '
-        "SELECT id, 'original_active', CASE WHEN active THEN '1' ELSE '0' END, '', '' "
-        "FROM token WHERE tokentype = 'u2f'"
-    ))
-    bind.execute(sa.text(
-        'INSERT INTO tokeninfo (token_id, "Key", "Value", "Type", "Description") '
-        "SELECT id, 'deprecated_in', '3.14', '', '' "
-        "FROM token WHERE tokentype = 'u2f'"
-    ))
+    _stash_marker(bind, "original_tokentype", sa.literal("u2f"))
+    _stash_marker(
+        bind,
+        "original_active",
+        case((_token.c.active.is_(True), sa.literal("1")), else_=sa.literal("0")),
+    )
+    _stash_marker(bind, "deprecated_in", sa.literal("3.14"))
 
-    bind.execute(sa.text(
-        "UPDATE token SET tokentype = 'deprecated', active = :inactive "
-        "WHERE tokentype = 'u2f'"
-    ).bindparams(inactive=False))
+    bind.execute(
+        _token.update()
+        .where(_token.c.tokentype == "u2f")
+        .values(tokentype="deprecated", active=False)
+    )
 
 
 def downgrade():
     bind = op.get_bind()
 
-    # Restore active=True for rows whose original_active was '1',
-    # and active=False for rows whose original_active was '0'. Two
-    # passes instead of a correlated subquery to stay dialect-neutral.
-    for stashed, restored in (('1', True), ('0', False)):
-        bind.execute(sa.text(
-            "UPDATE token SET active = :restored WHERE id IN ("
-            '   SELECT token_id FROM tokeninfo '
-            '   WHERE "Key" = :active_key AND "Value" = :stashed'
-            ") AND id IN ("
-            '   SELECT token_id FROM tokeninfo '
-            '   WHERE "Key" = :type_key AND "Value" = :type_val'
-            ")"
-        ).bindparams(
-            restored=restored,
-            stashed=stashed,
-            active_key='original_active',
-            type_key='original_tokentype',
-            type_val='u2f',
-        ))
+    # Restore active=True for rows whose stashed original_active was '1',
+    # and active=False for rows whose stashed original_active was '0'. Two
+    # passes avoids a correlated subquery.
+    for stashed_value, restored in (("1", True), ("0", False)):
+        token_ids_with_original_active = (
+            select(_tokeninfo.c.token_id)
+            .where(_tokeninfo.c.Key == "original_active")
+            .where(_tokeninfo.c.Value == stashed_value)
+        )
+        token_ids_with_original_type_u2f = (
+            select(_tokeninfo.c.token_id)
+            .where(_tokeninfo.c.Key == "original_tokentype")
+            .where(_tokeninfo.c.Value == "u2f")
+        )
+        bind.execute(
+            _token.update()
+            .where(_token.c.id.in_(token_ids_with_original_active))
+            .where(_token.c.id.in_(token_ids_with_original_type_u2f))
+            .values(active=restored)
+        )
 
-    # Restore tokentype to u2f
-    bind.execute(sa.text(
-        "UPDATE token SET tokentype = 'u2f' "
-        "WHERE id IN ("
-        '   SELECT token_id FROM tokeninfo '
-        '   WHERE "Key" = :key AND "Value" = :val'
-        ")"
-    ).bindparams(key='original_tokentype', val='u2f'))
+    # Restore tokentype to u2f for rows whose original_tokentype was u2f
+    u2f_origin_ids = (
+        select(_tokeninfo.c.token_id)
+        .where(_tokeninfo.c.Key == "original_tokentype")
+        .where(_tokeninfo.c.Value == "u2f")
+    )
+    bind.execute(
+        _token.update()
+        .where(_token.c.id.in_(u2f_origin_ids))
+        .values(tokentype="u2f")
+    )
 
-    # Drop the marker rows — but only those belonging to u2f-origin tokens,
-    # not any other deprecation that may also be present.
-    bind.execute(sa.text(
-        'DELETE FROM tokeninfo '
-        'WHERE "Key" IN (:k1, :k2, :k3) AND token_id IN ('
-        "   SELECT id FROM token WHERE tokentype = 'u2f'"
-        ")"
-    ).bindparams(
-        k1='original_tokentype',
-        k2='original_active',
-        k3='deprecated_in',
-    ))
+    # Drop the three marker rows — but only those belonging to u2f-origin
+    # tokens, not any other deprecation that may also be present.
+    u2f_restored_ids = select(_token.c.id).where(_token.c.tokentype == "u2f")
+    bind.execute(
+        _tokeninfo.delete()
+        .where(_tokeninfo.c.Key.in_(["original_tokentype", "original_active", "deprecated_in"]))
+        .where(_tokeninfo.c.token_id.in_(u2f_restored_ids))
+    )

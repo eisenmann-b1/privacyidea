@@ -1,5 +1,11 @@
 # Update Notes
 
+## Update from 3.13 to 3.14
+* Resolvers within a realm that share the same priority are now sorted **alphabetically by name**.
+  Previously, the order was undefined and depended on the database insertion order, which could
+  differ between SQLite, PostgreSQL and MariaDB. If you rely on a specific resolver ordering
+  within a realm, make sure each resolver has an explicit, distinct priority.
+
 ## Update from 3.12 to 3.13
 * `enrollpin` right enforcement has been made stricter. If you try to enroll a token with a PIN but do not have the
   the right, the enrollment will be denied with a PolicyError.

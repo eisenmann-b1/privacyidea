@@ -513,7 +513,6 @@ class UserTestCase(MyTestCase):
 
         # Test on node 1
         get_app_config()["PI_NODE_UUID"] = nd1_uuid
-        root = User("root", "sort_node_realm")
         r = get_ordered_resolvers("sort_node_realm")
         self.assertEqual(3, len(r), r)
         self.assertEqual(r[0], "reso4")
@@ -784,6 +783,9 @@ class UserTestCase(MyTestCase):
         delete_resolver(self.resolvername1)
 
     def test_90_masking_users_in_ordered_resolvers(self):
+        # Two resolvers point at different passwd files that both contain a
+        # user "cornelius" with the same uid. resolvername1 (PWFILE3) has the
+        # higher priority (1) and must mask resolvername2 (PWFILE, priority 2).
         realmname = "masked_realm"
         save_resolver({"resolver": self.resolvername1,
                        "type": "passwdresolver",
@@ -800,10 +802,21 @@ class UserTestCase(MyTestCase):
         self.assertEqual(len(added), 2)
 
         r = get_user_list({"realm": realmname, "username": "cornelius"})
-        # User cornelius should only be contained once.
-        self.assertEqual(1, len(r))
-        # And it should be the correct one, from PWFILE3
-        print(r)
+        # User cornelius must be returned exactly once — the lower-priority
+        # entry from PWFILE must be masked.
+        self.assertEqual(1, len(r), r)
+        user = r[0]
+        # The returned entry must be the one from the higher-priority
+        # resolver (resolvername1 → PWFILE3). The passwdresolver splits the
+        # GECOS field "Cornelius K" into givenname="Cornelius", surname="K",
+        # with email info@netknights.it — distinct from PWFILE's
+        # surname="Kölbel" / cornelius.koelbel@netknights.it.
+        self.assertEqual(self.resolvername1, user.get("resolver"), user)
+        self.assertEqual("info@netknights.it", user.get("email"), user)
+        self.assertEqual("K", user.get("surname"), user)
+        self.assertEqual("cornelius", user.get("username"), user)
+        self.assertEqual("1009", user.get("userid"), user)
+        self.assertEqual(realmname, user.get("realm"), user)
 
         delete_realm(realmname)
         delete_resolver(self.resolvername1)

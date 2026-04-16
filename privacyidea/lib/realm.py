@@ -356,8 +356,8 @@ def get_ordered_resolvers(realm) -> list[str]:
                                 resolver.get("priority") or 1000,
                                 resolver.get("node")))
 
-    # sort the resolvers by the 2nd entry in the tuple, the priority
-    sorted_resolvers = sorted(resolver_tuples, key=lambda res: res[1])
+    # sort the resolvers first by priority and then alphabetically by name
+    sorted_resolvers = sorted(resolver_tuples, key=lambda res: (res[1], res[0] or ""))
     # if the resolver contains a node setting, we only add it if it is on the correct node
     local_node_uuid = get_app_config_value("PI_NODE_UUID")
     resolvers = [r[0] for r in sorted_resolvers if not r[2] or r[2] == local_node_uuid]

@@ -732,8 +732,8 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
     This function returns a list of user dictionaries. The user dict contains the resolver and custom user attributes,
     if requested.
     If no realm is given in the param, the users from all realms are returned.
-    If users are searched in more than one realm, it also contains the realm name.
-    If users are only searched in a specific resolver, it does not contain the realm name.
+    The returned user dictionaries always contain the ``realm`` key. Its value is the realm name if the search is
+    performed in a realm context, or ``None`` if users are searched only in a specific resolver.
 
     Fixme: Please note: If a realm and a resolver is given, the resolver is currently ignored. So all users
     of this realm are returned. This is the old/current behaviour. When filtering for a resolver in a realm, we

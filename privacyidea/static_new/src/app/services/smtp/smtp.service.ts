@@ -16,9 +16,9 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { computed, inject, Injectable, Signal } from "@angular/core";
+import { computed, effect, inject, Injectable, Signal } from "@angular/core";
 import { environment } from "../../../environments/environment";
-import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
 import { PiResponse } from "../../app.component";
@@ -68,6 +68,17 @@ export class SmtpService implements SmtpServiceInterface {
   readonly contentService: ContentServiceInterface = inject(ContentService);
   readonly notificationService: NotificationServiceInterface = inject(NotificationService);
   readonly http: HttpClient = inject(HttpClient);
+
+  constructor() {
+    effect(() => {
+      if (this.smtpServerResource.error()) {
+        const err = this.smtpServerResource.error() as HttpErrorResponse;
+        console.error("Failed to get SMTP servers.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get SMTP servers. " + message);
+      }
+    });
+  }
 
   readonly smtpServerResource = httpResource<PiResponse<SmtpServers>>(() => {
     if (!this.contentService.onExternalSmtp() && !this.contentService.onConfigurationTokenTypes() && !this.contentService.onConfigurationSystem()) {

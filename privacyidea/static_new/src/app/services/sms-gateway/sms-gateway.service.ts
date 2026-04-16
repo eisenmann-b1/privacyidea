@@ -16,8 +16,8 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { computed, inject, Injectable, Signal } from "@angular/core";
-import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
+import { computed, effect, inject, Injectable, Signal } from "@angular/core";
+import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
@@ -68,6 +68,17 @@ export class SmsGatewayService implements SmsGatewayServiceInterface {
   private readonly contentService: ContentServiceInterface = inject(ContentService);
   private readonly notificationService: NotificationServiceInterface = inject(NotificationService);
   private readonly http: HttpClient = inject(HttpClient);
+
+  constructor() {
+    effect(() => {
+      if (this.smsGatewayResource.error()) {
+        const err = this.smsGatewayResource.error() as HttpErrorResponse;
+        console.error("Failed to get SMS gateways.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get SMS gateways. " + message);
+      }
+    });
+  }
 
   readonly smsGatewayResource = httpResource<PiResponse<SmsGateway[]>>(() => {
     if (!this.contentService.onExternalSms() && !this.contentService.onConfigurationTokenTypes()) {

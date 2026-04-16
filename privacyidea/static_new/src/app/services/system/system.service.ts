@@ -17,14 +17,15 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
-import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
-import { computed, inject, Injectable, linkedSignal, Signal, WritableSignal } from "@angular/core";
+import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { computed, effect, inject, Injectable, linkedSignal, Signal, WritableSignal } from "@angular/core";
 
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
 import { CaConnectors } from "../ca-connector/ca-connector.service";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
-import { Observable } from "rxjs";
+import { catchError, Observable, throwError } from "rxjs";
+import { NotificationService } from "../notification/notification.service";
 
 export interface NodeInfo {
   name: string;
@@ -62,6 +63,26 @@ export class SystemService implements SystemServiceInterface {
   private readonly authService: AuthServiceInterface = inject(AuthService);
   private readonly contentService: ContentServiceInterface = inject(ContentService);
   private readonly http: HttpClient = inject(HttpClient);
+  private readonly notificationService = inject(NotificationService);
+
+  constructor() {
+    effect(() => {
+      if (this.systemConfigResource.error()) {
+        const err = this.systemConfigResource.error() as HttpErrorResponse;
+        console.error("Failed to get system config.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get system config. " + message);
+      }
+    });
+    effect(() => {
+      if (this.nodesResource.error()) {
+        const err = this.nodesResource.error() as HttpErrorResponse;
+        console.error("Failed to get nodes.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get nodes. " + message);
+      }
+    });
+  }
   private onAllowedRoutes = computed(() => {
     return (
       this.contentService.onTokenEnrollmentLikely() ||
@@ -156,29 +177,63 @@ export class SystemService implements SystemServiceInterface {
   saveSystemConfig(config: any): Observable<PiResponse<any>> {
     return this.http.post<PiResponse<any>>(this.systemBaseUrl + "setConfig", config, {
       headers: this.authService.getHeaders()
-    });
+    }).pipe(
+      catchError((error) => {
+        console.error("Failed to save system config.", error);
+        const message = error.error?.result?.error?.message || "";
+        this.notificationService.openSnackBar("Failed to save system config. " + message);
+        return throwError(() => error);
+      })
+    );
   }
 
   deleteSystemConfig(key: string): Observable<PiResponse<any>> {
-    return this.http.delete<PiResponse<any>>(`${this.systemBaseUrl}${key}`, { headers: this.authService.getHeaders() });
+    return this.http.delete<PiResponse<any>>(`${this.systemBaseUrl}${key}`, { headers: this.authService.getHeaders() }).pipe(
+      catchError((error) => {
+        console.error("Failed to delete system config.", error);
+        const message = error.error?.result?.error?.message || "";
+        this.notificationService.openSnackBar("Failed to delete system config. " + message);
+        return throwError(() => error);
+      })
+    );
   }
 
   deleteUserCache(): Observable<PiResponse<any>> {
     return this.http.delete<PiResponse<any>>(`${this.systemBaseUrl}user-cache`, {
       headers: this.authService.getHeaders()
-    });
+    }).pipe(
+      catchError((error) => {
+        console.error("Failed to delete user cache.", error);
+        const message = error.error?.result?.error?.message || "";
+        this.notificationService.openSnackBar("Failed to delete user cache. " + message);
+        return throwError(() => error);
+      })
+    );
   }
 
   loadSmtpIdentifiers(): Observable<PiResponse<any>> {
     return this.http.get<PiResponse<any>>(`${this.systemBaseUrl}names/smtp`, {
       headers: this.authService.getHeaders()
-    });
+    }).pipe(
+      catchError((error) => {
+        console.error("Failed to load SMTP identifiers.", error);
+        const message = error.error?.result?.error?.message || "";
+        this.notificationService.openSnackBar("Failed to load SMTP identifiers. " + message);
+        return throwError(() => error);
+      })
+    );
   }
 
   getDocumentation(): Observable<string> {
     return this.http.get(`${this.systemBaseUrl}documentation`, {
       headers: this.authService.getHeaders(),
       responseType: "text"
-    });
+    }).pipe(
+      catchError((error) => {
+        console.error("Failed to get documentation.", error);
+        this.notificationService.openSnackBar("Failed to get documentation.");
+        return throwError(() => error);
+      })
+    );
   }
 }

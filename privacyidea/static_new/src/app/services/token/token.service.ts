@@ -363,15 +363,33 @@ export class TokenService implements TokenServiceInterface {
     effect(() => {
       if (this.tokenResource.error()) {
         const tokensResourceError = this.tokenResource.error() as HttpErrorResponse;
-        console.error("Failed to get token data.", tokensResourceError.error.result.error.message);
-        this.notificationService.openSnackBar(tokensResourceError.error.result.error.message);
+        console.error("Failed to get token data.", tokensResourceError.message);
+        const message = tokensResourceError.error?.result?.error?.message || tokensResourceError.message;
+        this.notificationService.openSnackBar("Failed to get token data. " + message);
       }
     });
     effect(() => {
       if (this.tokenTypesResource.error()) {
         const tokenTypesResourceError = this.tokenTypesResource.error() as HttpErrorResponse;
-        console.error("Failed to get token type data.", tokenTypesResourceError.error.result.error.message);
-        this.notificationService.openSnackBar(tokenTypesResourceError.error.result.error.message);
+        console.error("Failed to get token type data.", tokenTypesResourceError.message);
+        const message = tokenTypesResourceError.error?.result?.error?.message || tokenTypesResourceError.message;
+        this.notificationService.openSnackBar("Failed to get token type data. " + message);
+      }
+    });
+    effect(() => {
+      if (this.tokenDetailResource.error()) {
+        const err = this.tokenDetailResource.error() as HttpErrorResponse;
+        console.error("Failed to get token details.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get token details. " + message);
+      }
+    });
+    effect(() => {
+      if (this.userTokenResource.error()) {
+        const err = this.userTokenResource.error() as HttpErrorResponse;
+        console.error("Failed to get user tokens.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get user tokens. " + message);
       }
     });
   }
@@ -637,7 +655,7 @@ export class TokenService implements TokenServiceInterface {
     return this.http.delete<PiResponse<BulkResult, any>>(this.tokenBaseUrl, { headers, body }).pipe(
       catchError((error) => {
         console.error("Failed to delete tokens.", error);
-        const message = error.result?.error?.message || "";
+        const message = error.error?.result?.error?.message || "";
         this.notificationService.openSnackBar("Failed to delete tokens. " + message);
         return throwError(() => error);
       })
@@ -809,7 +827,14 @@ export class TokenService implements TokenServiceInterface {
 
   deleteToken(tokenSerial: string): Observable<Object> {
     const headers = this.authService.getHeaders();
-    return this.http.delete(this.tokenBaseUrl + tokenSerial, { headers });
+    return this.http.delete(this.tokenBaseUrl + tokenSerial, { headers }).pipe(
+      catchError((error) => {
+        console.error("Failed to delete token.", error);
+        const message = error.error?.result?.error?.message || "";
+        this.notificationService.openSnackBar("Failed to delete token. " + message);
+        return throwError(() => error);
+      })
+    );
   }
 
   revokeToken(tokenSerial: string): Observable<any> {
@@ -995,7 +1020,14 @@ export class TokenService implements TokenServiceInterface {
     return this.http.get<PiResponse<Tokens>>(this.tokenBaseUrl, {
       headers,
       params
-    });
+    }).pipe(
+      catchError((error) => {
+        console.error("Failed to get token details.", error);
+        const message = error.error?.result?.error?.message || "";
+        this.notificationService.openSnackBar("Failed to get token details. " + message);
+        return throwError(() => error);
+      })
+    );
   }
 
   enrollToken<T extends TokenEnrollmentData, R extends EnrollmentResponse>(args: {

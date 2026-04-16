@@ -18,7 +18,7 @@
  **/
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
-import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
 import { computed, effect, inject, Injectable, linkedSignal, Signal, signal, WritableSignal } from "@angular/core";
 import { RealmService, RealmServiceInterface } from "../realm/realm.service";
 import { TokenService, TokenServiceInterface } from "../token/token.service";
@@ -135,6 +135,24 @@ export class UserService implements UserServiceInterface {
     effect(() => {
       // Ensure the users are loaded for the autocomplete on allowed routes.
       this.selectionFilteredUsernames();
+    });
+
+    effect(() => {
+      if (this.userResource.error()) {
+        const err = this.userResource.error() as HttpErrorResponse;
+        console.error("Failed to get user details.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get user details. " + message);
+      }
+    });
+
+    effect(() => {
+      if (this.usersResource.error()) {
+        const err = this.usersResource.error() as HttpErrorResponse;
+        console.error("Failed to get users.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get users. " + message);
+      }
     });
   }
 
@@ -457,7 +475,14 @@ export class UserService implements UserServiceInterface {
     return this.http.post<PiResponse<number>>(this.baseUrl + "attribute", null, {
       headers: this.authService.getHeaders(),
       params
-    });
+    }).pipe(
+      catchError((error) => {
+        console.error("Failed to set user attribute.", error);
+        const message = error.error?.result?.error?.message || "";
+        this.notificationService.openSnackBar($localize`Failed to set user attribute. ` + message);
+        return of(undefined as any);
+      })
+    );
   }
 
   deleteUserAttribute(key: string) {
@@ -466,7 +491,14 @@ export class UserService implements UserServiceInterface {
     const url =
       this.baseUrl +
       `attribute/${encodeURIComponent(key)}/${encodeURIComponent(username)}/${encodeURIComponent(realm)}`;
-    return this.http.delete<PiResponse<any>>(url, { headers: this.authService.getHeaders() });
+    return this.http.delete<PiResponse<any>>(url, { headers: this.authService.getHeaders() }).pipe(
+      catchError((error) => {
+        console.error("Failed to delete user attribute.", error);
+        const message = error.error?.result?.error?.message || "";
+        this.notificationService.openSnackBar($localize`Failed to delete user attribute. ` + message);
+        return of(undefined as any);
+      })
+    );
   }
 
   createUser(resolver: string, userData: EditUserData) {

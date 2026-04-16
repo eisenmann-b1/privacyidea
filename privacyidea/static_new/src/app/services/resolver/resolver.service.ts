@@ -17,13 +17,13 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 
-import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
 import { AuthService } from "../auth/auth.service";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
 import { RealmService } from "../realm/realm.service";
-import { computed, inject, Injectable, Signal, signal, WritableSignal } from "@angular/core";
+import { computed, effect, inject, Injectable, Signal, signal, WritableSignal } from "@angular/core";
 import { catchError, Observable, throwError } from "rxjs";
 import { parseBooleanValue } from "../../utils/parse-boolean-value";
 import { NotificationService, NotificationServiceInterface } from "../notification/notification.service";
@@ -190,6 +190,17 @@ export class ResolverService implements ResolverServiceInterface {
   private readonly contentService: ContentServiceInterface = inject(ContentService);
   private readonly notificationService: NotificationServiceInterface = inject(NotificationService);
   private readonly http: HttpClient = inject(HttpClient);
+
+  constructor() {
+    effect(() => {
+      if (this.resolversResource.error()) {
+        const err = this.resolversResource.error() as HttpErrorResponse;
+        console.error("Failed to get resolvers.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get resolvers. " + message);
+      }
+    });
+  }
   resolversResource = httpResource<PiResponse<Resolvers>>(() => {
     if (!this.contentService.onAnyUsersRoute()) {
       return undefined;
@@ -282,6 +293,8 @@ export class ResolverService implements ResolverServiceInterface {
       .pipe(
         catchError((error) => {
           console.error("Error during resolver test:", error);
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar("Failed to test resolver. " + message);
           return throwError(() => error);
         })
       );
@@ -293,6 +306,8 @@ export class ResolverService implements ResolverServiceInterface {
       .pipe(
         catchError((error) => {
           console.error(`Error during posting resolver ${resolverName}:`, error);
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar("Failed to save resolver. " + message);
           return throwError(() => error);
         })
       );
@@ -304,6 +319,8 @@ export class ResolverService implements ResolverServiceInterface {
       .pipe(
         catchError((error) => {
           console.error(`Error during deleting resolver ${resolverName}:`, error);
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar("Failed to delete resolver. " + message);
           return throwError(() => error);
         })
       );
@@ -317,6 +334,8 @@ export class ResolverService implements ResolverServiceInterface {
       .pipe(
         catchError((error) => {
           console.error(`Error during getting default resolver config for ${resolverType}:`, error);
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar("Failed to get default resolver config. " + message);
           return throwError(() => error);
         })
       );

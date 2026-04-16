@@ -17,9 +17,9 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 
-import { computed, inject, Injectable, Signal } from "@angular/core";
+import { computed, effect, inject, Injectable, Signal } from "@angular/core";
 import { environment } from "../../../environments/environment";
-import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { PiResponse } from "../../app.component";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
@@ -98,6 +98,17 @@ export class MachineResolverService implements MachineResolverServiceInterface {
   readonly contentService: ContentServiceInterface = inject(ContentService);
   readonly notificationService: NotificationServiceInterface = inject(NotificationService);
   readonly http: HttpClient = inject(HttpClient);
+
+  constructor() {
+    effect(() => {
+      if (this.machineResolverResource.error()) {
+        const err = this.machineResolverResource.error() as HttpErrorResponse;
+        console.error("Failed to get machine resolvers.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get machine resolvers. " + message);
+      }
+    });
+  }
 
   readonly machineResolverResource = httpResource<PiResponse<MachineResolvers>>(() => {
     if (!this.contentService.onMachineResolver()) {

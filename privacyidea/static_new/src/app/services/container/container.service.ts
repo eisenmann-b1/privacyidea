@@ -893,7 +893,16 @@ export class ContainerService implements ContainerServiceInterface {
     effect(() => {
       if (this.containerResource.error()) {
         const error = this.containerResource.error() as HttpErrorResponse;
-        this.notificationService.openSnackBar(error.message);
+        const message = error.error?.result?.error?.message || error.message;
+        this.notificationService.openSnackBar("Failed to get containers. " + message);
+      }
+    });
+    effect(() => {
+      if (this.containerTypesResource.error()) {
+        const error = this.containerTypesResource.error() as HttpErrorResponse;
+        console.error("Failed to get container types.", error.message);
+        const message = error.error?.result?.error?.message || error.message;
+        this.notificationService.openSnackBar("Failed to get container types. " + message);
       }
     });
 

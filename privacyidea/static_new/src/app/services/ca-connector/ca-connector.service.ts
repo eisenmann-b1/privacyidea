@@ -16,8 +16,8 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
-import { inject, Injectable, linkedSignal, WritableSignal } from "@angular/core";
+import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { effect, inject, Injectable, linkedSignal, WritableSignal } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
@@ -64,6 +64,17 @@ export class CaConnectorService implements CaConnectorServiceInterface {
   private readonly http: HttpClient = inject(HttpClient);
 
   readonly caConnectorBaseUrl = environment.proxyUrl + "/caconnector/";
+
+  constructor() {
+    effect(() => {
+      if (this.caConnectorResource.error()) {
+        const err = this.caConnectorResource.error() as HttpErrorResponse;
+        console.error("Failed to get CA connectors.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get CA connectors. " + message);
+      }
+    });
+  }
 
   caConnectorResource = httpResource<PiResponse<CaConnectors>>(() => {
     if (!this.contentService.onExternalCaConnectors()) {

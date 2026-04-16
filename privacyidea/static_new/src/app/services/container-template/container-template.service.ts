@@ -17,8 +17,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 
-import { computed, inject, Injectable, linkedSignal, Signal, WritableSignal } from "@angular/core";
-import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
+import { computed, effect, inject, Injectable, linkedSignal, Signal, WritableSignal } from "@angular/core";
+import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
 import { PiResponse } from "../../app.component";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
@@ -81,6 +81,17 @@ export class ContainerTemplateService implements ContainerTemplateServiceInterfa
   readonly notificationService: NotificationServiceInterface = inject(NotificationService);
 
   // --- Resources ---
+
+  constructor() {
+    effect(() => {
+      if (this.templatesResource.error()) {
+        const err = this.templatesResource.error() as HttpErrorResponse;
+        console.error("Failed to get container templates.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get container templates. " + message);
+      }
+    });
+  }
   readonly templatesResource = httpResource<PiResponse<{ templates: ContainerTemplate[] }>>(() => {
     if (!this.authService.actionAllowed("container_template_list")) return undefined;
     if (!this.contentService.onTokensContainersCreate() && !this.contentService.onTokensContainersTemplates())

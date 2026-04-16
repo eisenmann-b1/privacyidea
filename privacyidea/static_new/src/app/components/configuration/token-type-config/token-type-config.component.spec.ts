@@ -85,11 +85,15 @@ describe("TokenTypeConfigComponent", () => {
     expect(component.yubikeyApiIds).toEqual(["yubikey.apiid.ID1", "yubikey.apiid.ID2"]);
   });
 
-  it("should call saveSystemConfig on save", () => {
+  it("should call saveSystemConfig on save", async () => {
     const systemService = TestBed.inject(SystemService);
     const saveSpy = jest.spyOn(systemService, "saveSystemConfig");
-    component.save();
+    const reloadSpy = jest.spyOn((systemService as any).systemConfigResource, "reload");
+
+    await component.save();
+
     expect(saveSpy).toHaveBeenCalledWith(component.formData());
+    expect(reloadSpy).toHaveBeenCalled();
   });
 
   it("should add new question to formData and increment nextQuestion without saving", () => {
@@ -104,21 +108,25 @@ describe("TokenTypeConfigComponent", () => {
     expect(saveSpy).not.toHaveBeenCalled();
   });
 
-  it("should call deleteSystemConfig but not reload on deleteSystemEntry", () => {
+  it("should update formData and pendingDeletes but not call service on deleteSystemEntry", () => {
     const systemService = TestBed.inject(SystemService);
     const deleteSpy = jest.spyOn(systemService as any, "deleteSystemConfig");
     const reloadSpy = jest.spyOn((systemService as any).systemConfigResource, "reload");
 
     const entryToDelete = "yubikey.apiid.123";
     const entryToKeep = "yubikey.apiid.456";
-    component.formData.set({ [entryToDelete]: "123", [entryToKeep]: "456" });
+
+    // Set initial config so it's tracked for deferred deletion
+    (systemService as any).systemConfig.set({ [entryToDelete]: "123", [entryToKeep]: "456" });
+    fixture.detectChanges();
 
     component.deleteSystemEntry(entryToDelete);
 
-    expect(deleteSpy).toHaveBeenCalledWith(entryToDelete);
+    expect(deleteSpy).not.toHaveBeenCalled();
     expect(reloadSpy).not.toHaveBeenCalled();
     expect(component.formData()).not.toHaveProperty(entryToDelete);
     expect(component.formData()[entryToKeep]).toEqual("456");
+    expect(component.pendingDeletes().has(entryToDelete)).toBe(true);
   });
 
   it("should update formData on onCheckboxChange", () => {

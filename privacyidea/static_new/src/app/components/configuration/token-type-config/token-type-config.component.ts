@@ -307,7 +307,7 @@ export class TokenTypeConfigComponent implements OnInit, AfterViewInit, OnDestro
   }
 
   save() {
-    this.savePromise();
+    return this.savePromise();
   }
 
   async savePromise(): Promise<boolean> {

@@ -93,7 +93,8 @@ export class CaConnectorsComponent {
     this.dialog.open(NewCaConnectorComponent, {
       data: connector ? { ...connector } : null,
       width: "auto",
-      maxWidth: "100vw"
+      maxWidth: "65vw",
+      maxHeight: "90vh"
     });
   }
 

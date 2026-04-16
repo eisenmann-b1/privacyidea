@@ -92,7 +92,8 @@ export class ServiceIdsComponent {
     this.dialog.open(NewServiceIdComponent, {
       data: serviceId ? { ...serviceId } : null,
       width: "auto",
-      maxWidth: "100vw"
+      maxWidth: "65vw",
+      maxHeight: "90vh"
     });
   }
 

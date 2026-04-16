@@ -18,8 +18,8 @@
  **/
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
-import { HttpClient, HttpParams, httpResource, HttpResourceRef } from "@angular/common/http";
-import { computed, inject, Injectable, linkedSignal, Signal, WritableSignal, DOCUMENT } from "@angular/core";
+import { HttpClient, HttpErrorResponse, HttpParams, httpResource, HttpResourceRef } from "@angular/common/http";
+import { computed, effect, inject, Injectable, linkedSignal, Signal, WritableSignal, DOCUMENT } from "@angular/core";
 
 import { TableUtilsService, TableUtilsServiceInterface } from "../table-utils/table-utils.service";
 import { FilterValue } from "../../core/models/filter_value/filter_value";
@@ -30,6 +30,7 @@ import { Sort } from "@angular/material/sort";
 import { environment } from "../../../environments/environment";
 import { TokenService, TokenServiceInterface } from "../token/token.service";
 import { StringUtils } from "../../utils/string.utils";
+import { NotificationService } from "../notification/notification.service";
 
 export type TokenApplications = TokenApplication[];
 
@@ -143,7 +144,28 @@ export class MachineService implements MachineServiceInterface {
   protected readonly contentService: ContentServiceInterface = inject(ContentService);
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   private readonly document: Document = inject(DOCUMENT);
+  private readonly notificationService = inject(NotificationService);
   private baseUrl = environment.proxyUrl + "/machine/";
+
+  constructor() {
+    effect(() => {
+      if (this.machinesResource.error()) {
+        const err = this.machinesResource.error() as HttpErrorResponse;
+        console.error("Failed to get machines.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get machines. " + message);
+      }
+    });
+
+    effect(() => {
+      if (this.tokenApplicationResource.error()) {
+        const err = this.tokenApplicationResource.error() as HttpErrorResponse;
+        console.error("Failed to get token applications.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get token applications. " + message);
+      }
+    });
+  }
   sshApiFilter = ["serial", "service_id"];
   offlineApiFilter = ["serial", "count", "rounds"];
   advancedApiFilter = ["hostname", "machineid & resolver"];

@@ -22,7 +22,7 @@ import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
-import { Observable } from "rxjs";
+import { Observable, catchError, throwError } from "rxjs";
 import { NotificationService, NotificationServiceInterface } from "../notification/notification.service";
 
 export type AdminRealms = string[];
@@ -226,7 +226,14 @@ export class RealmService implements RealmServiceInterface {
 
     return this.http.post<PiResponse<any>>(url, body, {
       headers: this.authService.getHeaders()
-    });
+    }).pipe(
+      catchError((error) => {
+        console.error("Failed to create realm.", error);
+        const message = error.error?.result?.error?.message || "";
+        this.notificationService.openSnackBar("Failed to create realm. " + message);
+        return throwError(() => error);
+      })
+    );
   }
 
   deleteRealm(realm: string): Observable<PiResponse<number | any>> {
@@ -235,14 +242,28 @@ export class RealmService implements RealmServiceInterface {
 
     return this.http.delete<PiResponse<number | any>>(url, {
       headers: this.authService.getHeaders()
-    });
+    }).pipe(
+      catchError((error) => {
+        console.error("Failed to delete realm.", error);
+        const message = error.error?.result?.error?.message || "";
+        this.notificationService.openSnackBar("Failed to delete realm. " + message);
+        return throwError(() => error);
+      })
+    );
   }
 
   setDefaultRealm(realm: string): Observable<PiResponse<number | any>> {
     const encodedRealm = encodeURIComponent(realm);
     const url = `${environment.proxyUrl}/defaultrealm/${encodedRealm}`;
 
-    return this.http.post<PiResponse<number | any>>(url, {}, { headers: this.authService.getHeaders() });
+    return this.http.post<PiResponse<number | any>>(url, {}, { headers: this.authService.getHeaders() }).pipe(
+      catchError((error) => {
+        console.error("Failed to set default realm.", error);
+        const message = error.error?.result?.error?.message || "";
+        this.notificationService.openSnackBar("Failed to set default realm. " + message);
+        return throwError(() => error);
+      })
+    );
   }
 
   constructor() {
@@ -261,6 +282,15 @@ export class RealmService implements RealmServiceInterface {
         console.error("Failed to get default realm.", defaultRealmError.message);
         const message = defaultRealmError.error?.result?.error?.message || defaultRealmError.message;
         this.notificationService.openSnackBar("Failed to get default realm. " + message);
+      }
+    });
+
+    effect(() => {
+      if (this.adminRealmResource.error()) {
+        const adminRealmError = this.adminRealmResource.error() as HttpErrorResponse;
+        console.error("Failed to get admin realms.", adminRealmError.message);
+        const message = adminRealmError.error?.result?.error?.message || adminRealmError.message;
+        this.notificationService.openSnackBar("Failed to get admin realms. " + message);
       }
     });
   }

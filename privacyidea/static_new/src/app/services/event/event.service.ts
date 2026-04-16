@@ -17,9 +17,9 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 
-import { computed, inject, Injectable, Signal, signal, WritableSignal } from "@angular/core";
+import { computed, effect, inject, Injectable, Signal, signal, WritableSignal } from "@angular/core";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
-import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
@@ -172,7 +172,8 @@ export class EventService implements EventServiceInterface {
         catchError((error) => {
           console.log("Failed to enable event handler:", error);
           this.allEventsResource.reload();
-          this.notificationService.openSnackBar("Failed to enable event handler!");
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar("Failed to enable event handler! " + message);
           return of(undefined);
         })
       )
@@ -186,7 +187,8 @@ export class EventService implements EventServiceInterface {
         catchError((error) => {
           console.log("Failed to disable event handler:", error);
           this.allEventsResource.reload();
-          this.notificationService.openSnackBar("Failed to disable event handler!");
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar("Failed to disable event handler! " + message);
           return of(undefined);
         })
       )
@@ -199,7 +201,7 @@ export class EventService implements EventServiceInterface {
     return this.http.delete<PiResponse<number, any>>(this.eventBaseUrl + "/" + eventId, { headers }).pipe(
       catchError((error) => {
         console.error("Failed to delete event handler.", error);
-        const message = error.result?.error?.message || "";
+        const message = error.error?.result?.error?.message || "";
         this.notificationService.openSnackBar("Failed to delete event handler. " + message);
         return throwError(() => error);
       })
@@ -349,4 +351,15 @@ export class EventService implements EventServiceInterface {
     }
     return conditions;
   });
+
+  constructor() {
+    effect(() => {
+      if (this.allEventsResource.error()) {
+        const err = this.allEventsResource.error() as HttpErrorResponse;
+        console.error("Failed to get event handlers.", err.message);
+        const message = err.error?.result?.error?.message || err.message;
+        this.notificationService.openSnackBar("Failed to get event handlers. " + message);
+      }
+    });
+  }
 }

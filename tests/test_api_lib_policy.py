@@ -1921,8 +1921,8 @@ class PrePolicyDecoratorTestCase(MyApiTestCase):
         self.setUp_user_realm3()
         (added, failed) = create_realm(realm,
                                        [
-                                           {'name': self.resolvername1},
-                                           {'name': self.resolvername3}])
+                                           {'name': self.resolvername1, 'priority': 1},
+                                           {'name': self.resolvername3, 'priority': 2}])
         self.assertEqual(0, len(failed))
         self.assertEqual(2, len(added))
         # We have cornelius@myRealm in self.resolvername1

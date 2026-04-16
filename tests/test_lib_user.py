@@ -213,8 +213,8 @@ class UserTestCase(MyTestCase):
 
         (added, failed) = set_realm(self.realm2,
                                     [
-                                        {'name': self.resolvername1},
-                                        {'name': self.resolvername3}])
+                                        {'name': self.resolvername1, 'priority': 1},
+                                        {'name': self.resolvername3, 'priority': 2}])
         self.assertTrue(len(failed) == 0)
         self.assertTrue(len(added) == 2)
 
@@ -480,6 +480,24 @@ class UserTestCase(MyTestCase):
         self.assertEqual(r[3], "resolver1")
 
         delete_realm("sort_realm")
+
+        # Resolvers with the same priority are ordered alphabetically by name
+        (added, failed) = set_realm("sort_alpha_realm",
+                                    [
+                                        {'name': "resolver1", 'priority': 10},
+                                        {'name': "resolver2", 'priority': 10},
+                                        {'name': "reso3", 'priority': 10},
+                                        {'name': "reso4", 'priority': 10}])
+        self.assertEqual(0, len(failed), failed)
+        self.assertEqual(4, len(added), added)
+
+        r = get_ordered_resolvers("sort_alpha_realm")
+        self.assertEqual(r[0], "reso3")
+        self.assertEqual(r[1], "reso4")
+        self.assertEqual(r[2], "resolver1")
+        self.assertEqual(r[3], "resolver2")
+
+        delete_realm("sort_alpha_realm")
 
         # Now check with nodes given
         nd1_uuid = "8e4272a9-9037-40df-8aa3-976e4a04b5a9"

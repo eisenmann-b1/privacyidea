@@ -170,7 +170,16 @@
               matInput
               name="password"
               required
-              type="password" />
+              [type]="hidePassword() ? 'password' : 'text'" />
+            <button
+              (click)="hidePassword.set(!hidePassword())"
+              [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'"
+              i18n-attr.aria-label
+              mat-icon-button
+              matSuffix
+              type="button">
+              <mat-icon>{{ hidePassword() ? "visibility_off" : "visibility" }}</mat-icon>
+            </button>
           </mat-form-field>
         }
 

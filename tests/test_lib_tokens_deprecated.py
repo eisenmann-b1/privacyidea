@@ -29,6 +29,7 @@ class DeprecatedTokenTestCase(MyTestCase):
     def test_01_class_identity(self):
         self.assertEqual("deprecated", DeprecatedTokenClass.get_class_type())
         self.assertEqual("DEPR", DeprecatedTokenClass.get_class_prefix())
+        self.assertEqual([], DeprecatedTokenClass.mode)
 
     def test_02_listable_via_get_tokens(self):
         """A deprecated token must show up in get_tokens() just like any other."""
@@ -56,23 +57,22 @@ class DeprecatedTokenTestCase(MyTestCase):
         self.assertEqual(1, removed)
         self.assertEqual(0, len(get_tokens(serial=self.serial_u2f)))
 
-    def test_04_check_otp_refuses(self):
+    def test_04_check_otp_returns_failure(self):
         token = self._create_deprecated_token(self.serial_u2f, "u2f")
-        with self.assertRaises(NoLongerSupportedError) as ctx:
-            token.check_otp("whatever")
-        self.assertIn("u2f", str(ctx.exception))
+        self.assertEqual(-1, token.check_otp("whatever"))
         remove_token(serial=self.serial_u2f)
 
-    def test_05_create_challenge_refuses(self):
+    def test_05_create_challenge_returns_failure(self):
         token = self._create_deprecated_token(self.serial_u2f, "u2f")
-        with self.assertRaises(NoLongerSupportedError):
-            token.create_challenge()
+        success, message, transaction_id, reply = token.create_challenge()
+        self.assertFalse(success)
         remove_token(serial=self.serial_u2f)
 
-    def test_06_authenticate_refuses(self):
+    def test_06_authenticate_returns_failure(self):
         token = self._create_deprecated_token(self.serial_u2f, "u2f")
-        with self.assertRaises(NoLongerSupportedError):
-            token.authenticate("pin")
+        pin_match, otp_counter, reply = token.authenticate("pin")
+        self.assertFalse(pin_match)
+        self.assertEqual(-1, otp_counter)
         remove_token(serial=self.serial_u2f)
 
     def test_07_update_refuses(self):
@@ -94,7 +94,7 @@ class DeprecatedTokenTestCase(MyTestCase):
     def test_09_error_message_mentions_original_type(self):
         token = self._create_deprecated_token(self.serial_u2f, "u2f")
         with self.assertRaises(NoLongerSupportedError) as ctx:
-            token.check_otp("x")
+            token.update({})
         self.assertIn("u2f", str(ctx.exception))
         remove_token(serial=self.serial_u2f)
 
@@ -106,7 +106,7 @@ class DeprecatedTokenTestCase(MyTestCase):
         """
         token = self._create_deprecated_token(self.serial_unknown, original=None)
         with self.assertRaises(NoLongerSupportedError) as ctx:
-            token.check_otp("x")
+            token.update({})
         self.assertIn("unknown", str(ctx.exception))
         remove_token(serial=self.serial_unknown)
 
@@ -146,10 +146,9 @@ class DeprecatedTokenTestCase(MyTestCase):
             token.get_init_detail()
         remove_token(serial=self.serial_u2f)
 
-    def test_15_check_challenge_response_refused(self):
+    def test_15_check_challenge_response_returns_failure(self):
         token = self._create_deprecated_token(self.serial_u2f, "u2f")
-        with self.assertRaises(NoLongerSupportedError):
-            token.check_challenge_response(passw="anything")
+        self.assertEqual(-1, token.check_challenge_response(passw="anything"))
         remove_token(serial=self.serial_u2f)
 
     def test_16_api_endpoint_refused(self):

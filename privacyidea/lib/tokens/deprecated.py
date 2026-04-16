@@ -39,16 +39,21 @@ class DeprecatedTokenClass(TokenClass):
     Stand-in for tokens whose original type has been removed.
 
     Instances are safe to construct, list, and delete — but any
-    attempt to use them for authentication, enrollment, or state
-    change (enable, reset) raises :class:`NoLongerSupportedError`.
+    attempt to use them for enrollment or state change (enable, reset)
+    raises :class:`NoLongerSupportedError`.
     Read-only operations like ``get_tokeninfo``, ``get_as_dict``, and
     deletion fall through to :class:`TokenClass` unchanged.
 
-    One deliberate exception: :meth:`is_challenge_request` returns
-    ``False`` instead of raising, so a user with a mix of working and
-    deprecated tokens can still authenticate with the working ones.
+    Authentication-path methods return silent failure values instead of
+    raising, because callers iterate over multiple tokens and an
+    exception would abort the loop for sibling tokens.  The ``mode``
+    class attribute is empty so the token is filtered out before
+    challenge creation, but the safe return values are a second line
+    of defence.
     See ``dev/token-deprecation-strategy.md``.
     """
+
+    mode = []
 
     @staticmethod
     def get_class_type():
@@ -71,22 +76,21 @@ class DeprecatedTokenClass(TokenClass):
     def get_init_detail(self, params=None, user=None):
         self._refuse()
 
-    # --- authentication ---
+    # --- authentication (silent failure — see class docstring) ---
     def is_challenge_request(self, passw, user=None, options=None):
-        # Intentional soft-skip: see class docstring.
         return False
 
     def create_challenge(self, transactionid=None, options=None):
-        self._refuse()
+        return False, "", None, {}
 
     def check_challenge_response(self, user=None, passw=None, options=None):
-        self._refuse()
+        return -1
 
     def check_otp(self, otpval, counter=None, window=None, options=None):
-        self._refuse()
+        return -1
 
     def authenticate(self, passw, user=None, options=None):
-        self._refuse()
+        return False, -1, {}
 
     # --- state changes that would make the token look usable again ---
     def enable(self, enable=True):

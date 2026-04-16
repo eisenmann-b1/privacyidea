@@ -60,16 +60,21 @@ is a second line of defence: any code path that bypasses the class
 (e.g. raw SQL reporting, future refactors) still sees the token as
 disabled. It costs one extra `UPDATE` in the migration.
 
-### Why `is_challenge_request` returns False instead of raising
+### Why authentication methods return failure values instead of raising
 
 A user with a deprecated token *and* another working token should not
-be locked out. Raising during challenge evaluation would abort the
-whole auth flow; returning False makes the deprecated token silently
-skipped, and the user's other tokens are still evaluated. The failure
-mode for a user with *only* a deprecated token is "no working token"
-rather than "clear error", which is worse for debugging — but the
-prominent migration log and the admin's cleanup workflow are the
-primary signal, not a runtime error.
+be locked out. Raising during challenge evaluation or token iteration
+would abort the whole auth flow; returning silent failure values makes
+the deprecated token skipped, and the user's other tokens are still
+evaluated. The `mode` class attribute is set to `[]` so that
+`trigger_challenge` and similar callers filter the token out before
+reaching `create_challenge`, but even if reached, the methods return
+safe defaults (`-1`, `False`, etc.) as a second line of defence.
+
+The failure mode for a user with *only* a deprecated token is "no
+working token" rather than "clear error", which is worse for
+debugging — but the prominent migration log and the admin's cleanup
+workflow are the primary signal, not a runtime error.
 
 ### Why the frontend is not touched
 
@@ -83,16 +88,20 @@ column, but it is not required for the deprecation to be usable.
 `DeprecatedTokenClass` overrides the following methods from
 `TokenClass` to raise `NoLongerSupportedError`:
 
-- **Authentication:** `check_otp`, `check_challenge_response`,
-  `authenticate`, `create_challenge`
 - **Enrollment:** `update`, `get_init_detail`
 - **State changes that would make the token look usable again:**
   `enable(True)` (an explicit `enable(False)` is still allowed so
   admins can audit-log a defensive disable), `reset`
 - **Token-specific REST endpoint:** `api_endpoint`
 
-`is_challenge_request` is the single deliberate exception: it
-returns `False` instead of raising, see the reasoning below.
+Authentication-path methods (`check_otp`, `check_challenge_response`,
+`authenticate`, `create_challenge`, `is_challenge_request`) return
+silent failure values instead of raising. Callers iterate over
+multiple tokens in a loop and an unhandled exception would abort the
+loop, preventing sibling tokens from being evaluated. The `mode`
+class attribute is set to `[]` so the token is filtered out before
+challenge creation in the first place, but the safe return values
+are a second line of defence.
 
 Everything else — `get_tokeninfo`, `get_as_dict`, `set_description`,
 `delete_token`, `revoke`, and so on — falls through to the base

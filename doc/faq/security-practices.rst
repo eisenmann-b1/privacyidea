@@ -50,9 +50,9 @@ Every pull request and nightly build is checked by the following tools:
 Testing
 ~~~~~~~
 
-The test suite comprises more than 2,400 test cases and ~100,000 lines of test
-code, run by pytest with ~92% code coverage. Tests execute against both
-**MariaDB** and **PostgreSQL**.
+The test suite comprises thousands of test cases and extensive test code, run
+by pytest with high code coverage. Tests execute against both **MariaDB** and
+**PostgreSQL**.
 
 Coverage by security-relevant area:
 

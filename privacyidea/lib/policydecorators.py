@@ -56,10 +56,30 @@ from privacyidea.lib.policies.helper import check_max_auth_fail, check_max_auth_
 from privacyidea.lib.policy import Match
 from privacyidea.lib.policy import SCOPE, ACTIONVALUE, LOGINMODE
 from privacyidea.lib.radiusserver import get_radius
+from privacyidea.lib.token import get_tokens
 from privacyidea.lib.user import User
 from privacyidea.lib.utils import parse_timedelta, split_pin_pass
 
 log = logging.getLogger(__name__)
+
+
+def _get_token_count_excluding_rollout_states(user_object, ignore_rollout_state):
+    """
+    Get the number of tokens for a user, optionally ignoring tokens
+    whose rollout_state matches one of the given states.
+
+    :param user_object: The user whose tokens to count
+    :param ignore_rollout_state: A collection of rollout states to ignore, or empty/falsy to count all
+    :return: The number of relevant tokens
+    """
+    token_count = get_tokens(user=user_object, count=True)
+    if ignore_rollout_state and token_count > 0:
+        ignored_states = {s.lower() for s in ignore_rollout_state}
+        user_tokens = get_tokens(user=user_object)
+        relevant_tokens = [t for t in user_tokens
+                           if (t.token.rollout_state or "").lower() not in ignored_states]
+        token_count = len(relevant_tokens)
+    return token_count
 
 
 class libpolicy(object):
@@ -213,7 +233,6 @@ def auth_user_has_no_token(wrapped_function, user_object, passw,
     :param options: Dict containing values for "g" and "clientip"
     :return: Tuple of True/False and reply-dictionary
     """
-    from privacyidea.lib.token import get_tokens
     options = options or {}
     g = options.get("g")
     if g:
@@ -227,13 +246,7 @@ def auth_user_has_no_token(wrapped_function, user_object, passw,
                                                action=PolicyAction.PASSNOTOKEN_IGNORE_ROLLOUT_STATE,
                                                user_object=user_object)
                                     .action_values(unique=False, write_to_audit_log=True))
-            token_count = get_tokens(user=user_object, count=True)
-            if ignore_rollout_state and token_count > 0:
-                ignored_states = {s.lower() for s in ignore_rollout_state}
-                user_tokens = get_tokens(user=user_object)
-                relevant_tokens = [t for t in user_tokens
-                                   if (t.token.rollout_state or "").lower() not in ignored_states]
-                token_count = len(relevant_tokens)
+            token_count = _get_token_count_excluding_rollout_states(user_object, ignore_rollout_state)
             if token_count == 0:
                 g.audit_object.add_policy({p.get("name") for p in pass_no_token})
                 return True, {"message": f"user has no token, accepted due to '{pass_no_token[0].get('name')}'"}
@@ -306,13 +319,7 @@ def auth_user_passthru(wrapped_function, user_object, passw, options=None):
         ignore_rollout_state = (Match.user(g, scope=SCOPE.AUTH, action=PolicyAction.PASSTHRU_IGNORE_ROLLOUT_STATE,
                                            user_object=user_object)
                                 .action_values(unique=False, write_to_audit_log=True))
-        token_count = get_tokens(user=user_object, count=True)
-        if ignore_rollout_state and token_count > 0:
-            ignored_states = {s.lower() for s in ignore_rollout_state}
-            user_tokens = get_tokens(user=user_object)
-            relevant_tokens = [t for t in user_tokens
-                               if (t.token.rollout_state or "").lower() not in ignored_states]
-            token_count = len(relevant_tokens)
+        token_count = _get_token_count_excluding_rollout_states(user_object, ignore_rollout_state)
         if pass_thru and token_count == 0:
             # Ensure that there are no conflicting action values within the same priority
             policy_object.check_for_conflicts(pass_thru, "passthru")

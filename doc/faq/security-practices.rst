@@ -26,7 +26,8 @@ run on a nightly schedule:
      - Purpose
    * - **Bandit** (SAST)
      - Python static security analysis. Results uploaded to the GitHub Security
-       tab as SARIF. Excludes test fixtures and auto-generated code.
+       tab as SARIF. In CI, excludes ``./docs``, ``./tests``, and
+       ``./migrations``.
    * - **CodeQL**
      - Semantic analysis for Python and JavaScript. Results to the GitHub
        Security tab.

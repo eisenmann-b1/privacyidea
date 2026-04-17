@@ -98,7 +98,8 @@ Cryptographic Discipline
   additional per-installation pepper.
 - **Constant-time comparison:** ``hmac.compare_digest()`` for PIN and token
   verification (prevents timing attacks).
-- **Random generation:** Python's ``secrets`` module throughout.
+- **Random generation:** Cryptographically secure randomness via
+  ``os.urandom`` / ``secrets`` where appropriate.
 - **HSM support:** PKCS#11 interface for hardware-backed key storage.
 - **Audit trail signing:** RSA 2048-bit with SHA-256 (configurable).
 - **Safe parsing:** ``defusedxml`` for XML (prevents XXE), ``yaml.safe_load()``

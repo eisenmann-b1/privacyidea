@@ -356,13 +356,11 @@ describe("LoginComponent", () => {
 
       // THEN: password visibility should be reset to hidden
       expect(component.hidePassword()).toBe(true);
-      // NOTE: Password input is removed from DOM when error message is shown? 
-      // Actually it's only removed if showOtpField is true or useRemoteLogin is true.
-      // But errorMessage is just a div at the top.
+
+      // The password input stays in the DOM because showOtpField is false and useRemoteLogin is false.
       const passwordInput = fixture.debugElement.query(By.css("#password"));
-      if (passwordInput) {
-        expect(passwordInput.nativeElement.type).toBe("password");
-      }
+      expect(passwordInput).not.toBeNull();
+      expect(passwordInput.nativeElement.type).toBe("password");
     });
   });
 
@@ -571,8 +569,7 @@ describe("LoginComponent", () => {
       expect(btn).toBeNull();
     });
   });
-})
-;
+});
 
 describe("passkeyLoginEnabled signal", () => {
   let fixture: ComponentFixture<LoginComponent>;

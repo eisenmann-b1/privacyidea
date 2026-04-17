@@ -56,7 +56,6 @@ from privacyidea.lib.policies.helper import check_max_auth_fail, check_max_auth_
 from privacyidea.lib.policy import Match
 from privacyidea.lib.policy import SCOPE, ACTIONVALUE, LOGINMODE
 from privacyidea.lib.radiusserver import get_radius
-from privacyidea.lib.token import get_tokens
 from privacyidea.lib.user import User
 from privacyidea.lib.utils import parse_timedelta, split_pin_pass
 
@@ -109,6 +108,7 @@ def _get_token_count_excluding_rollout_states(user_object, ignore_rollout_state)
     :param ignore_rollout_state: A collection of rollout states to ignore, or empty/falsy to count all
     :return: The number of relevant tokens
     """
+    from privacyidea.lib.token import get_tokens
     token_count = get_tokens(user=user_object, count=True)
     if ignore_rollout_state and token_count > 0:
         ignored_states = {s.lower() for s in ignore_rollout_state}

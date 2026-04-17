@@ -221,7 +221,19 @@ def auth_user_has_no_token(wrapped_function, user_object, passw,
                                    user_object=user_object).policies(write_to_audit_log=False)
         if pass_no_token:
             # Now we need to check, if the user really has no token.
+            # If PASSNOTOKEN_IGNORE_ROLLOUT_STATE is set, tokens with a rollout state
+            # listed in the policy are ignored when counting the user's tokens.
+            ignore_rollout_state = (Match.user(g, scope=SCOPE.AUTH,
+                                               action=PolicyAction.PASSNOTOKEN_IGNORE_ROLLOUT_STATE,
+                                               user_object=user_object)
+                                    .action_values(unique=False, write_to_audit_log=False))
             token_count = get_tokens(user=user_object, count=True)
+            if ignore_rollout_state and token_count > 0:
+                ignored_states = {s.lower() for s in ignore_rollout_state}
+                user_tokens = get_tokens(user=user_object)
+                relevant_tokens = [t for t in user_tokens
+                                   if (t.token.rollout_state or "").lower() not in ignored_states]
+                token_count = len(relevant_tokens)
             if token_count == 0:
                 g.audit_object.add_policy({p.get("name") for p in pass_no_token})
                 return True, {"message": f"user has no token, accepted due to '{pass_no_token[0].get('name')}'"}

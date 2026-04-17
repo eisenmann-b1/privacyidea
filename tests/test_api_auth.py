@@ -1446,6 +1446,127 @@ class AuthApiTestCase(MyApiTestCase):
         delete_policy("ignore_rollout")
         delete_policy("pi-login")
 
+    def test_17_passnotoken_ignore_rollout_state(self):
+        """
+        Test that tokens whose rollout_state is listed in the
+        PASSNOTOKEN_IGNORE_ROLLOUT_STATE policy are ignored when determining
+        whether a user has tokens for the passOnNoToken policy.
+        The policy value is stored as space-separated rollout states, e.g.
+        ``passnotoken_ignore_rollout_state=clientwait verify broken``.
+        """
+        self.setUp_user_realms()
+        set_policy("pi-login", scope=SCOPE.WEBUI,
+                   action=f"{PolicyAction.LOGINMODE}=privacyIDEA")
+        set_policy("notoken", scope=SCOPE.AUTH,
+                   action=f"{PolicyAction.PASSNOTOKEN}")
+
+        user = User("cornelius", self.realm1)
+        # Make sure the user has no tokens
+        remove_token(user=user)
+
+        # Assign a token with rollout_state=clientwait
+        tok1 = init_token({"serial": "PNTIRS1", "type": "spass", "pin": "pin"},
+                          user=user)
+        tok1.token.rollout_state = RolloutState.CLIENTWAIT
+        tok1.token.save()
+
+        # Without PASSNOTOKEN_IGNORE_ROLLOUT_STATE, the user has a token,
+        # so passOnNoToken should NOT trigger. Auth fails.
+        with self.app.test_request_context('/auth',
+                                           method='POST',
+                                           data={"username": "cornelius",
+                                                 "password": "test"}):
+            res = self.app.full_dispatch_request()
+            self.assertEqual(401, res.status_code, res)
+
+        # Set PASSNOTOKEN_IGNORE_ROLLOUT_STATE to "clientwait"
+        set_policy("notoken_ignore", scope=SCOPE.AUTH,
+                   action=f"{PolicyAction.PASSNOTOKEN_IGNORE_ROLLOUT_STATE}=clientwait")
+
+        # Token in "clientwait" is ignored -> passOnNoToken triggers
+        with self.app.test_request_context('/auth',
+                                           method='POST',
+                                           data={"username": "cornelius",
+                                                 "password": "test"}):
+            res = self.app.full_dispatch_request()
+            self.assertEqual(200, res.status_code, res)
+            result = res.json.get("result")
+            self.assertTrue(result.get("status"), result)
+
+        # Policy ignores only "verify" -> "clientwait" token NOT ignored
+        set_policy("notoken_ignore", scope=SCOPE.AUTH,
+                   action=f"{PolicyAction.PASSNOTOKEN_IGNORE_ROLLOUT_STATE}=verify")
+
+        with self.app.test_request_context('/auth',
+                                           method='POST',
+                                           data={"username": "cornelius",
+                                                 "password": "test"}):
+            res = self.app.full_dispatch_request()
+            self.assertEqual(401, res.status_code, res)
+
+        # --- Multiple rollout states (space-separated) ---
+        # Add a second token with rollout_state=verify
+        tok2 = init_token({"serial": "PNTIRS2", "type": "spass", "pin": "pin2"},
+                          user=user)
+        tok2.token.rollout_state = RolloutState.VERIFY_PENDING
+        tok2.token.save()
+
+        # Policy "clientwait verify" -> both ignored
+        set_policy("notoken_ignore", scope=SCOPE.AUTH,
+                   action=f"{PolicyAction.PASSNOTOKEN_IGNORE_ROLLOUT_STATE}=clientwait verify")
+
+        with self.app.test_request_context('/auth',
+                                           method='POST',
+                                           data={"username": "cornelius",
+                                                 "password": "test"}):
+            res = self.app.full_dispatch_request()
+            self.assertEqual(200, res.status_code, res)
+
+        # Add a third token with rollout_state=broken
+        tok3 = init_token({"serial": "PNTIRS3", "type": "spass", "pin": "pin3"},
+                          user=user)
+        tok3.token.rollout_state = RolloutState.BROKEN
+        tok3.token.save()
+
+        # "clientwait verify" does NOT cover "broken" -> auth fails
+        with self.app.test_request_context('/auth',
+                                           method='POST',
+                                           data={"username": "cornelius",
+                                                 "password": "test"}):
+            res = self.app.full_dispatch_request()
+            self.assertEqual(401, res.status_code, res)
+
+        # "clientwait verify broken" -> all three ignored
+        set_policy("notoken_ignore", scope=SCOPE.AUTH,
+                   action=f"{PolicyAction.PASSNOTOKEN_IGNORE_ROLLOUT_STATE}=clientwait verify broken")
+
+        with self.app.test_request_context('/auth',
+                                           method='POST',
+                                           data={"username": "cornelius",
+                                                 "password": "test"}):
+            res = self.app.full_dispatch_request()
+            self.assertEqual(200, res.status_code, res)
+
+        # Add a fully enrolled token -> user has a real token
+        tok4 = init_token({"serial": "PNTIRS4", "type": "spass", "pin": "Hallo"},
+                          user=user)
+
+        with self.app.test_request_context('/auth',
+                                           method='POST',
+                                           data={"username": "cornelius",
+                                                 "password": "test"}):
+            res = self.app.full_dispatch_request()
+            self.assertEqual(401, res.status_code, res)
+
+        # Clean up
+        remove_token("PNTIRS1")
+        remove_token("PNTIRS2")
+        remove_token("PNTIRS3")
+        remove_token("PNTIRS4")
+        delete_policy("notoken")
+        delete_policy("notoken_ignore")
+        delete_policy("pi-login")
+
 
 class AdminFromUserstore(OverrideConfigTestCase):
     class Config(TestingConfig):

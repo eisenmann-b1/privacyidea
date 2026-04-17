@@ -2610,6 +2610,13 @@ def get_static_policy_definitions(scope=None):
                 'desc': _('If the user has no token, the authentication '
                           'request for this user will always be true.')
             },
+            PolicyAction.PASSNOTOKEN_IGNORE_ROLLOUT_STATE: {
+                'type': 'str',
+                'multiple': True,
+                'desc': _(
+                    'Ignore token in given rollout state. This will only work if passOnNoToken policy is active.'),
+                'value': ['clientwait', 'pending', 'verify', 'enrolled', 'broken', 'failed', 'denied']
+            },
             PolicyAction.PASSNOUSER: {
                 'type': 'bool',
                 'desc': _('If the user user does not exist, '

@@ -338,6 +338,21 @@ def import_realms(data, name=None):
                  f'failed: {failed!s}')
 
 
+def get_realms_of_resolver(resolver_name: str) -> list[str]:
+    """
+    Return a list of realm names that contain the given resolver.
+
+    :param resolver_name: The name of the resolver
+    :return: list of realm names
+    """
+    all_realms = get_realms()
+    return [
+        realm_name
+        for realm_name, realm_conf in all_realms.items()
+        if any(r.get("name") == resolver_name for r in realm_conf.get("resolver", []))
+    ]
+
+
 @log_with(log)
 def get_ordered_resolvers(realm) -> list[str]:
     """

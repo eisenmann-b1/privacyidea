@@ -59,7 +59,8 @@ from .log import log_with
 from .realm import (get_realms, realm_is_defined,
                     get_default_realm,
                     get_ordered_resolvers,
-                    get_realm_id)
+                    get_realm_id,
+                    get_realms_of_resolver)
 from .resolver import (get_resolver_object,
                        get_resolver_type)
 from .usercache import (user_cache, cache_username, user_init, delete_user_cache)
@@ -732,16 +733,13 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
     This function returns a list of user dictionaries. The user dict contains the resolver and custom user attributes,
     if requested.
     If no realm is given in the param, the users from all realms are returned.
-    The returned user dictionaries always contain the ``realm`` key. Its value is the realm name if the search is
-    performed in a realm context, or ``None`` if users are searched only in a specific resolver.
+    The returned user dictionaries always contain the ``realm`` key. If only a resolver is given (no realm),
+    the function looks up all realms containing that resolver and iterates through them, so users are
+    always returned in a realm context with proper masking.
 
     Fixme: Please note: If a realm and a resolver is given, the resolver is currently ignored. So all users
     of this realm are returned. This is the old/current behaviour. When filtering for a resolver in a realm, we
     should probably take care, that masked users (in low priority resolvers) are not returned.
-
-    Fixme: Please note: When filtering only for a resolver, the function simply returns objects found in the user store.
-    However, this object might not be found as a user in a realm, since the object from this resolver might be masked
-    by an object found in a higher priority resolver.
 
     :param param: search parameters
     :param user:  a specific user object to return
@@ -800,8 +798,12 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
         realm_iteration = list(all_realms)
 
     if not realm_iteration:
-        # We could not determine any realm, this is only the case if no realm is given but a resolver is given.
-        realm_iteration = [None]
+        # No realm given but a resolver is given. Find all realms that contain this resolver.
+        resolver_name = param_resolver or user_resolver
+        realm_iteration = get_realms_of_resolver(resolver_name)
+        if not realm_iteration:
+            log.warning(f"Resolver '{resolver_name}' is not assigned to any realm.")
+            return []
 
     # Determine some display values.
     remove_user_id = False
@@ -814,14 +816,7 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
     requested_user_store_attributes = list(set(requested_attributes or []) - set(requested_pi_user_attributes))
 
     for realm in realm_iteration:
-        if realm:
-            resolvers = get_ordered_resolvers(realm)
-        else:
-            # The realm is None, since a specific resolver was given.
-            if param_resolver:
-                resolvers.append(param_resolver)
-            if user_resolver:
-                resolvers.append(user_resolver)
+        resolvers = get_ordered_resolvers(realm)
 
         for resolver_name in resolvers:
             try:

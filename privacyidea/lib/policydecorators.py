@@ -63,26 +63,6 @@ from privacyidea.lib.utils import parse_timedelta, split_pin_pass
 log = logging.getLogger(__name__)
 
 
-
-def _get_token_count_excluding_rollout_states(user_object, ignore_rollout_state):
-    """
-    Get the number of tokens for a user, optionally ignoring tokens
-    whose rollout_state matches one of the given states.
-
-    :param user_object: The user whose tokens to count
-    :param ignore_rollout_state: A collection of rollout states to ignore, or empty/falsy to count all
-    :return: The number of relevant tokens
-    """
-    token_count = get_tokens(user=user_object, count=True)
-    if ignore_rollout_state and token_count > 0:
-        ignored_states = {s.lower() for s in ignore_rollout_state}
-        user_tokens = get_tokens(user=user_object)
-        relevant_tokens = [t for t in user_tokens
-                           if (t.token.rollout_state or "").lower() not in ignored_states]
-        token_count = len(relevant_tokens)
-    return token_count
-
-  
 class libpolicy:
     """
     This is the decorator wrapper to call a specific function before a
@@ -118,6 +98,25 @@ class libpolicy:
             return self.decorator_function(wrapped_function, *args, **kwds)
 
         return policy_wrapper
+
+
+def _get_token_count_excluding_rollout_states(user_object, ignore_rollout_state):
+    """
+    Get the number of tokens for a user, optionally ignoring tokens
+    whose rollout_state matches one of the given states.
+
+    :param user_object: The user whose tokens to count
+    :param ignore_rollout_state: A collection of rollout states to ignore, or empty/falsy to count all
+    :return: The number of relevant tokens
+    """
+    token_count = get_tokens(user=user_object, count=True)
+    if ignore_rollout_state and token_count > 0:
+        ignored_states = {s.lower() for s in ignore_rollout_state}
+        user_tokens = get_tokens(user=user_object)
+        relevant_tokens = [t for t in user_tokens
+                           if (t.token.rollout_state or "").lower() not in ignored_states]
+        token_count = len(relevant_tokens)
+    return token_count
 
 
 def challenge_response_allowed(func):

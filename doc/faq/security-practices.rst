@@ -92,8 +92,10 @@ Cryptographic Discipline
 
 - **No hand-rolled cryptography.** All operations use the ``cryptography``
   library or well-audited alternatives (``argon2-cffi``, ``bcrypt``).
-- **Symmetric encryption:** AES-256-CBC with PKCS7 padding. Three separate
-  256-bit keys (token, config, value) stored in an encrypted key file.
+- **Symmetric encryption:** For key-file based encryption of token, config,
+  and value secrets, privacyIDEA uses AES-256-CBC with separate 256-bit keys
+  stored in an encrypted key file. Other AES-CBC based import/export or legacy
+  compatibility paths exist elsewhere in the codebase.
 - **Password and PIN hashing:** Argon2 (9 rounds). Admin passwords use an
   additional per-installation pepper.
 - **Constant-time comparison:** ``hmac.compare_digest()`` for PIN and token

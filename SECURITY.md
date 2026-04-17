@@ -15,7 +15,7 @@ page in our documentation.
 ## How to report a security vulnerability
 
 If you found a problematic security vulnerability, please
-refrain from reporting an issue at github but send this vulnerability to
+refrain from reporting an issue at GitHub but send this vulnerability to
 us directly.
 Please include the following details:
 

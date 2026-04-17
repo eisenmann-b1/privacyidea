@@ -233,6 +233,7 @@ def auth_user_has_no_token(wrapped_function, user_object, passw,
                 user_tokens = get_tokens(user=user_object)
                 relevant_tokens = [t for t in user_tokens
                                    if (t.token.rollout_state or "").lower() not in ignored_states]
+                g.audit_object.add_policy({p.get("name") for p in ignore_rollout_state})
                 token_count = len(relevant_tokens)
             if token_count == 0:
                 g.audit_object.add_policy({p.get("name") for p in pass_no_token})
@@ -312,6 +313,7 @@ def auth_user_passthru(wrapped_function, user_object, passw, options=None):
             user_tokens = get_tokens(user=user_object)
             relevant_tokens = [t for t in user_tokens
                                if (t.token.rollout_state or "").lower() not in ignored_states]
+            g.audit_object.add_policy({p.get("name") for p in ignore_rollout_state})
             token_count = len(relevant_tokens)
         if pass_thru and token_count == 0:
             # Ensure that there are no conflicting action values within the same priority

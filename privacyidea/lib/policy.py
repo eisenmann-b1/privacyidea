@@ -2595,7 +2595,8 @@ def get_static_policy_definitions(scope=None):
             PolicyAction.PASSTHRU_IGNORE_ROLLOUT_STATE: {
                 'type': 'str',
                 'multiple': True,
-                'desc': _('Ignore token in given rollout state. This will only work if the passthru policy is active.'),
+                'desc': _(
+                    'Ignore tokens in the given rollout state. This will only work if the passthru policy is active.'),
                 'value': ['clientwait', 'pending', 'verify', 'enrolled', 'broken', 'failed', 'denied']
             },
             PolicyAction.PASSTHRU_ASSIGN: {
@@ -2614,7 +2615,7 @@ def get_static_policy_definitions(scope=None):
                 'type': 'str',
                 'multiple': True,
                 'desc': _(
-                    'Ignore token in given rollout state. This will only work if passOnNoToken policy is active.'),
+                    'Ignore tokens in the given rollout state. This will only work if passOnNoToken policy is active.'),
                 'value': ['clientwait', 'pending', 'verify', 'enrolled', 'broken', 'failed', 'denied']
             },
             PolicyAction.PASSNOUSER: {

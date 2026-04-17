@@ -112,9 +112,12 @@ and audit signing.
 Release Process
 ~~~~~~~~~~~~~~~
 
-- **Signed releases:** GPG-signed tarballs published to PyPI.
-- **Automated build:** Tag-triggered GitHub Actions workflow builds the WebUI
-  and Python distribution artifacts and creates a GitHub release.
+- **Release artifacts:** Tag-triggered GitHub Actions workflows build the
+  WebUI and Python distribution artifacts for each tagged release.
+- **GitHub releases:** The automated workflow creates a GitHub release as part
+  of the tagged release process. Any signing or package index publication steps
+  should be considered separate from the workflow unless explicitly documented
+  elsewhere.
 - **Changelog:** Versioned entries documenting features, enhancements, and
   fixes.
 

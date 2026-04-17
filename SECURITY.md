@@ -5,9 +5,8 @@
 privacyIDEA is security infrastructure and is developed accordingly. Every pull
 request is checked by static analysis (Bandit, CodeQL), dependency scanning
 (pip-audit for Python, OSV-Scanner for npm), and a linter (Ruff). Push protection for secret
-scanning is enabled. The test suite runs more than 2,400 test cases against real MariaDB and
-PostgreSQL instances with ~92% code coverage. Python dependencies are fully pinned
-with SHA-256 hash verification.
+scanning is enabled. The test suite provides extensive automated coverage against real MariaDB
+and PostgreSQL instances. Python dependencies are fully pinned with SHA-256 hash verification.
 
 For the full description of our security development practices, see the
 [Security Development Practices](https://privacyidea.readthedocs.io/en/latest/faq/security-practices.html)

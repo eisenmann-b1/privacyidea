@@ -15,7 +15,8 @@ For reporting vulnerabilities see `SECURITY.md <https://github.com/privacyidea/p
 Continuous Integration & Security Scanning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Every pull request and nightly build is checked by the following tools:
+Every pull request is checked by the following tools, and some of them also
+run on a nightly schedule:
 
 .. list-table::
    :header-rows: 1

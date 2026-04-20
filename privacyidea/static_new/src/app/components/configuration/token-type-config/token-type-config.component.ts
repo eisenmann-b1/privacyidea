@@ -110,7 +110,7 @@ export class TokenTypeConfigComponent implements OnInit, AfterViewInit, OnDestro
     source: () => this.systemService.systemConfig(),
     computation: (config) => ({ ...config })
   });
-  nextQuestion = linkedSignal<any, number>({
+  nextQuestionIndex = linkedSignal<any, number>({
     source: () => this.systemService.systemConfig(),
     computation: (config) => {
       let max = -1;
@@ -224,12 +224,12 @@ export class TokenTypeConfigComponent implements OnInit, AfterViewInit, OnDestro
       this.notificationService.openSnackBar($localize`Please enter a question.`);
       return;
     }
-    const index = this.nextQuestion();
+    const index = this.nextQuestionIndex();
     this.formData.update((f) => ({
       ...f,
       [`question.question.${index}`]: text
     }));
-    this.nextQuestion.update((n) => n + 1);
+    this.nextQuestionIndex.update((n) => n + 1);
   }
 
   deleteQuestion(key: string) {

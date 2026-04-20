@@ -3072,10 +3072,11 @@ class ValidateAPITestCase(MyApiTestCase):
         # Use merge() rather than add() because the app's create_app() already
         # inserts Node1 at startup (PI_NODE_UUID in config.py). On Postgres a
         # plain INSERT here aborts the whole transaction; merge() is idempotent.
-        node1 = NodeName(id="8e4272a9-9037-40df-8aa3-976e4a04b5a9", name="Node1")
-        node2 = NodeName(id="d1d7fde6-330f-4c12-88f3-58a1752594bf", name="Node2")
-        db.session.merge(node1)
-        db.session.merge(node2)
+        # Re-bind the names to the merge() return values — the original transient
+        # instances are not added to the session, and later db.session.delete()
+        # would fail with "Instance is not persisted".
+        node1 = db.session.merge(NodeName(id="8e4272a9-9037-40df-8aa3-976e4a04b5a9", name="Node1"))
+        node2 = db.session.merge(NodeName(id="d1d7fde6-330f-4c12-88f3-58a1752594bf", name="Node2"))
         set_policy("realm_auth", scope=SCOPE.AUTH, action=f"{PolicyAction.SET_REALM}={self.realm3}",
                    pinode="Node1")
 

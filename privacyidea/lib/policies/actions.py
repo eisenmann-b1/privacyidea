@@ -64,7 +64,7 @@ class PolicyAction:
     OTPPINMINLEN = 'otp_pin_minlength'
     OTPPINCONTENTS = 'otp_pin_contents'
     PASSNOTOKEN = "passOnNoToken"
-    PASSNOTOKEN_IGNORE_ROLLOUT_STATE = "passnotoken_ignore_rollout_state"
+    PASSNOTOKEN_IGNORE_ROLLOUT_STATE = "passOnNoToken_ignore_rollout_state"
     PASSNOUSER = "passOnNoUser"
     PASSTHRU = "passthru"
     PASSTHRU_IGNORE_ROLLOUT_STATE = "passthru_ignore_rollout_state"

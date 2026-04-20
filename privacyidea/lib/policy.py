@@ -207,7 +207,6 @@ from ..models import (Policy, db, save_config_timestamp, PolicyDescription, Poli
 log = logging.getLogger(__name__)
 
 
-
 def check_policy_name(name):
     """
     Check that the given name is a valid policy name.
@@ -223,6 +222,7 @@ def check_policy_name(name):
 
     if not re.match(r'^[a-zA-Z0-9_.\- ]*$', name):
         raise ParameterError(_("The name of the policy may only contain the characters a-zA-Z0-9_. -"))
+
 
 DEFAULT_ANDROID_APP_URL = "https://play.google.com/store/apps/details?id=it.netknights.piauthenticator"
 DEFAULT_IOS_APP_URL = "https://apps.apple.com/us/app/privacyidea-authenticator/id1445401301"
@@ -1641,6 +1641,7 @@ def get_static_policy_definitions(scope=None):
         description.
     :rtype: dict
     """
+    from .tokenclass import RolloutState
     from .container import get_container_token_types, get_all_templates_with_type, get_templates_by_query
     resolvers = list(get_resolver_list())
     realms = list(get_realms())
@@ -2610,7 +2611,7 @@ def get_static_policy_definitions(scope=None):
                 'multiple': True,
                 'desc': _(
                     'Ignore tokens in the given rollout state. This will only work if the passthru policy is active.'),
-                'value': ['clientwait', 'pending', 'verify', 'enrolled', 'broken', 'failed', 'denied']
+                'value': RolloutState.all_states()
             },
             PolicyAction.PASSTHRU_ASSIGN: {
                 'type': 'str',
@@ -2629,7 +2630,7 @@ def get_static_policy_definitions(scope=None):
                 'multiple': True,
                 'desc': _(
                     'Ignore tokens in the given rollout state. This will only work if passOnNoToken policy is active.'),
-                'value': ['clientwait', 'pending', 'verify', 'enrolled', 'broken', 'failed', 'denied']
+                'value': RolloutState.all_states()
             },
             PolicyAction.PASSNOUSER: {
                 'type': 'bool',

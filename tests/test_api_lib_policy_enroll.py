@@ -201,7 +201,7 @@ class PrePolicyEnrollTestCase(PrePolicyHelperMixin, MyApiTestCase):
                         "realm": "home",
                         "type": "spass",
                         "pin": "abcdefghij"}
-        # Good OTP length, but missing nummbers
+        # Good OTP length, but missing numbers
         self.assertRaises(PolicyError, check_otp_pin, req)
 
         # finally delete policy
@@ -494,7 +494,7 @@ class PrePolicyEnrollTestCase(PrePolicyHelperMixin, MyApiTestCase):
                         "serial": "NEW002"}
         self.assertTrue(check_max_token_user(req))
 
-        # and we succeed in issueing a new totp token
+        # and we succeed in issuing a new totp token
         req.all_data = {"user": "cornelius",
                         "realm": self.realm1,
                         "serial": "NEW004",

@@ -1069,7 +1069,7 @@ class AChallengeResponse(MyApiTestCase):
 
         self.assertEqual(len(set(found_questions)), 5)
 
-        # Now we run the last resonse. It can be any of the 5 originial questions again.
+        # Now we run the last response. It can be any of the 5 original questions again.
 
         # Sixth and last response will be successful
         with self.app.test_request_context('/validate/check', method='POST',

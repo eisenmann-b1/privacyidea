@@ -484,7 +484,7 @@ class PrePolicyPinTestCase(PrePolicyHelperMixin, MyApiTestCase):
                         "realm": "home",
                         "type": "spass",
                         "pin": "abcdefghij"}
-        # Good OTP length, but missing nummbers
+        # Good OTP length, but missing numbers
         self.assertRaises(PolicyError, check_otp_pin, req)
 
         # finally delete policy

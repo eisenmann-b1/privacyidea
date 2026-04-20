@@ -50,6 +50,8 @@ import { EventComponent } from "./components/event/event.component";
 import { SystemConfigComponent } from "./components/configuration/system/system-config.component";
 import { TokenTypeConfigComponent } from "./components/configuration/token-type-config/token-type-config.component";
 import { ContainerTemplatesComponent } from "@components/token/container-templates/container-templates.component";
+import { UserNewResolverComponent } from "@components/user/user-new-resolver/user-new-resolver.component";
+import { EditPolicyDialogComponent } from "./components/policies/dialogs/edit-policy-dialog/edit-policy-dialog.component";
 
 export const routes: Routes = [
   {
@@ -79,7 +81,9 @@ export const routes: Routes = [
       { path: "", component: UserTableComponent, canDeactivate: [pendingChangesGuard] },
       { path: "details/:username", component: UserDetailsComponent, canDeactivate: [pendingChangesGuard] },
       { path: "realms", component: RealmTableComponent },
-      { path: "resolvers", component: UserResolversComponent, canDeactivate: [pendingChangesGuard] }
+      { path: "resolvers", component: UserResolversComponent },
+      { path: "resolvers/new", component: UserNewResolverComponent, canDeactivate: [pendingChangesGuard] },
+      { path: "resolvers/details/:name", component: UserNewResolverComponent, canDeactivate: [pendingChangesGuard] }
     ]
   },
   {

@@ -16,7 +16,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { httpResource, HttpResourceRef } from "@angular/common/http";
 import { computed, effect, inject, Injectable, linkedSignal, signal, WritableSignal } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
@@ -142,12 +142,7 @@ export class AuditService implements AuditServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.auditResource.error()) {
-        const err = this.auditResource.error() as HttpErrorResponse;
-        console.error("Failed to get audit data.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get audit data. " + message);
-      }
+      this.notificationService.handleResourceError(this.auditResource, "audit data");
     });
   }
 

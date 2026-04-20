@@ -19,7 +19,7 @@
 
 import { computed, effect, inject, Injectable, Signal } from "@angular/core";
 import { environment } from "../../../environments/environment";
-import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { PiResponse } from "../../app.component";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
@@ -101,12 +101,7 @@ export class MachineResolverService implements MachineResolverServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.machineResolverResource.error()) {
-        const err = this.machineResolverResource.error() as HttpErrorResponse;
-        console.error("Failed to get machine resolvers.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get machine resolvers. " + message);
-      }
+      this.notificationService.handleResourceError(this.machineResolverResource, "machine resolvers");
     });
   }
 

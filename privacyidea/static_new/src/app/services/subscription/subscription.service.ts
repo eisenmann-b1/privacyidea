@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { effect, inject, Injectable, signal } from "@angular/core";
-import { HttpClient, HttpErrorResponse, httpResource } from "@angular/common/http";
+import { HttpClient, httpResource } from "@angular/common/http";
 import { AuthService } from "../auth/auth.service";
 import { ContentService } from "../content/content.service";
 import { environment } from "../../../environments/environment";
@@ -62,12 +62,7 @@ export class SubscriptionService {
 
   constructor() {
     effect(() => {
-      if (this.subscriptionsResource.error()) {
-        const err = this.subscriptionsResource.error() as HttpErrorResponse;
-        console.error("Failed to get subscriptions.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get subscriptions. " + message);
-      }
+      this.notificationService.handleResourceError(this.subscriptionsResource, "subscriptions");
     });
   }
 

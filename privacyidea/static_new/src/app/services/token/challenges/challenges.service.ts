@@ -18,7 +18,7 @@
  **/
 import { AuthService, AuthServiceInterface } from "../../auth/auth.service";
 import { ContentService, ContentServiceInterface } from "../../content/content.service";
-import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { computed, effect, inject, Injectable, linkedSignal, signal, WritableSignal } from "@angular/core";
 import { TokenService, TokenServiceInterface } from "../token.service";
 import { Observable } from "rxjs";
@@ -81,12 +81,7 @@ export class ChallengesService implements ChallengesServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.challengesResource.error()) {
-        const err = this.challengesResource.error() as HttpErrorResponse;
-        console.error("Failed to get challenges.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get challenges. " + message);
-      }
+      this.notificationService.handleResourceError(this.challengesResource, "challenges");
     });
   }
   readonly apiFilter = apiFilter;

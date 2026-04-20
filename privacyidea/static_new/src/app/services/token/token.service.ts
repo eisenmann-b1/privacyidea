@@ -16,7 +16,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { HttpClient, HttpErrorResponse, HttpParams, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, HttpParams, httpResource, HttpResourceRef } from "@angular/common/http";
 import { computed, effect, inject, Injectable, linkedSignal, Signal, signal, WritableSignal } from "@angular/core";
 import { Sort } from "@angular/material/sort";
 import {
@@ -361,36 +361,16 @@ export class TokenService implements TokenServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.tokenResource.error()) {
-        const tokensResourceError = this.tokenResource.error() as HttpErrorResponse;
-        console.error("Failed to get token data.", tokensResourceError.message);
-        const message = tokensResourceError.error?.result?.error?.message || tokensResourceError.message;
-        this.notificationService.openSnackBar("Failed to get token data. " + message);
-      }
+      this.notificationService.handleResourceError(this.tokenResource, "token data");
     });
     effect(() => {
-      if (this.tokenTypesResource.error()) {
-        const tokenTypesResourceError = this.tokenTypesResource.error() as HttpErrorResponse;
-        console.error("Failed to get token type data.", tokenTypesResourceError.message);
-        const message = tokenTypesResourceError.error?.result?.error?.message || tokenTypesResourceError.message;
-        this.notificationService.openSnackBar("Failed to get token type data. " + message);
-      }
+      this.notificationService.handleResourceError(this.tokenTypesResource, "token type data");
     });
     effect(() => {
-      if (this.tokenDetailResource.error()) {
-        const err = this.tokenDetailResource.error() as HttpErrorResponse;
-        console.error("Failed to get token details.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get token details. " + message);
-      }
+      this.notificationService.handleResourceError(this.tokenDetailResource, "token details");
     });
     effect(() => {
-      if (this.userTokenResource.error()) {
-        const err = this.userTokenResource.error() as HttpErrorResponse;
-        console.error("Failed to get user tokens.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get user tokens. " + message);
-      }
+      this.notificationService.handleResourceError(this.userTokenResource, "user tokens");
     });
   }
 

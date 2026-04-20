@@ -18,7 +18,7 @@
  **/
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
-import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { computed, effect, inject, Injectable, linkedSignal, Signal, signal, WritableSignal } from "@angular/core";
 import { NotificationService, NotificationServiceInterface } from "../notification/notification.service";
 import { catchError, forkJoin, Observable, of, Subject, throwError } from "rxjs";
@@ -883,27 +883,13 @@ export class ContainerService implements ContainerServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.containerDetailResource.error()) {
-        const containerDetailError = this.containerDetailResource.error() as HttpErrorResponse;
-        console.error("Failed to get container details.", containerDetailError.message);
-        const message = containerDetailError.error?.result?.error?.message || containerDetailError.message;
-        this.notificationService.openSnackBar("Failed to get container details." + message);
-      }
+      this.notificationService.handleResourceError(this.containerDetailResource, "container details");
     });
     effect(() => {
-      if (this.containerResource.error()) {
-        const error = this.containerResource.error() as HttpErrorResponse;
-        const message = error.error?.result?.error?.message || error.message;
-        this.notificationService.openSnackBar("Failed to get containers. " + message);
-      }
+      this.notificationService.handleResourceError(this.containerResource, "containers");
     });
     effect(() => {
-      if (this.containerTypesResource.error()) {
-        const error = this.containerTypesResource.error() as HttpErrorResponse;
-        console.error("Failed to get container types.", error.message);
-        const message = error.error?.result?.error?.message || error.message;
-        this.notificationService.openSnackBar("Failed to get container types. " + message);
-      }
+      this.notificationService.handleResourceError(this.containerTypesResource, "container types");
     });
 
     effect(() => {

@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
-import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { computed, effect, inject, Injectable, linkedSignal, Signal, WritableSignal } from "@angular/core";
 
 import { environment } from "../../../environments/environment";
@@ -67,20 +67,10 @@ export class SystemService implements SystemServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.systemConfigResource.error()) {
-        const err = this.systemConfigResource.error() as HttpErrorResponse;
-        console.error("Failed to get system config.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get system config. " + message);
-      }
+      this.notificationService.handleResourceError(this.systemConfigResource, "system config");
     });
     effect(() => {
-      if (this.nodesResource.error()) {
-        const err = this.nodesResource.error() as HttpErrorResponse;
-        console.error("Failed to get nodes.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get nodes. " + message);
-      }
+      this.notificationService.handleResourceError(this.nodesResource, "nodes");
     });
   }
   private onAllowedRoutes = computed(() => {

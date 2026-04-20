@@ -18,7 +18,7 @@
  **/
 
 import { computed, effect, inject, Injectable, linkedSignal, Signal, WritableSignal } from "@angular/core";
-import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { PiResponse } from "../../app.component";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
@@ -84,12 +84,7 @@ export class ContainerTemplateService implements ContainerTemplateServiceInterfa
 
   constructor() {
     effect(() => {
-      if (this.templatesResource.error()) {
-        const err = this.templatesResource.error() as HttpErrorResponse;
-        console.error("Failed to get container templates.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get container templates. " + message);
-      }
+      this.notificationService.handleResourceError(this.templatesResource, "container templates");
     });
   }
   readonly templatesResource = httpResource<PiResponse<{ templates: ContainerTemplate[] }>>(() => {

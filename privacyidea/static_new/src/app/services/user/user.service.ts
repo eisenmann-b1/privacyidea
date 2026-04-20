@@ -18,7 +18,7 @@
  **/
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
-import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { computed, effect, inject, Injectable, linkedSignal, Signal, signal, WritableSignal } from "@angular/core";
 import { RealmService, RealmServiceInterface } from "../realm/realm.service";
 import { TokenService, TokenServiceInterface } from "../token/token.service";
@@ -138,21 +138,11 @@ export class UserService implements UserServiceInterface {
     });
 
     effect(() => {
-      if (this.userResource.error()) {
-        const err = this.userResource.error() as HttpErrorResponse;
-        console.error("Failed to get user details.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get user details. " + message);
-      }
+      this.notificationService.handleResourceError(this.userResource, "user details");
     });
 
     effect(() => {
-      if (this.usersResource.error()) {
-        const err = this.usersResource.error() as HttpErrorResponse;
-        console.error("Failed to get users.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get users. " + message);
-      }
+      this.notificationService.handleResourceError(this.usersResource, "users");
     });
   }
 

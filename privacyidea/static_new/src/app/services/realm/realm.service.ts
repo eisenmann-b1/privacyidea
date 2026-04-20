@@ -16,7 +16,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { computed, effect, inject, Injectable, Signal, signal, WritableSignal } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
@@ -268,30 +268,15 @@ export class RealmService implements RealmServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.realmResource.error()) {
-        const realmError = this.realmResource.error() as HttpErrorResponse;
-        console.error("Failed to get realms.", realmError.message);
-        const message = realmError.error?.result?.error?.message || realmError.message;
-        this.notificationService.openSnackBar("Failed to get realms. " + message);
-      }
+      this.notificationService.handleResourceError(this.realmResource, "realms");
     });
 
     effect(() => {
-      if (this.defaultRealmResource.error()) {
-        const defaultRealmError = this.defaultRealmResource.error() as HttpErrorResponse;
-        console.error("Failed to get default realm.", defaultRealmError.message);
-        const message = defaultRealmError.error?.result?.error?.message || defaultRealmError.message;
-        this.notificationService.openSnackBar("Failed to get default realm. " + message);
-      }
+      this.notificationService.handleResourceError(this.defaultRealmResource, "default realm");
     });
 
     effect(() => {
-      if (this.adminRealmResource.error()) {
-        const adminRealmError = this.adminRealmResource.error() as HttpErrorResponse;
-        console.error("Failed to get admin realms.", adminRealmError.message);
-        const message = adminRealmError.error?.result?.error?.message || adminRealmError.message;
-        this.notificationService.openSnackBar("Failed to get admin realms. " + message);
-      }
+      this.notificationService.handleResourceError(this.adminRealmResource, "admin realms");
     });
   }
 }

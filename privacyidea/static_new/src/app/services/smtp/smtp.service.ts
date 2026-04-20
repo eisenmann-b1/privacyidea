@@ -18,7 +18,7 @@
  **/
 import { computed, effect, inject, Injectable, Signal } from "@angular/core";
 import { environment } from "../../../environments/environment";
-import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
 import { PiResponse } from "../../app.component";
@@ -71,12 +71,7 @@ export class SmtpService implements SmtpServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.smtpServerResource.error()) {
-        const err = this.smtpServerResource.error() as HttpErrorResponse;
-        console.error("Failed to get SMTP servers.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get SMTP servers. " + message);
-      }
+      this.notificationService.handleResourceError(this.smtpServerResource, "SMTP servers");
     });
   }
 

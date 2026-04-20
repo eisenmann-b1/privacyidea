@@ -19,7 +19,7 @@
 
 import { computed, effect, inject, Injectable, Signal, signal, WritableSignal } from "@angular/core";
 import { ContentService, ContentServiceInterface } from "../content/content.service";
-import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
@@ -354,12 +354,7 @@ export class EventService implements EventServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.allEventsResource.error()) {
-        const err = this.allEventsResource.error() as HttpErrorResponse;
-        console.error("Failed to get event handlers.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get event handlers. " + message);
-      }
+      this.notificationService.handleResourceError(this.allEventsResource, "event handlers");
     });
   }
 }

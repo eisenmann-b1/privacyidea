@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { computed, effect, inject, Injectable, Signal } from "@angular/core";
-import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
 import { AuthService, AuthServiceInterface } from "../auth/auth.service";
@@ -71,12 +71,7 @@ export class SmsGatewayService implements SmsGatewayServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.smsGatewayResource.error()) {
-        const err = this.smsGatewayResource.error() as HttpErrorResponse;
-        console.error("Failed to get SMS gateways.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get SMS gateways. " + message);
-      }
+      this.notificationService.handleResourceError(this.smsGatewayResource, "SMS gateways");
     });
   }
 

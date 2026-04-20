@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 
-import { HttpResourceRef, HttpClient, HttpErrorResponse, httpResource } from "@angular/common/http";
+import { HttpResourceRef, HttpClient, httpResource } from "@angular/common/http";
 import { WritableSignal, Injectable, inject, signal, effect } from "@angular/core";
 import { Observable, lastValueFrom, catchError, of, throwError, forkJoin } from "rxjs";
 import { environment } from "../../../environments/environment";
@@ -119,12 +119,7 @@ export class PeriodicTaskService implements PeriodicTaskServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.periodicTasksResource.error()) {
-        const err = this.periodicTasksResource.error() as HttpErrorResponse;
-        console.error("Failed to get periodic tasks.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get periodic tasks. " + message);
-      }
+      this.notificationService.handleResourceError(this.periodicTasksResource, "periodic tasks");
     });
   }
 

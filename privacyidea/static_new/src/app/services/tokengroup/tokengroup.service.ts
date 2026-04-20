@@ -16,7 +16,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { effect, inject, Injectable, linkedSignal, WritableSignal } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
@@ -60,12 +60,7 @@ export class TokengroupService implements TokengroupServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.tokengroupResource.error()) {
-        const err = this.tokengroupResource.error() as HttpErrorResponse;
-        console.error("Failed to get tokengroups.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get tokengroups. " + message);
-      }
+      this.notificationService.handleResourceError(this.tokengroupResource, "tokengroups");
     });
   }
 

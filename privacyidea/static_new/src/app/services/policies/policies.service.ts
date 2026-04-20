@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 
-import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { computed, effect, inject, Injectable, linkedSignal, Signal } from "@angular/core";
 import { lastValueFrom } from "rxjs";
 import { environment } from "../../../environments/environment";
@@ -239,12 +239,7 @@ export class PolicyService implements PolicyServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.allPoliciesResource.error()) {
-        const err = this.allPoliciesResource.error() as HttpErrorResponse;
-        console.error("Failed to get policies.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get policies. " + message);
-      }
+      this.notificationService.handleResourceError(this.allPoliciesResource, "policies");
     });
   }
   readonly policyActionResource = httpResource<PiResponse<ScopedPolicyActions>>(() => {

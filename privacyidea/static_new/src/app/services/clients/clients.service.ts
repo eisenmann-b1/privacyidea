@@ -16,7 +16,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { httpResource, HttpResourceRef } from "@angular/common/http";
 import { PiResponse } from "../../app.component";
 import { effect, inject, Injectable } from "@angular/core";
 import { ROUTE_PATHS } from "../../route_paths";
@@ -49,12 +49,7 @@ export class ClientsService implements ClientsServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.clientsResource.error()) {
-        const err = this.clientsResource.error() as HttpErrorResponse;
-        console.error("Failed to get clients.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get clients. " + message);
-      }
+      this.notificationService.handleResourceError(this.clientsResource, "clients");
     });
   }
 

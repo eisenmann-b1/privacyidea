@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 
-import { HttpClient, HttpErrorResponse, httpResource, HttpResourceRef } from "@angular/common/http";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { PiResponse } from "../../app.component";
 import { AuthService } from "../auth/auth.service";
@@ -193,12 +193,7 @@ export class ResolverService implements ResolverServiceInterface {
 
   constructor() {
     effect(() => {
-      if (this.resolversResource.error()) {
-        const err = this.resolversResource.error() as HttpErrorResponse;
-        console.error("Failed to get resolvers.", err.message);
-        const message = err.error?.result?.error?.message || err.message;
-        this.notificationService.openSnackBar("Failed to get resolvers. " + message);
-      }
+      this.notificationService.handleResourceError(this.resolversResource, "resolvers");
     });
   }
   resolversResource = httpResource<PiResponse<Resolvers>>(() => {

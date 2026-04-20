@@ -1267,7 +1267,6 @@ class BaseEventHandlerTestCase(MyTestCase):
         self.assertEqual(tok.type, "pw")
         uhandler = BaseEventHandler()
         req_data = {'user': "cornelius@realm1", "pass": "secret"}
-        user = User("cornelius", "realm1")
         resp_data = """{"result": {"value": true}}"""
         options = self.setup_request(req_data=req_data, all_data=req_data, user=user, resp_data=resp_data)
 

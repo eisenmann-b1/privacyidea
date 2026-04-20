@@ -2620,19 +2620,19 @@ def get_static_policy_definitions(scope=None):
                           'is used to find the unassigned token in privacyIDEA. Enter the length of the OTP value '
                           'and where the PIN is set like 8:pin or pin:6.')
             },
-            PolicyAction.PASSNOTOKEN: {
+            PolicyAction.PASSONNOTOKEN: {
                 'type': 'bool',
                 'desc': _('If the user has no token, the authentication '
                           'request for this user will always be true.')
             },
-            PolicyAction.PASSNOTOKEN_IGNORE_ROLLOUT_STATE: {
+            PolicyAction.PASSONNOTOKEN_IGNORE_ROLLOUT_STATE: {
                 'type': 'str',
                 'multiple': True,
                 'desc': _(
                     'Ignore tokens in the given rollout state. This will only work if passOnNoToken policy is active.'),
                 'value': RolloutState.all_states()
             },
-            PolicyAction.PASSNOUSER: {
+            PolicyAction.PASSONNOUSER: {
                 'type': 'bool',
                 'desc': _('If the user user does not exist, '
                           'the authentication request for this '

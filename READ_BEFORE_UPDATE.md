@@ -1,5 +1,6 @@
 # Update Notes
 ## Update from 3.13 to 3.14
+
 * The `u2f` token has been removed. It no longer functions. If you have any tokens of this type left,
   the schema update will flip them to `tokentype='deprecated'` and disable them, preserving the
   original type in `tokeninfo['original_tokentype']`. The migration logs a loud warning with the
@@ -8,14 +9,16 @@
 
       pi-tokenjanitor deprecated delete u2f
 
-
-## Update from 3.13 to 3.14
-
 * The `rollout_state` of fully enrolled tokens has changed. Previously, tokens that completed enrollment could have an
   empty string (`""`) as their `rollout_state`. Now, fully enrolled tokens have the `rollout_state` set to `enrolled`.
   A database migration script updates all existing tokens with an empty or `NULL` `rollout_state` to `enrolled`.
   If you have custom code or external tools that check the `rollout_state` of tokens (e.g. by comparing against
   an empty string), you need to update those checks to also handle the value `enrolled`.
+
+  **Event handlers** that use the `rollout_state` condition with an empty string (`""`) to mean
+  "fully enrolled" will silently stop matching after the migration. Update any such conditions to
+  use `enrolled` instead. You can find affected event handlers in the WebUI under *Config → Events*
+  by reviewing handlers whose conditions reference `rollout_state`.
 
 ## Update from 3.12 to 3.13
 

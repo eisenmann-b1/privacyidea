@@ -3069,9 +3069,13 @@ class ValidateAPITestCase(MyApiTestCase):
 
         # set policy for auth realm with condition on node
         delete_policy("realm_auth")
+        # Use merge() rather than add() because the app's create_app() already
+        # inserts Node1 at startup (PI_NODE_UUID in config.py). On Postgres a
+        # plain INSERT here aborts the whole transaction; merge() is idempotent.
         node1 = NodeName(id="8e4272a9-9037-40df-8aa3-976e4a04b5a9", name="Node1")
         node2 = NodeName(id="d1d7fde6-330f-4c12-88f3-58a1752594bf", name="Node2")
-        db.session.add_all([node1, node2])
+        db.session.merge(node1)
+        db.session.merge(node2)
         set_policy("realm_auth", scope=SCOPE.AUTH, action=f"{PolicyAction.SET_REALM}={self.realm3}",
                    pinode="Node1")
 

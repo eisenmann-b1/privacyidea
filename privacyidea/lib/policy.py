@@ -226,7 +226,7 @@ def check_policy_name(name):
 
 DEFAULT_ANDROID_APP_URL = "https://play.google.com/store/apps/details?id=it.netknights.piauthenticator"
 DEFAULT_IOS_APP_URL = "https://apps.apple.com/us/app/privacyidea-authenticator/id1445401301"
-DEFAULT_PREFERRED_CLIENT_MODE_LIST = ['interactive', 'webauthn', 'poll', 'u2f']
+DEFAULT_PREFERRED_CLIENT_MODE_LIST = ['interactive', 'webauthn', 'poll']
 
 comma_escape_text = lazy_gettext("Note: If you use a comma in the message, you "
                                  "need to escape it with a backslash.")
@@ -2605,6 +2605,13 @@ def get_static_policy_definitions(scope=None):
                           'given RADIUS config,'
                           ' if the user has no tokens assigned.')
             },
+            PolicyAction.PASSTHRU_IGNORE_ROLLOUT_STATE: {
+                'type': 'str',
+                'multiple': True,
+                'desc': _(
+                    'Ignore tokens in the given rollout state. This will only work if the passthru policy is active.'),
+                'value': ['clientwait', 'pending', 'verify', 'enrolled', 'broken', 'failed', 'denied']
+            },
             PolicyAction.PASSTHRU_ASSIGN: {
                 'type': 'str',
                 'desc': _('This allows to automatically assign a Token within privacyIDEA, if the '
@@ -2616,6 +2623,13 @@ def get_static_policy_definitions(scope=None):
                 'type': 'bool',
                 'desc': _('If the user has no token, the authentication '
                           'request for this user will always be true.')
+            },
+            PolicyAction.PASSNOTOKEN_IGNORE_ROLLOUT_STATE: {
+                'type': 'str',
+                'multiple': True,
+                'desc': _(
+                    'Ignore tokens in the given rollout state. This will only work if passOnNoToken policy is active.'),
+                'value': ['clientwait', 'pending', 'verify', 'enrolled', 'broken', 'failed', 'denied']
             },
             PolicyAction.PASSNOUSER: {
                 'type': 'bool',
@@ -2654,7 +2668,7 @@ def get_static_policy_definitions(scope=None):
             PolicyAction.PREFERREDCLIENTMODE: {
                 'type': 'str',
                 'desc': _('You can set the client modes in the order that you prefer. '
-                          'For example: "interactive webauthn poll u2f". Accepted '
+                          'For example: "interactive webauthn poll". Accepted '
                           'values are: <code>interactive webauthn poll u2f</code>')
             },
             PolicyAction.FORCE_CHALLENGE_RESPONSE: {

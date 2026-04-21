@@ -206,6 +206,7 @@ export interface TokenImportResult {
 }
 
 export interface TokenServiceInterface {
+  maxDescriptionLength: number;
   apiFilterKeyMap: Record<string, string>;
   stopPolling$: Subject<void>;
   tokenBaseUrl: string;
@@ -215,6 +216,7 @@ export interface TokenServiceInterface {
   showOnlyTokenNotInContainer: WritableSignal<boolean>;
   tokenFilter: WritableSignal<FilterValue>;
   tokenDetailResource: HttpResourceRef<PiResponse<Tokens> | undefined>;
+  tokenDetailResourceValue: Signal<Tokens | undefined>;
   tokenTypesResource: HttpResourceRef<PiResponse<{}> | undefined>;
   userTokenResource: HttpResourceRef<PiResponse<Tokens> | undefined>;
   detailsUsername: WritableSignal<string>;
@@ -230,6 +232,7 @@ export interface TokenServiceInterface {
   pageIndex: WritableSignal<number>;
   tokenResource: HttpResourceRef<PiResponse<Tokens> | undefined>;
   tokenSerialResource: HttpResourceRef<PiResponse<Tokens> | undefined>;
+  tokenResourceValue: Signal<Tokens | null>;
   tokenSelection: WritableSignal<TokenDetails[]>;
   selectedToken: WritableSignal<string | null>;
   tokenOptions: Signal<string[]>;
@@ -321,13 +324,12 @@ export class TokenService implements TokenServiceInterface {
   private readonly realmService: RealmServiceInterface = inject(RealmService);
 
   readonly hiddenApiFilter = hiddenApiFilter;
+  readonly maxDescriptionLength = 80;
   readonly apiFilterKeyMap = apiFilterKeyMap;
   stopPolling$ = new Subject<void>();
   tokenBaseUrl = environment.proxyUrl + "/token/";
   eventPageSize = 10;
-  userRealm = signal("");
   tokenSerial = this.contentService.tokenSerial;
-  detailsUsername = this.contentService.detailsUsername;
   filterParams = computed<Record<string, string>>(() => {
     const allowed = [...this.apiFilter, ...this.advancedApiFilter, ...this.hiddenApiFilter, "infokey", "infovalue"];
 
@@ -342,20 +344,7 @@ export class TokenService implements TokenServiceInterface {
       .filter(([key, v]) => (key === "container_serial" ? true : StringUtils.validFilterValue(v)))
       .map(([key, v]) => [key, plainKeys.has(key) ? v : `*${v}*`] as const);
     return Object.fromEntries(entries) as Record<string, string>;
-  });
-
-  tokenSerialResource = httpResource<PiResponse<Tokens>>(() => {
-    const filter = this.selectedToken();
-    if (!filter || filter.length < 1) {
-      return undefined;
-    }
-    return {
-      url: this.tokenBaseUrl,
-      method: "GET",
-      headers: this.authService.getHeaders(),
-      params: { serial: `*${filter}*` }
-    };
-  });
+  });  userRealm = signal("");
 
   constructor() {
     effect(() => {
@@ -373,6 +362,21 @@ export class TokenService implements TokenServiceInterface {
       }
     });
   }
+
+  detailsUsername = this.contentService.detailsUsername;
+
+  tokenSerialResource = httpResource<PiResponse<Tokens>>(() => {
+    const filter = this.selectedToken();
+    if (!filter || filter.length < 1) {
+      return undefined;
+    }
+    return {
+      url: this.tokenBaseUrl,
+      method: "GET",
+      headers: this.authService.getHeaders(),
+      params: { serial: `*${filter}*` }
+    };
+  });
 
   selectedTokenType = linkedSignal({
     source: () => ({
@@ -470,6 +474,11 @@ export class TokenService implements TokenServiceInterface {
     };
   });
 
+  tokenDetailResourceValue = computed(() => {
+    if (!this.tokenDetailResource.hasValue()) return undefined;
+    return this.tokenDetailResource.value()?.result?.value;
+  });
+
   tokenTypesResource = httpResource<PiResponse<{}>>(() => {
     // Only load token types on routes with a tokentype list or selection.
     const onAllowedRoute =
@@ -506,6 +515,7 @@ export class TokenService implements TokenServiceInterface {
   });
 
   tokenTypeOptions = computed<TokenType[]>(() => {
+    if (!this.tokenTypesResource.hasValue()) return [];
     const obj = this.tokenTypesResource?.value()?.result?.value;
     if (!obj) return [];
     return Object.entries(obj).map(([key, info]) => ({
@@ -574,10 +584,15 @@ export class TokenService implements TokenServiceInterface {
     };
   });
 
+  tokenResourceValue = computed(() => {
+    if (!this.tokenResource.hasValue()) return null;
+    return this.tokenResource.value()?.result?.value || null;
+  });
+
   tokenSelection: WritableSignal<TokenDetails[]> = linkedSignal({
     source: () => ({
       routeUrl: this.contentService.routeUrl(),
-      tokenResource: this.tokenResource.value()
+      tokenResource: this.tokenResourceValue()
     }),
     computation: () => []
   });
@@ -585,9 +600,10 @@ export class TokenService implements TokenServiceInterface {
   selectedToken: WritableSignal<string | null> = signal(null);
 
   tokenOptions = linkedSignal({
-    source: this.tokenSerialResource.value,
+    source: () => this.tokenSerialResource.hasValue() ? this.tokenSerialResource.value() : undefined,
     computation: (tokenSerialResource) => {
-      return tokenSerialResource?.result?.value?.tokens?.map((token) => token.serial) ?? [];
+      if (!tokenSerialResource) return [];
+      return tokenSerialResource.result?.value?.tokens?.map((token) => token.serial) ?? [];
     }
   });
 

@@ -122,7 +122,7 @@ class DisplayTANTestCase(MyApiTestCase):
                                            method='POST',
                                            data={"serial": "ocra1234",
                                                  "pass": otpvalue,
-                                                 "transcation_id":
+                                                 "transaction_id":
                                                      transaction_id}):
             res = self.app.full_dispatch_request()
             self.assertTrue(res.status_code == 200, res)

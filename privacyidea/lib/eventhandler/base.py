@@ -214,7 +214,7 @@ class BaseEventHandler(object):
             CONDITION.USER_INFO:
                 {
                     "type": "str",
-                    "desc": _("This condition can check any arbitrary userinfo "
+                    "desc": _("This condition can check any arbitrary user info "
                               "field. You need to enter something like "
                               "'<fieldname> == <fieldvalue>', '<fieldname> > "
                               "<fieldvalue>' or '<fieldname> < <fieldvalue>'."),

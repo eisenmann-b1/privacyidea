@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2024 NetKnights GmbH <https://netknights.it>
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """
 2020-09-07 Cornelius Kölbel <cornelius.koelbel@netknights.it>
            Add exception

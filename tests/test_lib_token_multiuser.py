@@ -1,17 +1,6 @@
-"""
-This test file tests the lib.token methods.
-
-The lib.token depends on the DB model and lib.user and
-all lib.tokenclasses
-
-This tests the token functions on an interface level
-
-We start with simple database functions:
-
-getTokens4UserOrSerial
-gettokensoftype
-getToken....
-"""
+# SPDX-FileCopyrightText: 2024 NetKnights GmbH <https://netknights.it>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+"""Tests for tokens that are assigned to multiple users."""
 import binascii
 import datetime
 import hashlib

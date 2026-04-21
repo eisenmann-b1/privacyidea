@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2024 NetKnights GmbH <https://netknights.it>
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Shared mixin and constants for split test_api_lib_policy_*.py files."""
 
 """

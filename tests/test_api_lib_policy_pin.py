@@ -1,8 +1,6 @@
-"""
-This test file tests the api.lib.policy.py
-
-The api.lib.policy.py depends on lib.policy and on flask!
-"""
+# SPDX-FileCopyrightText: 2024 NetKnights GmbH <https://netknights.it>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+"""Tests for PIN-related prepolicies (privacyidea.api.lib.prepolicy)."""
 import json
 import logging
 from datetime import datetime, timedelta

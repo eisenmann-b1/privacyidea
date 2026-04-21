@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2024 NetKnights GmbH <https://netknights.it>
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Shared constants and helpers extracted from test_api_validate.py.
 
 Imported by test_api_validate*.py modules. Not collected by pytest.

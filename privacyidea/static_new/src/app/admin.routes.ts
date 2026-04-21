@@ -88,7 +88,11 @@ export const routes: Routes = [
   },
   {
     path: "policies",
-    children: [{ path: "", component: PoliciesTableComponent, canDeactivate: [pendingChangesGuard] }]
+    children: [
+      { path: "", component: PoliciesTableComponent },
+      { path: "new", component: EditPolicyDialogComponent, canDeactivate: [pendingChangesGuard] },
+      { path: "details/:name", component: EditPolicyDialogComponent, canDeactivate: [pendingChangesGuard] }
+    ]
   },
   {
     path: "events",

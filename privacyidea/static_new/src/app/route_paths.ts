@@ -23,6 +23,8 @@ export const ROUTE_PATHS = {
   TOKENS: "/tokens",
   USERS: "/users",
   POLICIES: "/policies",
+  POLICIES_NEW: "/policies/new",
+  POLICIES_DETAILS: "/policies/details/",
   TOKENS_DETAILS: "/tokens/details/",
   TOKENS_ENROLLMENT: "/tokens/enrollment",
   TOKENS_CHALLENGES: "/tokens/challenges",

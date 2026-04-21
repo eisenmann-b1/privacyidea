@@ -1,7 +1,7 @@
 """Set empty rollout_state to 'enrolled' in token table
 
 Revision ID: 3cafe2771cdd
-Revises: 06b105a4f941
+Revises: a1e0ba6ad9dc
 Create Date: 2026-03-20 12:22:44.365016
 
 """
@@ -10,7 +10,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '3cafe2771cdd'
-down_revision = '06b105a4f941'
+down_revision = 'a1e0ba6ad9dc'
 branch_labels = None
 depends_on = None
 

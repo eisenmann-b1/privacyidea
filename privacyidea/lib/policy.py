@@ -520,8 +520,8 @@ class PolicyClass:
             for policy in reduced_policies:
                 if policy.get("check_all_resolvers"):
                     if realm and user:
-                        # We have a realm and a user and can get all resolvers
-                        # of this user in the realm
+                        # We have a realm and a user, so get all resolvers of that realm
+                        # in priority order to match against the policy's resolver list.
                         if not user_resolvers:
                             user_resolvers = get_ordered_resolvers(realm)
                         for reso in user_resolvers:

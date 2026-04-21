@@ -354,14 +354,15 @@ def get_realms_of_resolver(resolver_name: str) -> list[str]:
 
 
 @log_with(log)
-def get_ordered_resolvers(realm) -> list[str]:
+def get_ordered_resolvers(realm: str) -> list[str]:
     """
-    returns a list of resolver names ordered by priority.
-    The resolver with the lowest priority is the first.
-    If resolvers have the same priority, they are ordered alphabetically.
+    Return the resolvers of the given realm ordered by priority (lowest priority number first).
+    Resolvers with the same priority are ordered alphabetically by name. Resolvers pinned to a node
+    are filtered to the local node (``PI_NODE_UUID``). Duplicate resolver names are removed while
+    preserving order.
 
+    :param realm: The name of the realm
     :return: list of resolver names
-    :rtype: list
     """
     resolver_tuples = []
     realm_config = get_realms(realm)

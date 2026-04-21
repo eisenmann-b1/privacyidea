@@ -750,9 +750,8 @@ class APIUsersTestCase(MyApiTestCase):
             result = res.json.get("result")
             self.assertTrue(result.get("status"))
             user = result.get("value")[0]
-            # realm is always added on the lib layer regardless of the requested attributes
-            self.assertDictEqual({"username": "cornelius", "email": "user@localhost.localdomain",
-                                  "realm": self.realm1}, user)
+            # realm is only added when explicitly requested
+            self.assertDictEqual({"username": "cornelius", "email": "user@localhost.localdomain"}, user)
 
         # Request specific attributes with editable and resolver which are not set in the user store itself
         with self.app.test_request_context('/user/',
@@ -766,9 +765,9 @@ class APIUsersTestCase(MyApiTestCase):
             result = res.json.get("result")
             self.assertTrue(result.get("status"))
             user = result.get("value")[0]
-            # realm is always added on the lib layer regardless of the requested attributes
+            # realm is only added when explicitly requested
             self.assertDictEqual({"username": "cornelius", "email": "user@localhost.localdomain", "editable": False,
-                                  "resolver": self.resolvername1, "realm": self.realm1}, user)
+                                  "resolver": self.resolvername1}, user)
 
         # Request specific attributes with custom attributes
         with self.app.test_request_context('/user/',
@@ -782,9 +781,9 @@ class APIUsersTestCase(MyApiTestCase):
             result = res.json.get("result")
             self.assertTrue(result.get("status"))
             user = result.get("value")[0]
-            # realm is always added on the lib layer regardless of the requested attributes
+            # realm is only added when explicitly requested
             expected_user = {"username": "cornelius", "email": "user@localhost.localdomain", "custom1": "value1",
-                             "custom2": "value2", "realm": self.realm1}
+                             "custom2": "value2"}
             self.assertDictEqual(expected_user, user)
 
         # Clean up

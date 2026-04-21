@@ -733,9 +733,10 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
     This function returns a list of user dictionaries. The user dict contains the resolver and custom user attributes,
     if requested.
     If no realm is given in the param, the users from all realms are returned.
-    The returned user dictionaries always contain the ``realm`` key. If only a resolver is given (no realm),
-    the function looks up all realms containing that resolver and iterates through them, so users are
-    always returned in a realm context with proper masking.
+    The ``realm``, ``resolver`` and ``editable`` keys are added on the lib layer and are only included in the
+    returned user dictionaries when ``requested_attributes`` is None/empty or explicitly lists them.
+    If only a resolver is given (no realm), the function looks up all realms containing that resolver and
+    iterates through them, so users are always returned in a realm context with proper masking.
 
     Fixme: Please note: If a realm and a resolver is given, the resolver is currently ignored. So all users
     of this realm are returned. This is the old/current behaviour. When filtering for a resolver in a realm, we
@@ -748,8 +749,6 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
         attributes are returned.
     :return: list of user info as dictionaries
     """
-    # The user list, that will be returned
-    users = []
     # The user dictionary, what we use to avoid duplicates in realms, while searching for users. The key will be the
     # tuple of (username, realm)
     users_dict = {}
@@ -785,11 +784,12 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
         user_resolver = user.resolver
         user_realm = user.realm
 
-    # Determine the realms to iterate through
+    # Determine the realms to iterate through. Dedupe while preserving order in case param_realm == user_realm.
     if param_realm:
         realm_iteration.append(param_realm)
     if user_realm:
         realm_iteration.append(user_realm)
+    realm_iteration = list(dict.fromkeys(realm_iteration))
 
     if not (param_resolver or user_resolver or param_realm or user_realm):
         # if no realm or resolver was specified, we search the resolvers in all realms
@@ -812,11 +812,12 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
         requested_attributes.append("userid")
         remove_user_id = True
     log.debug(f"With this search dictionary: {search_dict!r}")
-    requested_pi_user_attributes = list({"resolver", "editable"}.intersection(requested_attributes or []))
+    requested_pi_user_attributes = list({"realm", "resolver", "editable"}.intersection(requested_attributes or []))
     requested_user_store_attributes = list(set(requested_attributes or []) - set(requested_pi_user_attributes))
 
     for realm in realm_iteration:
         resolvers = get_ordered_resolvers(realm)
+        realm_id = get_realm_id(realm)
 
         for resolver_name in resolvers:
             try:
@@ -827,9 +828,9 @@ def get_user_list(param: dict = None, user: User = None, include_custom_attribut
                     log.info(f"Can not find a resolver with the name '{resolver_name}'")
                     continue
                 user_list = resolver.getUserList(search_dict, requested_user_store_attributes)
-                realm_id = get_realm_id(realm)
                 for user_info in user_list:
-                    user_info["realm"] = realm
+                    if not requested_attributes or "realm" in requested_pi_user_attributes:
+                        user_info["realm"] = realm
                     if not requested_attributes or "resolver" in requested_pi_user_attributes:
                         user_info["resolver"] = resolver_name
                     if not requested_attributes or "editable" in requested_pi_user_attributes:

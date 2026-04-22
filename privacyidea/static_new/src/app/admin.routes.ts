@@ -50,6 +50,7 @@ import { EventComponent } from "./components/event/event.component";
 import { SystemConfigComponent } from "./components/configuration/system/system-config.component";
 import { TokenTypeConfigComponent } from "./components/configuration/token-type-config/token-type-config.component";
 import { ContainerTemplatesComponent } from "@components/token/container-templates/container-templates.component";
+import { ContainerTemplateEditDialogComponent } from "@components/token/container-templates/dialogs/container-template-edit-dialog/container-template-edit-dialog.component";
 import { UserNewResolverComponent } from "@components/user/user-new-resolver/user-new-resolver.component";
 import { EditPolicyDialogComponent } from "./components/policies/dialogs/edit-policy-dialog/edit-policy-dialog.component";
 
@@ -68,7 +69,9 @@ export const routes: Routes = [
           { path: "", component: ContainerTableComponent },
           { path: "create", component: ContainerCreateComponent },
           { path: "details/:serial", component: ContainerDetailsComponent },
-          { path: "templates", component: ContainerTemplatesComponent, canDeactivate: [pendingChangesGuard] }
+          { path: "templates", component: ContainerTemplatesComponent },
+          { path: "templates/new", component: ContainerTemplateEditDialogComponent, canDeactivate: [pendingChangesGuard] },
+          { path: "templates/details/:name", component: ContainerTemplateEditDialogComponent, canDeactivate: [pendingChangesGuard] }
         ]
       },
       { path: "details/:serial", component: TokenDetailsComponent },

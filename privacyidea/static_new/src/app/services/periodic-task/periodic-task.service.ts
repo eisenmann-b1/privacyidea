@@ -119,10 +119,10 @@ export class PeriodicTaskService implements PeriodicTaskServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.periodicTasksResource, "periodic tasks");
+      this.notificationService.handleResourceError(this.periodicTasksResource.error(), "periodic tasks");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.periodicTaskModuleResource, "periodic task modules");
+      this.notificationService.handleResourceError(this.periodicTaskModuleResource.error(), "periodic task modules");
     });
   }
 

@@ -268,15 +268,15 @@ export class RealmService implements RealmServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.realmResource, "realms");
+      this.notificationService.handleResourceError(this.realmResource.error(), "realms");
     });
 
     effect(() => {
-      this.notificationService.handleResourceError(this.defaultRealmResource, "default realm");
+      this.notificationService.handleResourceError(this.defaultRealmResource.error(), "default realm");
     });
 
     effect(() => {
-      this.notificationService.handleResourceError(this.adminRealmResource, "admin realms");
+      this.notificationService.handleResourceError(this.adminRealmResource.error(), "admin realms");
     });
   }
 }

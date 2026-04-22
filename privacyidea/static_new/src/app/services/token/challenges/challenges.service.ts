@@ -81,7 +81,7 @@ export class ChallengesService implements ChallengesServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.challengesResource, "challenges");
+      this.notificationService.handleResourceError(this.challengesResource.error(), "challenges");
     });
   }
   readonly apiFilter = apiFilter;

@@ -138,17 +138,17 @@ export class UserService implements UserServiceInterface {
     });
 
     effect(() => {
-      this.notificationService.handleResourceError(this.userResource, "user details");
+      this.notificationService.handleResourceError(this.userResource.error(), "user details");
     });
 
     effect(() => {
-      this.notificationService.handleResourceError(this.usersResource, "users");
+      this.notificationService.handleResourceError(this.usersResource.error(), "users");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.editableAttributesResource, "editable attributes");
+      this.notificationService.handleResourceError(this.editableAttributesResource.error(), "editable attributes");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.userAttributesResource, "user attributes");
+      this.notificationService.handleResourceError(this.userAttributesResource.error(), "user attributes");
     });
   }
 

@@ -66,7 +66,7 @@ export class RadiusServerService implements RadiusServerServiceInterface {
   readonly radiusServerBaseUrl = environment.proxyUrl + "/radiusserver/";
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.radiusServerResource, "RADIUS servers");
+      this.notificationService.handleResourceError(this.radiusServerResource.error(), "RADIUS servers");
     });
   }
 

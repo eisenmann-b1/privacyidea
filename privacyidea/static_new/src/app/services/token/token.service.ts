@@ -361,19 +361,19 @@ export class TokenService implements TokenServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.tokenResource, "token data");
+      this.notificationService.handleResourceError(this.tokenResource.error(), "token data");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.tokenTypesResource, "token type data");
+      this.notificationService.handleResourceError(this.tokenTypesResource.error(), "token type data");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.tokenDetailResource, "token details");
+      this.notificationService.handleResourceError(this.tokenDetailResource.error(), "token details");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.userTokenResource, "user tokens");
+      this.notificationService.handleResourceError(this.userTokenResource.error(), "user tokens");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.tokenSerialResource, "token serial data");
+      this.notificationService.handleResourceError(this.tokenSerialResource.error(), "token serial data");
     });
   }
 

@@ -142,7 +142,7 @@ export class AuditService implements AuditServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.auditResource, "audit data");
+      this.notificationService.handleResourceError(this.auditResource.error(), "audit data");
     });
   }
 

@@ -354,22 +354,22 @@ export class EventService implements EventServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.allEventsResource, "event handlers");
+      this.notificationService.handleResourceError(this.allEventsResource.error(), "event handlers");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.eventHandlerModulesResource, "event handler modules");
+      this.notificationService.handleResourceError(this.eventHandlerModulesResource.error(), "event handler modules");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.availableEventsResource, "available events");
+      this.notificationService.handleResourceError(this.availableEventsResource.error(), "available events");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.modulePositionsResource, "module positions");
+      this.notificationService.handleResourceError(this.modulePositionsResource.error(), "module positions");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.moduleActionsResource, "module actions");
+      this.notificationService.handleResourceError(this.moduleActionsResource.error(), "module actions");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.moduleConditionsResource, "module conditions");
+      this.notificationService.handleResourceError(this.moduleConditionsResource.error(), "module conditions");
     });
   }
 }

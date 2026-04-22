@@ -239,10 +239,10 @@ export class PolicyService implements PolicyServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.allPoliciesResource, "policies");
+      this.notificationService.handleResourceError(this.allPoliciesResource.error(), "policies");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.policyActionResource, "policy actions");
+      this.notificationService.handleResourceError(this.policyActionResource.error(), "policy actions");
     });
   }
   readonly policyActionResource = httpResource<PiResponse<ScopedPolicyActions>>(() => {

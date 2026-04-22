@@ -62,7 +62,7 @@ export class SubscriptionService {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.subscriptionsResource, "subscriptions");
+      this.notificationService.handleResourceError(this.subscriptionsResource.error(), "subscriptions");
     });
   }
 

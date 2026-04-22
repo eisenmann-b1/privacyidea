@@ -60,7 +60,7 @@ export class ServiceIdService implements ServiceIdServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.serviceIdResource, "service IDs");
+      this.notificationService.handleResourceError(this.serviceIdResource.error(), "service IDs");
     });
   }
 

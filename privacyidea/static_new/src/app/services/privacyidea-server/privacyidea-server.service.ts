@@ -67,7 +67,7 @@ export class PrivacyideaServerService implements PrivacyideaServerServiceInterfa
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.remoteServerResource, "privacyIDEA servers");
+      this.notificationService.handleResourceError(this.remoteServerResource.error(), "privacyIDEA servers");
     });
   }
 

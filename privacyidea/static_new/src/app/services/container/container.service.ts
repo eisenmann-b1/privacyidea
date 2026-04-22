@@ -883,13 +883,13 @@ export class ContainerService implements ContainerServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.containerDetailResource, "container details");
+      this.notificationService.handleResourceError(this.containerDetailResource.error(), "container details");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.containerResource, "containers");
+      this.notificationService.handleResourceError(this.containerResource.error(), "containers");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.containerTypesResource, "container types");
+      this.notificationService.handleResourceError(this.containerTypesResource.error(), "container types");
     });
 
     effect(() => {

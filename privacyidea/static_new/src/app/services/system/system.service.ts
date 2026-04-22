@@ -67,16 +67,16 @@ export class SystemService implements SystemServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.systemConfigResource, "system config");
+      this.notificationService.handleResourceError(this.systemConfigResource.error(), "system config");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.nodesResource, "nodes");
+      this.notificationService.handleResourceError(this.nodesResource.error(), "nodes");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.radiusServerResource, "RADIUS servers");
+      this.notificationService.handleResourceError(this.radiusServerResource.error(), "RADIUS servers");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.caConnectorResource, "CA connectors");
+      this.notificationService.handleResourceError(this.caConnectorResource.error(), "CA connectors");
     });
   }
   private onAllowedRoutes = computed(() => {

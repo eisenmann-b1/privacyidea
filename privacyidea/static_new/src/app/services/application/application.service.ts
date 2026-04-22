@@ -81,7 +81,7 @@ export class ApplicationService implements ApplicationServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.applicationResource, "applications");
+      this.notificationService.handleResourceError(this.applicationResource.error(), "applications");
     });
   }
 

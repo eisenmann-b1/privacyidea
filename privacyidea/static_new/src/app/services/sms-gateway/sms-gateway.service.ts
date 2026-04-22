@@ -71,10 +71,10 @@ export class SmsGatewayService implements SmsGatewayServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.smsGatewayResource, "SMS gateways");
+      this.notificationService.handleResourceError(this.smsGatewayResource.error(), "SMS gateways");
     });
     effect(() => {
-      this.notificationService.handleResourceError(this.smsProvidersResource, "SMS providers");
+      this.notificationService.handleResourceError(this.smsProvidersResource.error(), "SMS providers");
     });
   }
 

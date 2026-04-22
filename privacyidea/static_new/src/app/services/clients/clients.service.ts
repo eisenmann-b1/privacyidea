@@ -49,7 +49,7 @@ export class ClientsService implements ClientsServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.clientsResource, "clients");
+      this.notificationService.handleResourceError(this.clientsResource.error(), "clients");
     });
   }
 

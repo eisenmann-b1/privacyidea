@@ -101,7 +101,7 @@ export class MachineResolverService implements MachineResolverServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.machineResolverResource, "machine resolvers");
+      this.notificationService.handleResourceError(this.machineResolverResource.error(), "machine resolvers");
     });
   }
 

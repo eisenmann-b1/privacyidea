@@ -19,7 +19,7 @@
 import { inject, Injectable } from "@angular/core";
 import { MatSnackBar, MatSnackBarRef } from "@angular/material/snack-bar";
 import { Subscription, timer } from "rxjs";
-import { HttpErrorResponse, HttpResourceRef } from "@angular/common/http";
+import { HttpErrorResponse } from "@angular/common/http";
 
 export interface NotificationServiceInterface {
   remainingTime: number;
@@ -27,7 +27,7 @@ export interface NotificationServiceInterface {
   startTime: number;
 
   openSnackBar(message: string): void;
-  handleResourceError(resource: HttpResourceRef<any>, subject: string): void;
+  handleResourceError(error: Error | undefined, subject: string): void;
 }
 
 @Injectable({
@@ -84,10 +84,10 @@ export class NotificationService implements NotificationServiceInterface {
     }
   }
 
-  handleResourceError(resource: HttpResourceRef<any>, subject: string): void {
-    if (resource.error()) {
-      const err = resource.error() as HttpErrorResponse;
-      const message = err.error?.result?.error?.message || err.message;
+  handleResourceError(error: Error | undefined, subject: string): void {
+    if (error) {
+      const err = error as HttpErrorResponse;
+      const message = err.error?.result?.error?.message || error.message;
       this.openSnackBar(`Failed to get ${subject}. ${message}`);
     }
   }

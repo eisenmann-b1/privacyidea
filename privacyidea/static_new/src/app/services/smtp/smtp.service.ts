@@ -71,7 +71,7 @@ export class SmtpService implements SmtpServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.smtpServerResource, "SMTP servers");
+      this.notificationService.handleResourceError(this.smtpServerResource.error(), "SMTP servers");
     });
   }
 

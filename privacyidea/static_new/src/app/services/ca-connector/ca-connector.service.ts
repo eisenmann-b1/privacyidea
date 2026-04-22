@@ -67,7 +67,7 @@ export class CaConnectorService implements CaConnectorServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.caConnectorResource, "CA connectors");
+      this.notificationService.handleResourceError(this.caConnectorResource.error(), "CA connectors");
     });
   }
 

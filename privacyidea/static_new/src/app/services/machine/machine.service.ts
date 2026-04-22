@@ -149,11 +149,11 @@ export class MachineService implements MachineServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.machinesResource, "machines");
+      this.notificationService.handleResourceError(this.machinesResource.error(), "machines");
     });
 
     effect(() => {
-      this.notificationService.handleResourceError(this.tokenApplicationResource, "token applications");
+      this.notificationService.handleResourceError(this.tokenApplicationResource.error(), "token applications");
     });
   }
   sshApiFilter = ["serial", "service_id"];

@@ -60,7 +60,7 @@ export class TokengroupService implements TokengroupServiceInterface {
 
   constructor() {
     effect(() => {
-      this.notificationService.handleResourceError(this.tokengroupResource, "tokengroups");
+      this.notificationService.handleResourceError(this.tokengroupResource.error(), "tokengroups");
     });
   }
 

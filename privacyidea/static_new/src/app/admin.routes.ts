@@ -47,6 +47,7 @@ import { pendingChangesGuard } from "./guards/pending-changes.guard";
 import { PoliciesTableComponent } from "./components/policies/policies-table/policies-table.component";
 import { SubscriptionComponent } from "./components/configuration/subscription/subscription.component";
 import { EventComponent } from "./components/event/event.component";
+import { EventPanelComponent } from "./components/event/event-panel/event-panel.component";
 import { SystemConfigComponent } from "./components/configuration/system/system-config.component";
 import { TokenTypeConfigComponent } from "./components/configuration/token-type-config/token-type-config.component";
 import { ContainerTemplatesComponent } from "@components/token/container-templates/container-templates.component";
@@ -99,7 +100,11 @@ export const routes: Routes = [
   },
   {
     path: "events",
-    children: [{ path: "", component: EventComponent, canDeactivate: [pendingChangesGuard] }]
+    children: [
+      { path: "", component: EventComponent, canDeactivate: [pendingChangesGuard] },
+      { path: "new", component: EventPanelComponent, canDeactivate: [pendingChangesGuard] },
+      { path: "details/:id", component: EventPanelComponent, canDeactivate: [pendingChangesGuard] }
+    ]
   },
   {
     path: "configuration",

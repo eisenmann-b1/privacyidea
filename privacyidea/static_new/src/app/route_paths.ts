@@ -58,5 +58,7 @@ export const ROUTE_PATHS = {
   USERS_RESOLVERS_DETAILS: "/users/resolvers/details/",
   USERS_RESOLVERS_NEW: "/users/resolvers/new",
   SUBSCRIPTION: "/configuration/subscription",
-  EVENTS: "/events"
+  EVENTS: "/events",
+  EVENTS_NEW: "/events/new",
+  EVENTS_DETAILS: "/events/details/"
 };

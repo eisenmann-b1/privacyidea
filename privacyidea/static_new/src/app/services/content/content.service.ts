@@ -131,7 +131,11 @@ export class ContentService implements ContentServiceInterface {
     this.routeUrl().startsWith(ROUTE_PATHS.TOKENS_CONTAINERS_TEMPLATES_DETAILS) ||
     this.routeUrl() === ROUTE_PATHS.TOKENS_CONTAINERS_TEMPLATES_NEW
   );
-  onEvents = computed(() => this.routeUrl() === ROUTE_PATHS.EVENTS);
+  onEvents = computed(() =>
+    this.routeUrl() === ROUTE_PATHS.EVENTS ||
+    this.routeUrl() === ROUTE_PATHS.EVENTS_NEW ||
+    this.routeUrl().startsWith(ROUTE_PATHS.EVENTS_DETAILS)
+  );
   onConfigurationSystem = computed(() => this.routeUrl() === ROUTE_PATHS.CONFIGURATION_SYSTEM);
   onConfigurationTokenTypes = computed(() => this.routeUrl() === ROUTE_PATHS.CONFIGURATION_TOKENTYPES);
   onConfigurationMachines = computed(() => this.routeUrl() === ROUTE_PATHS.CONFIGURATION_MACHINES);

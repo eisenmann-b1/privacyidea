@@ -195,6 +195,9 @@ export class ResolverService implements ResolverServiceInterface {
     effect(() => {
       this.notificationService.handleResourceError(this.resolversResource, "resolvers");
     });
+    effect(() => {
+      this.notificationService.handleResourceError(this.selectedResolverResource, "resolver details");
+    });
   }
   resolversResource = httpResource<PiResponse<Resolvers>>(() => {
     if (!this.contentService.onAnyUsersRoute()) {

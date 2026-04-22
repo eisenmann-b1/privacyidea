@@ -86,6 +86,9 @@ export class ContainerTemplateService implements ContainerTemplateServiceInterfa
     effect(() => {
       this.notificationService.handleResourceError(this.templatesResource, "container templates");
     });
+    effect(() => {
+      this.notificationService.handleResourceError(this.templateTokenTypesResource, "template token types");
+    });
   }
   readonly templatesResource = httpResource<PiResponse<{ templates: ContainerTemplate[] }>>(() => {
     if (!this.authService.actionAllowed("container_template_list")) return undefined;

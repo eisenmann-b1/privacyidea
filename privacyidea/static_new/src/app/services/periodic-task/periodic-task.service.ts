@@ -121,6 +121,9 @@ export class PeriodicTaskService implements PeriodicTaskServiceInterface {
     effect(() => {
       this.notificationService.handleResourceError(this.periodicTasksResource, "periodic tasks");
     });
+    effect(() => {
+      this.notificationService.handleResourceError(this.periodicTaskModuleResource, "periodic task modules");
+    });
   }
 
   periodicTasksResource = httpResource<PiResponse<PeriodicTask[]>>(() => {

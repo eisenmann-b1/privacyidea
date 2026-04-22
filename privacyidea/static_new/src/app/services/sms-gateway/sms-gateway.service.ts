@@ -73,6 +73,9 @@ export class SmsGatewayService implements SmsGatewayServiceInterface {
     effect(() => {
       this.notificationService.handleResourceError(this.smsGatewayResource, "SMS gateways");
     });
+    effect(() => {
+      this.notificationService.handleResourceError(this.smsProvidersResource, "SMS providers");
+    });
   }
 
   readonly smsGatewayResource = httpResource<PiResponse<SmsGateway[]>>(() => {

@@ -72,6 +72,12 @@ export class SystemService implements SystemServiceInterface {
     effect(() => {
       this.notificationService.handleResourceError(this.nodesResource, "nodes");
     });
+    effect(() => {
+      this.notificationService.handleResourceError(this.radiusServerResource, "RADIUS servers");
+    });
+    effect(() => {
+      this.notificationService.handleResourceError(this.caConnectorResource, "CA connectors");
+    });
   }
   private onAllowedRoutes = computed(() => {
     return (

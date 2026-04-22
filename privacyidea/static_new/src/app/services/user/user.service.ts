@@ -144,6 +144,12 @@ export class UserService implements UserServiceInterface {
     effect(() => {
       this.notificationService.handleResourceError(this.usersResource, "users");
     });
+    effect(() => {
+      this.notificationService.handleResourceError(this.editableAttributesResource, "editable attributes");
+    });
+    effect(() => {
+      this.notificationService.handleResourceError(this.userAttributesResource, "user attributes");
+    });
   }
 
   readonly apiFilter = apiFilter;

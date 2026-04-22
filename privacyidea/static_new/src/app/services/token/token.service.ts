@@ -372,6 +372,9 @@ export class TokenService implements TokenServiceInterface {
     effect(() => {
       this.notificationService.handleResourceError(this.userTokenResource, "user tokens");
     });
+    effect(() => {
+      this.notificationService.handleResourceError(this.tokenSerialResource, "token serial data");
+    });
   }
 
   selectedTokenType = linkedSignal({

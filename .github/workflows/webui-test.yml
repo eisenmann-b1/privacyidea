@@ -33,5 +33,13 @@ jobs:
           cache-dependency-path: privacyidea/static_new/package-lock.json
       - name: Install Node.js dependencies
         run: npm ci
-      - name: Build the new WebUI
+      - name: Run tests for the new WebUI
+        id: jest_run
         run: npm run test
+      - name: Codecov upload
+        if: ${{ steps.jest_run.outcome == 'success' }}
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
+        with:
+          files: ./privacyidea/static_new/coverage/lcov.info
+          flags: frontend
+          token: ${{ secrets.CODECOV_TOKEN }}

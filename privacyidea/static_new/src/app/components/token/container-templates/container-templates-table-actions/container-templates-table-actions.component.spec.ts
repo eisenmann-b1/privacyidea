@@ -20,21 +20,19 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { ContainerTemplatesTableActionsComponent } from "./container-templates-table-actions.component";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
-import { Router } from "@angular/router";
 import { DialogService } from "src/app/services/dialog/dialog.service";
 import { ContainerTemplateService } from "../../../../services/container-template/container-template.service";
-import { MockDialogService, MockContainerTemplateService, MockRouter } from "src/testing/mock-services";
+import { MockDialogService, MockContainerTemplateService } from "src/testing/mock-services";
+import { ContainerTemplateEditDialogComponent } from "../dialogs/container-template-edit-dialog/container-template-edit-dialog.component";
 import { ContainerTemplateCopyDialogComponent } from "../dialogs/container-template-copy-dialog/container-template-copy-dialog.component";
 import { ContainerTemplateDeleteDialogComponent } from "../dialogs/container-template-delete-dialog/container-template-delete-dialog.component";
 import { By } from "@angular/platform-browser";
-import { ROUTE_PATHS } from "../../../../route_paths";
 
 describe("ContainerTemplatesTableActionsComponent", () => {
   let component: ContainerTemplatesTableActionsComponent;
   let fixture: ComponentFixture<ContainerTemplatesTableActionsComponent>;
   let dialogServiceMock: MockDialogService;
   let containerTemplateServiceMock: MockContainerTemplateService;
-  let mockRouter: MockRouter;
 
   const mockTemplates = [
     { name: "Template1", container_type: "type1" },
@@ -46,8 +44,7 @@ describe("ContainerTemplatesTableActionsComponent", () => {
       imports: [ContainerTemplatesTableActionsComponent, NoopAnimationsModule],
       providers: [
         { provide: DialogService, useClass: MockDialogService },
-        { provide: ContainerTemplateService, useClass: MockContainerTemplateService },
-        { provide: Router, useClass: MockRouter }
+        { provide: ContainerTemplateService, useClass: MockContainerTemplateService }
       ]
     }).compileComponents();
 
@@ -55,7 +52,6 @@ describe("ContainerTemplatesTableActionsComponent", () => {
     component = fixture.componentInstance;
     dialogServiceMock = TestBed.inject(DialogService) as unknown as MockDialogService;
     containerTemplateServiceMock = TestBed.inject(ContainerTemplateService) as unknown as MockContainerTemplateService;
-    mockRouter = TestBed.inject(Router) as unknown as MockRouter;
 
     // Default input
     fixture.componentRef.setInput("selectedTemplates", []);
@@ -82,9 +78,15 @@ describe("ContainerTemplatesTableActionsComponent", () => {
     expect(buttons[2].nativeElement.disabled).toBeFalsy();
   });
 
-  it("should navigate to the new template route when Create is clicked", () => {
+  it("should open ContainerTemplateEditDialogComponent when Create is clicked", () => {
+    const spy = jest.spyOn(dialogServiceMock, "openDialog");
     component.openNewTemplateDialog();
-    expect(mockRouter.navigateByUrl).toHaveBeenCalledWith(ROUTE_PATHS.TOKENS_CONTAINERS_TEMPLATES_NEW);
+
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        component: ContainerTemplateEditDialogComponent
+      })
+    );
   });
 
   it("should open Copy dialog and call service for each selected template", async () => {

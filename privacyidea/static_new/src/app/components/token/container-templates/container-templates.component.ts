@@ -19,7 +19,6 @@
 
 import { CommonModule, KeyValuePipe } from "@angular/common";
 import { Component, computed, inject, linkedSignal, signal } from "@angular/core";
-import { Router } from "@angular/router";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCheckbox, MatCheckboxChange } from "@angular/material/checkbox";
 import { MatIconModule } from "@angular/material/icon";
@@ -37,8 +36,8 @@ import { ContainerTemplate } from "../../../services/container/container.service
 import { DialogService, DialogServiceInterface } from "src/app/services/dialog/dialog.service";
 import { ContainerTemplatesFilterComponent } from "./container-templates-filter/container-templates-filter.component";
 import { ContainerTemplatesTableActionsComponent } from "./container-templates-table-actions/container-templates-table-actions.component";
+import { ContainerTemplateEditDialogComponent } from "./dialogs/container-template-edit-dialog/container-template-edit-dialog.component";
 import { ViewTemplateTokensComponent } from "./view-template-tokens/view-template-tokens.component";
-import { ROUTE_PATHS } from "../../../route_paths";
 
 const containerTemplateFilterOptions: FilterOption<ContainerTemplate>[] = [
   new FilterOption<ContainerTemplate>({
@@ -102,7 +101,6 @@ export class ContainerTemplatesComponent {
   readonly containerTemplateService: ContainerTemplateServiceInterface = inject(ContainerTemplateService);
   readonly authService: AuthServiceInterface = inject(AuthService);
   readonly dialogService: DialogServiceInterface = inject(DialogService);
-  private readonly _router = inject(Router);
 
   readonly columns = {
     name: { label: $localize`Name`, filterable: true, sortable: true },
@@ -272,6 +270,9 @@ export class ContainerTemplatesComponent {
 
   openEditDialog(template: ContainerTemplate): void {
     if (!template.name) return;
-    this._router.navigateByUrl(ROUTE_PATHS.TOKENS_CONTAINERS_TEMPLATES_DETAILS + encodeURIComponent(template.name));
+    this.dialogService.openDialog({
+      component: ContainerTemplateEditDialogComponent,
+      data: template
+    });
   }
 }

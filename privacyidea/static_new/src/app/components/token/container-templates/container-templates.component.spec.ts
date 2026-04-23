@@ -23,18 +23,14 @@ import { ContainerTemplatesComponent } from "./container-templates.component";
 import { ContainerTemplateService } from "../../../services/container-template/container-template.service";
 import { AuthService } from "../../../services/auth/auth.service";
 import { DialogService } from "src/app/services/dialog/dialog.service";
-import { Router } from "@angular/router";
 import { signal } from "@angular/core";
 import { ContainerTemplate } from "../../../services/container/container.service";
 import { By } from "@angular/platform-browser";
 import { MatCheckboxChange } from "@angular/material/checkbox";
-import { ROUTE_PATHS } from "../../../route_paths";
-import { MockRouter } from "../../../../testing/mock-services";
 
 describe("ContainerTemplatesComponent", () => {
   let component: ContainerTemplatesComponent;
   let fixture: ComponentFixture<ContainerTemplatesComponent>;
-  let mockRouter: MockRouter;
 
   const mockTemplates: ContainerTemplate[] = [
     { name: "Template-C", container_type: "Type-1", default: false, template_options: { tokens: [] } },
@@ -63,15 +59,12 @@ describe("ContainerTemplatesComponent", () => {
       providers: [
         { provide: ContainerTemplateService, useValue: mockContainerTemplateService },
         { provide: AuthService, useValue: mockAuthService },
-        { provide: DialogService, useValue: mockDialogService },
-        { provide: Router, useClass: MockRouter }
+        { provide: DialogService, useValue: mockDialogService }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ContainerTemplatesComponent);
     component = fixture.componentInstance;
-
-    mockRouter = TestBed.inject(Router) as unknown as MockRouter;
     fixture.detectChanges();
   });
 
@@ -172,15 +165,13 @@ describe("ContainerTemplatesComponent", () => {
     expect(actionComponent.selectedTemplates().length).toBe(1);
     expect(actionComponent.selectedTemplates()[0].name).toBe("Template-C");
   });
-  it("should navigate to edit route when opening an existing template, and not navigate for skeleton rows", () => {
+  it("should open edit dialog only if row is not a skeleton row", () => {
     component.openEditDialog(mockTemplates[0]);
-    expect(mockRouter.navigateByUrl).toHaveBeenCalledWith(
-      ROUTE_PATHS.TOKENS_CONTAINERS_TEMPLATES_DETAILS + encodeURIComponent(mockTemplates[0].name)
-    );
+    expect(mockDialogService.openDialog).toHaveBeenCalled();
 
-    mockRouter.navigateByUrl.mockClear();
+    mockDialogService.openDialog.mockClear();
     component.openEditDialog({ name: "" } as ContainerTemplate);
-    expect(mockRouter.navigateByUrl).not.toHaveBeenCalled();
+    expect(mockDialogService.openDialog).not.toHaveBeenCalled();
   });
 
   it("should filter items and update totalLength", () => {

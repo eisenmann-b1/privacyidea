@@ -20,16 +20,15 @@
 import { Component, inject, input } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
-import { Router } from "@angular/router";
 import { ContainerTemplate } from "../../../../services/container/container.service";
 import { DialogServiceInterface, DialogService } from "src/app/services/dialog/dialog.service";
+import { ContainerTemplateEditDialogComponent } from "../dialogs/container-template-edit-dialog/container-template-edit-dialog.component";
 import { ContainerTemplateCopyDialogComponent } from "../dialogs/container-template-copy-dialog/container-template-copy-dialog.component";
 import { ContainerTemplateDeleteDialogComponent } from "../dialogs/container-template-delete-dialog/container-template-delete-dialog.component";
 import {
   ContainerTemplateService,
   ContainerTemplateServiceInterface
 } from "../../../../services/container-template/container-template.service";
-import { ROUTE_PATHS } from "../../../../route_paths";
 
 @Component({
   selector: "app-container-templates-table-actions",
@@ -41,12 +40,13 @@ import { ROUTE_PATHS } from "../../../../route_paths";
 export class ContainerTemplatesTableActionsComponent {
   readonly dialogService: DialogServiceInterface = inject(DialogService);
   readonly containerTemplateService: ContainerTemplateServiceInterface = inject(ContainerTemplateService);
-  private readonly _router = inject(Router);
 
   readonly selectedTemplates = input.required<ContainerTemplate[]>();
 
   openNewTemplateDialog() {
-    this._router.navigateByUrl(ROUTE_PATHS.TOKENS_CONTAINERS_TEMPLATES_NEW);
+    this.dialogService.openDialog({
+      component: ContainerTemplateEditDialogComponent
+    });
   }
 
   async openCopyTemplateDialog() {

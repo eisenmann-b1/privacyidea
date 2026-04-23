@@ -52,6 +52,8 @@ export const ROUTE_PATHS = {
   EXTERNAL_SERVICES_SMS: "/external-services/sms",
   EXTERNAL_SERVICES_PRIVACYIDEA: "/external-services/privacyidea",
   EXTERNAL_SERVICES_CA_CONNECTORS: "/external-services/ca-connectors",
+  EXTERNAL_SERVICES_CA_CONNECTORS_NEW: "/external-services/ca-connectors/new",
+  EXTERNAL_SERVICES_CA_CONNECTORS_DETAILS: "/external-services/ca-connectors/details/",
   EXTERNAL_SERVICES_TOKENGROUPS: "/external-services/tokengroups",
   EXTERNAL_SERVICES_SERVICE_IDS: "/external-services/service-ids",
   USERS_RESOLVERS: "/users/resolvers",

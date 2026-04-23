@@ -143,7 +143,11 @@ export class ContentService implements ContentServiceInterface {
   onExternalSmtp = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SMTP);
   onExternalRadius = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_RADIUS);
   onExternalSms = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SMS);
-  onExternalCaConnectors = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_CA_CONNECTORS);
+  onExternalCaConnectors = computed(() =>
+    this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_CA_CONNECTORS ||
+    this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_CA_CONNECTORS_NEW ||
+    this.routeUrl().startsWith(ROUTE_PATHS.EXTERNAL_SERVICES_CA_CONNECTORS_DETAILS)
+  );
   onExternalPrivacyIdea = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_PRIVACYIDEA);
   onExternalTokenGroups = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_TOKENGROUPS);
   onExternalServiceIds = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SERVICE_IDS);

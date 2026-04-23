@@ -42,9 +42,9 @@ jobs:
           OSV_SCANNER_VERSION: v2.3.5
         run: |
           set -euo pipefail
-          curl -sSL -o osv-scanner.tar.gz \
-            "https://github.com/google/osv-scanner/releases/download/${OSV_SCANNER_VERSION}/osv-scanner_linux_amd64.tar.gz"
-          tar xzf osv-scanner.tar.gz
+          curl -sSL -o osv-scanner \
+            "https://github.com/google/osv-scanner/releases/download/${OSV_SCANNER_VERSION}/osv-scanner_linux_amd64"
+          chmod +x osv-scanner
           sudo mv osv-scanner /usr/local/bin/osv-scanner
           osv-scanner --version
 
@@ -53,6 +53,7 @@ jobs:
         continue-on-error: true
         run: |
           osv-scanner scan \
+            --config=privacyidea/static_new/osv-scanner.toml \
             --lockfile=privacyidea/static_new/package-lock.json \
             --format=sarif \
             --output=osv-results.sarif

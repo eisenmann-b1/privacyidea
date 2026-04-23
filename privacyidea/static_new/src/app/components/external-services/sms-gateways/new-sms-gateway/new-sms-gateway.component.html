@@ -16,21 +16,50 @@
 
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
+<div class="sms-gateway-page-layout">
+  <div
+    #scrollContainer
+    class="sms-gateway-page-container">
 @if (isEditMode) {
   <h3
-    class="margin-8 external-service-dialog-title"
+    class="margin-8"
     i18n>
     Edit SMS Gateway
   </h3>
 } @else {
   <h3
-    class="margin-8 external-service-dialog-title"
+    class="margin-8"
     i18n>
     Create SMS Gateway
   </h3>
 }
 
-<mat-dialog-content class="sms-gateway-dialog-content">
+<div
+  #stickySentinel
+  class="sticky-sentinel"></div>
+
+<div
+  #stickyHeader
+  class="sticky-header">
+  <div class="sticky-controls ali-center">
+    <button
+      (click)="onCancel()"
+      class="action-button-secondary button-width-s"
+      mat-stroked-button>
+      <span i18n>Cancel</span>
+    </button>
+    <button
+      (click)="save()"
+      [disabled]="smsForm.invalid || parametersForm.invalid"
+      class="action-button-primary button-width-s"
+      mat-stroked-button>
+      <mat-icon>save</mat-icon>
+      <span i18n>Save</span>
+    </button>
+  </div>
+</div>
+
+<div class="sms-gateway-content">
   <form
     [formGroup]="smsForm"
     class="sms-gateway-form">
@@ -393,25 +422,8 @@
       </table>
     </div>
   }
-</mat-dialog-content>
+</div>
+  </div>
+</div>
 
-<mat-dialog-actions
-  align="end"
-  class="margin-8 external-service-dialog-actions">
-  <button
-    (click)="onCancel()"
-    class="action-button-secondary button-width-s"
-    i18n
-    mat-stroked-button>
-    Cancel
-  </button>
-  <button
-    (click)="save()"
-    [disabled]="smsForm.invalid || parametersForm.invalid"
-    class="action-button-primary button-width-s"
-    i18n
-    mat-stroked-button>
-    <mat-icon>save</mat-icon>
-    Save
-  </button>
-</mat-dialog-actions>
+

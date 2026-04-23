@@ -52,6 +52,8 @@ export const ROUTE_PATHS = {
   EXTERNAL_SERVICES_RADIUS_NEW: "/external-services/radius/new",
   EXTERNAL_SERVICES_RADIUS_DETAILS: "/external-services/radius/details/",
   EXTERNAL_SERVICES_SMS: "/external-services/sms",
+  EXTERNAL_SERVICES_SMS_NEW: "/external-services/sms/new",
+  EXTERNAL_SERVICES_SMS_DETAILS: "/external-services/sms/details/",
   EXTERNAL_SERVICES_PRIVACYIDEA: "/external-services/privacyidea",
   EXTERNAL_SERVICES_PRIVACYIDEA_NEW: "/external-services/privacyidea/new",
   EXTERNAL_SERVICES_PRIVACYIDEA_DETAILS: "/external-services/privacyidea/details/",

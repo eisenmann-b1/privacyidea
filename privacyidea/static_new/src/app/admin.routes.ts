@@ -36,6 +36,7 @@ import { MachineResolverComponent } from "./components/machine-resolver/machine-
 import { PeriodicTaskComponent } from "./components/configuration/periodic-task/periodic-task.component";
 import { MachinesComponent } from "./components/configuration/machines/machines.component";
 import { SmtpServersComponent } from "./components/external-services/smtp-servers/smtp-servers.component";
+import { NewSmtpServerComponent } from "./components/external-services/smtp-servers/new-smtp-server/new-smtp-server.component";
 import { RadiusServersComponent } from "./components/external-services/radius-servers/radius-servers.component";
 import { NewRadiusServerComponent } from "./components/external-services/radius-servers/new-radius-server/new-radius-server.component";
 import { SmsGatewaysComponent } from "./components/external-services/sms-gateways/sms-gateways.component";
@@ -133,7 +134,14 @@ export const routes: Routes = [
   {
     path: "external-services",
     children: [
-      { path: "smtp", component: SmtpServersComponent, canDeactivate: [pendingChangesGuard] },
+      {
+        path: "smtp",
+        children: [
+          { path: "", component: SmtpServersComponent },
+          { path: "new", component: NewSmtpServerComponent, canDeactivate: [pendingChangesGuard] },
+          { path: "details/:identifier", component: NewSmtpServerComponent, canDeactivate: [pendingChangesGuard] }
+        ]
+      },
       {
         path: "radius",
         children: [

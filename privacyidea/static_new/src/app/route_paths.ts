@@ -48,6 +48,8 @@ export const ROUTE_PATHS = {
   CONFIGURATION_SYSTEM: "/configuration/system",
   CONFIGURATION_TOKENTYPES: "/configuration/tokens",
   EXTERNAL_SERVICES_SMTP: "/external-services/smtp",
+  EXTERNAL_SERVICES_SMTP_NEW: "/external-services/smtp/new",
+  EXTERNAL_SERVICES_SMTP_DETAILS: "/external-services/smtp/details/",
   EXTERNAL_SERVICES_RADIUS: "/external-services/radius",
   EXTERNAL_SERVICES_RADIUS_NEW: "/external-services/radius/new",
   EXTERNAL_SERVICES_RADIUS_DETAILS: "/external-services/radius/details/",

@@ -140,7 +140,11 @@ export class ContentService implements ContentServiceInterface {
   onConfigurationTokenTypes = computed(() => this.routeUrl() === ROUTE_PATHS.CONFIGURATION_TOKENTYPES);
   onConfigurationMachines = computed(() => this.routeUrl() === ROUTE_PATHS.CONFIGURATION_MACHINES);
 
-  onExternalSmtp = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SMTP);
+  onExternalSmtp = computed(() =>
+    this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SMTP ||
+    this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SMTP_NEW ||
+    this.routeUrl().startsWith(ROUTE_PATHS.EXTERNAL_SERVICES_SMTP_DETAILS)
+  );
   onExternalRadius = computed(() =>
     this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_RADIUS ||
     this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_RADIUS_NEW ||

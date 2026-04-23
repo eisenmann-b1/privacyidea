@@ -252,7 +252,8 @@ describe("EventService", () => {
       // Execute
       const req = httpMock.expectOne(`${service.eventBaseUrl}/`);
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403, statusText: "Permission denied"
+        status: 403,
+        statusText: "Permission denied"
       });
       await Promise.resolve();
 
@@ -315,7 +316,8 @@ describe("EventService", () => {
 
       const req = httpMock.expectOne(`${service.eventBaseUrl}/handlermodules`);
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403, statusText: "Permission denied"
+        status: 403,
+        statusText: "Permission denied"
       });
       await Promise.resolve();
 
@@ -345,7 +347,8 @@ describe("EventService", () => {
 
       const req = httpMock.expectOne(`${service.eventBaseUrl}/available`);
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403, statusText: "Permission denied"
+        status: 403,
+        statusText: "Permission denied"
       });
       await Promise.resolve();
 
@@ -371,7 +374,8 @@ describe("EventService", () => {
       // Execute
       const req = httpMock.expectOne(`${service.eventBaseUrl}/positions/testModule`);
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403, statusText: "Permission denied"
+        status: 403,
+        statusText: "Permission denied"
       });
       await Promise.resolve();
 
@@ -436,7 +440,8 @@ describe("EventService", () => {
       // Execute
       const req = httpMock.expectOne(`${service.eventBaseUrl}/actions/testModule`);
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403, statusText: "Permission denied"
+        status: 403,
+        statusText: "Permission denied"
       });
       await Promise.resolve();
 
@@ -482,7 +487,8 @@ describe("EventService", () => {
       // Execute
       const req = httpMock.expectOne(`${service.eventBaseUrl}/conditions/testModule`);
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403, statusText: "Permission denied"
+        status: 403,
+        statusText: "Permission denied"
       });
       await Promise.resolve();
 

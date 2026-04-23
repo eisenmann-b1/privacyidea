@@ -31,7 +31,7 @@ describe("PeriodicTaskPanelNewComponent", () => {
   let component: PeriodicTaskPanelNewComponent;
   let fixture: ComponentFixture<PeriodicTaskPanelNewComponent>;
   let periodicTaskServiceMock: MockPeriodicTaskService;
-  let task = {...EMPTY_PERIODIC_TASK};
+  let task = { ...EMPTY_PERIODIC_TASK };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -41,8 +41,7 @@ describe("PeriodicTaskPanelNewComponent", () => {
         { provide: AuthService, useClass: MockAuthService },
         { provide: PeriodicTaskService, useClass: MockPeriodicTaskService }
       ]
-    })
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(PeriodicTaskPanelNewComponent);
     component = fixture.componentInstance;
@@ -50,7 +49,6 @@ describe("PeriodicTaskPanelNewComponent", () => {
     periodicTaskServiceMock = TestBed.inject(PeriodicTaskService) as unknown as MockPeriodicTaskService;
     fixture.detectChanges();
   });
-
 
   it("should create", () => {
     expect(component).toBeTruthy();

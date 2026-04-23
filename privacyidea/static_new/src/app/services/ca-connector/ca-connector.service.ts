@@ -42,16 +42,19 @@ export interface CaConnectorServiceInterface {
 
   deleteCaConnector(connectorname: string): Promise<void>;
 
-  getCaSpecificOptions(catype: string, params: {
-    hostname: any;
-    port?: any;
-    use_ssl?: any;
-    ssl_ca_cert?: any;
-    ssl_client_cert?: any;
-    ssl_client_key?: any;
-    ssl_client_key_password?: any;
-    http_proxy?: any;
-  }): Promise<any>;
+  getCaSpecificOptions(
+    catype: string,
+    params: {
+      hostname: any;
+      port?: any;
+      use_ssl?: any;
+      ssl_ca_cert?: any;
+      ssl_client_cert?: any;
+      ssl_client_key?: any;
+      ssl_client_key_password?: any;
+      http_proxy?: any;
+    }
+  ): Promise<any>;
 }
 
 @Injectable({
@@ -83,7 +86,7 @@ export class CaConnectorService implements CaConnectorServiceInterface {
   });
 
   caConnectors: WritableSignal<CaConnectors> = linkedSignal({
-    source: () => this.caConnectorResource.hasValue() ? this.caConnectorResource.value() : undefined,
+    source: () => (this.caConnectorResource.hasValue() ? this.caConnectorResource.value() : undefined),
     computation: (source, previous) => source?.result?.value ?? previous?.value ?? []
   });
 

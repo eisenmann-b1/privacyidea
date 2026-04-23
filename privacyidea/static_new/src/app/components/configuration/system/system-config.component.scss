@@ -7,7 +7,11 @@
 }
 
 .system-config-scroll-container {
-  @include styles.base-table-structure(".system-config-form", ".system-config-filter", ".system-config-scroll-container");
+  @include styles.base-table-structure(
+    ".system-config-form",
+    ".system-config-filter",
+    ".system-config-scroll-container"
+  );
 }
 
 .well {

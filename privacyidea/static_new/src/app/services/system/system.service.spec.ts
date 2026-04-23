@@ -102,7 +102,8 @@ describe("SystemService", () => {
     const req = httpMock.expectOne(`${environment.proxyUrl}/system/names/caconnector`);
     expect(req.request.method).toBe("GET");
     req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-      status: 403, statusText: "Permission denied"
+      status: 403,
+      statusText: "Permission denied"
     });
     await lastValueFrom(of({})); // Wait for async updates
 
@@ -111,7 +112,6 @@ describe("SystemService", () => {
   });
 
   describe("systemConfigResource", () => {
-
     it("systemConfig and systemConfigInit fall back to default when resource empty", () => {
       expect(service.systemConfig()).toEqual({});
       expect(service.systemConfigInit()).toEqual({});
@@ -140,7 +140,8 @@ describe("SystemService", () => {
       const req = httpMock.expectOne((r) => r.url === "/system/");
       expect(req.request.method).toBe("GET");
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403, statusText: "Permission denied"
+        status: 403,
+        statusText: "Permission denied"
       });
       await Promise.resolve();
 
@@ -151,7 +152,6 @@ describe("SystemService", () => {
   });
 
   describe("nodesResource", () => {
-
     it("nodes falls back to default when resource is empty", () => {
       expect(service.nodes()).toEqual([]);
     });
@@ -177,7 +177,8 @@ describe("SystemService", () => {
       const req = httpMock.expectOne((r) => r.url === "/system/nodes");
       expect(req.request.method).toBe("GET");
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403, statusText: "Permission denied"
+        status: 403,
+        statusText: "Permission denied"
       });
       await Promise.resolve();
 
@@ -187,7 +188,6 @@ describe("SystemService", () => {
   });
 
   describe("radiusServers", () => {
-
     beforeEach(() => {
       authService.actionAllowed.mockImplementation((action) => action === "enrollRADIUS");
     });
@@ -217,7 +217,8 @@ describe("SystemService", () => {
       const req = httpMock.expectOne((r) => r.url === "/system/names/radius");
       expect(req.request.method).toBe("GET");
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403, statusText: "Permission denied"
+        status: 403,
+        statusText: "Permission denied"
       });
       await Promise.resolve();
 

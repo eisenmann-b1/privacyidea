@@ -49,8 +49,7 @@ describe("PeriodicTaskPanelComponent", () => {
         { provide: AuthService, useClass: MockAuthService },
         { provide: PeriodicTaskService, useClass: MockPeriodicTaskService }
       ]
-    })
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(PeriodicTaskPanelComponent);
     component = fixture.componentInstance;

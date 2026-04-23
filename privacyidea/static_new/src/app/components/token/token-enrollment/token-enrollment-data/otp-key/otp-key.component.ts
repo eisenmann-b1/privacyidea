@@ -27,12 +27,7 @@ import {
 
 @Component({
   selector: "app-otp-key",
-  imports: [
-    MatAccordion,
-    MatExpansionPanel,
-    MatExpansionPanelHeader,
-    MatExpansionPanelTitle
-  ],
+  imports: [MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle],
   templateUrl: "./otp-key.component.html",
   styleUrl: "./otp-key.component.scss"
 })

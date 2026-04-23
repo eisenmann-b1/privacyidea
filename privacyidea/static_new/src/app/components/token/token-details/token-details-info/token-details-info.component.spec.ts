@@ -26,11 +26,7 @@ import { EditableElement } from "../../../shared/edit-buttons/edit-buttons.compo
 import { TokenService } from "../../../../services/token/token.service";
 import { AuthService } from "../../../../services/auth/auth.service";
 
-import {
-  MockLocalService,
-  MockNotificationService,
-  MockTokenService
-} from "../../../../../testing/mock-services";
+import { MockLocalService, MockNotificationService, MockTokenService } from "../../../../../testing/mock-services";
 import { provideHttpClient } from "@angular/common/http";
 import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { MockAuthService } from "../../../../../testing/mock-services/mock-auth-service";

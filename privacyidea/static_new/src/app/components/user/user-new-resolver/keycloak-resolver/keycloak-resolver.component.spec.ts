@@ -39,8 +39,7 @@ describe("KeycloakResolverComponent", () => {
         { provide: ResolverService, useClass: MockResolverService }
       ],
       imports: [KeycloakResolverComponent, NoopAnimationsModule]
-    })
-      .compileComponents();
+    }).compileComponents();
 
     resolverService = TestBed.inject(ResolverService) as unknown as MockResolverService;
     fixture = TestBed.createComponent(KeycloakResolverComponent);

@@ -22,7 +22,6 @@
   aria-label="Event Handler Editor"
   class="edit-event-handler-container"
   i18n-aria-label>
-
   <h3 class="margin-8 flex-row flex-nowrap ali-center">
     @if (isNewEvent()) {
       <span i18n>Create New Event Handler</span>
@@ -55,7 +54,7 @@
         }
       </mat-slide-toggle>
       <button
-        (click)="$event.stopPropagation(); saveEvent();"
+        (click)="$event.stopPropagation(); saveEvent()"
         [disabled]="!canSave()"
         class="action-button-primary button-width-s"
         mat-stroked-button>
@@ -74,8 +73,7 @@
   <div class="flex-column just-center">
     @if (isNewEvent()) {
       <div class="flex-row gap-16">
-        <mat-form-field
-          class="input-width-l">
+        <mat-form-field class="input-width-l">
           <mat-label i18n>Name</mat-label>
           <input
             (ngModelChange)="updateEventHandler('name', $event)"
@@ -83,12 +81,9 @@
             matInput
             required
             type="text" />
-          <mat-error i18n>
-            Name is <strong>required</strong>.
-          </mat-error>
+          <mat-error i18n> Name is <strong>required</strong>. </mat-error>
         </mat-form-field>
-        <mat-form-field
-          class="input-width-l">
+        <mat-form-field class="input-width-l">
           <mat-label i18n>Handler Module</mat-label>
           <mat-select
             (ngModelChange)="setNewHandlerModule($event)"
@@ -100,16 +95,13 @@
               </mat-option>
             }
           </mat-select>
-          <mat-error i18n>
-            Selecting a handler module is <strong>required</strong>.
-          </mat-error>
+          <mat-error i18n> Selecting a handler module is <strong>required</strong>. </mat-error>
         </mat-form-field>
       </div>
     }
 
     <div class="flex-row gap-16 margin-bottom-32">
-      <mat-form-field
-        class="input-width-l">
+      <mat-form-field class="input-width-l">
         <mat-label i18n>Position</mat-label>
         <mat-select
           (selectionChange)="updateEventHandler('position', $event.value)"
@@ -121,14 +113,10 @@
             </mat-option>
           }
         </mat-select>
-        <mat-hint i18n>Whether the action should be taken before (pre) or after (post) the actual event.
-        </mat-hint>
-        <mat-error i18n>
-          Selecting a position is <strong>required</strong>.
-        </mat-error>
+        <mat-hint i18n>Whether the action should be taken before (pre) or after (post) the actual event. </mat-hint>
+        <mat-error i18n> Selecting a position is <strong>required</strong>. </mat-error>
       </mat-form-field>
-      <mat-form-field
-        class="input-width-l">
+      <mat-form-field class="input-width-l">
         <mat-label i18n>Ordering</mat-label>
         <input
           (ngModelChange)="updateEventHandler('ordering', $event)"
@@ -137,9 +125,7 @@
           required
           type="number" />
         <mat-hint i18n>Event handlers with lower ordering number are executed first.</mat-hint>
-        <mat-error i18n>
-          Ordering is <strong>required</strong>.
-        </mat-error>
+        <mat-error i18n> Ordering is <strong>required</strong>. </mat-error>
       </mat-form-field>
     </div>
 

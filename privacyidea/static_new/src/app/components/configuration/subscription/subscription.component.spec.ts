@@ -40,7 +40,7 @@ describe("SubscriptionComponent", () => {
   let dialogService: MockDialogService;
 
   const mockSubscriptions = {
-    "app1": {
+    app1: {
       application: "app1",
       timedelta: -20,
       level: "Gold",
@@ -72,19 +72,14 @@ describe("SubscriptionComponent", () => {
     dialogService = new MockDialogService();
 
     await TestBed.configureTestingModule({
-      imports: [
-        SubscriptionComponent,
-        MatSnackBarModule,
-        BrowserAnimationsModule
-      ],
+      imports: [SubscriptionComponent, MatSnackBarModule, BrowserAnimationsModule],
       providers: [
         { provide: SubscriptionService, useValue: subscriptionService },
         { provide: NotificationService, useValue: notificationService },
         { provide: AuthService, useValue: authService },
         { provide: DialogService, useValue: dialogService }
       ]
-    })
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(SubscriptionComponent);
     component = fixture.componentInstance;
@@ -116,7 +111,7 @@ describe("SubscriptionComponent", () => {
 
   it("should show warning alert when -14 <= timedelta < 0", () => {
     const subscriptions = {
-      "app1": { ...mockSubscriptions.app1, timedelta: -5 }
+      app1: { ...mockSubscriptions.app1, timedelta: -5 }
     };
     subscriptionService.subscriptionsResource.set(MockPiResponse.fromValue(subscriptions));
     fixture.detectChanges();
@@ -128,7 +123,7 @@ describe("SubscriptionComponent", () => {
 
   it("should show danger alert when timedelta >= 0", () => {
     const subscriptions = {
-      "app1": { ...mockSubscriptions.app1, timedelta: 5 }
+      app1: { ...mockSubscriptions.app1, timedelta: 5 }
     };
     subscriptionService.subscriptionsResource.set(MockPiResponse.fromValue(subscriptions));
     fixture.detectChanges();
@@ -148,7 +143,7 @@ describe("SubscriptionComponent", () => {
     } as unknown as Event;
 
     subscriptionService.uploadSubscriptionFile.mockReturnValue(of(MockPiResponse.fromValue({})));
-    
+
     component.upload(event);
 
     expect(subscriptionService.uploadSubscriptionFile).toHaveBeenCalledWith(file);

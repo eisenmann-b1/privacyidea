@@ -45,18 +45,22 @@ describe("MachineDetailsDialogComponent", () => {
 
   beforeEach(async () => {
     machineServiceMock = {
-      getMachineTokens: jest.fn().mockReturnValue(of({
-        result: {
-          value: [{
-            id: 10,
-            serial: "S1",
-            application: "ssh",
-            type: "sshkey",
-            hostname: "host1",
-            options: { user: "alice", service_id: "svc1" }
-          }]
-        }
-      })),
+      getMachineTokens: jest.fn().mockReturnValue(
+        of({
+          result: {
+            value: [
+              {
+                id: 10,
+                serial: "S1",
+                application: "ssh",
+                type: "sshkey",
+                hostname: "host1",
+                options: { user: "alice", service_id: "svc1" }
+              }
+            ]
+          }
+        })
+      ),
       deleteTokenById: jest.fn().mockReturnValue(of({})),
       postAssignMachineToToken: jest.fn().mockReturnValue(of({})),
       postTokenOption: jest.fn().mockReturnValue(of({}))
@@ -126,9 +130,11 @@ describe("MachineDetailsDialogComponent", () => {
   it("should detach token after confirmation", async () => {
     const token = component.dataSource.data[0];
     component.detachToken(token);
-    expect(dialogServiceMock.openDialog).toHaveBeenCalledWith(expect.objectContaining({
-      component: SimpleConfirmationDialogComponent
-    }));
+    expect(dialogServiceMock.openDialog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        component: SimpleConfirmationDialogComponent
+      })
+    );
     await Promise.resolve();
     expect(machineServiceMock.deleteTokenById).toHaveBeenCalledWith("S1", "ssh", "10");
   });

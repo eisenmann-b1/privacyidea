@@ -48,8 +48,13 @@
       <mat-icon>refresh</mat-icon>
     </button>
     <div
-      [ngClass]="[sessionTimerService.remainingTime()! < 31000 ? 'red-light' : sessionTimerService.remainingTime()! <
-       60000 ? 'yellow-light' : 'surface-highest']"
+      [ngClass]="[
+        sessionTimerService.remainingTime()! < 31000
+          ? 'red-light'
+          : sessionTimerService.remainingTime()! < 60000
+            ? 'yellow-light'
+            : 'surface-highest'
+      ]"
       class="session-timer"
       matTooltip="Time until session expires">
       {{ sessionTimerService.remainingTime() | date: sessionTimeFormat() : "UTC" }}

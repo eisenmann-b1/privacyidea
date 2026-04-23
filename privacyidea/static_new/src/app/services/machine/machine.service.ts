@@ -182,7 +182,9 @@ export class MachineService implements MachineServiceInterface {
   machineFilter: WritableSignal<FilterValue> = linkedSignal({
     source: () => ({
       selectedApplicationType: this.selectedApplicationType(),
-      tokenDetailResource: this.tokenService.tokenDetailResource.hasValue() ? this.tokenService.tokenDetailResource.value() : undefined
+      tokenDetailResource: this.tokenService.tokenDetailResource.hasValue()
+        ? this.tokenService.tokenDetailResource.value()
+        : undefined
     }),
     computation: (source) => {
       const tokenSerial = source.tokenDetailResource?.result?.value?.tokens[0]?.serial;
@@ -284,14 +286,14 @@ export class MachineService implements MachineServiceInterface {
   });
 
   machines: WritableSignal<Machines | undefined> = linkedSignal({
-    source: () => this.machinesResource.hasValue() ? this.machinesResource.value() : undefined,
+    source: () => (this.machinesResource.hasValue() ? this.machinesResource.value() : undefined),
     computation: (machinesResource, previous) => {
       return machinesResource?.result?.value ?? previous?.value;
     }
   });
 
   tokenApplications: Signal<TokenApplications | undefined> = linkedSignal({
-    source: () => this.tokenApplicationResource.hasValue() ? this.tokenApplicationResource.value() : undefined,
+    source: () => (this.tokenApplicationResource.hasValue() ? this.tokenApplicationResource.value() : undefined),
     computation: (tokenApplicationResource, previous) => {
       return tokenApplicationResource?.result?.value ?? previous?.value;
     }

@@ -74,7 +74,7 @@ export class TokenEnrollmentLastStepDialogWizardComponent extends TokenEnrollmen
       type: "auxiliary",
       label: "Logout",
       value: "logout",
-      primary: true,
+      primary: true
     });
     return actions;
   });

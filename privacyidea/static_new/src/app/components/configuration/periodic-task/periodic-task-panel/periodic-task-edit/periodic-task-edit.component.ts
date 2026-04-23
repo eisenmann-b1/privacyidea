@@ -99,9 +99,7 @@ export class PeriodicTaskEditComponent {
   // Add this computed signal for required options
   requiredOptions = computed(() => {
     const options = this.taskModuleOptions() || {};
-    return Object.fromEntries(
-      Object.entries(options).filter(([_, opt]) => opt.required)
-    );
+    return Object.fromEntries(Object.entries(options).filter(([_, opt]) => opt.required));
   });
 
   get allowSave() {
@@ -124,13 +122,10 @@ export class PeriodicTaskEditComponent {
   }
 
   notUsedOptions: Signal<Record<string, PeriodicTaskOption>> = computed(() => {
-      const allOptions = this.taskModuleOptions() || {};
-      const usedOptionKeys = Object.keys(this.editTask().options || {});
-      return Object.fromEntries(
-        Object.entries(allOptions)
-          .filter(([key]) => !usedOptionKeys.includes(key)));
-    }
-  );
+    const allOptions = this.taskModuleOptions() || {};
+    const usedOptionKeys = Object.keys(this.editTask().options || {});
+    return Object.fromEntries(Object.entries(allOptions).filter(([key]) => !usedOptionKeys.includes(key)));
+  });
 
   selectedOption = linkedSignal(() => {
     if (Object.keys(this.editTask().options).length > 0) {

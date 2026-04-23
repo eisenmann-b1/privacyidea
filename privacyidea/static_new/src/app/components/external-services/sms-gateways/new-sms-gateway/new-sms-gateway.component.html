@@ -34,7 +34,6 @@
   <form
     [formGroup]="smsForm"
     class="sms-gateway-form">
-
     <div class="flex-row gap-16 margin-bottom-16">
       <mat-form-field
         appearance="fill"
@@ -49,7 +48,7 @@
             placeholder="mySmsGateway"
             required />
         </app-clearable-input>
-        @if (smsForm.get('name')?.hasError('required')) {
+        @if (smsForm.get("name")?.hasError("required")) {
           <mat-error i18n>Name is <strong>required</strong></mat-error>
         }
       </mat-form-field>
@@ -63,11 +62,11 @@
           required>
           @for (provider of providerEntries(); track provider.key) {
             <mat-option [value]="provider.key">
-              {{ provider.key.split('.').pop() }}
+              {{ provider.key.split(".").pop() }}
             </mat-option>
           }
         </mat-select>
-        @if (smsForm.get('providermodule')?.hasError('required')) {
+        @if (smsForm.get("providermodule")?.hasError("required")) {
           <mat-error i18n>Provider Module is <strong>required</strong></mat-error>
         }
       </mat-form-field>
@@ -97,8 +96,10 @@
         <mat-form-field
           [class.input-width-l]="param.key !== 'REGEXP' && param.value.type !== 'text'"
           [class.input-width-xl]="param.key === 'REGEXP' || param.value.type === 'text'"
-          [class.margin-bottom-64]="param.key === 'PROXY' && providermoduleSignal()
-            === 'privacyidea.lib.smsprovider.HttpSMSProvider.HttpSMSProvider'"
+          [class.margin-bottom-64]="
+            param.key === 'PROXY' &&
+            providermoduleSignal() === 'privacyidea.lib.smsprovider.HttpSMSProvider.HttpSMSProvider'
+          "
           appearance="fill"
           class="margin-bottom-16">
           <mat-label>{{ param.key }}</mat-label>
@@ -115,7 +116,7 @@
             </mat-select>
           }
 
-          @if (!param.value.values && param.value.type === 'text') {
+          @if (!param.value.values && param.value.type === "text") {
             <textarea
               [formControlName]="param.key"
               [required]="param.value.required"
@@ -123,7 +124,7 @@
               rows="2"></textarea>
           }
 
-          @if (!param.value.values && param.value.type !== 'text') {
+          @if (!param.value.values && param.value.type !== "text") {
             <app-clearable-input
               (onClick)="parametersForm.get(param.key)?.setValue('')"
               [showClearButton]="!!parametersForm.get(param.key)?.value">
@@ -136,7 +137,7 @@
 
           <mat-hint>{{ param.value.description }}</mat-hint>
 
-          @if (parametersForm.get(param.key)?.hasError('required')) {
+          @if (parametersForm.get(param.key)?.hasError("required")) {
             <mat-error i18n>{{ param.key }} is <strong>required</strong></mat-error>
           }
         </mat-form-field>

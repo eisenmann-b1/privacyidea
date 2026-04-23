@@ -23,11 +23,7 @@ import { of } from "rxjs";
 import { ContainerDetailsInfoComponent, ContainerInfoDetail } from "./container-details-info.component";
 import { ContainerService } from "../../../../services/container/container.service";
 import { AuthService } from "../../../../services/auth/auth.service";
-import {
-  MockContainerService,
-  MockLocalService,
-  MockNotificationService
-} from "../../../../../testing/mock-services";
+import { MockContainerService, MockLocalService, MockNotificationService } from "../../../../../testing/mock-services";
 import { provideHttpClient } from "@angular/common/http";
 import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { MockAuthService } from "../../../../../testing/mock-services/mock-auth-service";

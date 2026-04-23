@@ -26,12 +26,12 @@ import {
 } from "../../../../services/token/token.service";
 import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
 import { DialogAction } from "../../../../models/dialog";
-import {FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
+import { FormControl, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { DialogWrapperComponent } from "@components/shared/dialog/dialog-wrapper/dialog-wrapper.component";
 import { MatFormField, MatInput, MatLabel } from "@angular/material/input";
 import { TokenEnrollmentDataComponent } from "@components/token/token-enrollment/token-enrollment-data/token-enrollment-data.component";
 import { MatHint } from "@angular/material/form-field";
-import {toSignal} from "@angular/core/rxjs-interop";
+import { toSignal } from "@angular/core/rxjs-interop";
 
 @Component({
   selector: "app-token-complete-enrollment",
@@ -56,12 +56,18 @@ export class TokenCompleteEnrollmentComponent extends AbstractDialogComponent<To
   protected readonly tokenType = this.data.response?.type ?? "hotp";
   protected readonly enrollParameters = this.data.enrollParameters ?? {};
   protected readonly twoStepEnrollment = computed(() => {
-    return this.enrollDetails?.["2step_output"] || this.enrollDetails?.["2step_difficulty"] || this.enrollDetails?.["2step_salt"];
+    return (
+      this.enrollDetails?.["2step_output"] ||
+      this.enrollDetails?.["2step_difficulty"] ||
+      this.enrollDetails?.["2step_salt"]
+    );
   });
 
   clientPartControl = new FormControl("", { nonNullable: true, validators: Validators.required });
 
-  private readonly statusSignal = toSignal(this.clientPartControl.statusChanges, { initialValue: this.clientPartControl.status });
+  private readonly statusSignal = toSignal(this.clientPartControl.statusChanges, {
+    initialValue: this.clientPartControl.status
+  });
   invalidInputSignal = computed(() => {
     this.statusSignal();
     return this.clientPartControl.invalid;

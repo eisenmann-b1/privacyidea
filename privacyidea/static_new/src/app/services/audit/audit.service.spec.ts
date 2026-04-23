@@ -87,7 +87,7 @@ describe("AuditService (signals & helpers)", () => {
       next: 1,
       prev: 1
     });
-    req.flush(response)
+    req.flush(response);
     await Promise.resolve();
     TestBed.tick();
   });

@@ -78,15 +78,15 @@ describe("NewSmtpServerComponent", () => {
           { provide: SmtpService, useClass: MockSmtpService },
           { provide: ContentService, useValue: contentServiceMock },
           { provide: PendingChangesService, useClass: MockPendingChangesService },
-          { provide: DialogService, useClass: MockDialogService },
+          { provide: DialogService, useClass: MockDialogService }
         ]
-      }).overrideComponent(NewSmtpServerComponent, {
-        add: {
-          providers: [
-            { provide: MatDialog, useValue: dialogMock }
-          ]
-        }
-      }).compileComponents();
+      })
+        .overrideComponent(NewSmtpServerComponent, {
+          add: {
+            providers: [{ provide: MatDialog, useValue: dialogMock }]
+          }
+        })
+        .compileComponents();
 
       smtpServiceMock = TestBed.inject(SmtpService);
       pendingChangesService = TestBed.inject(PendingChangesService) as unknown as MockPendingChangesService;
@@ -251,7 +251,7 @@ describe("NewSmtpServerComponent", () => {
 
         component.onCancel();
 
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise((resolve) => setTimeout(resolve, 10));
 
         expect(pendingChangesService.clearAllRegistrations).toHaveBeenCalled();
         expect(dialogRefMock.close).toHaveBeenCalled();
@@ -273,7 +273,7 @@ describe("NewSmtpServerComponent", () => {
 
         component.onCancel();
 
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         expect(pendingChangesService.clearAllRegistrations).toHaveBeenCalled();
         expect(dialogRefMock.close).toHaveBeenCalled();
@@ -296,7 +296,7 @@ describe("NewSmtpServerComponent", () => {
 
         component.onCancel();
 
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
         expect(dialogRefMock.close).not.toHaveBeenCalled();
@@ -311,7 +311,7 @@ describe("NewSmtpServerComponent", () => {
 
         component.onCancel();
 
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         expect(pendingChangesService.save).not.toHaveBeenCalled();
         expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
@@ -333,7 +333,7 @@ describe("NewSmtpServerComponent", () => {
 
         component.onCancel();
 
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise((resolve) => setTimeout(resolve, 10));
 
         expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
         expect(dialogRefMock.close).not.toHaveBeenCalled();
@@ -364,13 +364,13 @@ describe("NewSmtpServerComponent", () => {
           { provide: SmtpService, useClass: MockSmtpService },
           { provide: ContentService, useValue: contentServiceMock }
         ]
-      }).overrideComponent(NewSmtpServerComponent, {
-        add: {
-          providers: [
-            { provide: MatDialog, useValue: dialogMock }
-          ]
-        }
-      }).compileComponents();
+      })
+        .overrideComponent(NewSmtpServerComponent, {
+          add: {
+            providers: [{ provide: MatDialog, useValue: dialogMock }]
+          }
+        })
+        .compileComponents();
 
       editFixture = TestBed.createComponent(NewSmtpServerComponent);
       editComponent = editFixture.componentInstance;

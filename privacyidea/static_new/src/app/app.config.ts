@@ -18,12 +18,7 @@
  **/
 import { APP_BASE_HREF } from "@angular/common";
 import { provideHttpClient, withInterceptors } from "@angular/common/http";
-import {
-  ApplicationConfig,
-  inject,
-  provideAppInitializer,
-  provideZonelessChangeDetection
-} from "@angular/core";
+import { ApplicationConfig, inject, provideAppInitializer, provideZonelessChangeDetection } from "@angular/core";
 import { provideAnimationsAsync } from "@angular/platform-browser/animations/async";
 import { provideRouter } from "@angular/router";
 import { routes } from "./app.routes";

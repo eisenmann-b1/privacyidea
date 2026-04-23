@@ -21,6 +21,8 @@
   text-decoration: underline;
 }
 
-::ng-deep app-smtp-edit-dialog.mat-mdc-dialog-component-host mat-dialog-content.mat-mdc-dialog-content.mdc-dialog__content.smtp-dialog-content {
+::ng-deep
+  app-smtp-edit-dialog.mat-mdc-dialog-component-host
+  mat-dialog-content.mat-mdc-dialog-content.mdc-dialog__content.smtp-dialog-content {
   max-height: 82vh;
 }

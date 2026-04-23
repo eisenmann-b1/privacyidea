@@ -110,9 +110,7 @@ export class MockContainerService implements ContainerServiceInterface {
   deleteContainer = jest.fn().mockReturnValue(of({}));
   deleteAllTokens = jest.fn().mockReturnValue(of(null));
 
-  registerContainer = jest.fn(() =>
-    of(MockPiResponse.fromValue({})) as any
-  );
+  registerContainer = jest.fn(() => of(MockPiResponse.fromValue({})) as any);
 
   readonly unregister = jest.fn().mockReturnValue(of({}));
   containerBelongsToUser = jest.fn().mockReturnValue(false);

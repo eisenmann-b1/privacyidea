@@ -236,7 +236,7 @@ export class AuthService implements AuthServiceInterface {
   readonly rightsWithValues = computed(() => {
     const rightsList = this.rights();
     const result: Record<string, string | null> = {};
-    rightsList.forEach(entry => {
+    rightsList.forEach((entry) => {
       const equation_index = entry.indexOf("=");
       if (equation_index === -1) {
         if (!(entry in result)) {

@@ -120,8 +120,9 @@ describe("ResolverService", () => {
     const req = httpMock.expectOne(resolverService.resolverBaseUrl);
     expect(req.request.method).toBe("GET");
     req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403, statusText: "Permission denied"
-      });
+      status: 403,
+      statusText: "Permission denied"
+    });
     await lastValueFrom(of({})); // Wait for async updates
 
     expect(resolverService.resolverResourceValue()).toEqual({});
@@ -178,7 +179,7 @@ describe("ResolverService", () => {
   describe("userAttributes signal", () => {
     it("should return attribute keys for ldapresolver  with stringified mapping", async () => {
       const mockResolvers = {
-        ldap1: { data: { USERINFO: "{ \"surname\": \"sn\", \"givenname\": \"givenName\" }" }, type: "ldapresolver" }
+        ldap1: { data: { USERINFO: '{ "surname": "sn", "givenname": "givenName" }' }, type: "ldapresolver" }
       };
       (resolverService as any).selectedResolverName.set("ldap1");
       const mockResponse = MockPiResponse.fromValue(mockResolvers);
@@ -236,7 +237,8 @@ describe("ResolverService", () => {
               mobile: "mobilePhone",
               surname: "surname"
             }
-          }, type: "httpresolver"
+          },
+          type: "httpresolver"
         }
       };
       const mockResponse = MockPiResponse.fromValue(mockResolvers);

@@ -30,18 +30,10 @@ import { MatButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
 
 @Component({
-  selector: 'app-verify-enrollment',
-  imports: [
-    FormsModule,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    ReactiveFormsModule,
-    MatButton,
-    MatIcon
-  ],
-  templateUrl: './verify-enrollment.component.html',
-  styleUrl: './verify-enrollment.component.scss'
+  selector: "app-verify-enrollment",
+  imports: [FormsModule, MatFormField, MatInput, MatLabel, ReactiveFormsModule, MatButton, MatIcon],
+  templateUrl: "./verify-enrollment.component.html",
+  styleUrl: "./verify-enrollment.component.scss"
 })
 export class VerifyEnrollmentComponent {
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);

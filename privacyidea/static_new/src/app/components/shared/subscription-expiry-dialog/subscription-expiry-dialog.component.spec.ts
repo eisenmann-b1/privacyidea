@@ -17,7 +17,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { SubscriptionExpiryDialogComponent, SubscriptionExpiryDialogData } from "./subscription-expiry-dialog.component";
+import {
+  SubscriptionExpiryDialogComponent,
+  SubscriptionExpiryDialogData
+} from "./subscription-expiry-dialog.component";
 import { MAT_DIALOG_DATA, MatDialogModule } from "@angular/material/dialog";
 import { By } from "@angular/platform-browser";
 

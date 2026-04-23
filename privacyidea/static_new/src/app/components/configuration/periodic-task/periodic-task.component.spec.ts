@@ -33,10 +33,7 @@ describe("PeriodicTaskComponent", () => {
 
     await TestBed.configureTestingModule({
       imports: [PeriodicTaskComponent],
-      providers: [
-        provideHttpClient(),
-        { provide: PeriodicTaskService, useValue: periodicTaskService }
-      ]
+      providers: [provideHttpClient(), { provide: PeriodicTaskService, useValue: periodicTaskService }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(PeriodicTaskComponent);

@@ -87,15 +87,9 @@ export class UserDetailsContainerTableComponent {
   protected readonly authService: AuthServiceInterface = inject(AuthService);
   protected readonly userService: UserServiceInterface = inject(UserService);
 
-  readonly columnsKeyMap = this.tableUtilsService.pickColumns(
-    "serial",
-    "type",
-    "states",
-    "description",
-    "realms"
-  );
+  readonly columnsKeyMap = this.tableUtilsService.pickColumns("serial", "type", "states", "description", "realms");
   readonly columnKeys = [...this.tableUtilsService.getColumnKeys(this.columnsKeyMap)];
-  displayedColumns: string[] = this.columnsKeyMap.map(c => c.key);
+  displayedColumns: string[] = this.columnsKeyMap.map((c) => c.key);
 
   dataSource = new MatTableDataSource<ContainerDetailData>([]);
   filterValue = "";
@@ -105,7 +99,7 @@ export class UserDetailsContainerTableComponent {
   pageSizeOptions = this.tableUtilsService.pageSizeOptions;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild('filterInput', { static: false }) filterInput!: ElementRef<HTMLInputElement>;
+  @ViewChild("filterInput", { static: false }) filterInput!: ElementRef<HTMLInputElement>;
 
   userContainers: WritableSignal<ContainerDetailData[]> = linkedSignal({
     source: this.containerService.containerResource.value,
@@ -137,13 +131,9 @@ export class UserDetailsContainerTableComponent {
     this.dataSource.filterPredicate = (row: ContainerDetailData, filter: string) => {
       const currentState = (row.states?.[0] ?? "").toString();
       const realmsJoined = (row.realms ?? []).join(" ");
-      const haystack = [
-        row.serial,
-        row.type,
-        row.description ?? "",
-        currentState,
-        realmsJoined
-      ].join(" ").toLowerCase();
+      const haystack = [row.serial, row.type, row.description ?? "", currentState, realmsJoined]
+        .join(" ")
+        .toLowerCase();
 
       return haystack.includes(filter);
     };

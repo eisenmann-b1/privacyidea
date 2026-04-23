@@ -63,11 +63,7 @@ export class TokenApplicationsOfflineComponent {
   protected readonly tableUtilsService: TableUtilsServiceInterface = inject(TableUtilsService);
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   protected readonly contentService: ContentServiceInterface = inject(ContentService);
-  readonly columnsKeyMap = this.tableUtilsService.pickColumns(
-    "serial",
-    "count",
-    "rounds"
-  );
+  readonly columnsKeyMap = this.tableUtilsService.pickColumns("serial", "count", "rounds");
   readonly columnKeys = [...this.tableUtilsService.getColumnKeys(this.columnsKeyMap)];
   pageSizeOptions = this.tableUtilsService.pageSizeOptions;
   length = computed(() => this.machineService.tokenApplications()?.length ?? 0);

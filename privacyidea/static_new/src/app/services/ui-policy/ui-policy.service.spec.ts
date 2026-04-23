@@ -62,14 +62,11 @@ describe("UiPolicyService", () => {
   });
 
   it("falls back to defaults and warns when appConfig is missing", () => {
-    const warn = jest.spyOn(console, "warn").mockImplementation(() => {
-    });
+    const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
 
     const srv = new UiPolicyService();
 
-    expect(warn).toHaveBeenCalledWith(
-      "App configuration not found. Using default values."
-    );
+    expect(warn).toHaveBeenCalledWith("App configuration not found. Using default values.");
     expect(srv.remoteUser).toBe("");
     expect(srv.passwordReset).toBe(false);
     expect(srv.hasJobQueue).toBe(true);

@@ -76,7 +76,11 @@ export class SmtpService implements SmtpServiceInterface {
   }
 
   readonly smtpServerResource = httpResource<PiResponse<SmtpServers>>(() => {
-    if (!this.contentService.onExternalSmtp() && !this.contentService.onConfigurationTokenTypes() && !this.contentService.onConfigurationSystem()) {
+    if (
+      !this.contentService.onExternalSmtp() &&
+      !this.contentService.onConfigurationTokenTypes() &&
+      !this.contentService.onConfigurationSystem()
+    ) {
       return undefined;
     }
     return {

@@ -27,7 +27,8 @@ import { PendingChangesService } from "src/app/services/pending-changes/pending-
 @Directive()
 export abstract class PendingChangesDialogComponent<D = any, R = any>
   extends AbstractDialogComponent<D, R>
-  implements OnInit, OnDestroy {
+  implements OnInit, OnDestroy
+{
   protected readonly dialogService: DialogServiceInterface = inject(DialogService);
   protected readonly pendingChangesService: PendingChangesService = inject(PendingChangesService);
   private readonly destroyRef = inject(DestroyRef);

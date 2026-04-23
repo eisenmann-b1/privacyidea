@@ -116,7 +116,7 @@ describe("SmsConfigComponent", () => {
 
   it("should handle numeric values for provider timeout", () => {
     jest.spyOn(component.formDataChange, "emit");
-    
+
     component.updateFormData(SMS_PROVIDER_TIMEOUT, 100);
     expect(component.formDataChange.emit).toHaveBeenCalledWith({ [SMS_PROVIDER_TIMEOUT]: 100 });
 

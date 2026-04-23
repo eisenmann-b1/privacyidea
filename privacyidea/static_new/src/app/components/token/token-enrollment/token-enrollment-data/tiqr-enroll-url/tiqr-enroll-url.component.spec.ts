@@ -28,7 +28,7 @@ describe("TiqrEnrollUrlComponent", () => {
     TestBed.resetTestingModule();
     fixture = TestBed.createComponent(TiqrEnrollUrlComponent);
     component = fixture.componentInstance;
-  })
+  });
 
   it("should create", () => {
     expect(component).toBeTruthy();

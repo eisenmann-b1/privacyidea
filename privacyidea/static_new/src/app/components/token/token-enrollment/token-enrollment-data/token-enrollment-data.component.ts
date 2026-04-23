@@ -69,24 +69,31 @@ export class TokenEnrollmentDataComponent {
   enrolledData = linkedSignal(() => this.enrolledInputData());
   protected readonly serial = computed(() => this.enrolledData()?.serial ?? "");
   protected readonly containerSerial = computed(() => this.enrolledData()?.["container_serial"] ?? "");
-  protected readonly qrCode = computed(() =>
-    this.enrolledData()?.googleurl?.img ??
-    this.enrolledData()?.motpurl?.img ??
-    this.enrolledData()?.otpkey?.img ??
-    this.enrolledData()?.tiqrenroll?.img ??
-    "");
-  protected readonly url = computed(() =>
-    this.enrolledData()?.googleurl?.value ??
-    this.enrolledData()?.motpurl?.value ??
-    this.enrolledData()?.otpkey?.value ??
-    this.enrolledData()?.tiqrenroll?.value ??
-    "");
+  protected readonly qrCode = computed(
+    () =>
+      this.enrolledData()?.googleurl?.img ??
+      this.enrolledData()?.motpurl?.img ??
+      this.enrolledData()?.otpkey?.img ??
+      this.enrolledData()?.tiqrenroll?.img ??
+      ""
+  );
+  protected readonly url = computed(
+    () =>
+      this.enrolledData()?.googleurl?.value ??
+      this.enrolledData()?.motpurl?.value ??
+      this.enrolledData()?.otpkey?.value ??
+      this.enrolledData()?.tiqrenroll?.value ??
+      ""
+  );
   protected readonly verify_message = computed(() => this.enrolledData()?.verify?.message ?? null);
 
   showQRCode = computed(() => !NO_QR_CODE_TOKEN_TYPES.includes(this.tokenType()));
   showRegenerateButton = computed(() => !NO_REGENERATE_TOKEN_TYPES.includes(this.tokenType()));
   regenerateButtonText = computed(() =>
-    REGENERATE_AS_VALUES_TOKEN_TYPES.includes(this.tokenType()) ? $localize`Regenerate Values` : $localize`Regenerate QR Code`);
+    REGENERATE_AS_VALUES_TOKEN_TYPES.includes(this.tokenType())
+      ? $localize`Regenerate Values`
+      : $localize`Regenerate QR Code`
+  );
 
   regenerateQRCode() {
     if (!this.enrollmentParameters()) {
@@ -94,7 +101,7 @@ export class TokenEnrollmentDataComponent {
       return;
     }
     const newEnrollmentData: TokenEnrollmentData = {
-      ...(this.enrollmentParameters()?.data ?? {} as TokenEnrollmentData)
+      ...(this.enrollmentParameters()?.data ?? ({} as TokenEnrollmentData))
     };
     const mapper = this.enrollmentParameters()?.mapper ?? new BaseApiPayloadMapper();
 

@@ -47,12 +47,20 @@ describe("EnrollFoureyesComponent", () => {
       fixture.componentRef.setInput("enrollmentData", {
         type: "4eyes",
         separator: ":",
-        requiredTokenOfRealms: [{ realm: "realm1", tokens: 1 }, { realm: "realm2", tokens: 2 }]
+        requiredTokenOfRealms: [
+          { realm: "realm1", tokens: 1 },
+          { realm: "realm2", tokens: 2 }
+        ]
       });
       component.ngOnInit();
       expect(component.separatorControl.value).toBe(":");
       expect(component.requiredTokensOfRealmsControl.value).toEqual(["realm1", "realm2"]);
-      expect(component.tokensByRealm).toEqual(new Map([["realm1", 1], ["realm2", 2]]));
+      expect(component.tokensByRealm).toEqual(
+        new Map([
+          ["realm1", 1],
+          ["realm2", 2]
+        ])
+      );
     });
 
     it("should ignore values from enrollmentData if they are undefined", () => {

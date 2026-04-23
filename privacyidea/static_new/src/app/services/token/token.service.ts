@@ -78,7 +78,17 @@ export type TokenTypeKey =
   | "webauthn"
   | "passkey";
 
-const apiFilter = ["serial", "type", "active", "user", "realm", "description", "rollout_state", "tokenrealm", "container_serial"];
+const apiFilter = [
+  "serial",
+  "type",
+  "active",
+  "user",
+  "realm",
+  "description",
+  "rollout_state",
+  "tokenrealm",
+  "container_serial"
+];
 
 const advancedApiFilter = ["infokey & infovalue", "userid", "resolver", "assigned"];
 
@@ -170,7 +180,7 @@ export interface WebAuthnRegisterRequest {
 
 export type LostTokenResponse = PiResponse<LostTokenData>;
 
-export type EnrollTokenArguments = { data: TokenEnrollmentData, mapper: BaseApiPayloadMapper };
+export type EnrollTokenArguments = { data: TokenEnrollmentData; mapper: BaseApiPayloadMapper };
 
 export type TokenEnrollmentDialogData = {
   tokenType: string;
@@ -181,7 +191,7 @@ export type TokenEnrollmentDialogData = {
   onlyAddToRealm?: boolean;
   rollover?: boolean;
   showEnrollData?: boolean;
-}
+};
 
 export interface LostTokenData {
   disable: number;
@@ -344,7 +354,8 @@ export class TokenService implements TokenServiceInterface {
       .filter(([key, v]) => (key === "container_serial" ? true : StringUtils.validFilterValue(v)))
       .map(([key, v]) => [key, plainKeys.has(key) ? v : `*${v}*`] as const);
     return Object.fromEntries(entries) as Record<string, string>;
-  });  userRealm = signal("");
+  });
+  userRealm = signal("");
 
   constructor() {
     effect(() => {
@@ -601,7 +612,7 @@ export class TokenService implements TokenServiceInterface {
   selectedToken: WritableSignal<string | null> = signal(null);
 
   tokenOptions = linkedSignal({
-    source: () => this.tokenSerialResource.hasValue() ? this.tokenSerialResource.value() : undefined,
+    source: () => (this.tokenSerialResource.hasValue() ? this.tokenSerialResource.value() : undefined),
     computation: (tokenSerialResource) => {
       if (!tokenSerialResource) return [];
       return tokenSerialResource.result?.value?.tokens?.map((token) => token.serial) ?? [];
@@ -1002,17 +1013,19 @@ export class TokenService implements TokenServiceInterface {
   getTokenDetails(tokenSerial: string): Observable<PiResponse<Tokens>> {
     const headers = this.authService.getHeaders();
     let params = new HttpParams().set("serial", tokenSerial);
-    return this.http.get<PiResponse<Tokens>>(this.tokenBaseUrl, {
-      headers,
-      params
-    }).pipe(
-      catchError((error) => {
-        console.error("Failed to get token details.", error);
-        const message = error.error?.result?.error?.message || "";
-        this.notificationService.openSnackBar("Failed to get token details. " + message);
-        return throwError(() => error);
+    return this.http
+      .get<PiResponse<Tokens>>(this.tokenBaseUrl, {
+        headers,
+        params
       })
-    );
+      .pipe(
+        catchError((error) => {
+          console.error("Failed to get token details.", error);
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar("Failed to get token details. " + message);
+          return throwError(() => error);
+        })
+      );
   }
 
   enrollToken<T extends TokenEnrollmentData, R extends EnrollmentResponse>(args: {
@@ -1039,7 +1052,8 @@ export class TokenService implements TokenServiceInterface {
 
   verifyToken(verifyData: TokenEnrollmentData): Observable<PiResponse<boolean, EnrollmentResponseDetail>> {
     const headers = this.authService.getHeaders();
-    return this.http.post<PiResponse<boolean, EnrollmentResponseDetail>>(`${this.tokenBaseUrl}init`, verifyData, { headers })
+    return this.http
+      .post<PiResponse<boolean, EnrollmentResponseDetail>>(`${this.tokenBaseUrl}init`, verifyData, { headers })
       .pipe(
         catchError((error) => {
           console.error("Failed to verify token.", error);

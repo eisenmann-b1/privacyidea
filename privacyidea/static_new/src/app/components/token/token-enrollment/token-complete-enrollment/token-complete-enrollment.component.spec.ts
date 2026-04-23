@@ -76,10 +76,12 @@ describe("TokenCompleteEnrollmentComponent", () => {
   });
 
   it("should call enrollToken and close dialog on successful enroll", () => {
-    mockTokenService.enrollToken = jest.fn().mockReturnValue(of({
-      detail: { serial: "X", rollout_state: "enrolled" },
-      result: { status: true }
-    } as any));
+    mockTokenService.enrollToken = jest.fn().mockReturnValue(
+      of({
+        detail: { serial: "X", rollout_state: "enrolled" },
+        result: { status: true }
+      } as any)
+    );
     component.clientPartControl.setValue("SOMEKEY");
     component.onDialogAction("enroll");
     expect(mockTokenService.enrollToken).toHaveBeenCalled();
@@ -87,24 +89,30 @@ describe("TokenCompleteEnrollmentComponent", () => {
   });
 
   it("should not close dialog if rollout_state is client_wait", () => {
-     mockTokenService.enrollToken = jest.fn().mockReturnValue(of({
-      detail: { serial: "X", rollout_state: "client_wait" },
-      result: { status: true }
-    } as any));
+    mockTokenService.enrollToken = jest.fn().mockReturnValue(
+      of({
+        detail: { serial: "X", rollout_state: "client_wait" },
+        result: { status: true }
+      } as any)
+    );
     component.clientPartControl.setValue("SOMEKEY");
     component.onDialogAction("enroll");
     expect(mockTokenService.enrollToken).toHaveBeenCalled();
     expect(dialogRefSpy.close).not.toHaveBeenCalled();
   });
 
-  it('should remove twoStepInit from enrollParameters.data when enrolling', () => {
-    component.clientPartControl.setValue('SOMEKEY');
+  it("should remove twoStepInit from enrollParameters.data when enrolling", () => {
+    component.clientPartControl.setValue("SOMEKEY");
     fixture.detectChanges();
-    jest.spyOn(component['tokenService'], 'enrollToken').mockImplementation((params) => {
+    jest.spyOn(component["tokenService"], "enrollToken").mockImplementation((params) => {
       expect(params.data.type).toEqual("hotp");
-      expect(params.data['twoStepInit']).toBeUndefined();
-      return of({ result: { status: true }, detail: { rollout_state: 'enrolled', type: 'hotp', serial: '123' }, type: 'hotp' });
+      expect(params.data["twoStepInit"]).toBeUndefined();
+      return of({
+        result: { status: true },
+        detail: { rollout_state: "enrolled", type: "hotp", serial: "123" },
+        type: "hotp"
+      });
     });
-    component.onDialogAction('enroll');
+    component.onDialogAction("enroll");
   });
 });

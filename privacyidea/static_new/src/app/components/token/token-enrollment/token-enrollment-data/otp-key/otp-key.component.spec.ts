@@ -26,11 +26,8 @@ describe("OtpKeyComponent", () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        OtpKeyComponent
-      ]
-    })
-      .compileComponents();
+      imports: [OtpKeyComponent]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(OtpKeyComponent);
     component = fixture.componentInstance;

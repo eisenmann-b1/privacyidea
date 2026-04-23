@@ -67,13 +67,13 @@ describe("NewRadiusServerComponent", () => {
         { provide: DialogService, useClass: MockDialogService },
         { provide: AuthService, useClass: MockAuthService }
       ]
-    }).overrideComponent(NewRadiusServerComponent, {
-      add: {
-        providers: [
-          { provide: MatDialog, useValue: dialogMock }
-        ]
-      }
-    }).compileComponents();
+    })
+      .overrideComponent(NewRadiusServerComponent, {
+        add: {
+          providers: [{ provide: MatDialog, useValue: dialogMock }]
+        }
+      })
+      .compileComponents();
 
     radiusServiceMock = TestBed.inject(RadiusServerService);
     pendingChangesService = TestBed.inject(PendingChangesService) as unknown as MockPendingChangesService;
@@ -199,7 +199,7 @@ describe("NewRadiusServerComponent", () => {
 
       component.onCancel();
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(pendingChangesService.clearAllRegistrations).toHaveBeenCalled();
       expect(dialogRefMock.close).toHaveBeenCalled();
@@ -220,7 +220,7 @@ describe("NewRadiusServerComponent", () => {
 
       component.onCancel();
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(pendingChangesService.clearAllRegistrations).toHaveBeenCalled();
       expect(dialogRefMock.close).toHaveBeenCalled();
@@ -242,7 +242,7 @@ describe("NewRadiusServerComponent", () => {
 
       component.onCancel();
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
       expect(dialogRefMock.close).not.toHaveBeenCalled();
@@ -257,7 +257,7 @@ describe("NewRadiusServerComponent", () => {
 
       component.onCancel();
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(pendingChangesService.save).not.toHaveBeenCalled();
       expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
@@ -278,7 +278,7 @@ describe("NewRadiusServerComponent", () => {
 
       component.onCancel();
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
       expect(dialogRefMock.close).not.toHaveBeenCalled();

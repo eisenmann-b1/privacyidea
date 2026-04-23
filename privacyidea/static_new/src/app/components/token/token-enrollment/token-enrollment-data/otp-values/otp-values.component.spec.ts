@@ -28,27 +28,27 @@ describe("OtpValuesComponent", () => {
     TestBed.resetTestingModule();
     fixture = TestBed.createComponent(OtpValuesComponent);
     component = fixture.componentInstance;
-  })
+  });
 
   it("should create", () => {
     expect(component).toBeTruthy();
   });
 
   it("printOtps should open window", async () => {
-      const mockPrintWindow = {
-        document: { open: jest.fn(), write: jest.fn(), close: jest.fn() },
-        focus: jest.fn(),
-        print: jest.fn(),
-        close: jest.fn()
-      };
-      jest.spyOn(window, "open").mockReturnValue(mockPrintWindow as any);
-      component.printOtps();
-      expect(window.open).toHaveBeenCalledWith("", "_blank", "width=800,height=600");
-      expect(mockPrintWindow.document.open).toHaveBeenCalled();
-      expect(mockPrintWindow.document.write).toHaveBeenCalled();
-      expect(mockPrintWindow.document.close).toHaveBeenCalled();
-      expect(mockPrintWindow.focus).toHaveBeenCalled();
-      expect(mockPrintWindow.print).toHaveBeenCalled();
-      expect(mockPrintWindow.close).toHaveBeenCalled();
-    });
+    const mockPrintWindow = {
+      document: { open: jest.fn(), write: jest.fn(), close: jest.fn() },
+      focus: jest.fn(),
+      print: jest.fn(),
+      close: jest.fn()
+    };
+    jest.spyOn(window, "open").mockReturnValue(mockPrintWindow as any);
+    component.printOtps();
+    expect(window.open).toHaveBeenCalledWith("", "_blank", "width=800,height=600");
+    expect(mockPrintWindow.document.open).toHaveBeenCalled();
+    expect(mockPrintWindow.document.write).toHaveBeenCalled();
+    expect(mockPrintWindow.document.close).toHaveBeenCalled();
+    expect(mockPrintWindow.focus).toHaveBeenCalled();
+    expect(mockPrintWindow.print).toHaveBeenCalled();
+    expect(mockPrintWindow.close).toHaveBeenCalled();
+  });
 });

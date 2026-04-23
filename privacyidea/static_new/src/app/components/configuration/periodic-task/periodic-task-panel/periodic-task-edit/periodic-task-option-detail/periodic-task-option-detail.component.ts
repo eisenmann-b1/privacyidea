@@ -17,7 +17,6 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 
-
 import { Component, EventEmitter, input, linkedSignal, Output, ViewEncapsulation } from "@angular/core";
 import { MatInput } from "@angular/material/input";
 import { MatFormField, MatLabel } from "@angular/material/form-field";
@@ -28,14 +27,7 @@ import { PeriodicTaskOption } from "../../../../../../services/periodic-task/per
 
 @Component({
   selector: "app-periodic-task-option-detail",
-  imports: [
-    MatFormField,
-    MatLabel,
-    MatInput,
-    FormsModule,
-    MatButton,
-    MatIcon
-  ],
+  imports: [MatFormField, MatLabel, MatInput, FormsModule, MatButton, MatIcon],
   templateUrl: "./periodic-task-option-detail.component.html",
   styleUrl: "./periodic-task-option-detail.component.scss",
   encapsulation: ViewEncapsulation.None

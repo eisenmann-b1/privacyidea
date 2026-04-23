@@ -31,10 +31,7 @@ describe("TokenApplicationsActionsComponent", () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TokenApplicationsActionsComponent, BrowserAnimationsModule],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting()
-      ]
+      providers: [provideHttpClient(), provideHttpClientTesting()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(TokenApplicationsActionsComponent);

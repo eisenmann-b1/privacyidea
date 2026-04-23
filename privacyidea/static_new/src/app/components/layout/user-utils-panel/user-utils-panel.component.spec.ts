@@ -115,8 +115,7 @@ describe("UserUtilsPanelComponent", () => {
         MockLocalService,
         MockNotificationService
       ]
-    })
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(UserUtilsPanelComponent);
     component = fixture.componentInstance;
@@ -141,7 +140,6 @@ describe("UserUtilsPanelComponent", () => {
   it("should create", () => {
     expect(component).toBeTruthy();
   });
-
 
   describe("refreshPage per route", () => {
     beforeEach(() => {
@@ -214,7 +212,7 @@ describe("UserUtilsPanelComponent", () => {
       expect(component.profileText()).toBe("bob");
     });
     it("returns username and realm if available", () => {
-     authService.role.set("");
+      authService.role.set("");
       authService.realm.set("default");
       authService.username.set("alice");
       expect(component.profileText()).toBe("alice @ default");
@@ -234,7 +232,6 @@ describe("UserUtilsPanelComponent", () => {
   });
 
   describe("sessionTimeFormat signal", () => {
-
     it("format less than 10 min is 'm:ss'", () => {
       sessionTimerService.remainingTime.set(10 * 60 * 1000 - 1000);
       expect(component.sessionTimeFormat()).toBe("m:ss");

@@ -50,7 +50,8 @@ import { DialogWrapperComponent } from "../../../../shared/dialog/dialog-wrapper
 import { DialogAction } from "../../../../../models/dialog";
 import { AbstractDialogComponent } from "../../../../shared/dialog/abstract-dialog/abstract-dialog.component";
 import {
-  TokenDetails, TokenEnrollmentDialogData,
+  TokenDetails,
+  TokenEnrollmentDialogData,
   TokenService,
   TokenServiceInterface,
   TokenType
@@ -94,9 +95,12 @@ import { TokenCompleteEnrollmentComponent } from "@components/token/token-enroll
   templateUrl: "./token-rollover.component.html",
   styleUrl: "./token-rollover.component.scss"
 })
-export class TokenRolloverComponent extends AbstractDialogComponent<{
-  token: TokenDetails
-}, boolean> {
+export class TokenRolloverComponent extends AbstractDialogComponent<
+  {
+    token: TokenDetails;
+  },
+  boolean
+> {
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   protected readonly notificationService: NotificationServiceInterface = inject(NotificationService);
   protected readonly dialogService: DialogServiceInterface = inject(DialogService);
@@ -114,12 +118,14 @@ export class TokenRolloverComponent extends AbstractDialogComponent<{
   dialogActions = linkedSignal({
     source: this.formGroupInvalid,
     computation: (invalid) => {
-      return [{
-        type: "confirm",
-        label: $localize`Rollover`,
-        value: true,
-        disabled: invalid
-      }] as DialogAction<boolean>[];
+      return [
+        {
+          type: "confirm",
+          label: $localize`Rollover`,
+          value: true,
+          disabled: invalid
+        }
+      ] as DialogAction<boolean>[];
     }
   });
 
@@ -226,13 +232,13 @@ export class TokenRolloverComponent extends AbstractDialogComponent<{
       component: TokenCompleteEnrollmentComponent,
       data: this.enrolledDialogData()
     });
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       this.tokenService.tokenDetailResource.reload();
       if (result) {
         this.enrollResponse.set(result);
         this.enrolledDialogData.set({
           ...this.enrolledDialogData()!,
-          showEnrollData: false,
+          showEnrollData: false
         });
         this.handleVerifyEnrollment(result);
       }
@@ -246,7 +252,7 @@ export class TokenRolloverComponent extends AbstractDialogComponent<{
     this.enrolledDialogData.set({
       ...this.enrolledDialogData()!,
       response: enrollmentResponse
-    })
+    });
 
     if (!enrollmentResponse?.detail?.verify) {
       // No verify required, directly open last step dialog
@@ -258,7 +264,7 @@ export class TokenRolloverComponent extends AbstractDialogComponent<{
       component: TokenVerifyEnrollmentComponent,
       data: this.enrolledDialogData()
     });
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       this.tokenService.tokenDetailResource.reload();
       if (result) {
         this.enrollResponse.set(result);
@@ -276,14 +282,14 @@ export class TokenRolloverComponent extends AbstractDialogComponent<{
     this.enrolledDialogData.set({
       ...this.enrolledDialogData()!,
       response: response
-    })
+    });
 
     const dialogRef = this.dialogService.openDialog({
       component: TokenEnrollmentLastStepDialogComponent,
       data: this.enrolledDialogData()
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       this.tokenService.tokenDetailResource.reload();
     });
   }
@@ -301,7 +307,7 @@ export class TokenRolloverComponent extends AbstractDialogComponent<{
 
   updateAdditionalFormFields(event: { [key: string]: any }): void {
     // Remove all existing controls from the formGroup
-    Object.keys(this.formGroup.controls).forEach(key => {
+    Object.keys(this.formGroup.controls).forEach((key) => {
       this.formGroup.removeControl(key);
     });
     // Add new controls from the event
@@ -318,6 +324,4 @@ export class TokenRolloverComponent extends AbstractDialogComponent<{
   updateOnEnrollmentResponse(event: OnEnrollmentResponseFn) {
     this.onEnrollmentResponse.set(event);
   }
-
 }
-

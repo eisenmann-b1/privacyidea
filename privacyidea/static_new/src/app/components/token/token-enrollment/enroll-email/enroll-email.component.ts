@@ -146,7 +146,7 @@ export class EnrollEmailComponent implements OnInit {
   }
 
   onEmailConfigKeydown(event: KeyboardEvent) {
-    if (event.key === 'Enter' || event.key === ' ') {
+    if (event.key === "Enter" || event.key === " ") {
       this.goToEmailConfig();
     }
   }

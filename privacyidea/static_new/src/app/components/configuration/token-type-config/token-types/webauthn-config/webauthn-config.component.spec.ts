@@ -66,4 +66,3 @@ describe("WebauthnConfigComponent", () => {
     expect(component.formDataChange.emit).toHaveBeenCalledWith({ [WEBAUTHN_TRUST_ANCHOR_DIR]: "" });
   });
 });
-

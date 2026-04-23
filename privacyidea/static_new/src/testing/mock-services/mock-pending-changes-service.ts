@@ -22,9 +22,13 @@ export class MockPendingChangesService implements PendingChangesServiceInterface
   hasChangesMockValue = false;
   validChangesMockValue = true;
 
-  get hasChanges() {return this.hasChangesMockValue;};
+  get hasChanges() {
+    return this.hasChangesMockValue;
+  }
 
-  get validChanges() {return this.validChangesMockValue;};
+  get validChanges() {
+    return this.validChangesMockValue;
+  }
 
   registerHasChanges = jest.fn();
   clearAllRegistrations = jest.fn();

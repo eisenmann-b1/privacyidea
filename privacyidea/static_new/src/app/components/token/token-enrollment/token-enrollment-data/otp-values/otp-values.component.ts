@@ -29,14 +29,7 @@ import { MatIconButton } from "@angular/material/button";
 
 @Component({
   selector: "app-otp-values",
-  imports: [
-    MatAccordion,
-    MatExpansionPanel,
-    MatExpansionPanelHeader,
-    MatExpansionPanelTitle,
-    MatIcon,
-    MatIconButton
-  ],
+  imports: [MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatIcon, MatIconButton],
   templateUrl: "./otp-values.component.html",
   styleUrl: "./otp-values.component.scss"
 })

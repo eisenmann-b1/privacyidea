@@ -24,9 +24,7 @@ import { UserData } from "../../../../services/user/user.service";
 import { DialogWrapperComponent } from "../../../shared/dialog/dialog-wrapper/dialog-wrapper.component";
 import { TokenEnrollmentLastStepDialogComponent } from "./token-enrollment-last-step-dialog.component";
 import { TokenEnrollmentDataComponent } from "@components/token/token-enrollment/token-enrollment-data/token-enrollment-data.component";
-import {
-    TokenEnrolledTextComponent
-} from "@components/token/token-enrollment/token-enrolled-text/token-enrolled-text.component";
+import { TokenEnrolledTextComponent } from "@components/token/token-enrollment/token-enrolled-text/token-enrolled-text.component";
 
 export type TokenEnrollmentLastStepDialogData = {
   tokentype: TokenType;
@@ -41,12 +39,7 @@ export type TokenEnrollmentLastStepDialogData = {
 
 @Component({
   selector: "app-token-enrollment-last-step-dialog-self-service",
-    imports: [
-        MatButtonModule,
-        DialogWrapperComponent,
-        TokenEnrollmentDataComponent,
-        TokenEnrolledTextComponent
-    ],
+  imports: [MatButtonModule, DialogWrapperComponent, TokenEnrollmentDataComponent, TokenEnrolledTextComponent],
   templateUrl: "./token-enrollment-last-step-dialog.self-service.component.html",
   styleUrl: "./token-enrollment-last-step-dialog.component.scss"
 })

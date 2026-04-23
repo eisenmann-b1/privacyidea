@@ -101,4 +101,3 @@ describe("RadiusConfigComponent", () => {
     expect(component.updateFormData).toHaveBeenCalledWith(RADIUS_SERVER, "");
   });
 });
-

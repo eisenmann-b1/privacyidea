@@ -129,7 +129,9 @@ export class ContainerCreateComponent {
   generateQRCode: WritableSignal<boolean> = linkedSignal({
     source: this.containerService.selectedContainerType,
     computation: (containerType?: ContainerType) =>
-      containerType?.containerType === "smartphone" && this.authService.actionAllowed("container_register") && this.authService.actionAllowed("container_create")
+      containerType?.containerType === "smartphone" &&
+      this.authService.actionAllowed("container_register") &&
+      this.authService.actionAllowed("container_create")
   });
   passphrasePrompt = signal("");
   passphraseResponse = signal("");
@@ -188,7 +190,11 @@ export class ContainerCreateComponent {
           this.registrationDialog.closeAll();
           this.containerService.stopPolling();
 
-          if (container?.type === "smartphone" && this.authService.containerWizard().registration && this.authService.actionAllowed("container_register")) {
+          if (
+            container?.type === "smartphone" &&
+            this.authService.containerWizard().registration &&
+            this.authService.actionAllowed("container_register")
+          ) {
             let registrationCompletedDialogComponent: any = ContainerRegistrationCompletedDialogComponent;
             if (this.wizard) {
               registrationCompletedDialogComponent = ContainerRegistrationCompletedDialogWizardComponent;

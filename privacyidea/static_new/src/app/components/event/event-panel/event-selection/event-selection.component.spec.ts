@@ -30,10 +30,7 @@ describe("EventsSelectionComponent", () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [EventSelectionComponent],
-      providers: [
-        provideHttpClient(),
-        { provide: EventService, useClass: MockEventService }
-      ]
+      providers: [provideHttpClient(), { provide: EventService, useClass: MockEventService }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(EventSelectionComponent);

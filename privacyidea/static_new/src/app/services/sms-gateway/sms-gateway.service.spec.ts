@@ -39,7 +39,7 @@ describe("SmsGatewayService", () => {
     };
     const notificationServiceMock = {
       openSnackBar: jest.fn(),
-      handleResourceError: jest.fn(),
+      handleResourceError: jest.fn()
     };
 
     TestBed.configureTestingModule({
@@ -89,7 +89,6 @@ describe("SmsGatewayService", () => {
   });
 
   describe("smsGateways", () => {
-
     it("smsGateways falls back to default when resource empty", () => {
       expect(service.smsGateways()).toEqual([]);
     });
@@ -116,7 +115,8 @@ describe("SmsGatewayService", () => {
       const req = httpMock.expectOne((r) => r.url === "/smsgateway/");
       expect(req.request.method).toBe("GET");
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403, statusText: "Permission denied"
+        status: 403,
+        statusText: "Permission denied"
       });
       await Promise.resolve();
 

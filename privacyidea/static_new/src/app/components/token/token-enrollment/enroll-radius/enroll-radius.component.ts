@@ -128,7 +128,9 @@ export class EnrollRadiusComponent implements OnInit {
   private _setInitialFormValues() {
     if (!!this.enrollmentData()) {
       this.radiusUserControl.setValue(this.enrollmentData()?.radiusUser ?? "", { emitEvent: false });
-      this.radiusServerConfigurationControl.setValue(this.enrollmentData()?.radiusServerConfiguration ?? "", { emitEvent: false });
+      this.radiusServerConfigurationControl.setValue(this.enrollmentData()?.radiusServerConfiguration ?? "", {
+        emitEvent: false
+      });
     }
   }
 
@@ -162,11 +164,11 @@ export class EnrollRadiusComponent implements OnInit {
   };
 
   goToRadiusConfig() {
-    this.contentService.router.navigate([ROUTE_PATHS.CONFIGURATION_TOKENTYPES], { fragment: 'radius' });
+    this.contentService.router.navigate([ROUTE_PATHS.CONFIGURATION_TOKENTYPES], { fragment: "radius" });
   }
 
   onRadiusConfigKeydown(event: KeyboardEvent) {
-    if (event.key === 'Enter' || event.key === ' ') {
+    if (event.key === "Enter" || event.key === " ") {
       this.goToRadiusConfig();
     }
   }

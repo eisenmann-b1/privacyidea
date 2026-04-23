@@ -165,10 +165,7 @@ describe("ThemeService", () => {
     service.setTheme("system");
     service.setTheme("dark");
 
-    expect((mql as any).removeEventListener).toHaveBeenCalledWith(
-      "change",
-      expect.any(Function)
-    );
+    expect((mql as any).removeEventListener).toHaveBeenCalledWith("change", expect.any(Function));
   });
 
   it("always writes the theme to localStorage", () => {

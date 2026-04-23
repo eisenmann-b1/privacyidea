@@ -59,8 +59,7 @@ export class SystemDocumentationDialogComponent implements AfterViewInit {
       if (element) {
         try {
           element.setSelectionRange(0, 0);
-        } catch {
-        }
+        } catch {}
         element.scrollTop = 0;
       }
     });

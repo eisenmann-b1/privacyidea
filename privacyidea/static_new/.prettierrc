@@ -16,11 +16,7 @@
     "embeddedLanguageFormatting": "auto",
     "singleAttributePerLine": true,
     "quoteProps": "as-needed",
-    "jsxBracketSameLine": false,
     "insertPragma": false,
     "requirePragma": false,
-    "rangeStart": 0,
-    "pluginSearchDirs": [
-        "."
-    ]
+    "rangeStart": 0
 }

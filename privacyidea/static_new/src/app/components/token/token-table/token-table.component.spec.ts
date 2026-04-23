@@ -123,10 +123,10 @@ describe("TokenTableComponent + TokenTableSelfServiceComponent", () => {
   it("isAllSelected/toggleAllRows/toggleRow work as expected", () => {
     const tokens = [{ serial: "T-1" } as any, { serial: "T-2" } as any];
     tokenService.tokenResourceValue.set({
-        tokens,
-        count: 2,
-        current: 1
-      });
+      tokens,
+      count: 2,
+      current: 1
+    });
     tableFixture.detectChanges();
 
     expect(table.isAllSelected()).toBe(false);

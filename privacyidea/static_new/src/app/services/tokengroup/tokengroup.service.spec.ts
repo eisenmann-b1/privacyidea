@@ -89,7 +89,6 @@ describe("TokengroupService", () => {
   });
 
   describe("tokengroupResource / tokengroups", () => {
-
     it("tokengroups falls back to default when resource empty", () => {
       expect(service.tokengroups()).toEqual([]);
     });
@@ -100,11 +99,11 @@ describe("TokengroupService", () => {
 
       const req = httpMock.expectOne((r) => r.url === "/tokengroup/");
       expect(req.request.method).toBe("GET");
-      const tokenGroups = {test: { description: "", id: 1 }};
+      const tokenGroups = { test: { description: "", id: 1 } };
       req.flush(MockPiResponse.fromValue(tokenGroups));
       await Promise.resolve();
 
-      expect(service.tokengroups()).toEqual([{groupname: "test", description: "", id: 1 }]);
+      expect(service.tokengroups()).toEqual([{ groupname: "test", description: "", id: 1 }]);
     });
 
     it("should handle error state from smsGatewayResource", async () => {
@@ -114,7 +113,8 @@ describe("TokengroupService", () => {
       const req = httpMock.expectOne((r) => r.url === "/tokengroup/");
       expect(req.request.method).toBe("GET");
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403, statusText: "Permission denied"
+        status: 403,
+        statusText: "Permission denied"
       });
       await Promise.resolve();
 

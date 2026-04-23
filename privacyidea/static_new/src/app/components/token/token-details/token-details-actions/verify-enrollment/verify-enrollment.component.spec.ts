@@ -61,14 +61,18 @@ describe("VerifyEnrollmentComponent", () => {
       verify: "123456"
     });
     expect(tokenService.tokenDetailResource.reload).toHaveBeenCalled();
-    expect(notificationService.openSnackBar).toHaveBeenCalledWith(expect.stringContaining("Token verified successfully!"));
+    expect(notificationService.openSnackBar).toHaveBeenCalledWith(
+      expect.stringContaining("Token verified successfully!")
+    );
   });
 
   it("should not call openSnackBar if rollout_state is not enrolled", () => {
-    jest.spyOn(tokenService, "verifyToken").mockReturnValue(of({
-      detail: { serial: "ABC123", rollout_state: "pending" },
-      result: { status: true }
-    }));
+    jest.spyOn(tokenService, "verifyToken").mockReturnValue(
+      of({
+        detail: { serial: "ABC123", rollout_state: "pending" },
+        result: { status: true }
+      })
+    );
     const snackSpy = jest.spyOn(notificationService, "openSnackBar");
     component.otpControl.setValue("654321");
     component.verifyOTP();

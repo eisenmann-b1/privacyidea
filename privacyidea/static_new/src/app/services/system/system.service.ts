@@ -133,7 +133,7 @@ export class SystemService implements SystemServiceInterface {
   });
 
   caConnectors: WritableSignal<CaConnectors> = linkedSignal({
-    source: () => this.caConnectorResource.hasValue() ? this.caConnectorResource.value() : undefined,
+    source: () => (this.caConnectorResource.hasValue() ? this.caConnectorResource.value() : undefined),
     computation: (caConnectorResource, previous) => {
       const caConnectors = caConnectorResource?.result?.value;
       return caConnectors ?? previous?.value ?? [];
@@ -171,65 +171,75 @@ export class SystemService implements SystemServiceInterface {
   });
 
   saveSystemConfig(config: any): Observable<PiResponse<any>> {
-    return this.http.post<PiResponse<any>>(this.systemBaseUrl + "setConfig", config, {
-      headers: this.authService.getHeaders()
-    }).pipe(
-      catchError((error) => {
-        console.error("Failed to save system config.", error);
-        const message = error.error?.result?.error?.message || "";
-        this.notificationService.openSnackBar("Failed to save system config. " + message);
-        return throwError(() => error);
+    return this.http
+      .post<PiResponse<any>>(this.systemBaseUrl + "setConfig", config, {
+        headers: this.authService.getHeaders()
       })
-    );
+      .pipe(
+        catchError((error) => {
+          console.error("Failed to save system config.", error);
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar("Failed to save system config. " + message);
+          return throwError(() => error);
+        })
+      );
   }
 
   deleteSystemConfig(key: string): Observable<PiResponse<any>> {
-    return this.http.delete<PiResponse<any>>(`${this.systemBaseUrl}${key}`, { headers: this.authService.getHeaders() }).pipe(
-      catchError((error) => {
-        console.error("Failed to delete system config.", error);
-        const message = error.error?.result?.error?.message || "";
-        this.notificationService.openSnackBar("Failed to delete system config. " + message);
-        return throwError(() => error);
-      })
-    );
+    return this.http
+      .delete<PiResponse<any>>(`${this.systemBaseUrl}${key}`, { headers: this.authService.getHeaders() })
+      .pipe(
+        catchError((error) => {
+          console.error("Failed to delete system config.", error);
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar("Failed to delete system config. " + message);
+          return throwError(() => error);
+        })
+      );
   }
 
   deleteUserCache(): Observable<PiResponse<any>> {
-    return this.http.delete<PiResponse<any>>(`${this.systemBaseUrl}user-cache`, {
-      headers: this.authService.getHeaders()
-    }).pipe(
-      catchError((error) => {
-        console.error("Failed to delete user cache.", error);
-        const message = error.error?.result?.error?.message || "";
-        this.notificationService.openSnackBar("Failed to delete user cache. " + message);
-        return throwError(() => error);
+    return this.http
+      .delete<PiResponse<any>>(`${this.systemBaseUrl}user-cache`, {
+        headers: this.authService.getHeaders()
       })
-    );
+      .pipe(
+        catchError((error) => {
+          console.error("Failed to delete user cache.", error);
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar("Failed to delete user cache. " + message);
+          return throwError(() => error);
+        })
+      );
   }
 
   loadSmtpIdentifiers(): Observable<PiResponse<any>> {
-    return this.http.get<PiResponse<any>>(`${this.systemBaseUrl}names/smtp`, {
-      headers: this.authService.getHeaders()
-    }).pipe(
-      catchError((error) => {
-        console.error("Failed to load SMTP identifiers.", error);
-        const message = error.error?.result?.error?.message || "";
-        this.notificationService.openSnackBar("Failed to load SMTP identifiers. " + message);
-        return throwError(() => error);
+    return this.http
+      .get<PiResponse<any>>(`${this.systemBaseUrl}names/smtp`, {
+        headers: this.authService.getHeaders()
       })
-    );
+      .pipe(
+        catchError((error) => {
+          console.error("Failed to load SMTP identifiers.", error);
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar("Failed to load SMTP identifiers. " + message);
+          return throwError(() => error);
+        })
+      );
   }
 
   getDocumentation(): Observable<string> {
-    return this.http.get(`${this.systemBaseUrl}documentation`, {
-      headers: this.authService.getHeaders(),
-      responseType: "text"
-    }).pipe(
-      catchError((error) => {
-        console.error("Failed to get documentation.", error);
-        this.notificationService.openSnackBar("Failed to get documentation.");
-        return throwError(() => error);
+    return this.http
+      .get(`${this.systemBaseUrl}documentation`, {
+        headers: this.authService.getHeaders(),
+        responseType: "text"
       })
-    );
+      .pipe(
+        catchError((error) => {
+          console.error("Failed to get documentation.", error);
+          this.notificationService.openSnackBar("Failed to get documentation.");
+          return throwError(() => error);
+        })
+      );
   }
 }

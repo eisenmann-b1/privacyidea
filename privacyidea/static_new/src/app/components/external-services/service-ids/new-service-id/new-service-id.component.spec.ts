@@ -49,7 +49,7 @@ describe("NewServiceIdComponent", () => {
     };
 
     dialogMock = {
-      open: jest.fn().mockReturnValue({ afterClosed: () => of(true) }),
+      open: jest.fn().mockReturnValue({ afterClosed: () => of(true) })
     };
 
     await TestBed.configureTestingModule({
@@ -61,15 +61,15 @@ describe("NewServiceIdComponent", () => {
         { provide: MatDialogRef, useValue: dialogRefMock },
         { provide: ServiceIdService, useClass: MockServiceIdService },
         { provide: PendingChangesService, useClass: MockPendingChangesService },
-        { provide: DialogService, useClass: MockDialogService },
+        { provide: DialogService, useClass: MockDialogService }
       ]
-    }).overrideComponent(NewServiceIdComponent, {
-      add: {
-        providers: [
-          { provide: MatDialog, useValue: dialogMock }
-        ]
-      }
-    }).compileComponents();
+    })
+      .overrideComponent(NewServiceIdComponent, {
+        add: {
+          providers: [{ provide: MatDialog, useValue: dialogMock }]
+        }
+      })
+      .compileComponents();
 
     serviceIdServiceMock = TestBed.inject(ServiceIdService);
     pendingChangesService = TestBed.inject(PendingChangesService) as unknown as MockPendingChangesService;
@@ -168,7 +168,7 @@ describe("NewServiceIdComponent", () => {
 
       component.onCancel();
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(pendingChangesService.clearAllRegistrations).toHaveBeenCalled();
       expect(dialogRefMock.close).toHaveBeenCalled();
@@ -187,7 +187,7 @@ describe("NewServiceIdComponent", () => {
 
       component.onCancel();
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(pendingChangesService.clearAllRegistrations).toHaveBeenCalled();
       expect(dialogRefMock.close).toHaveBeenCalled();
@@ -207,7 +207,7 @@ describe("NewServiceIdComponent", () => {
 
       component.onCancel();
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
       expect(dialogRefMock.close).not.toHaveBeenCalled();
@@ -222,7 +222,7 @@ describe("NewServiceIdComponent", () => {
 
       component.onCancel();
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(pendingChangesService.save).not.toHaveBeenCalled();
       expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
@@ -241,7 +241,7 @@ describe("NewServiceIdComponent", () => {
 
       component.onCancel();
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(pendingChangesService.clearAllRegistrations).not.toHaveBeenCalled();
       expect(dialogRefMock.close).not.toHaveBeenCalled();

@@ -104,4 +104,3 @@ describe("TotpConfigComponent", () => {
     expect(component.updateFormData).toHaveBeenCalledWith(TOTP_TIME_STEP, "");
   });
 });
-

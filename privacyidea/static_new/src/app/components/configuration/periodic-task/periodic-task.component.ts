@@ -33,13 +33,7 @@ import { AuthService } from "../../../services/auth/auth.service";
   selector: "app-periodic-task",
   standalone: true,
   templateUrl: "./periodic-task.component.html",
-  imports: [
-    ScrollToTopDirective,
-    MatAccordion,
-    PeriodicTaskPanelComponent,
-    PeriodicTaskPanelNewComponent,
-    MatDivider
-  ],
+  imports: [ScrollToTopDirective, MatAccordion, PeriodicTaskPanelComponent, PeriodicTaskPanelNewComponent, MatDivider],
   styleUrls: ["./periodic-task.component.scss"]
 })
 export class PeriodicTaskComponent {
@@ -47,7 +41,10 @@ export class PeriodicTaskComponent {
   protected readonly authService = inject(AuthService);
 
   periodicTasks: WritableSignal<PeriodicTask[] | undefined> = linkedSignal({
-    source: () => this.periodicTaskService.periodicTasksResource.hasValue() ? this.periodicTaskService.periodicTasksResource.value() : undefined,
+    source: () =>
+      this.periodicTaskService.periodicTasksResource.hasValue()
+        ? this.periodicTaskService.periodicTasksResource.value()
+        : undefined,
     computation: (periodicTasksResource) => {
       if (!periodicTasksResource) return [];
       return periodicTasksResource.result?.value ?? [];

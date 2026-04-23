@@ -34,29 +34,38 @@
     <div class="detail-row">
       <span
         class="label"
-        i18n>Hostname:</span>
+        i18n
+        >Hostname:</span
+      >
       <span class="value">{{ data.hostname }}</span>
     </div>
     <div class="detail-row">
       <span
         class="label"
-        i18n>IP Address:</span>
+        i18n
+        >IP Address:</span
+      >
       <span class="value">{{ data.ip }}</span>
     </div>
     <div class="detail-row">
       <span
         class="label"
-        i18n>Machine ID:</span>
+        i18n
+        >Machine ID:</span
+      >
       <span class="value">{{ data.id }}</span>
     </div>
     <div class="detail-row">
       <span
         class="label"
-        i18n>Machine Resolver:</span>
+        i18n
+        >Machine Resolver:</span
+      >
       <div class="flex-row flex-nowrap ali-center">
         <a
           (click)="onMachineResolverClick(data.resolver_name)"
-          class="value">{{ data.resolver_name }}
+          class="value"
+          >{{ data.resolver_name }}
         </a>
         <app-copy-button [copyText]="data.resolver_name" />
       </div>
@@ -66,7 +75,8 @@
   <div class="filter-paginator-container">
     <h3
       class="margin-0"
-      i18n>Tokens and Applications
+      i18n>
+      Tokens and Applications
     </h3>
     <mat-paginator
       [pageSizeOptions]="[5, 10, 20]"
@@ -83,7 +93,8 @@
         <th
           *matHeaderCellDef
           i18n
-          mat-header-cell> Serial
+          mat-header-cell>
+          Serial
         </th>
         <td
           *matCellDef="let token"
@@ -104,11 +115,13 @@
         <th
           *matHeaderCellDef
           i18n
-          mat-header-cell> Application
+          mat-header-cell>
+          Application
         </th>
         <td
           *matCellDef="let token"
-          mat-cell> {{ token.application }}
+          mat-cell>
+          {{ token.application }}
         </td>
       </ng-container>
 
@@ -116,7 +129,8 @@
         <th
           *matHeaderCellDef
           i18n
-          mat-header-cell> Options
+          mat-header-cell>
+          Options
         </th>
         <td
           *matCellDef="let token"
@@ -128,10 +142,9 @@
               </div>
             }
           } @else {
-            @if (token.application === 'ssh') {
+            @if (token.application === "ssh") {
               <div class="flex-column margin-top-16 gap-8">
-                <mat-form-field
-                  appearance="fill">
+                <mat-form-field appearance="fill">
                   <mat-label i18n>Service ID</mat-label>
                   <mat-select [(ngModel)]="editedOptions[token.id]['service_id']">
                     @for (v of applicationsDef().ssh.options.sshkey.service_id.value; track v) {
@@ -141,8 +154,7 @@
                     }
                   </mat-select>
                 </mat-form-field>
-                <mat-form-field
-                  appearance="fill">
+                <mat-form-field appearance="fill">
                   <mat-label i18n>User</mat-label>
                   <input
                     [(ngModel)]="editedOptions[token.id]['user']"
@@ -160,7 +172,8 @@
         <th
           *matHeaderCellDef
           i18n
-          mat-header-cell> Actions
+          mat-header-cell>
+          Actions
         </th>
         <td
           *matCellDef="let token"
@@ -207,7 +220,7 @@
         *matHeaderRowDef="displayedColumns"
         mat-header-row></tr>
       <tr
-        *matRowDef="let row; columns: displayedColumns;"
+        *matRowDef="let row; columns: displayedColumns"
         mat-row></tr>
     </table>
   </div>
@@ -266,6 +279,7 @@
   <button
     (click)="close()"
     i18n
-    mat-button>Close
+    mat-button>
+    Close
   </button>
 </mat-dialog-actions>

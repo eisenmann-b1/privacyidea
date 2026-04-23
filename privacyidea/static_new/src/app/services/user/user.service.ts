@@ -235,7 +235,7 @@ export class UserService implements UserServiceInterface {
 
   apiUserFilter = signal(new FilterValue());
 
-  pageSize = linkedSignal(() => this.authService.userPageSize() > 0 ? this.authService.userPageSize() : 10);
+  pageSize = linkedSignal(() => (this.authService.userPageSize() > 0 ? this.authService.userPageSize() : 10));
 
   pageIndex = linkedSignal({
     source: () => ({
@@ -468,17 +468,19 @@ export class UserService implements UserServiceInterface {
       key,
       value
     };
-    return this.http.post<PiResponse<number>>(this.baseUrl + "attribute", null, {
-      headers: this.authService.getHeaders(),
-      params
-    }).pipe(
-      catchError((error) => {
-        console.error("Failed to set user attribute.", error);
-        const message = error.error?.result?.error?.message || "";
-        this.notificationService.openSnackBar($localize`Failed to set user attribute. ` + message);
-        return of(undefined as any);
+    return this.http
+      .post<PiResponse<number>>(this.baseUrl + "attribute", null, {
+        headers: this.authService.getHeaders(),
+        params
       })
-    );
+      .pipe(
+        catchError((error) => {
+          console.error("Failed to set user attribute.", error);
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar($localize`Failed to set user attribute. ` + message);
+          return of(undefined as any);
+        })
+      );
   }
 
   deleteUserAttribute(key: string) {
@@ -505,16 +507,19 @@ export class UserService implements UserServiceInterface {
       delete (payload as any)["username"];
     }
     payload["resolver"] = resolver;
-    return this.http.post<PiResponse<number>>(this.baseUrl, payload, {
-      headers: this.authService.getHeaders()
-    }).pipe(map((response) => response.result?.status || false),
-      catchError((error) => {
-        console.warn("Failed to create user", error);
-        const message = error.error?.result?.error?.message || "";
-        this.notificationService.openSnackBar($localize`Failed to create user ${userData.username}. ` + message);
-        return of(false);
+    return this.http
+      .post<PiResponse<number>>(this.baseUrl, payload, {
+        headers: this.authService.getHeaders()
       })
-    );
+      .pipe(
+        map((response) => response.result?.status || false),
+        catchError((error) => {
+          console.warn("Failed to create user", error);
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar($localize`Failed to create user ${userData.username}. ` + message);
+          return of(false);
+        })
+      );
   }
 
   editUser(resolver: string, userData: EditUserData) {
@@ -525,29 +530,27 @@ export class UserService implements UserServiceInterface {
       delete (payload as any)["username"];
     }
     payload["resolver"] = resolver;
-    return this.http.put<PiResponse<number>>(this.baseUrl, payload, { headers: this.authService.getHeaders() })
-      .pipe(
-        map((response) => response.result?.status || false),
-        catchError((error) => {
-          console.warn("Failed to update user", error);
-          const message = error.error?.result?.error?.message || "";
-          this.notificationService.openSnackBar($localize`Failed to update user ${userData.username}. ` + message);
-          return of(false);
-        })
-      );
+    return this.http.put<PiResponse<number>>(this.baseUrl, payload, { headers: this.authService.getHeaders() }).pipe(
+      map((response) => response.result?.status || false),
+      catchError((error) => {
+        console.warn("Failed to update user", error);
+        const message = error.error?.result?.error?.message || "";
+        this.notificationService.openSnackBar($localize`Failed to update user ${userData.username}. ` + message);
+        return of(false);
+      })
+    );
   }
 
   deleteUser(resolver: string, username: string): Observable<boolean> {
     const url = this.baseUrl + encodeURIComponent(resolver) + "/" + encodeURIComponent(username);
-    return this.http.delete<PiResponse<any>>(url, { headers: this.authService.getHeaders() })
-      .pipe(
-        map((response) => response.result?.status || false),
-        catchError((error) => {
-          console.warn("Failed to delete user", error);
-          const message = error.error?.result?.error?.message || "";
-          this.notificationService.openSnackBar($localize`Failed to delete user ${username}. ` + message);
-          return of(false);
-        })
-      );
+    return this.http.delete<PiResponse<any>>(url, { headers: this.authService.getHeaders() }).pipe(
+      map((response) => response.result?.status || false),
+      catchError((error) => {
+        console.warn("Failed to delete user", error);
+        const message = error.error?.result?.error?.message || "";
+        this.notificationService.openSnackBar($localize`Failed to delete user ${username}. ` + message);
+        return of(false);
+      })
+    );
   }
 }

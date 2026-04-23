@@ -132,7 +132,8 @@ describe("SessionTimerService", () => {
 
     jest.advanceTimersByTime(2000);
     expect(notify.openSnackBar).toHaveBeenCalledWith(
-      "Your session has expired. You will be logged out and redirected to the login page.");
+      "Your session has expired. You will be logged out and redirected to the login page."
+    );
     jest.advanceTimersByTime(1500);
     expect(authService.logout).toHaveBeenCalled();
     expect(clearIntervalSpy).toHaveBeenCalled();
@@ -164,7 +165,6 @@ describe("SessionTimerService", () => {
     expect(after3s).toBeGreaterThanOrEqual(6500);
   });
 
-
   it("shows a 30s warning when remainingTime enters the 30–31s window", async () => {
     authService.logoutTimeS.set(31);
     service.startTimer();
@@ -180,7 +180,6 @@ describe("SessionTimerService", () => {
 
     expect(snackSpy).toHaveBeenCalledWith("Session will expire in 30 seconds.");
   });
-
 
   it("remainingTime counts down relative to startTime when timer restarted", () => {
     authService.logoutTimeS.set(5);

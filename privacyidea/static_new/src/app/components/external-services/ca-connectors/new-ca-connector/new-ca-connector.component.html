@@ -34,7 +34,6 @@
   <form
     [formGroup]="caConnectorForm"
     class="ca-connector-form">
-
     <div class="flex-row gap-16">
       <mat-form-field
         appearance="fill"
@@ -49,7 +48,7 @@
             placeholder="MyConnector1"
             required />
         </app-clearable-input>
-        @if (caConnectorForm.get('connectorname')?.hasError('required')) {
+        @if (caConnectorForm.get("connectorname")?.hasError("required")) {
           <mat-error i18n>Connector Name is <strong>required</strong></mat-error>
         }
       </mat-form-field>
@@ -63,20 +62,22 @@
           required>
           <mat-option
             i18n
-            value="local">Local
+            value="local"
+            >Local
           </mat-option>
           <mat-option
             i18n
-            value="microsoft">Microsoft
+            value="microsoft"
+            >Microsoft
           </mat-option>
         </mat-select>
-        @if (caConnectorForm.get('type')?.hasError('required')) {
+        @if (caConnectorForm.get("type")?.hasError("required")) {
           <mat-error i18n>Type is <strong>required</strong></mat-error>
         }
       </mat-form-field>
     </div>
 
-    @if (caConnectorForm.get('type')?.value === 'local') {
+    @if (caConnectorForm.get("type")?.value === "local") {
       <h4 i18n>Base Config</h4>
 
       <div class="flex-row gap-16 margin-bottom-16">
@@ -93,7 +94,7 @@
               placeholder="/etc/cacert.pem"
               [required]="caConnectorForm.get('type')?.value === 'local'" />
           </app-clearable-input>
-          @if (caConnectorForm.get('cacert')?.hasError('required')) {
+          @if (caConnectorForm.get("cacert")?.hasError("required")) {
             <mat-error i18n>CA Certificate is <strong>required</strong></mat-error>
           }
         </mat-form-field>
@@ -111,13 +112,12 @@
               placeholder="/etc/cakey.pem"
               [required]="caConnectorForm.get('type')?.value === 'local'" />
           </app-clearable-input>
-          @if (caConnectorForm.get('cakey')?.hasError('required')) {
+          @if (caConnectorForm.get("cakey")?.hasError("required")) {
             <mat-error i18n>CA Key is <strong>required</strong></mat-error>
           }
         </mat-form-field>
       </div>
       <div class="flex-row gap-16 margin-bottom-16">
-
         <mat-form-field
           appearance="fill"
           class="input-width-l">
@@ -131,7 +131,7 @@
               placeholder="/etc/openssl.cnf"
               [required]="caConnectorForm.get('type')?.value === 'local'" />
           </app-clearable-input>
-          @if (caConnectorForm.get('openssl.cnf')?.hasError('required')) {
+          @if (caConnectorForm.get("openssl.cnf")?.hasError("required")) {
             <mat-error i18n>OpenSSL Config File is <strong>required</strong></mat-error>
           }
         </mat-form-field>
@@ -197,7 +197,8 @@
 
       <h4
         class="margin-top-32"
-        i18n>CRL Configuration
+        i18n>
+        CRL Configuration
       </h4>
       <mat-form-field
         appearance="fill"
@@ -211,8 +212,8 @@
             matInput
             placeholder="/opt/myCA/certs/crl.pem" />
         </app-clearable-input>
-        <mat-hint i18n>This is the CRL file, which is written when a certificate is revoked or the CRL is created
-                       otherwise.
+        <mat-hint i18n
+          >This is the CRL file, which is written when a certificate is revoked or the CRL is created otherwise.
         </mat-hint>
       </mat-form-field>
 
@@ -241,7 +242,7 @@
           <mat-hint i18n>Number of days a new CRL should be generated before the current CRL expires.</mat-hint>
         </mat-form-field>
       </div>
-    } @else if (caConnectorForm.get('type')?.value === 'microsoft') {
+    } @else if (caConnectorForm.get("type")?.value === "microsoft") {
       <h4 i18n>Base Config</h4>
       <div class="flex-row gap-16">
         <mat-form-field
@@ -257,7 +258,7 @@
               placeholder="example.net"
               [required]="caConnectorForm.get('type')?.value === 'microsoft'" />
           </app-clearable-input>
-          @if (caConnectorForm.get('hostname')?.hasError('required')) {
+          @if (caConnectorForm.get("hostname")?.hasError("required")) {
             <mat-error i18n>Hostname is <strong>required</strong></mat-error>
           }
         </mat-form-field>
@@ -272,7 +273,7 @@
             placeholder="1234"
             [required]="caConnectorForm.get('type')?.value === 'microsoft'"
             type="number" />
-          @if (caConnectorForm.get('port')?.hasError('required')) {
+          @if (caConnectorForm.get("port")?.hasError("required")) {
             <mat-error i18n>Port is <strong>required</strong></mat-error>
           }
         </mat-form-field>
@@ -280,16 +281,18 @@
 
       <mat-checkbox
         formControlName="http_proxy"
-        i18n>Use HTTP proxy
+        i18n
+        >Use HTTP proxy
       </mat-checkbox>
 
       <h4 i18n>SSL Config</h4>
       <mat-checkbox
         formControlName="use_ssl"
-        i18n>Use SSL
+        i18n
+        >Use SSL
       </mat-checkbox>
 
-      @if (caConnectorForm.get('use_ssl')?.value) {
+      @if (caConnectorForm.get("use_ssl")?.value) {
         <div class="flex-row gap-16">
           <mat-form-field
             appearance="fill"
@@ -365,7 +368,7 @@
                 <mat-option [value]="ca">{{ ca }}</mat-option>
               }
             </mat-select>
-            @if (caConnectorForm.get('ca')?.hasError('required')) {
+            @if (caConnectorForm.get("ca")?.hasError("required")) {
               <mat-error i18n>Domain CA is <strong>required</strong></mat-error>
             }
           </mat-form-field>

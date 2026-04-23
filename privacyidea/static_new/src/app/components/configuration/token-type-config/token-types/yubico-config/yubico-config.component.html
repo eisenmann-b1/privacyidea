@@ -25,13 +25,14 @@
   <div class="panel-content expansion-well">
     <p i18n>The Yubico Token is a Yubikey that is registered with the YubiCloud service.</p>
     <p i18n>The Yubikey emits a 44 character one time password.</p>
-    <p i18n>The first 12 characters are a unique ID which is used to bind the device to the user.
-    </p>
+    <p i18n>The first 12 characters are a unique ID which is used to bind the device to the user.</p>
     <p i18n>The authentication request is forwarded to the YubiCloud.</p>
-    <p i18n>For accessing the YubiCloud you need to enter an API Client ID and an API Key, which you can request
+    <p i18n>
+      For accessing the YubiCloud you need to enter an API Client ID and an API Key, which you can request
       <a
         href="https://upgrade.yubico.com/getapikey/"
-        target="_blank">here
+        target="_blank"
+        >here
       </a>
     </p>
 
@@ -47,8 +48,8 @@
           [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="API Key"
-          required>
-        @if (apiKeyInput.errors?.['required']) {
+          required />
+        @if (apiKeyInput.errors?.["required"]) {
           <mat-error i18n>API Key is <strong>required</strong></mat-error>
         }
       </mat-form-field>
@@ -64,8 +65,8 @@
           [ngModelOptions]="{ standalone: true }"
           matInput
           placeholder="The client ID"
-          required>
-        @if (clientIdInput.errors?.['required']) {
+          required />
+        @if (clientIdInput.errors?.["required"]) {
           <mat-error i18n>API Client ID is <strong>required</strong></mat-error>
         }
       </mat-form-field>
@@ -84,8 +85,8 @@
           matInput
           placeholder="https://api.yubico.com/wsapi/2.0/verify"
           required
-          type="url">
-        @if (urlInput.errors?.['required']) {
+          type="url" />
+        @if (urlInput.errors?.["required"]) {
           <mat-error i18n>Yubico URL is <strong>required</strong></mat-error>
         }
       </mat-form-field>

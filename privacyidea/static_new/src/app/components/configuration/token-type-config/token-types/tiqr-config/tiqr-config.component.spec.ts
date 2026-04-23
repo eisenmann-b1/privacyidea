@@ -21,7 +21,10 @@ import { TiqrConfigComponent } from "@components/configuration/token-type-config
 import { provideRouter } from "@angular/router";
 import { provideAnimations } from "@angular/platform-browser/animations";
 import {
-  TIQR_AUTH_SERVER, TIQR_INFO_URL, TIQR_LOGO_URL, TIQR_OCRASUITE,
+  TIQR_AUTH_SERVER,
+  TIQR_INFO_URL,
+  TIQR_LOGO_URL,
+  TIQR_OCRASUITE,
   TIQR_REG_SERVER,
   TIQR_SERVICE_DISPLAYNAME,
   TIQR_SERVICE_IDENTIFIER
@@ -95,7 +98,7 @@ describe("TiqrConfigComponent", () => {
 
   it("should handle empty field values", () => {
     jest.spyOn(component.formDataChange, "emit");
-    
+
     component.updateFormData(TIQR_REG_SERVER, "");
     expect(component.formDataChange.emit).toHaveBeenCalledWith({ [TIQR_REG_SERVER]: "" });
 
@@ -103,4 +106,3 @@ describe("TiqrConfigComponent", () => {
     expect(component.formDataChange.emit).toHaveBeenCalledWith({ [TIQR_SERVICE_DISPLAYNAME]: "" });
   });
 });
-

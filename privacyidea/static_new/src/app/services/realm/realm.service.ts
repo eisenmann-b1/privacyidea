@@ -224,32 +224,36 @@ export class RealmService implements RealmServiceInterface {
       };
     }
 
-    return this.http.post<PiResponse<any>>(url, body, {
-      headers: this.authService.getHeaders()
-    }).pipe(
-      catchError((error) => {
-        console.error("Failed to create realm.", error);
-        const message = error.error?.result?.error?.message || "";
-        this.notificationService.openSnackBar("Failed to create realm. " + message);
-        return throwError(() => error);
+    return this.http
+      .post<PiResponse<any>>(url, body, {
+        headers: this.authService.getHeaders()
       })
-    );
+      .pipe(
+        catchError((error) => {
+          console.error("Failed to create realm.", error);
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar("Failed to create realm. " + message);
+          return throwError(() => error);
+        })
+      );
   }
 
   deleteRealm(realm: string): Observable<PiResponse<number | any>> {
     const encodedRealm = encodeURIComponent(realm);
     const url = `${environment.proxyUrl}/realm/${encodedRealm}`;
 
-    return this.http.delete<PiResponse<number | any>>(url, {
-      headers: this.authService.getHeaders()
-    }).pipe(
-      catchError((error) => {
-        console.error("Failed to delete realm.", error);
-        const message = error.error?.result?.error?.message || "";
-        this.notificationService.openSnackBar("Failed to delete realm. " + message);
-        return throwError(() => error);
+    return this.http
+      .delete<PiResponse<number | any>>(url, {
+        headers: this.authService.getHeaders()
       })
-    );
+      .pipe(
+        catchError((error) => {
+          console.error("Failed to delete realm.", error);
+          const message = error.error?.result?.error?.message || "";
+          this.notificationService.openSnackBar("Failed to delete realm. " + message);
+          return throwError(() => error);
+        })
+      );
   }
 
   setDefaultRealm(realm: string): Observable<PiResponse<number | any>> {

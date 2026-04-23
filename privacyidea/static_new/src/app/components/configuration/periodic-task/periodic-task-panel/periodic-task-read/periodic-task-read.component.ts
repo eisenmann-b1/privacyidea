@@ -26,10 +26,7 @@ import { parseBooleanValue } from "../../../../../utils/parse-boolean-value";
   selector: "app-periodic-task-read",
   templateUrl: "./periodic-task-read.component.html",
   styleUrl: "./periodic-task-read.component.scss",
-  imports: [
-    DatePipe,
-    MatIcon
-  ]
+  imports: [DatePipe, MatIcon]
 })
 export class PeriodicTaskReadComponent {
   task = input<PeriodicTask>(EMPTY_PERIODIC_TASK);

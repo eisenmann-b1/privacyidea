@@ -103,7 +103,6 @@ describe("SmtpService", () => {
   });
 
   describe("smtpServers", () => {
-
     it("smsGateways falls back to default when resource empty", () => {
       expect(service.smtpServers()).toEqual([]);
     });
@@ -115,7 +114,7 @@ describe("SmtpService", () => {
       const req = httpMock.expectOne((r) => r.url === "/smtpserver/");
       expect(req.request.method).toBe("GET");
       const smtpServers = {
-        "test": {
+        test: {
           identifier: "test",
           server: "",
           port: 25,
@@ -140,7 +139,8 @@ describe("SmtpService", () => {
       const req = httpMock.expectOne((r) => r.url === "/smtpserver/");
       expect(req.request.method).toBe("GET");
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403, statusText: "Permission denied"
+        status: 403,
+        statusText: "Permission denied"
       });
       await Promise.resolve();
 

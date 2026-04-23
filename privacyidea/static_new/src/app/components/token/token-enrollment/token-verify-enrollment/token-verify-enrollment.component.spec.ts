@@ -85,11 +85,13 @@ describe("TokenVerifyEnrollmentComponent", () => {
   });
 
   it("should not close dialog if rollout_state is not enrolled", () => {
-    mockTokenService.verifyToken = jest.fn().mockReturnValue(of({
-      result: { status: true },
-      detail: { rollout_state: "client_wait", serial: "123", type: "hotp" },
-      type: "hotp"
-    }));
+    mockTokenService.verifyToken = jest.fn().mockReturnValue(
+      of({
+        result: { status: true },
+        detail: { rollout_state: "client_wait", serial: "123", type: "hotp" },
+        type: "hotp"
+      })
+    );
     component.verifyOTPControl.setValue("123456");
     component.onDialogAction("verify");
     expect(mockTokenService.verifyToken).toHaveBeenCalled();

@@ -45,6 +45,7 @@ import { CaConnectorsComponent } from "./components/external-services/ca-connect
 import { NewCaConnectorComponent } from "./components/external-services/ca-connectors/new-ca-connector/new-ca-connector.component";
 import { TokengroupsComponent } from "./components/external-services/tokengroups/tokengroups.component";
 import { ServiceIdsComponent } from "./components/external-services/service-ids/service-ids.component";
+import { NewServiceIdComponent } from "./components/external-services/service-ids/new-service-id/new-service-id.component";
 import { UserResolversComponent } from "./components/user/user-resolver/user-resolver.component";
 import { pendingChangesGuard } from "./guards/pending-changes.guard";
 import { PoliciesTableComponent } from "./components/policies/policies-table/policies-table.component";
@@ -158,7 +159,14 @@ export const routes: Routes = [
         ]
       },
       { path: "tokengroups", component: TokengroupsComponent, canDeactivate: [pendingChangesGuard] },
-      { path: "service-ids", component: ServiceIdsComponent, canDeactivate: [pendingChangesGuard] }
+      {
+        path: "service-ids",
+        children: [
+          { path: "", component: ServiceIdsComponent },
+          { path: "new", component: NewServiceIdComponent, canDeactivate: [pendingChangesGuard] },
+          { path: "details/:name", component: NewServiceIdComponent, canDeactivate: [pendingChangesGuard] }
+        ]
+      }
     ]
   }
 ];

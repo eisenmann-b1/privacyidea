@@ -39,6 +39,7 @@ import { SmtpServersComponent } from "./components/external-services/smtp-server
 import { RadiusServersComponent } from "./components/external-services/radius-servers/radius-servers.component";
 import { SmsGatewaysComponent } from "./components/external-services/sms-gateways/sms-gateways.component";
 import { PrivacyideaServersComponent } from "./components/external-services/privacyidea-servers/privacyidea-servers.component";
+import { NewPrivacyideaServerComponent } from "./components/external-services/privacyidea-servers/new-privacyidea-server/new-privacyidea-server.component";
 import { CaConnectorsComponent } from "./components/external-services/ca-connectors/ca-connectors.component";
 import { NewCaConnectorComponent } from "./components/external-services/ca-connectors/new-ca-connector/new-ca-connector.component";
 import { TokengroupsComponent } from "./components/external-services/tokengroups/tokengroups.component";
@@ -132,7 +133,14 @@ export const routes: Routes = [
       { path: "smtp", component: SmtpServersComponent, canDeactivate: [pendingChangesGuard] },
       { path: "radius", component: RadiusServersComponent, canDeactivate: [pendingChangesGuard] },
       { path: "sms", component: SmsGatewaysComponent, canDeactivate: [pendingChangesGuard] },
-      { path: "privacyidea", component: PrivacyideaServersComponent, canDeactivate: [pendingChangesGuard] },
+      {
+        path: "privacyidea",
+        children: [
+          { path: "", component: PrivacyideaServersComponent },
+          { path: "new", component: NewPrivacyideaServerComponent, canDeactivate: [pendingChangesGuard] },
+          { path: "details/:identifier", component: NewPrivacyideaServerComponent, canDeactivate: [pendingChangesGuard] }
+        ]
+      },
        {
         path: "ca-connectors",
         children: [

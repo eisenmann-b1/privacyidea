@@ -20,7 +20,7 @@
   .action-buttons {
     display: flex;
     flex-direction: row;
-    gap: 0.5rem;
+    gap: var(--global-padding);
   }
 }
 

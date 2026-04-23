@@ -84,9 +84,7 @@ export class MachinesComponent {
   });
 
   openDetailsDialog(machine: Machine): void {
-    this.router.navigateByUrl(ROUTE_PATHS.CONFIGURATION_MACHINES_DETAILS, {
-      state: { machine }
-    });
+    this.router.navigateByUrl(ROUTE_PATHS.CONFIGURATION_MACHINES_DETAILS + machine.id + "?resolver=" + encodeURIComponent(machine.resolver_name));
   }
 
   onFilterInput(value: string): void {

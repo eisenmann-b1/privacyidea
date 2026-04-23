@@ -138,5 +138,5 @@ export class MockRouter {
   navigate = jest.fn();
   navigateByUrl = jest.fn();
   events = of();
-  urls = "";
+  url = "";
 }

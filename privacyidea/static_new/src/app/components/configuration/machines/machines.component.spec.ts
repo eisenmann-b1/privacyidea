@@ -74,8 +74,7 @@ describe("MachinesComponent", () => {
     const machine = machineServiceMock.machines()[0];
     component.openDetailsDialog(machine);
     expect(router.navigateByUrl).toHaveBeenCalledWith(
-      ROUTE_PATHS.CONFIGURATION_MACHINES_DETAILS,
-      { state: { machine } }
+      ROUTE_PATHS.CONFIGURATION_MACHINES_DETAILS + machine.id + "?resolver=" + machine.resolver_name
     );
   });
 });

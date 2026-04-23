@@ -16,7 +16,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Component, inject, OnInit, signal, ViewChild } from "@angular/core";
+import { Component, effect, inject, OnInit, signal, ViewChild } from "@angular/core";
 import { lastValueFrom } from "rxjs";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
@@ -43,7 +43,7 @@ import { SimpleConfirmationDialogComponent } from "../../../shared/dialog/confir
 import { ContentService, ContentServiceInterface } from "../../../../services/content/content.service";
 import { ROUTE_PATHS } from "../../../../route_paths";
 import { CopyButtonComponent } from "../../../shared/copy-button/copy-button.component";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 
 @Component({
   selector: "app-machine-details-dialog",
@@ -71,10 +71,13 @@ export class MachineDetailsDialogComponent implements OnInit {
   private readonly dialogService: DialogServiceInterface = inject(DialogService);
   private readonly contentService: ContentServiceInterface = inject(ContentService);
   private readonly router: Router = inject(Router);
+  private readonly route: ActivatedRoute = inject(ActivatedRoute);
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   protected readonly ROUTE_PATHS = ROUTE_PATHS;
 
   data = signal<Machine | undefined>(history.state?.machine as Machine | undefined);
+  private readonly routeMachineId: string | null;
+  private readonly routeResolver: string | null;
   tokenApplications = signal<TokenApplications>([]);
   dataSource = new MatTableDataSource<TokenApplication>([]);
   displayedColumns: string[] = ["serial", "application", "options", "actions"];
@@ -87,11 +90,28 @@ export class MachineDetailsDialogComponent implements OnInit {
   editedOptions: { [id: number]: Record<string, any> } = {};
 
   constructor() {
+    this.routeMachineId = this.route.snapshot.paramMap.get("id");
+    this.routeResolver = this.route.snapshot.queryParamMap.get("resolver");
+
+    effect(() => {
+      const machines = this.machineService.machines();
+      if (!this.data() && this.routeMachineId && machines?.length) {
+        const found = machines.find(m => String(m.id) === this.routeMachineId
+          && (!this.routeResolver || m.resolver_name === this.routeResolver));
+        if (found) {
+          this.data.set(found);
+          this.loadTokenApplications();
+        }
+      }
+    });
   }
 
   ngOnInit(): void {
     this.applicationOptions = Object.keys(this.applicationsDef()).filter(k => k !== "offline");
-    this.loadTokenApplications();
+    if (this.data()) {
+      this.loadTokenApplications();
+    }
+    // If data() is still undefined, the effect() will handle it once machines signal resolves.
   }
 
   onTokenSerialInput(value: string): void {

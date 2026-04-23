@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 
-import { AfterViewInit, Component, ElementRef, inject, OnDestroy, Renderer2, signal, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, effect, ElementRef, inject, OnDestroy, Renderer2, signal, ViewChild } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
@@ -69,6 +69,7 @@ export class NewSmtpServerComponent implements AfterViewInit, OnDestroy {
   smtpForm!: FormGroup;
   isEditMode = false;
   isTesting = signal(false);
+  private editIdentifier: string | null = null;
 
   private _observer!: IntersectionObserver;
 
@@ -85,12 +86,26 @@ export class NewSmtpServerComponent implements AfterViewInit, OnDestroy {
       const identifier = params.get("identifier");
       if (identifier) {
         this.isEditMode = true;
+        this.editIdentifier = identifier;
         this.data = this.smtpService.smtpServers().find((s) => s.identifier === identifier) ?? null;
       } else {
         this.isEditMode = false;
+        this.editIdentifier = null;
         this.data = null;
       }
       this.initForm();
+    });
+
+    // Re-initialize once the async list arrives, but only if the user hasn't started editing yet.
+    effect(() => {
+      const servers = this.smtpService.smtpServers();
+      if (this.isEditMode && this.editIdentifier && this.smtpForm?.pristine) {
+        const found = servers.find((s) => s.identifier === this.editIdentifier);
+        if (found) {
+          this.data = found;
+          this.initForm();
+        }
+      }
     });
   }
 

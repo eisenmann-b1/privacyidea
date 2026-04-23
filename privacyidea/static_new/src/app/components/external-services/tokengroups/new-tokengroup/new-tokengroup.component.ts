@@ -16,7 +16,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Component, inject, OnDestroy } from "@angular/core";
+import { Component, effect, inject, OnDestroy } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
@@ -60,7 +60,7 @@ export class NewTokengroupComponent implements OnDestroy {
   protected data: Tokengroup | null = null;
   tokengroupForm!: FormGroup;
   isEditMode = false;
-
+  private editGroupName: string | null = null;
 
   constructor() {
     this.pendingChangesService.registerHasChanges(() => this.hasChanges);
@@ -71,12 +71,26 @@ export class NewTokengroupComponent implements OnDestroy {
       const name = params.get("name");
       if (name) {
         this.isEditMode = true;
+        this.editGroupName = name;
         this.data = this.tokengroupService.tokengroups().find((g) => g.groupname === name) ?? null;
       } else {
         this.isEditMode = false;
+        this.editGroupName = null;
         this.data = null;
       }
       this.initForm();
+    });
+
+    // Re-initialize once the async list arrives, but only if the user hasn't started editing yet.
+    effect(() => {
+      const tokengroups = this.tokengroupService.tokengroups();
+      if (this.isEditMode && this.editGroupName && this.tokengroupForm?.pristine) {
+        const found = tokengroups.find((g) => g.groupname === this.editGroupName);
+        if (found) {
+          this.data = found;
+          this.initForm();
+        }
+      }
     });
   }
 

@@ -16,7 +16,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { AfterViewInit, Component, ElementRef, inject, OnDestroy, Renderer2, signal, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, effect, ElementRef, inject, OnDestroy, Renderer2, signal, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import {
   CaConnector,
@@ -76,6 +76,7 @@ export class NewCaConnectorComponent implements AfterViewInit, OnDestroy {
   isEditMode = false;
   availableCas = signal<string[]>([]);
   isLoadingCas = signal(false);
+  private editConnectorName: string | null = null;
 
   constructor() {
     this.pendingChangesService.registerHasChanges(() => this.hasChanges);
@@ -86,13 +87,26 @@ export class NewCaConnectorComponent implements AfterViewInit, OnDestroy {
       const connectorName = params.get("name");
       if (connectorName) {
         this.isEditMode = true;
+        this.editConnectorName = connectorName;
         const connector = this.caConnectorService.caConnectors().find((c) => c.connectorname === connectorName);
         if (connector) {
           this.initForm(connector);
         }
       } else {
         this.isEditMode = false;
+        this.editConnectorName = null;
         this.initForm(null);
+      }
+    });
+
+    // Re-initialize once the async list arrives, but only if the user hasn't started editing yet.
+    effect(() => {
+      const connectors = this.caConnectorService.caConnectors();
+      if (this.isEditMode && this.editConnectorName && this.caConnectorForm?.pristine) {
+        const found = connectors.find((c) => c.connectorname === this.editConnectorName);
+        if (found) {
+          this.initForm(found);
+        }
       }
     });
   }

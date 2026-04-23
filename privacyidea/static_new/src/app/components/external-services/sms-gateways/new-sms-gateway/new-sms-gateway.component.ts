@@ -139,6 +139,18 @@ export class NewSmsGatewayComponent implements AfterViewInit, OnDestroy {
         untracked(() => this.onProviderChange(module));
       }
     });
+
+    // Re-initialize once the async list arrives, but only if the user hasn't started editing yet.
+    effect(() => {
+      const gateways = this.smsGatewayService.smsGateways();
+      if (this.isEditMode && this.gatewayName && this.smsForm?.pristine) {
+        const found = gateways.find((g) => g.name === this.gatewayName);
+        if (found) {
+          this.data = found;
+          this.initForm();
+        }
+      }
+    });
   }
 
   private initForm(): void {

@@ -120,7 +120,7 @@ export const routes: Routes = [
         path: "machines",
         children: [
           { path: "", component: MachinesComponent },
-          { path: "details", component: MachineDetailsDialogComponent }
+          { path: "details/:id", component: MachineDetailsDialogComponent }
         ]
       },
       { path: "periodic-tasks", component: PeriodicTaskComponent },

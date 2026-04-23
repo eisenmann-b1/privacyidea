@@ -22,6 +22,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   ElementRef,
   inject,
   linkedSignal,
@@ -115,6 +116,7 @@ export class EventPanelComponent implements AfterViewInit, OnDestroy {
   editEvent = signal(EMPTY_EVENT);
   isNewEvent = signal(false);
   hasChanges = signal(false);
+  private editEventId: string | null = null;
 
   selectedEvents = linkedSignal(() => this.event().event);
 
@@ -128,6 +130,7 @@ export class EventPanelComponent implements AfterViewInit, OnDestroy {
       const id = params.get("id");
       if (id) {
         this.isNewEvent.set(false);
+        this.editEventId = id;
         const handler = (this.eventService.eventHandlers() ?? []).find((h) => String(h.id) === id);
         if (handler) {
           this.event.set(deepCopy(handler));
@@ -136,11 +139,25 @@ export class EventPanelComponent implements AfterViewInit, OnDestroy {
         }
       } else {
         this.isNewEvent.set(true);
+        this.editEventId = null;
         this.event.set(deepCopy(EMPTY_EVENT));
         this.editEvent.set(deepCopy(EMPTY_EVENT));
         const modules = this.eventService.eventHandlerModules();
         if (modules.length > 0) {
           this.eventService.selectedHandlerModule.set(modules[0]);
+        }
+      }
+    });
+
+    // Re-initialize once the async list arrives, but only if the user hasn't started editing yet.
+    effect(() => {
+      const handlers = this.eventService.eventHandlers() ?? [];
+      if (!this.isNewEvent() && this.editEventId && !this.hasChanges()) {
+        const found = handlers.find((h) => String(h.id) === this.editEventId);
+        if (found) {
+          this.event.set(deepCopy(found));
+          this.editEvent.set(deepCopy(found));
+          this.eventService.selectedHandlerModule.set(found.handlermodule);
         }
       }
     });

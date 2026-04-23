@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 
-import { AfterViewInit, Component, ElementRef, inject, OnDestroy, OnInit, Renderer2, signal, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, effect, ElementRef, inject, OnDestroy, OnInit, Renderer2, signal, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCheckboxModule } from "@angular/material/checkbox";
@@ -76,6 +76,7 @@ export class NewPrivacyideaServerComponent implements AfterViewInit, OnDestroy {
   privacyideaForm!: FormGroup;
   isEditMode = false;
   isTesting = signal(false);
+  private editIdentifier: string | null = null;
 
   constructor() {
     this.pendingChangesService.registerHasChanges(() => this.hasChanges);
@@ -86,13 +87,26 @@ export class NewPrivacyideaServerComponent implements AfterViewInit, OnDestroy {
       const identifier = params.get("identifier");
       if (identifier) {
         this.isEditMode = true;
+        this.editIdentifier = identifier;
         const server = this.privacyideaServerService.remoteServerOptions().find(
           (s) => s.identifier === identifier
         );
         this.initForm(server ?? null);
       } else {
         this.isEditMode = false;
+        this.editIdentifier = null;
         this.initForm(null);
+      }
+    });
+
+    // Re-initialize once the async list arrives, but only if the user hasn't started editing yet.
+    effect(() => {
+      const servers = this.privacyideaServerService.remoteServerOptions();
+      if (this.isEditMode && this.editIdentifier && this.privacyideaForm?.pristine) {
+        const found = servers.find((s) => s.identifier === this.editIdentifier);
+        if (found) {
+          this.initForm(found);
+        }
       }
     });
   }

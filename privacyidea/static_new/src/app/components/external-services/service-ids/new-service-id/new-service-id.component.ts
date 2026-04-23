@@ -16,7 +16,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { Component, inject, OnDestroy } from "@angular/core";
+import { Component, effect, inject, OnDestroy } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
@@ -59,6 +59,7 @@ export class NewServiceIdComponent implements OnDestroy {
 
   serviceIdForm!: FormGroup;
   isEditMode = false;
+  private editServiceName: string | null = null;
 
   constructor() {
     this.pendingChangesService.registerHasChanges(() => this.hasChanges);
@@ -69,11 +70,24 @@ export class NewServiceIdComponent implements OnDestroy {
       const serviceName = params.get("name");
       if (serviceName) {
         this.isEditMode = true;
+        this.editServiceName = serviceName;
         const serviceId = this.serviceIdService.serviceIds().find((s) => s.servicename === serviceName);
         this.initForm(serviceId ?? null);
       } else {
         this.isEditMode = false;
+        this.editServiceName = null;
         this.initForm(null);
+      }
+    });
+
+    // Re-initialize once the async list arrives, but only if the user hasn't started editing yet.
+    effect(() => {
+      const serviceIds = this.serviceIdService.serviceIds();
+      if (this.isEditMode && this.editServiceName && this.serviceIdForm?.pristine) {
+        const serviceId = serviceIds.find((s) => s.servicename === this.editServiceName);
+        if (serviceId) {
+          this.initForm(serviceId);
+        }
       }
     });
   }

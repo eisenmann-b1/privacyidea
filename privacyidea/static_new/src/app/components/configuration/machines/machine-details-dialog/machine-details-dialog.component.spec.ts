@@ -28,7 +28,8 @@ import { NoopAnimationsModule } from "@angular/platform-browser/animations";
 import { ContentService } from "../../../../services/content/content.service";
 import { ROUTE_PATHS } from "../../../../route_paths";
 import { TokenService } from "../../../../services/token/token.service";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
+import { convertToParamMap } from "@angular/router";
 
 describe("MachineDetailsDialogComponent", () => {
   let component: MachineDetailsDialogComponent;
@@ -59,6 +60,7 @@ describe("MachineDetailsDialogComponent", () => {
           }]
         }
       })),
+      machines: signal([mockMachine]),
       deleteTokenById: jest.fn().mockReturnValue(of({})),
       postAssignMachineToToken: jest.fn().mockReturnValue(of({})),
       postTokenOption: jest.fn().mockReturnValue(of({}))
@@ -103,7 +105,16 @@ describe("MachineDetailsDialogComponent", () => {
         { provide: DialogService, useValue: dialogServiceMock },
         { provide: ContentService, useValue: contentServiceMock },
         { provide: TokenService, useValue: tokenServiceMock },
-        { provide: Router, useValue: routerMock }
+        { provide: Router, useValue: routerMock },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              paramMap: convertToParamMap({ id: "1" }),
+              queryParamMap: convertToParamMap({ resolver: "res1" })
+            }
+          }
+        }
       ]
     }).compileComponents();
 

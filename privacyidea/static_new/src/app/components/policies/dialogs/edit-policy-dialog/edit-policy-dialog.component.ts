@@ -22,6 +22,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  effect,
   ElementRef,
   inject,
   OnDestroy,
@@ -69,6 +70,7 @@ export class EditPolicyDialogComponent implements AfterViewInit, OnDestroy {
   readonly mode = signal<"create" | "edit">("create");
   readonly policy = signal<PolicyDetail>(this.policyService.getEmptyPolicy());
   readonly policyEdits = signal<Partial<PolicyDetail>>({});
+  private editPolicyName: string | null = null;
   readonly editedPolicy = computed(() => ({ ...this.policy(), ...this.policyEdits() }));
   readonly isPolicyEdited = computed(() => Object.keys(this.policyEdits()).length > 0);
   readonly isDirty = this.isPolicyEdited;
@@ -80,11 +82,22 @@ export class EditPolicyDialogComponent implements AfterViewInit, OnDestroy {
       const name = params.get("name");
       if (name) {
         this.mode.set("edit");
+        this.editPolicyName = name;
         const policy = this.policyService.allPolicies().find((p) => p.name === name);
         if (policy) this.policy.set(policy);
       } else {
         this.mode.set("create");
+        this.editPolicyName = null;
         this.policy.set(this.policyService.getEmptyPolicy());
+      }
+    });
+
+    // Re-initialize once the async list arrives, but only if the user hasn't started editing yet.
+    effect(() => {
+      const policies = this.policyService.allPolicies();
+      if (this.mode() === "edit" && this.editPolicyName && !this.isPolicyEdited()) {
+        const found = policies.find((p) => p.name === this.editPolicyName);
+        if (found) this.policy.set(found);
       }
     });
 

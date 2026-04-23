@@ -16,7 +16,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { AfterViewInit, Component, ElementRef, inject, OnDestroy, OnInit, Renderer2, signal, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, effect, ElementRef, inject, OnDestroy, OnInit, Renderer2, signal, ViewChild } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
@@ -71,6 +71,7 @@ export class NewRadiusServerComponent implements AfterViewInit, OnDestroy {
   radiusForm!: FormGroup;
   isEditMode = false;
   isTesting = signal(false);
+  private editIdentifier: string | null = null;
 
   constructor() {
     this.pendingChangesService.registerHasChanges(() => this.hasChanges);
@@ -81,11 +82,24 @@ export class NewRadiusServerComponent implements AfterViewInit, OnDestroy {
       const identifier = params.get("identifier");
       if (identifier) {
         this.isEditMode = true;
+        this.editIdentifier = identifier;
         const server = this.radiusService.radiusServers().find((s) => s.identifier === identifier);
         this.initForm(server ?? null);
       } else {
         this.isEditMode = false;
+        this.editIdentifier = null;
         this.initForm(null);
+      }
+    });
+
+    // Re-initialize once the async list arrives, but only if the user hasn't started editing yet.
+    effect(() => {
+      const servers = this.radiusService.radiusServers();
+      if (this.isEditMode && this.editIdentifier && this.radiusForm?.pristine) {
+        const found = servers.find((s) => s.identifier === this.editIdentifier);
+        if (found) {
+          this.initForm(found);
+        }
       }
     });
   }

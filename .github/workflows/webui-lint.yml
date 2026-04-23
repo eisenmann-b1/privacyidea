@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2014 NetKnights GmbH <https://netknights.it>
 # SPDX-License-Identifier: CC0-1.0
 #
-name: Lint WebUI
+name: Linting WebUI
 on:
   pull_request:
     branches:
@@ -19,11 +19,8 @@ defaults:
 
 jobs:
   lint-webui:
-    name: Lint the new WebUI
+    name: ESLint
     runs-on: ubuntu-latest
-    # Reporting-only for now: surface violations without blocking PRs while the
-    # existing backlog is worked down. Flip to required once the count is manageable.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -37,4 +34,7 @@ jobs:
       - name: Install Node.js dependencies
         run: npm ci
       - name: Run ESLint
+        # Reporting-only for now: surface violations without blocking PRs while the
+        # existing backlog is worked down. Remove once the count is manageable.
+        continue-on-error: true
         run: npm run lint

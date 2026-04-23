@@ -141,7 +141,11 @@ export class ContentService implements ContentServiceInterface {
   onConfigurationMachines = computed(() => this.routeUrl() === ROUTE_PATHS.CONFIGURATION_MACHINES);
 
   onExternalSmtp = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SMTP);
-  onExternalRadius = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_RADIUS);
+  onExternalRadius = computed(() =>
+    this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_RADIUS ||
+    this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_RADIUS_NEW ||
+    this.routeUrl().startsWith(ROUTE_PATHS.EXTERNAL_SERVICES_RADIUS_DETAILS)
+  );
   onExternalSms = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SMS);
   onExternalCaConnectors = computed(() =>
     this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_CA_CONNECTORS ||

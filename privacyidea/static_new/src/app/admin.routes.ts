@@ -46,6 +46,7 @@ import { NewPrivacyideaServerComponent } from "./components/external-services/pr
 import { CaConnectorsComponent } from "./components/external-services/ca-connectors/ca-connectors.component";
 import { NewCaConnectorComponent } from "./components/external-services/ca-connectors/new-ca-connector/new-ca-connector.component";
 import { TokengroupsComponent } from "./components/external-services/tokengroups/tokengroups.component";
+import { NewTokengroupComponent } from "./components/external-services/tokengroups/new-tokengroup/new-tokengroup.component";
 import { ServiceIdsComponent } from "./components/external-services/service-ids/service-ids.component";
 import { NewServiceIdComponent } from "./components/external-services/service-ids/new-service-id/new-service-id.component";
 import { UserResolversComponent } from "./components/user/user-resolver/user-resolver.component";
@@ -174,7 +175,14 @@ export const routes: Routes = [
           { path: "details/:name", component: NewCaConnectorComponent, canDeactivate: [pendingChangesGuard] }
         ]
       },
-      { path: "tokengroups", component: TokengroupsComponent, canDeactivate: [pendingChangesGuard] },
+      {
+        path: "tokengroups",
+        children: [
+          { path: "", component: TokengroupsComponent },
+          { path: "new", component: NewTokengroupComponent, canDeactivate: [pendingChangesGuard] },
+          { path: "details/:name", component: NewTokengroupComponent, canDeactivate: [pendingChangesGuard] }
+        ]
+      },
       {
         path: "service-ids",
         children: [

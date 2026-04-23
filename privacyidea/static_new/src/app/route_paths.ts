@@ -63,6 +63,8 @@ export const ROUTE_PATHS = {
   EXTERNAL_SERVICES_CA_CONNECTORS_NEW: "/external-services/ca-connectors/new",
   EXTERNAL_SERVICES_CA_CONNECTORS_DETAILS: "/external-services/ca-connectors/details/",
   EXTERNAL_SERVICES_TOKENGROUPS: "/external-services/tokengroups",
+  EXTERNAL_SERVICES_TOKENGROUPS_NEW: "/external-services/tokengroups/new",
+  EXTERNAL_SERVICES_TOKENGROUPS_DETAILS: "/external-services/tokengroups/details/",
   EXTERNAL_SERVICES_SERVICE_IDS: "/external-services/service-ids",
   EXTERNAL_SERVICES_SERVICE_IDS_NEW: "/external-services/service-ids/new",
   EXTERNAL_SERVICES_SERVICE_IDS_DETAILS: "/external-services/service-ids/details/",

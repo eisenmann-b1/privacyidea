@@ -165,7 +165,11 @@ export class ContentService implements ContentServiceInterface {
     this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_PRIVACYIDEA_NEW ||
     this.routeUrl().startsWith(ROUTE_PATHS.EXTERNAL_SERVICES_PRIVACYIDEA_DETAILS)
   );
-  onExternalTokenGroups = computed(() => this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_TOKENGROUPS);
+  onExternalTokenGroups = computed(() =>
+    this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_TOKENGROUPS ||
+    this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_TOKENGROUPS_NEW ||
+    this.routeUrl().startsWith(ROUTE_PATHS.EXTERNAL_SERVICES_TOKENGROUPS_DETAILS)
+  );
   onExternalServiceIds = computed(() =>
     this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SERVICE_IDS ||
     this.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SERVICE_IDS_NEW ||

@@ -217,7 +217,9 @@ class BaseEventHandler(object):
                     "desc": _("This condition can check any arbitrary user info "
                               "field. You need to enter something like "
                               "'<fieldname> == <fieldvalue>', '<fieldname> > "
-                              "<fieldvalue>' or '<fieldname> < <fieldvalue>'."),
+                              "<fieldvalue>' or '<fieldname> < <fieldvalue>'."
+                              "You can use '{now}' for time-based comparisons, e.g. "
+                              "'last_login < {now} - 7d'"),
                     "group": GROUP.USER
                 },
             CONDITION.TOKENREALM:
@@ -761,16 +763,15 @@ class BaseEventHandler(object):
                 return False
 
         if CONDITION.USER_INFO in conditions:
-            cond = conditions.get(CONDITION.USER_INFO)
+            condition = conditions.get(CONDITION.USER_INFO)
             # replace {now} in condition
-            cond, td = parse_time_offset_from_now(cond)
-            s_now = (datetime.datetime.now(tzlocal()) + td).strftime(
+            condition, time_delta = parse_time_offset_from_now(condition)
+            str_format_now = (datetime.datetime.now(tzlocal()) + time_delta).strftime(
                 DATE_FORMAT)
-            cond = cond.format(now=s_now)
-            if not compare_generic(cond,
+            condition = condition.replace(now=str_format_now)
+            if not compare_generic(condition,
                                    lambda key: user.get_specific_info([key]).get(key),
-                                   "Misconfiguration in your userinfo "
-                                   "condition: {0!s}"):
+                                   "Misconfiguration in your userinfo condition: {0!s}"):
                 return False
 
         if CONDITION.RESOLVER in conditions:
@@ -843,8 +844,8 @@ class BaseEventHandler(object):
 
         if CONDITION.USER_TOKEN_NUMBER in conditions and user:
             num_tokens = get_tokens(user=user, count=True)
-            cond = conditions.get(CONDITION.USER_TOKEN_NUMBER)
-            if not compare_ints(cond, num_tokens):
+            condition = conditions.get(CONDITION.USER_TOKEN_NUMBER)
+            if not compare_ints(condition, num_tokens):
                 return False
 
         if CONDITION.USER_CONTAINER_NUMBER in conditions and user:
@@ -903,8 +904,8 @@ class BaseEventHandler(object):
                     return False
 
             if CONDITION.OTP_COUNTER in conditions:
-                cond = conditions.get(CONDITION.OTP_COUNTER)
-                if not compare_ints(cond, token_obj.token.count):
+                condition = conditions.get(CONDITION.OTP_COUNTER)
+                if not compare_ints(condition, token_obj.token.count):
                     return False
 
             if CONDITION.LAST_AUTH in conditions:
@@ -913,54 +914,55 @@ class BaseEventHandler(object):
 
             if CONDITION.COUNT_AUTH in conditions:
                 count = token_obj.get_count_auth()
-                cond = conditions.get(CONDITION.COUNT_AUTH)
-                if not compare_ints(cond, count):
+                condition = conditions.get(CONDITION.COUNT_AUTH)
+                if not compare_ints(condition, count):
                     return False
 
             if CONDITION.COUNT_AUTH_SUCCESS in conditions:
                 count = token_obj.get_count_auth_success()
-                cond = conditions.get(CONDITION.COUNT_AUTH_SUCCESS)
-                if not compare_ints(cond, count):
+                condition = conditions.get(CONDITION.COUNT_AUTH_SUCCESS)
+                if not compare_ints(condition, count):
                     return False
 
             if CONDITION.COUNT_AUTH_FAIL in conditions:
                 count = token_obj.get_count_auth()
                 c_success = token_obj.get_count_auth_success()
                 c_fail = count - c_success
-                cond = conditions.get(CONDITION.COUNT_AUTH_FAIL)
-                if not compare_ints(cond, c_fail):
+                condition = conditions.get(CONDITION.COUNT_AUTH_FAIL)
+                if not compare_ints(condition, c_fail):
                     return False
 
             if CONDITION.FAILCOUNTER in conditions:
                 failcount = token_obj.get_failcount()
-                cond = conditions.get(CONDITION.FAILCOUNTER)
-                res = compare_ints(cond, failcount)
+                condition = conditions.get(CONDITION.FAILCOUNTER)
+                res = compare_ints(condition, failcount)
                 if not res:
                     return False
 
             if CONDITION.TOKENINFO in conditions:
-                cond = conditions.get(CONDITION.TOKENINFO)
+                condition = conditions.get(CONDITION.TOKENINFO)
                 # replace {now} in condition
-                cond, td = parse_time_offset_from_now(cond)
-                s_now = (datetime.datetime.now(tzlocal()) + td).strftime(
+                condition, time_delta = parse_time_offset_from_now(condition)
+                str_format_now = (datetime.datetime.now(tzlocal()) + time_delta).strftime(
                     DATE_FORMAT)
-                cond = cond.format(now=s_now)
-                if not compare_generic(cond,
+                condition = condition.format(now=str_format_now)
+                if not compare_generic(condition,
                                        token_obj.get_tokeninfo,
                                        "Misconfiguration in your tokeninfo "
                                        "condition: {0!s}"):
                     return False
 
             if CONDITION.ROLLOUT_STATE in conditions:
-                cond = conditions.get(CONDITION.ROLLOUT_STATE)
-                if not cond == token_obj.token.rollout_state:
+                condition = conditions.get(CONDITION.ROLLOUT_STATE)
+                if not condition == token_obj.token.rollout_state:
                     return False
 
             if CONDITION.TOKEN_IS_IN_CONTAINER in conditions:
-                cond = conditions.get(CONDITION.TOKEN_IS_IN_CONTAINER)
+                condition = conditions.get(CONDITION.TOKEN_IS_IN_CONTAINER)
                 container = find_container_for_token(serial)
                 token_is_in_container = container is not None
-                if (not token_is_in_container and is_true(cond)) or (token_is_in_container and not is_true(cond)):
+                if (not token_is_in_container and is_true(condition)) or (
+                        token_is_in_container and not is_true(condition)):
                     log.debug(f"Condition {CONDITION.TOKEN_IS_IN_CONTAINER} for token {token_obj} "
                               "not fulfilled.")
                     return False
@@ -995,23 +997,23 @@ class BaseEventHandler(object):
         # Container specific conditions
         if container:
             if CONDITION.CONTAINER_STATE in conditions:
-                cond = conditions.get(CONDITION.CONTAINER_STATE).split(',')
+                condition = conditions.get(CONDITION.CONTAINER_STATE).split(',')
                 container_states = container.get_states()
-                for cond_state in cond:
+                for cond_state in condition:
                     if cond_state not in container_states:
                         log.debug(f"Condition container_state {cond_state} for container {container.serial} not "
                                   "fulfilled.")
                         return False
 
             if CONDITION.CONTAINER_EXACT_STATE in conditions:
-                cond = conditions.get(CONDITION.CONTAINER_EXACT_STATE).split(',')
+                condition = conditions.get(CONDITION.CONTAINER_EXACT_STATE).split(',')
                 container_states = container.get_states()
-                if len(cond) != len(container_states):
-                    log.debug(f"Condition container_single_state {cond} for container {container.serial} not "
+                if len(condition) != len(container_states):
+                    log.debug(f"Condition container_single_state {condition} for container {container.serial} not "
                               "fulfilled.")
                     return False
 
-                for cond_state in cond:
+                for cond_state in condition:
                     if cond_state not in container_states:
                         log.debug(f"Condition container_state {cond_state} for container {container.serial} not "
                                   "fulfilled.")
@@ -1019,21 +1021,21 @@ class BaseEventHandler(object):
 
             if CONDITION.CONTAINER_HAS_OWNER in conditions:
                 has_container_owner = len(container.get_users()) > 0
-                cond = conditions.get(CONDITION.CONTAINER_HAS_OWNER)
-                if (not has_container_owner and is_true(cond)) or (has_container_owner and not is_true(cond)):
+                condition = conditions.get(CONDITION.CONTAINER_HAS_OWNER)
+                if (not has_container_owner and is_true(condition)) or (has_container_owner and not is_true(condition)):
                     log.debug(f"Condition container_has_owner for container {container.serial} not fulfilled.")
                     return False
 
             if CONDITION.CONTAINER_TYPE in conditions:
-                cond = conditions.get(CONDITION.CONTAINER_TYPE)
-                if container.type != cond:
-                    log.debug(f"Condition container_type {cond} for container {container.serial} not fulfilled.")
+                condition = conditions.get(CONDITION.CONTAINER_TYPE)
+                if container.type != condition:
+                    log.debug(f"Condition container_type {condition} for container {container.serial} not fulfilled.")
                     return False
 
             if CONDITION.CONTAINER_HAS_TOKEN in conditions:
                 tokens = [token.get_serial() for token in container.get_tokens()]
-                cond = conditions.get(CONDITION.CONTAINER_HAS_TOKEN)
-                if (len(tokens) == 0 and is_true(cond)) or (len(tokens) > 0 and not is_true(cond)):
+                condition = conditions.get(CONDITION.CONTAINER_HAS_TOKEN)
+                if (len(tokens) == 0 and is_true(condition)) or (len(tokens) > 0 and not is_true(condition)):
                     log.debug(f"Condition container_has_token for container {container.serial} not fulfilled.")
                     return False
 
@@ -1062,27 +1064,27 @@ class BaseEventHandler(object):
                         return False
 
             if CONDITION.CONTAINER_INFO in conditions:
-                cond = conditions.get(CONDITION.CONTAINER_INFO)
+                condition = conditions.get(CONDITION.CONTAINER_INFO)
 
-                if not compare_generic(cond, container.get_container_info_dict().get,
+                if not compare_generic(condition, container.get_container_info_dict().get,
                                        "Misconfiguration in your container info condition: {0!s}"):
                     return False
 
             if CONDITION.CONTAINER_LAST_AUTH in conditions:
-                cond = conditions.get(CONDITION.CONTAINER_LAST_AUTH)
+                condition = conditions.get(CONDITION.CONTAINER_LAST_AUTH)
                 last_auth = container.last_authentication
                 res = False
                 if last_auth:
-                    res = compare_time(cond, last_auth)
+                    res = compare_time(condition, last_auth)
                 if not res:
                     return False
 
             if CONDITION.CONTAINER_LAST_SYNC in conditions:
-                cond = conditions.get(CONDITION.CONTAINER_LAST_SYNC)
+                condition = conditions.get(CONDITION.CONTAINER_LAST_SYNC)
                 last_sync = container.last_synchronization
                 res = False
                 if last_sync:
-                    res = compare_time(cond, last_sync)
+                    res = compare_time(condition, last_sync)
                 if not res:
                     return False
 

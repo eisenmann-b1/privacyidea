@@ -1272,8 +1272,8 @@ class BaseEventHandlerTestCase(MyTestCase):
 
         # Verify the user info is what we expect from the passwd resolver
         info = user.info
-        self.assertEqual(info.get("givenname"), "Cornelius")
-        self.assertEqual(info.get("email"), "user@localhost.localdomain")
+        self.assertEqual("Cornelius", info.get("givenname"))
+        self.assertEqual("user@localhost.localdomain", info.get("email"))
 
         # Test string equality: givenname matches
         options["handler_def"] = {"conditions": {CONDITION.USER_INFO: "givenname == Cornelius"}}

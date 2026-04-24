@@ -16,11 +16,25 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { AfterViewInit, Component, effect, ElementRef, inject, OnDestroy, OnInit, Renderer2, signal, ViewChild } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  effect,
+  ElementRef,
+  inject,
+  OnDestroy,
+  Renderer2,
+  signal,
+  ViewChild
+} from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
-import { RadiusServer, RadiusServerService, RadiusServerServiceInterface } from "../../../../services/radius-server/radius-server.service";
+import {
+  RadiusServer,
+  RadiusServerService,
+  RadiusServerServiceInterface
+} from "../../../../services/radius-server/radius-server.service";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatCheckboxModule } from "@angular/material/checkbox";

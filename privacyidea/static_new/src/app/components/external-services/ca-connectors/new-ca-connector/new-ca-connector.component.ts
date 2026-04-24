@@ -16,7 +16,17 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
-import { AfterViewInit, Component, effect, ElementRef, inject, OnDestroy, Renderer2, signal, ViewChild } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  effect,
+  ElementRef,
+  inject,
+  OnDestroy,
+  Renderer2,
+  signal,
+  ViewChild
+} from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import {
   CaConnector,

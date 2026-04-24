@@ -168,10 +168,14 @@ export const routes: Routes = [
         children: [
           { path: "", component: PrivacyideaServersComponent },
           { path: "new", component: NewPrivacyideaServerComponent, canDeactivate: [pendingChangesGuard] },
-          { path: "details/:identifier", component: NewPrivacyideaServerComponent, canDeactivate: [pendingChangesGuard] }
+          {
+            path: "details/:identifier",
+            component: NewPrivacyideaServerComponent,
+            canDeactivate: [pendingChangesGuard]
+          }
         ]
       },
-       {
+      {
         path: "ca-connectors",
         children: [
           { path: "", component: CaConnectorsComponent },

@@ -23,7 +23,11 @@ import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortModule } from "@angular/material/sort";
 import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
-import { RadiusServer, RadiusServerService, RadiusServerServiceInterface } from "../../../services/radius-server/radius-server.service";
+import {
+  RadiusServer,
+  RadiusServerService,
+  RadiusServerServiceInterface
+} from "../../../services/radius-server/radius-server.service";
 import { AuthService, AuthServiceInterface } from "../../../services/auth/auth.service";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { Router } from "@angular/router";

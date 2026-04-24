@@ -29,7 +29,7 @@ import { PendingChangesService } from "../../../../services/pending-changes/pend
 import { MockPendingChangesService } from "../../../../../testing/mock-services/mock-pending-changes-service";
 import { DialogService } from "../../../../services/dialog/dialog.service";
 import { MockDialogService } from "../../../../../testing/mock-services";
-import { provideRouter, Router, ActivatedRoute, convertToParamMap } from "@angular/router";
+import { ActivatedRoute, convertToParamMap, provideRouter, Router } from "@angular/router";
 import { ROUTE_PATHS } from "../../../../route_paths";
 
 describe("NewTokengroupComponent", () => {
@@ -50,7 +50,7 @@ describe("NewTokengroupComponent", () => {
         { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({})) } },
         { provide: TokengroupService, useClass: MockTokengroupService },
         { provide: PendingChangesService, useClass: MockPendingChangesService },
-        { provide: DialogService, useClass: MockDialogService },
+        { provide: DialogService, useClass: MockDialogService }
       ]
     }).compileComponents();
 
@@ -94,7 +94,7 @@ describe("NewTokengroupComponent", () => {
     });
     tokengroupServiceMock.postTokengroup = jest.fn().mockRejectedValue(new Error("Save failed"));
     // Clear any previous calls to close from setup
-    
+
 
     const success = await component.save();
 
@@ -114,7 +114,7 @@ describe("NewTokengroupComponent", () => {
     });
 
     it("should close directly when there are no changes", () => {
-      
+
 
       component.onCancel();
 
@@ -149,7 +149,7 @@ describe("NewTokengroupComponent", () => {
         description: "desc"
       });
       component.tokengroupForm.markAsDirty();
-      
+
 
       component.onCancel();
 
@@ -168,7 +168,6 @@ describe("NewTokengroupComponent", () => {
       mockSaveExitDialogRef.afterClosed.mockReturnValue(of("save-exit"));
       pendingChangesService.save.mockReturnValue(Promise.resolve(true));
 
-      
 
       component.onCancel();
 
@@ -188,7 +187,6 @@ describe("NewTokengroupComponent", () => {
       mockSaveExitDialogRef.afterClosed.mockReturnValue(of("save-exit"));
       pendingChangesService.save.mockReturnValue(Promise.resolve(false));
 
-      
 
       component.onCancel();
 
@@ -203,7 +201,6 @@ describe("NewTokengroupComponent", () => {
       component.tokengroupForm.markAsDirty();
       mockSaveExitDialogRef.afterClosed.mockReturnValue(of("save-exit"));
 
-      
 
       component.onCancel();
 
@@ -222,7 +219,6 @@ describe("NewTokengroupComponent", () => {
       });
       component.tokengroupForm.markAsDirty();
 
-      
 
       component.onCancel();
 

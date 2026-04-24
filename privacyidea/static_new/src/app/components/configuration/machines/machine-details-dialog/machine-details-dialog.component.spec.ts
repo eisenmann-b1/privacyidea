@@ -28,8 +28,7 @@ import { NoopAnimationsModule } from "@angular/platform-browser/animations";
 import { ContentService } from "../../../../services/content/content.service";
 import { ROUTE_PATHS } from "../../../../route_paths";
 import { TokenService } from "../../../../services/token/token.service";
-import { ActivatedRoute, Router } from "@angular/router";
-import { convertToParamMap } from "@angular/router";
+import { ActivatedRoute, convertToParamMap, Router } from "@angular/router";
 
 describe("MachineDetailsDialogComponent", () => {
   let component: MachineDetailsDialogComponent;

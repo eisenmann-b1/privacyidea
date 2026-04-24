@@ -94,7 +94,7 @@ export class NewTokengroupComponent implements OnDestroy {
     });
   }
 
-    get hasChanges(): boolean {
+  get hasChanges(): boolean {
     return !this.tokengroupForm.pristine;
   }
 

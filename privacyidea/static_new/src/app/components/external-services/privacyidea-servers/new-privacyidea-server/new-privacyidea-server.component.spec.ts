@@ -21,7 +21,7 @@ import { NewPrivacyideaServerComponent } from "./new-privacyidea-server.componen
 import { provideHttpClient } from "@angular/common/http";
 import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
-import { provideRouter, Router, ActivatedRoute, convertToParamMap, ParamMap } from "@angular/router";
+import { ActivatedRoute, convertToParamMap, ParamMap, provideRouter, Router } from "@angular/router";
 import { BehaviorSubject } from "rxjs";
 import { PrivacyideaServerService } from "../../../../services/privacyidea-server/privacyidea-server.service";
 import { MockPrivacyideaServerService } from "../../../../../testing/mock-services/mock-privacyidea-server-service";

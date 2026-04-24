@@ -32,7 +32,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { ROUTE_PATHS } from "../../../../route_paths";
 import { PendingChangesService } from "../../../../services/pending-changes/pending-changes.service";
 import { SaveAndExitDialogComponent } from "../../../shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
-import { DialogServiceInterface, DialogService } from "../../../../services/dialog/dialog.service";
+import { DialogService, DialogServiceInterface } from "../../../../services/dialog/dialog.service";
 import { ClearableInputComponent } from "../../../shared/clearable-input/clearable-input.component";
 
 @Component({

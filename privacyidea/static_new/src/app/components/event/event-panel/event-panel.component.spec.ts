@@ -22,17 +22,22 @@ import { provideHttpClient } from "@angular/common/http";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { MockEventService } from "../../../../testing/mock-services/mock-event-service";
 import { EMPTY_EVENT, EventHandler, EventService } from "../../../services/event/event.service";
-import { MockNotificationService, MockPendingChangesService, MockRouter } from "../../../../testing/mock-services";import { NotificationService } from "../../../services/notification/notification.service";
-import { ActivatedRoute, Router, convertToParamMap } from "@angular/router";
+import { MockNotificationService, MockPendingChangesService, MockRouter } from "../../../../testing/mock-services";
+import { NotificationService } from "../../../services/notification/notification.service";
+import { ActivatedRoute, convertToParamMap, Router } from "@angular/router";
 import { BehaviorSubject } from "rxjs";
 import { PendingChangesService } from "../../../services/pending-changes/pending-changes.service";
 import { ROUTE_PATHS } from "../../../route_paths";
 
 global.IntersectionObserver = class IntersectionObserver {
   constructor() {}
+
   disconnect() {}
+
   observe() {}
+
   unobserve() {}
+
   takeRecords() { return []; }
 } as any;
 
@@ -69,7 +74,12 @@ describe("EventPanelComponent — edit mode", () => {
         { provide: NotificationService, useClass: MockNotificationService },
         { provide: PendingChangesService, useClass: MockPendingChangesService },
         { provide: Router, useClass: MockRouter },
-        { provide: ActivatedRoute, useValue: { paramMap: paramMap$.asObservable(), snapshot: { paramMap: convertToParamMap({ id: mockEventHandler.id }) } } }
+        { provide: ActivatedRoute,
+          useValue: {
+            paramMap: paramMap$.asObservable(),
+            snapshot: { paramMap: convertToParamMap({ id: mockEventHandler.id }) }
+          }
+        }
       ]
     }).compileComponents();
 
@@ -319,7 +329,12 @@ describe("EventPanelComponent — create new mode", () => {
         { provide: NotificationService, useClass: MockNotificationService },
         { provide: PendingChangesService, useClass: MockPendingChangesService },
         { provide: Router, useClass: MockRouter },
-        { provide: ActivatedRoute, useValue: { paramMap: new BehaviorSubject(convertToParamMap({})).asObservable(), snapshot: { paramMap: convertToParamMap({}) } } }
+        { provide: ActivatedRoute,
+          useValue: {
+            paramMap: new BehaviorSubject(convertToParamMap({})).asObservable(),
+            snapshot: { paramMap: convertToParamMap({}) }
+          }
+        }
       ]
     }).compileComponents();
 

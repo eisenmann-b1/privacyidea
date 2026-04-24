@@ -29,7 +29,7 @@ import { PendingChangesService } from "../../../../services/pending-changes/pend
 import { MockPendingChangesService } from "../../../../../testing/mock-services/mock-pending-changes-service";
 import { DialogService } from "../../../../services/dialog/dialog.service";
 import { MockDialogService } from "../../../../../testing/mock-services";
-import { provideRouter, Router, ActivatedRoute, convertToParamMap } from "@angular/router";
+import { ActivatedRoute, convertToParamMap, provideRouter, Router } from "@angular/router";
 import { ROUTE_PATHS } from "../../../../route_paths";
 
 describe("NewSmsGatewayComponent", () => {
@@ -53,7 +53,7 @@ describe("NewSmsGatewayComponent", () => {
         },
         { provide: SmsGatewayService, useClass: MockSmsGatewayService },
         { provide: PendingChangesService, useClass: MockPendingChangesService },
-        { provide: DialogService, useClass: MockDialogService },
+        { provide: DialogService, useClass: MockDialogService }
       ]
     }).compileComponents();
 

@@ -19,33 +19,33 @@
 
 
 import {
-  Component,
   AfterViewInit,
-  OnDestroy,
-  inject,
-  Renderer2,
-  DestroyRef,
-  ViewChild,
-  ElementRef,
-  viewChild,
-  signal,
+  Component,
   computed,
-  effect
+  DestroyRef,
+  effect,
+  ElementRef,
+  inject,
+  OnDestroy,
+  Renderer2,
+  signal,
+  ViewChild,
+  viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { FormsModule, AbstractControl } from "@angular/forms";
+import { AbstractControl, FormsModule } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
-import { MatFormField, MatLabel, MatError } from "@angular/material/form-field";
-import { MatSelectModule, MatSelect, MatOption } from "@angular/material/select";
-import { Router, ActivatedRoute } from "@angular/router";
+import { MatError, MatFormField, MatLabel } from "@angular/material/form-field";
+import { MatOption, MatSelect, MatSelectModule } from "@angular/material/select";
+import { ActivatedRoute, Router } from "@angular/router";
 import { ClearableInputComponent } from "@components/shared/clearable-input/clearable-input.component";
 import { SaveAndExitDialogComponent } from "@components/shared/dialog/save-and-exit-dialog/save-and-exit-dialog.component";
 import { ScrollToTopDirective } from "@components/shared/directives/app-scroll-to-top.directive";
 import { ROUTE_PATHS } from "src/app/route_paths";
-import { DialogServiceInterface, DialogService } from "src/app/services/dialog/dialog.service";
+import { DialogService, DialogServiceInterface } from "src/app/services/dialog/dialog.service";
 import { NotificationService } from "src/app/services/notification/notification.service";
 import { PendingChangesService } from "src/app/services/pending-changes/pending-changes.service";
 import { ResolverService, ResolverType } from "src/app/services/resolver/resolver.service";

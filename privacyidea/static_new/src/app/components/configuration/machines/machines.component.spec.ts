@@ -22,7 +22,7 @@ import { provideHttpClient } from "@angular/common/http";
 import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
 import { MachineService } from "../../../services/machine/machine.service";
-import { Router, provideRouter } from "@angular/router";
+import { provideRouter, Router } from "@angular/router";
 import { ROUTE_PATHS } from "../../../route_paths";
 import { signal } from "@angular/core";
 

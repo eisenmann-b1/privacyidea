@@ -30,7 +30,7 @@ import { PendingChangesService } from "../../../../services/pending-changes/pend
 import { MockPendingChangesService } from "../../../../../testing/mock-services/mock-pending-changes-service";
 import { DialogService } from "../../../../services/dialog/dialog.service";
 import { MockDialogService } from "../../../../../testing/mock-services";
-import { provideRouter, Router, ActivatedRoute, convertToParamMap } from "@angular/router";
+import { ActivatedRoute, convertToParamMap, provideRouter, Router } from "@angular/router";
 
 describe("NewSmtpServerComponent", () => {
   let smtpServiceMock: any;
@@ -58,7 +58,7 @@ describe("NewSmtpServerComponent", () => {
           { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({})) } },
           { provide: SmtpService, useClass: MockSmtpService },
           { provide: PendingChangesService, useClass: MockPendingChangesService },
-          { provide: DialogService, useClass: MockDialogService },
+          { provide: DialogService, useClass: MockDialogService }
         ]
       }).compileComponents();
 
@@ -219,7 +219,7 @@ describe("NewSmtpServerComponent", () => {
           timeout: 5
         });
         component.smtpForm.markAsDirty();
-        
+
 
         component.onCancel();
 
@@ -241,7 +241,6 @@ describe("NewSmtpServerComponent", () => {
         mockSaveExitDialogRef.afterClosed.mockReturnValue(of("save-exit"));
         pendingChangesService.save.mockReturnValue(Promise.resolve(true));
 
-        
 
         component.onCancel();
 
@@ -264,7 +263,6 @@ describe("NewSmtpServerComponent", () => {
         mockSaveExitDialogRef.afterClosed.mockReturnValue(of("save-exit"));
         pendingChangesService.save.mockReturnValue(Promise.resolve(false));
 
-        
 
         component.onCancel();
 
@@ -279,7 +277,6 @@ describe("NewSmtpServerComponent", () => {
         component.smtpForm.markAsDirty();
         mockSaveExitDialogRef.afterClosed.mockReturnValue(of("save-exit"));
 
-        
 
         component.onCancel();
 
@@ -301,7 +298,6 @@ describe("NewSmtpServerComponent", () => {
         });
         component.smtpForm.markAsDirty();
 
-        
 
         component.onCancel();
 
@@ -341,7 +337,7 @@ describe("NewSmtpServerComponent", () => {
             useValue: { smtpServers: () => [editData], postSmtpServer: jest.fn(), testSmtpServer: jest.fn() }
           },
           { provide: PendingChangesService, useClass: MockPendingChangesService },
-          { provide: DialogService, useClass: MockDialogService },
+          { provide: DialogService, useClass: MockDialogService }
         ]
       }).compileComponents();
 

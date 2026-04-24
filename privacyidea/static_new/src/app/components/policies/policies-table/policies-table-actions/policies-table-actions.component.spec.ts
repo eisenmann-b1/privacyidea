@@ -45,7 +45,7 @@ describe("PoliciesTableActionsComponent", () => {
         { provide: DialogService, useClass: MockDialogService },
         { provide: AuthService, useClass: MockAuthService },
         { provide: PolicyService, useClass: MockPolicyService },
-        { provide: Router, useClass: MockRouter}
+        { provide: Router, useClass: MockRouter }
       ]
     }).compileComponents();
 

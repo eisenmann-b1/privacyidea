@@ -41,7 +41,8 @@ from privacyidea.lib.counter import read as counter_read
 from privacyidea.lib.realm import get_realms
 from privacyidea.lib.resolver import get_resolver_list
 from privacyidea.lib.token import get_token_owner, get_tokens
-from privacyidea.lib.tokenclass import DATE_FORMAT, RolloutState
+from privacyidea.lib.tokenclass import DATE_FORMAT
+from privacyidea.lib.tokenrolloutstate import RolloutState
 from privacyidea.lib.user import User
 from privacyidea.lib.utils import parse_time_offset_from_now, is_true, check_ip_in_policy, AUTH_RESPONSE
 from privacyidea.lib.utils.compare import compare_time, compare_ints, compare_generic

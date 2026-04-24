@@ -106,7 +106,8 @@ from privacyidea.lib.policydecorators import (libpolicy,
                                               reset_all_user_tokens, force_challenge_response)
 from privacyidea.lib.realm import realm_is_defined, get_realms
 from privacyidea.lib.resolver import get_resolver_object
-from privacyidea.lib.tokenclass import DATE_FORMAT, Tokenkind, TokenClass, RolloutState
+from privacyidea.lib.tokenclass import DATE_FORMAT, Tokenkind, TokenClass
+from privacyidea.lib.tokenrolloutstate import RolloutState
 from privacyidea.lib.user import User
 from privacyidea.lib.utils import (is_true, BASE58, hexlify_and_unicode, check_serial_valid, create_tag_dict,
                                    redacted_phone_number, redacted_email)
@@ -116,7 +117,6 @@ from privacyidea.models import (db, Token, Realm, TokenRealm, Challenge,
 from privacyidea.models.utils import clob_to_varchar
 
 log = logging.getLogger(__name__)
-
 
 ENCODING = "utf-8"
 
@@ -2667,7 +2667,7 @@ def check_token_list(token_object_list, passw, user=None, options=None, allow_re
                     reply_dict["message"] = ". ".join(messages)
                     log.info("Received a valid response to a "
                              "challenge for a non-fit token {!s}. {!s}".format(token_object.token.serial,
-                                                                                 reply_dict["message"]))
+                                                                               reply_dict["message"]))
                 else:
                     # Challenge matches, token is active and token is fit for challenge
                     res = True

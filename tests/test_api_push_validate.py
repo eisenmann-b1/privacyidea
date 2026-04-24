@@ -1,32 +1,33 @@
 # SPDX-FileCopyrightText: 2020 NetKnights GmbH <https://netknights.it>
 # SPDX-License-Identifier: AGPL-3.0-or-later
+import datetime
+import logging
 import time
 from base64 import b32encode
+
+from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
-from cryptography.hazmat.backends import default_backend
-import datetime
-import logging
-
 from testfixtures import LogCapture
 
-from .base import MyApiTestCase
-from privacyidea.lib.user import User
-from privacyidea.lib.token import (get_tokens, init_token, remove_token,
-                                   get_one_token, enable_token)
-from privacyidea.lib.tokenclass import ClientMode, RolloutState
-from privacyidea.lib.policy import SCOPE, set_policy, delete_policy
-from privacyidea.lib.tokens.pushtoken import (PushAction, strip_pem_headers, POLL_ONLY,
-                                              DEFAULT_CHALLENGE_TEXT, PushMode)
 from privacyidea.lib.challenge import get_challenges
-from privacyidea.lib.smsprovider.SMSProvider import set_smsgateway
-from privacyidea.lib.smsprovider.FirebaseProvider import FirebaseConfig
-from privacyidea.lib.utils import to_bytes, to_unicode, AUTH_RESPONSE
 from privacyidea.lib.policies.actions import PolicyAction
+from privacyidea.lib.policy import SCOPE, set_policy, delete_policy
 from privacyidea.lib.realm import set_realm, set_default_realm, delete_realm
 from privacyidea.lib.resolver import save_resolver, delete_resolver
+from privacyidea.lib.smsprovider.FirebaseProvider import FirebaseConfig
+from privacyidea.lib.smsprovider.SMSProvider import set_smsgateway
+from privacyidea.lib.token import (get_tokens, init_token, remove_token,
+                                   get_one_token, enable_token)
+from privacyidea.lib.tokenclass import ClientMode
+from privacyidea.lib.tokenrolloutstate import RolloutState
+from privacyidea.lib.tokens.pushtoken import (PushAction, strip_pem_headers, POLL_ONLY,
+                                              DEFAULT_CHALLENGE_TEXT, PushMode)
+from privacyidea.lib.user import User
+from privacyidea.lib.utils import to_bytes, to_unicode, AUTH_RESPONSE
 from . import ldap3mock
+from .base import MyApiTestCase
 
 PWFILE = "tests/testdata/passwords"
 HOSTSFILE = "tests/testdata/hosts"
@@ -1377,7 +1378,7 @@ class PushAPITestCase(MyApiTestCase):
             res = self.app.full_dispatch_request()
             self.assertEqual(200, res.status_code, res)
             # Check that we actually waited
-            self.assertGreater(time.time() - start_time, push_wait_time_seconds-1)
+            self.assertGreater(time.time() - start_time, push_wait_time_seconds - 1)
             result = res.json.get("result")
             # The challenge was not answered in time, so we get reject
             self.assertTrue(result.get("status"))

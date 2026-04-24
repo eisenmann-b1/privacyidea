@@ -210,7 +210,7 @@ export class PeriodicTaskService implements PeriodicTaskServiceInterface {
     }
     try {
       if (task.id == null) {
-        this.notificationService.openSnackBar("Failed to delete periodic task: Missing ID");
+        this.notificationService.openSnackBar("Failed to delete periodic task: Missing ID.");
         return;
       }
       const response = await lastValueFrom(this.deletePeriodicTask(task.id));

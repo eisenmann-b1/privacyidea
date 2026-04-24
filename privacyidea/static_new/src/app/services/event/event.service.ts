@@ -83,9 +83,9 @@ export interface EventServiceInterface {
 
   saveEventHandler(event: Record<string, any>): Observable<PiResponse<number, any> | undefined>;
 
-  enableEvent(eventId: number): Promise<Object | undefined>;
+  enableEvent(eventId: number | null): Promise<Object | undefined>;
 
-  disableEvent(eventId: number): Promise<Object | undefined>;
+  disableEvent(eventId: number | null): Promise<Object | undefined>;
 
   deleteEvent(eventId: number): Observable<PiResponse<number, any>>;
 
@@ -165,7 +165,11 @@ export class EventService implements EventServiceInterface {
     );
   }
 
-  enableEvent(eventId: number) {
+  enableEvent(eventId: number | null) {
+    if (eventId === null) {
+      this.notificationService.openSnackBar("Can not enable event handler due to missing ID");
+      return Promise.resolve(undefined);
+    }
     const headers = this.authService.getHeaders();
     return lastValueFrom(
       this.http.post(this.eventBaseUrl + "/enable/" + eventId, {}, { headers: headers }).pipe(
@@ -180,7 +184,11 @@ export class EventService implements EventServiceInterface {
     );
   }
 
-  disableEvent(eventId: number) {
+  disableEvent(eventId: number | null) {
+    if (eventId === null) {
+      this.notificationService.openSnackBar("Can not disable event handler due to missing ID");
+      return Promise.resolve(undefined);
+    }
     const headers = this.authService.getHeaders();
     return lastValueFrom(
       this.http.post(this.eventBaseUrl + "/disable/" + eventId, {}, { headers: headers }).pipe(

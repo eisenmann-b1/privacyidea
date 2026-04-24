@@ -768,7 +768,7 @@ class BaseEventHandler(object):
             condition, time_delta = parse_time_offset_from_now(condition)
             str_format_now = (datetime.datetime.now(tzlocal()) + time_delta).strftime(
                 DATE_FORMAT)
-            condition = condition.replace(now=str_format_now)
+            condition = condition.replace('{now}', str_format_now)
             if not compare_generic(condition,
                                    lambda key: user.get_specific_info([key]).get(key),
                                    "Misconfiguration in your userinfo condition: {0!s}"):

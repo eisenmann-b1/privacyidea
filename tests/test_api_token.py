@@ -4286,7 +4286,7 @@ class APIRolloutState(MyApiTestCase):
         serial1 = r.token.serial
 
         r = init_token({"genkey": 1})
-        self.assertEqual(r.rollout_state, "enrolled")
+        self.assertEqual(r.rollout_state, RolloutState.ENROLLED)
 
         # There are two tokens enrolled
         with self.app.test_request_context('/token/',
@@ -4314,7 +4314,7 @@ class APIRolloutState(MyApiTestCase):
 
         # Test wildcard rollout_state filter
         r = init_token({"genkey": 1})
-        self.assertEqual(r.rollout_state, "enrolled")
+        self.assertEqual(r.rollout_state, RolloutState.ENROLLED)
         serial3 = r.token.serial
         # Set a dummy rollout state
         r.token.rollout_state = "special"

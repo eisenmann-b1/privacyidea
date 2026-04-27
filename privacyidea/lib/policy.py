@@ -189,7 +189,7 @@ from privacyidea.lib.config import (get_token_classes, get_token_types,
 from privacyidea.lib.error import ParameterError, PolicyError, ResourceNotFoundError, ServerError
 from privacyidea.lib.error import PrivacyIDEAError
 from privacyidea.lib.radiusserver import get_radiusservers
-from privacyidea.lib.realm import get_realms
+from privacyidea.lib.realm import get_realms, get_ordered_resolvers
 from privacyidea.lib.resolver import get_resolver_list
 from privacyidea.lib.smtpserver import get_smtpservers
 from privacyidea.lib.user import User
@@ -520,11 +520,10 @@ class PolicyClass:
             for policy in reduced_policies:
                 if policy.get("check_all_resolvers"):
                     if realm and user:
-                        # We have a realm and a user and can get all resolvers
-                        # of this user in the realm
+                        # We have a realm and a user, so get all resolvers of that realm
+                        # in priority order to match against the policy's resolver list.
                         if not user_resolvers:
-                            user_resolvers = User(user,
-                                                  realm=realm).get_ordered_resolvers()
+                            user_resolvers = get_ordered_resolvers(realm)
                         for reso in user_resolvers:
                             value_found, _v_ex = self._search_value(
                                 policy.get("resolver"), reso)

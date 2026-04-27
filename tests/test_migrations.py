@@ -493,6 +493,51 @@ def test_all_down_revisions_point_to_existing_revisions():
     )
 
 
+def test_per_migration_test_parent_revisions_match_alembic_chain():
+    """
+    Every ``MigrationTestBase`` subclass declares ``REVISION`` and
+    ``PARENT_REVISION`` constants. ``PARENT_REVISION`` must equal the
+    ``down_revision`` of ``REVISION`` in the alembic chain — otherwise
+    ``_load_seed_and_upgrade_to_parent`` lands at the wrong place and
+    ``_upgrade()`` / ``_downgrade()`` silently span more than one revision.
+
+    The mismatch is invisible at runtime as long as the in-between migrations
+    don't touch the same data, so this static check is the only thing that
+    catches it.
+    """
+    import importlib
+    import pkgutil
+
+    import tests
+    from tests.migration_test_utils import MigrationTestBase
+
+    for module_info in pkgutil.iter_modules(tests.__path__):
+        name = module_info.name
+        if name.startswith("test_migration_") and name != "test_migrations":
+            importlib.import_module(f"tests.{name}")
+
+    script = ScriptDirectory.from_config(_get_alembic_cfg())
+
+    bad = []
+    for cls in MigrationTestBase.__subclasses__():
+        rev = script.get_revision(cls.REVISION)
+        expected = rev.down_revision
+        if isinstance(expected, tuple):
+            expected = expected[0]
+        if cls.PARENT_REVISION != expected:
+            bad.append((cls.__name__, cls.REVISION, cls.PARENT_REVISION, expected))
+
+    assert not bad, (
+        "The following per-migration test classes have a PARENT_REVISION "
+        "that does not match the alembic chain:\n"
+        + "\n".join(
+            f"  {name} (REVISION={rev}): PARENT_REVISION={got!r} but "
+            f"alembic down_revision={want!r}"
+            for name, rev, got, want in bad
+        )
+    )
+
+
 def test_each_migration_survives_round_trip(flask_app):
     """
     True idempotency test: for every migration in the window, verify that the

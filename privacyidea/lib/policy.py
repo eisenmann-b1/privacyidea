@@ -1640,7 +1640,7 @@ def get_static_policy_definitions(scope=None):
         description.
     :rtype: dict
     """
-    from .tokenclass import RolloutState
+    from privacyidea.lib.tokenrolloutstate import RolloutState
     from .container import get_container_token_types, get_all_templates_with_type, get_templates_by_query
     resolvers = list(get_resolver_list())
     realms = list(get_realms())

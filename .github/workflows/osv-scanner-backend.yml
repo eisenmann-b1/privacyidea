@@ -1,0 +1,35 @@
+# osv-scanner scans the Python backend dependencies for known vulnerabilities
+# using the OSV database (the same upstream that feeds GitHub's advisory DB).
+# Results are uploaded to the Security tab as SARIF and do not block merging.
+# Findings require manual triage — presence of a CVE does not imply reachability.
+#
+# https://github.com/google/osv-scanner
+
+name: osv-scanner-backend
+
+on:
+  pull_request:
+    branches:
+      - "master"
+      - "branch-*"
+    paths:
+      - "requirements.txt"
+      - ".github/workflows/osv-scanner-backend.yml"
+  schedule:
+    # Nightly at 22:47 UTC — offset from frontend scan (22:53) to avoid simultaneous load.
+    - cron: '47 22 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  scan:
+    permissions:
+      contents: read
+      security-events: write  # upload SARIF to the Security tab
+      actions: read           # required by the reusable workflow for SARIF upload
+
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@c51854704019a247608d928f370c98740469d4b5" # v2.3.5
+    with:
+      scan-args: |-
+        --lockfile=requirements.txt:requirements.txt

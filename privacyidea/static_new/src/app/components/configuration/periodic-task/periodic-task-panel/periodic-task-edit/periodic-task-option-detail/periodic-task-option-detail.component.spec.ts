@@ -28,7 +28,8 @@ describe("PeriodicTaskOptionDetailComponent", () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PeriodicTaskOptionDetailComponent]
-    }).compileComponents();
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(PeriodicTaskOptionDetailComponent);
     component = fixture.componentInstance;

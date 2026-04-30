@@ -17,7 +17,9 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  **/
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { YubikeyConfigComponent } from "@components/configuration/token-type-config/token-types/yubikey-config/yubikey-config.component";
+import {
+  YubikeyConfigComponent
+} from "@components/configuration/token-type-config/token-types/yubikey-config/yubikey-config.component";
 import { provideRouter } from "@angular/router";
 import { provideAnimations } from "@angular/platform-browser/animations";
 
@@ -62,7 +64,7 @@ describe("YubikeyConfigComponent", () => {
     const newId = "newClientId";
     component.newYubikeyApiId.set(newId);
     component.createNewKey();
-    expect(component.onYubikeyCreateNewKey.emit).toHaveBeenCalledWith({ apiId: newId, apiKey: "", generateKey: true });
+    expect(component.onYubikeyCreateNewKey.emit).toHaveBeenCalledWith({apiId: newId, apiKey: "", generateKey: true});
   });
 
   it("should clear newYubikeyApiId and newYubikeyApiKey after creating a new key", () => {
@@ -119,3 +121,4 @@ describe("YubikeyConfigComponent", () => {
     expect(component.newYubikeyApiKey()).toBe(newKey);
   });
 });
+

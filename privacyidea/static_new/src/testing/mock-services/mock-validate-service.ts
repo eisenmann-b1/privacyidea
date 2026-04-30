@@ -82,12 +82,7 @@ export class MockValidateService implements ValidateServiceInterface {
     return of(MockPiResponse.fromValue<AuthData, AuthDetail>(new MockAuthData(), new MockAuthDetail()) as any);
   }
 
-  authenticateWebAuthn(_args: {
-    signRequest: any;
-    transaction_id: string;
-    username: string;
-    isTest?: boolean;
-  }): Observable<AuthResponse> {
+  authenticateWebAuthn(_args: { signRequest: any; transaction_id: string; username: string; isTest?: boolean }): Observable<AuthResponse> {
     return of(MockPiResponse.fromValue<AuthData, AuthDetail>(new MockAuthData(), new MockAuthDetail()) as any);
   }
 

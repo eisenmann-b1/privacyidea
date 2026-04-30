@@ -60,13 +60,13 @@
     class="privacyidea-servers-table"
     mat-table
     matSort>
+
     <ng-container matColumnDef="identifier">
       <th
         *matHeaderCellDef
         i18n
         mat-header-cell
-        mat-sort-header>
-        Identifier
+        mat-sort-header> Identifier
       </th>
       <td
         *matCellDef="let server"
@@ -87,13 +87,11 @@
         *matHeaderCellDef
         i18n
         mat-header-cell
-        mat-sort-header>
-        URL
+        mat-sort-header> URL
       </th>
       <td
         *matCellDef="let server"
-        mat-cell>
-        {{ server.url }}
+        mat-cell> {{ server.url }}
       </td>
     </ng-container>
 
@@ -102,8 +100,7 @@
         *matHeaderCellDef
         i18n
         mat-header-cell
-        mat-sort-header>
-        Verify TLS
+        mat-sort-header> Verify TLS
       </th>
       <td
         *matCellDef="let server"
@@ -123,13 +120,11 @@
         *matHeaderCellDef
         i18n
         mat-header-cell
-        mat-sort-header>
-        Description
+        mat-sort-header> Description
       </th>
       <td
         *matCellDef="let server"
-        mat-cell>
-        {{ server.description }}
+        mat-cell> {{ server.description }}
       </td>
     </ng-container>
 
@@ -137,8 +132,7 @@
       <th
         *matHeaderCellDef
         i18n
-        mat-header-cell>
-        Actions
+        mat-header-cell> Actions
       </th>
       <td
         *matCellDef="let server"
@@ -160,7 +154,7 @@
       *matHeaderRowDef="displayedColumns"
       mat-header-row></tr>
     <tr
-      *matRowDef="let row; columns: displayedColumns"
+      *matRowDef="let row; columns: displayedColumns;"
       mat-row></tr>
 
     <tr
@@ -169,8 +163,7 @@
       <td
         class="mat-cell"
         colspan="5"
-        i18n>
-        No privacyIDEA servers found.
+        i18n>No privacyIDEA servers found.
       </td>
     </tr>
   </table>

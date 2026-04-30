@@ -96,7 +96,7 @@ export class MachineDetailsDialogComponent implements OnInit {
       this.dialogRef.backdropClick().subscribe(() => {
         this.close();
       });
-      this.dialogRef.keydownEvents().subscribe((event) => {
+      this.dialogRef.keydownEvents().subscribe(event => {
         if (event.key === "Escape") {
           this.close();
         }
@@ -112,7 +112,7 @@ export class MachineDetailsDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTokenApplications();
-    this.applicationOptions = Object.keys(this.applicationsDef()).filter((k) => k !== "offline");
+    this.applicationOptions = Object.keys(this.applicationsDef()).filter(k => k !== "offline");
   }
 
   onTokenSerialInput(value: string): void {
@@ -120,18 +120,16 @@ export class MachineDetailsDialogComponent implements OnInit {
   }
 
   loadTokenApplications(): void {
-    this.machineService
-      .getMachineTokens({
-        machineid: this.data.id,
-        resolver: this.data.resolver_name
-      })
-      .subscribe((response) => {
-        if (response.result?.value) {
-          this.tokenApplications.set(response.result?.value ?? ([] as TokenApplications));
-          this.dataSource.data = response.result?.value;
-          this.dataSource.paginator = this.paginator;
-        }
-      });
+    this.machineService.getMachineTokens({
+      machineid: this.data.id,
+      resolver: this.data.resolver_name
+    }).subscribe(response => {
+      if (response.result?.value) {
+        this.tokenApplications.set(response.result?.value ?? [] as TokenApplications);
+        this.dataSource.data = response.result?.value;
+        this.dataSource.paginator = this.paginator;
+      }
+    });
   }
 
   isEditing(tokenId: number): boolean {
@@ -167,22 +165,17 @@ export class MachineDetailsDialogComponent implements OnInit {
   }
 
   detachToken(token: TokenApplication): void {
-    lastValueFrom(
-      this.dialogService
-        .openDialog({
-          component: SimpleConfirmationDialogComponent,
-          data: {
-            title: $localize`Detach Token`,
-            items: [token.serial],
-            itemType: "token",
-            confirmAction: { label: $localize`Detach`, value: true, type: "destruct" }
-          }
-        })
-        .afterClosed()
-    ).then((confirmed) => {
+    lastValueFrom(this.dialogService.openDialog({
+      component: SimpleConfirmationDialogComponent,
+      data: {
+        title: $localize`Detach Token`,
+        items: [token.serial],
+        itemType: "token",
+        confirmAction: { label: $localize`Detach`, value: true, type: "destruct" }
+      }
+    }).afterClosed()).then(confirmed => {
       if (confirmed) {
-        this.machineService
-          .deleteTokenById(token.serial, token.application, token.id.toString())
+        this.machineService.deleteTokenById(token.serial, token.application, token.id.toString())
           .subscribe(() => this.loadTokenApplications());
       }
     });
@@ -193,18 +186,16 @@ export class MachineDetailsDialogComponent implements OnInit {
       return;
     }
 
-    this.machineService
-      .postAssignMachineToToken({
-        serial: this.newTokenSerial,
-        application: this.selectedApplication,
-        machineid: this.data.id,
-        resolver: this.data.resolver_name
-      })
-      .subscribe(() => {
-        this.newTokenSerial = "";
-        this.selectedApplication = "offline";
-        this.loadTokenApplications();
-      });
+    this.machineService.postAssignMachineToToken({
+      serial: this.newTokenSerial,
+      application: this.selectedApplication,
+      machineid: this.data.id,
+      resolver: this.data.resolver_name
+    }).subscribe(() => {
+      this.newTokenSerial = "";
+      this.selectedApplication = "offline";
+      this.loadTokenApplications();
+    });
   }
 
   onTokenClick(serial: string): void {

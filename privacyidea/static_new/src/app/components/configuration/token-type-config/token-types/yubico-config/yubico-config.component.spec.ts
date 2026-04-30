@@ -82,7 +82,7 @@ describe("YubicoConfigComponent", () => {
 
   it("should handle empty field values", () => {
     jest.spyOn(component.formDataChange, "emit");
-
+    
     component.updateFormData(YUBICO_ID, "");
     expect(component.formDataChange.emit).toHaveBeenCalledWith({ [YUBICO_ID]: "" });
 
@@ -100,3 +100,4 @@ describe("YubicoConfigComponent", () => {
     expect(component.expanded()).toBe(false);
   });
 });
+

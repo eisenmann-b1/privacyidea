@@ -18,7 +18,11 @@
  **/
 
 import { ClientsService } from "./clients.service";
-import { MockContentService, MockLocalService, MockNotificationService } from "../../../testing/mock-services";
+import {
+  MockContentService,
+  MockLocalService,
+  MockNotificationService
+} from "../../../testing/mock-services";
 import { TestBed } from "@angular/core/testing";
 import { provideHttpClient } from "@angular/common/http";
 import { AuthService } from "../auth/auth.service";
@@ -27,6 +31,7 @@ import { HttpTestingController, provideHttpClientTesting } from "@angular/common
 import { ROUTE_PATHS } from "../../route_paths";
 import { environment } from "../../../environments/environment";
 import { MockAuthService } from "../../../testing/mock-services/mock-auth-service";
+
 
 describe("ClientsService", () => {
   let clientService: ClientsService;

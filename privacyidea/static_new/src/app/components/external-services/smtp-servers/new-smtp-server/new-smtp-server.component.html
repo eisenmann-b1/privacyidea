@@ -48,8 +48,10 @@
           required />
       </app-clearable-input>
       <mat-hint i18n>The unique identifying name of the SMTP server definition.</mat-hint>
-      @if (smtpForm.get("identifier")?.hasError("required")) {
-        <mat-error i18n>Identifier is <strong>required</strong> </mat-error>
+      @if (smtpForm.get('identifier')?.hasError('required')) {
+        <mat-error
+          i18n>Identifier is <strong>required</strong>
+        </mat-error>
       }
     </mat-form-field>
 
@@ -67,8 +69,10 @@
             placeholder="smtp://mail.example.com"
             required />
         </app-clearable-input>
-        @if (smtpForm.get("server")?.hasError("required")) {
-          <mat-error i18n>Server is <strong>required</strong> </mat-error>
+        @if (smtpForm.get('server')?.hasError('required')) {
+          <mat-error
+            i18n>Server is <strong>required</strong>
+          </mat-error>
         }
       </mat-form-field>
 
@@ -98,11 +102,15 @@
             placeholder="privacyidea@example.com"
             required />
         </app-clearable-input>
-        @if (smtpForm.get("sender")?.hasError("required")) {
-          <mat-error i18n>Sender email is <strong>required</strong> </mat-error>
+        @if (smtpForm.get('sender')?.hasError('required')) {
+          <mat-error
+            i18n>Sender email is <strong>required</strong>
+          </mat-error>
         }
-        @if (smtpForm.get("sender")?.hasError("email")) {
-          <mat-error i18n>Invalid email format </mat-error>
+        @if (smtpForm.get('sender')?.hasError('email')) {
+          <mat-error
+            i18n>Invalid email format
+          </mat-error>
         }
       </mat-form-field>
 
@@ -168,14 +176,12 @@
       @if (showTLS) {
         <mat-checkbox
           formControlName="tls"
-          i18n
-          >Use StartTLS
+          i18n>Use StartTLS
         </mat-checkbox>
       }
       <mat-checkbox
         formControlName="enqueue_job"
-        i18n
-        >Send mail from job queue
+        i18n>Send mail from job queue
       </mat-checkbox>
     </div>
 
@@ -209,13 +215,11 @@
       <div class="checkbox-group">
         <mat-checkbox
           formControlName="smime"
-          i18n
-          >S/MIME signing
+          i18n>S/MIME signing
         </mat-checkbox>
         <mat-checkbox
           formControlName="dont_send_on_error"
-          i18n
-          >Don't send on signing error
+          i18n>Don't send on signing error
         </mat-checkbox>
       </div>
 

@@ -31,8 +31,7 @@
         [value]="remoteServerControl.value"
         required>
         @for (option of remoteServerOptions(); track option) {
-          <mat-option [value]="option">{{ option.name }}</mat-option
-          ><!-- Assuming option is the RemoteServer object -->
+          <mat-option [value]="option">{{ option.name }}</mat-option><!-- Assuming option is the RemoteServer object -->
         }
       </mat-select>
       <mat-error
@@ -61,7 +60,8 @@
         required />
       <mat-error i18n>Remote User is <strong>required</strong></mat-error>
     </mat-form-field>
-    <mat-form-field class="input-width-l">
+    <mat-form-field
+      class="input-width-l">
       <mat-label i18n>Remote Realm</mat-label>
       <input
         [formControl]="remoteRealmControl"

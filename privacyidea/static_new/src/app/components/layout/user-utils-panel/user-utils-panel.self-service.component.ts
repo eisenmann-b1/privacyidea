@@ -27,7 +27,14 @@ import { UserUtilsPanelComponent } from "@components/layout/user-utils-panel/use
 
 @Component({
   selector: "app-user-utils-panel-self-service",
-  imports: [MatIcon, MatIconButton, MatTooltip, ThemeSwitcherComponent, NgClass, DatePipe],
+  imports: [
+    MatIcon,
+    MatIconButton,
+    MatTooltip,
+    ThemeSwitcherComponent,
+    NgClass,
+    DatePipe
+  ],
   templateUrl: "./user-utils-panel.self-service.component.html",
   styleUrl: "./user-utils-panel.component.scss"
 })

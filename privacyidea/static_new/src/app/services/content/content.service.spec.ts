@@ -50,7 +50,10 @@ describe("ContentService", () => {
     };
 
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), { provide: Router, useValue: mockRouter }]
+      providers: [
+        provideHttpClient(),
+        { provide: Router, useValue: mockRouter }
+      ]
     });
 
     service = TestBed.inject(ContentService);
@@ -99,7 +102,9 @@ describe("ContentService", () => {
       emitNav("/tokens/containers");
       service.tokenSelected("SER1");
 
-      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith(ROUTE_PATHS.TOKENS_DETAILS + "SER1");
+      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith(
+        ROUTE_PATHS.TOKENS_DETAILS + "SER1"
+      );
       expect(service.tokenSerial()).toBe("SER1");
       expect(service.routeUrl()).toBe(ROUTE_PATHS.TOKENS_DETAILS + "SER1");
       expect(service.previousUrl()).toBe("/tokens/containers");
@@ -111,7 +116,9 @@ describe("ContentService", () => {
       emitNav("/tokens");
       service.containerSelected("C1");
 
-      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith(ROUTE_PATHS.TOKENS_CONTAINERS_DETAILS + "C1");
+      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith(
+        ROUTE_PATHS.TOKENS_CONTAINERS_DETAILS + "C1"
+      );
       expect(service.containerSerial()).toBe("C1");
       expect(service.routeUrl()).toBe(ROUTE_PATHS.TOKENS_CONTAINERS_DETAILS + "C1");
       expect(service.previousUrl()).toBe("/tokens");

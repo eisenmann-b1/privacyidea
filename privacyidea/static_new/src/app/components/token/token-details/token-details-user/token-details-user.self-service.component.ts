@@ -66,7 +66,7 @@ export class TokenDetailsUserSelfServiceComponent extends TokenDetailsUserCompon
   protected override realmService: RealmServiceInterface = inject(RealmService);
   protected override userService: UserServiceInterface = inject(UserService);
   protected override notificationService: NotificationServiceInterface = inject(NotificationService);
-  protected override authService: AuthServiceInterface = inject(AuthService);
+  protected  override authService: AuthServiceInterface = inject(AuthService);
 
   constructor() {
     super();

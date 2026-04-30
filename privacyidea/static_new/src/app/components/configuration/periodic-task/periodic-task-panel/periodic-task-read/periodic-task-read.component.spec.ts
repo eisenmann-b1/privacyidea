@@ -73,17 +73,14 @@ describe("PeriodicTaskPanelComponent", () => {
 
   it("should render interval, nodes, ordering, and retry_if_failed", () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain("Interval " + task.interval);
+    expect(compiled.textContent).toContain("Interval " + task.interval );
     expect(compiled.textContent).toContain("Nodes " + task.nodes[0]);
     expect(compiled.textContent).toContain("Ordering " + task.ordering.toString());
     expect(compiled.textContent).toContain("Retry If Failed");
   });
 
   it("should render options", () => {
-    fixture.componentRef.setInput("task", {
-      ...task,
-      options: { event_counter: "test-counter", reset_event_counter: "true" }
-    });
+    fixture.componentRef.setInput("task", { ...task, options: { event_counter: "test-counter", reset_event_counter: "true" } });
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.textContent).toContain("Options");
@@ -95,8 +92,7 @@ describe("PeriodicTaskPanelComponent", () => {
 
   it("should render last_runs as dates and fallback", () => {
     fixture.componentRef.setInput("task", {
-      ...task,
-      last_runs: {
+      ...task, last_runs: {
         node1: "2024-08-03T12:00:00Z",
         node2: 1717238400000,
         node3: "not-a-date"

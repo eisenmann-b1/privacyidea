@@ -129,12 +129,11 @@ describe("ServiceIdService", () => {
     const req = httpMock.expectOne(`${environment.proxyUrl}/serviceid/`);
     expect(req.request.method).toBe("GET");
     req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-      status: 403,
-      statusText: "Permission denied"
-    });
+        status: 403, statusText: "Permission denied"
+      });
     await lastValueFrom(of({})); // Wait for async updates
 
-    expect(service.serviceIdResource.hasValue()).toEqual(false);
+    expect(service.serviceIdResource.hasValue()).toEqual(false)
     expect(service.serviceIds()).toEqual([]);
   });
 });

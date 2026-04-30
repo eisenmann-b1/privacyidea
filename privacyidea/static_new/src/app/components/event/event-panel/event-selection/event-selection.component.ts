@@ -125,8 +125,9 @@ export class EventSelectionComponent {
       search: this.searchTerm()
     }),
     computation: ({ available, selected, search }) =>
-      available.filter(
-        (event) => !selected.includes(event) && (!search || event.toLowerCase().includes(search.toLowerCase()))
+      available.filter(event =>
+        !selected.includes(event) &&
+        (!search || event.toLowerCase().includes(search.toLowerCase()))
       )
   });
 

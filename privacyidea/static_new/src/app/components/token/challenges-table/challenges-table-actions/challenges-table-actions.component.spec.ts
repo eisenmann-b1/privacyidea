@@ -77,9 +77,7 @@ describe("ChallengesTableActionsComponent", () => {
   });
 
   it("should show fallback message when error has no api message", () => {
-    jest
-      .spyOn(challengesService, "deleteExpiredChallenges")
-      .mockReturnValue(throwError(() => new Error("Network error")));
+    jest.spyOn(challengesService, "deleteExpiredChallenges").mockReturnValue(throwError(() => new Error("Network error")));
     const reloadSpy = jest.spyOn(challengesService.challengesResource, "reload");
 
     component.onDeleteExpiredChallenges();

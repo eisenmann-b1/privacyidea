@@ -56,6 +56,7 @@ import { TokenRolloverComponent } from "./token-rollover/token-rollover.componen
 import { tokenTypes } from "../../../../utils/token.utils";
 import { VerifyEnrollmentComponent } from "@components/token/token-details/token-details-actions/verify-enrollment/verify-enrollment.component";
 
+
 @Component({
   selector: "app-token-details-actions",
   standalone: true,
@@ -266,5 +267,7 @@ export class TokenDetailsActionsComponent {
     });
   }
 
-  readonly rolloverTokenTypes = computed(() => tokenTypes.filter((t) => t.rollover === true).map((t) => t.key));
+  readonly rolloverTokenTypes = computed(() =>
+    tokenTypes.filter(t => t.rollover === true).map(t => t.key)
+  );
 }

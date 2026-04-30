@@ -34,6 +34,7 @@
   <form
     [formGroup]="privacyideaForm"
     class="privacyidea-server-form">
+
     <div class="flex-row gap-16 margin-bottom-16">
       <mat-form-field
         appearance="fill"
@@ -48,7 +49,7 @@
             placeholder="myRemotePrivacyIDEAServer"
             required />
         </app-clearable-input>
-        @if (privacyideaForm.get("identifier")?.hasError("required")) {
+        @if (privacyideaForm.get('identifier')?.hasError('required')) {
           <mat-error i18n>Identifier is <strong>required</strong></mat-error>
         }
         <mat-hint i18n>This is the unique identifying name of the privacyIDEA server definition.</mat-hint>
@@ -67,7 +68,7 @@
             placeholder="https://pi17.example.com/"
             required />
         </app-clearable-input>
-        @if (privacyideaForm.get("url")?.hasError("required")) {
+        @if (privacyideaForm.get('url')?.hasError('required')) {
           <mat-error i18n>URL of the privacyIDEA Server is <strong>required</strong></mat-error>
         }
         <mat-hint i18n>Please provide the base URL of the privacyIDEA server.</mat-hint>

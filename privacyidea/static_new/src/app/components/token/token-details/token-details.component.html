@@ -41,7 +41,8 @@
         </button>
       }
     </div>
-    <div class="details-flex-layout responsive-flex-row-1310">
+    <div
+      class="details-flex-layout responsive-flex-row-1310">
       <div>
         <table
           [dataSource]="tokenDetailData()"
@@ -60,9 +61,8 @@
           <ng-container matColumnDef="value">
             <td
               *matCellDef="let element"
-              [ngClass]="
-                tableUtilsService.getTdClassForKey(element.keyMap.key).concat(element.isEditing() ? ['padding-0'] : [])
-              "
+              [ngClass]="tableUtilsService.getTdClassForKey(element.keyMap.key)
+              .concat(element.isEditing() ? ['padding-0'] : [])"
               mat-cell>
               @switch (element.keyMap.key) {
                 @case ("container_serial") {
@@ -182,8 +182,7 @@
                         matInput
                         placeholder="Enter description"
                         rows="4"></textarea>
-                      <mat-hint align="end"
-                        >{{ element.value?.length || 0 }} / {{ tokenService.maxDescriptionLength }}
+                      <mat-hint align="end">{{ element.value?.length || 0 }} /  {{ tokenService.maxDescriptionLength }}
                       </mat-hint>
                     </mat-form-field>
                   } @else {
@@ -243,9 +242,7 @@
               class="edit-column-cell"
               mat-cell>
               <div class="ali-center">
-                @if (
-                  element.keyMap.key === "failcount" && !isAnyEditingOrRevoked() && authService.actionAllowed("reset")
-                ) {
+                @if (element.keyMap.key === "failcount" && !isAnyEditingOrRevoked() && authService.actionAllowed("reset")) {
                   <div class="edit-button-container">
                     <button
                       (click)="resetFailCount()"
@@ -254,12 +251,10 @@
                       <mat-icon> lock_reset</mat-icon>
                     </button>
                   </div>
-                } @else if (
-                  element.keyMap.key === "container_serial" &&
-                  !isAnyEditingOrRevoked() &&
-                  element.value &&
-                  authService.actionAllowed("container_remove_token")
-                ) {
+                } @else if (element.keyMap.key === "container_serial" &&
+                !isAnyEditingOrRevoked() &&
+                element.value &&
+                authService.actionAllowed("container_remove_token")) {
                   <div class="edit-button-container">
                     <button
                       (click)="removeFromContainer()"

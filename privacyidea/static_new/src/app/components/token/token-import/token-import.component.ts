@@ -69,7 +69,7 @@ export class TokenImportComponent {
   fileTypes: Record<string, string> = {
     "OATH CSV": "CSV File for OATH Tokens",
     "Yubikey CSV": "CSV File for Yubikey Tokens",
-    pskc: "PSKC File",
+    "pskc": "PSKC File",
     "aladdin-xml": "XML File from Aladdin or SafeNet"
   };
   fileType = signal<string>("OATH CSV");
@@ -78,12 +78,14 @@ export class TokenImportComponent {
   preSharedKey = new FormControl("", this.preSharedKeyLength());
   pskPassword = signal("");
   pskValidationOptions: Record<string, string> = {
-    no_check: "Do not verify the authenticity",
-    check_fail_soft: "Skip tokens that can not be verified",
-    check_fail_hard: "Abort operation on unverifiable token"
+    "no_check": "Do not verify the authenticity",
+    "check_fail_soft": "Skip tokens that can not be verified",
+    "check_fail_hard": "Abort operation on unverifiable token"
   };
   pskValidation = signal("check_fail_hard");
-  selectedRealms = signal<string[]>(this.realmService.defaultRealm() ? [this.realmService.defaultRealm()!] : []);
+  selectedRealms = signal<string[]>(
+    this.realmService.defaultRealm() ? [this.realmService.defaultRealm()!] : []
+  );
   inputForm = new FormGroup({
     file: this.file,
     preSharedKey: this.preSharedKey

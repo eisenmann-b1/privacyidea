@@ -32,7 +32,8 @@
     </p>
   }
   <div class="selected-user-attach-container">
-    <mat-form-field class="input-width-l">
+    <mat-form-field
+      class="input-width-l">
       <mat-label i18n>Select Realm of User</mat-label>
       <mat-select
         [formControl]="selectedUserRealmControl"
@@ -43,7 +44,8 @@
         }
       </mat-select>
     </mat-form-field>
-    <mat-form-field class="input-width-l">
+    <mat-form-field
+      class="input-width-l">
       <mat-label i18n>Enter User</mat-label>
       <app-clearable-input
         (onClick)="userService.selectionFilter.set('')"

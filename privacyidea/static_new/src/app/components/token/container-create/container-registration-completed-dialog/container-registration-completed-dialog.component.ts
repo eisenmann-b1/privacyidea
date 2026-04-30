@@ -20,8 +20,7 @@
 import { Component, inject } from "@angular/core";
 import {
   MAT_DIALOG_DATA,
-  MatDialogActions,
-  MatDialogClose,
+  MatDialogActions, MatDialogClose,
   MatDialogContent,
   MatDialogRef,
   MatDialogTitle
@@ -37,7 +36,13 @@ export type ContainerRegistrationCompletedDialogData = {
   selector: "app-container-registration-completed-dialog",
   templateUrl: "./container-registration-completed-dialog.component.html",
   styleUrls: ["./container-registration-completed-dialog.component.scss"],
-  imports: [MatDialogContent, MatDialogTitle, MatDialogActions, MatButton, MatDialogClose]
+  imports: [
+    MatDialogContent,
+    MatDialogTitle,
+    MatDialogActions,
+    MatButton,
+    MatDialogClose
+  ]
 })
 export class ContainerRegistrationCompletedDialogComponent {
   public readonly data: ContainerRegistrationCompletedDialogData = inject(MAT_DIALOG_DATA);

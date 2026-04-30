@@ -161,9 +161,7 @@ export class EnrollTotpComponent implements OnInit {
       this.generateOnServerFormControl.setValue(enrollmentData.generateOnServer ?? true, { emitEvent: eventEmit });
       this.otpLengthFormControl.setValue(enrollmentData.otpLength ?? 6, { emitEvent: eventEmit });
       this.otpKeyFormControl.setValue(enrollmentData.otpKey ?? "", { emitEvent: eventEmit });
-      this.hashAlgorithmControl.setValue(enrollmentData.hashAlgorithm ?? this.defaultHashlib(), {
-        emitEvent: eventEmit
-      });
+      this.hashAlgorithmControl.setValue(enrollmentData.hashAlgorithm ?? this.defaultHashlib(), { emitEvent: eventEmit });
       this.timeStepControl.setValue(enrollmentData.timeStep ?? this.defaultTimeStep(), { emitEvent: eventEmit });
     }
   }

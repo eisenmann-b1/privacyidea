@@ -410,7 +410,7 @@ describe("ContainerService", () => {
     expect(notificationServiceMock.openSnackBar).toHaveBeenCalled();
   });
 
-  it('setContainerRealm joins array, blank array ⇒ ""', async () => {
+  it("setContainerRealm joins array, blank array ⇒ \"\"", async () => {
     const post = jest.spyOn(http, "post").mockReturnValue(of({}) as any);
     await lastValueFrom(containerService.setContainerRealm("cX", ["r1", "r2"]));
     expect(post).toHaveBeenCalledWith(
@@ -627,6 +627,7 @@ describe("ContainerService", () => {
   });
 
   describe("containerOptions", () => {
+
     it("should update containerOptions from httpResource when not yet present", async () => {
       authServiceMock.actionAllowed = jest.fn().mockReturnValue(true);
       contentServiceMock.onTokensContainers = signal(true);
@@ -634,14 +635,12 @@ describe("ContainerService", () => {
 
       const req = httpMock.expectOne((r) => r.url === "/container/");
       expect(req.request.method).toBe("GET");
-      req.flush(
-        MockPiResponse.fromValue({
-          containers: [
-            { serial: "c1", type: "typeA", realms: [], states: [], tokens: [], users: [] },
-            { serial: "c2", type: "typeB", realms: [], states: [], tokens: [], users: [] }
-          ]
-        })
-      );
+      req.flush(MockPiResponse.fromValue({
+        containers: [
+          { serial: "c1", type: "typeA", realms: [], states: [], tokens: [], users: [] },
+          { serial: "c2", type: "typeB", realms: [], states: [], tokens: [], users: [] }
+        ]
+      }));
       await Promise.resolve();
 
       expect(containerService.containerOptions()).toEqual(["c1", "c2"]);
@@ -652,7 +651,7 @@ describe("ContainerService", () => {
       contentServiceMock.onTokensContainers = signal(true);
       TestBed.tick();
 
-      const req = httpMock.expectOne((r) => r.url === "/container/");
+      const req = httpMock.expectOne(r => r.url === "/container/");
       expect(req.request.method).toBe("GET");
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
         status: 403,
@@ -676,12 +675,10 @@ describe("ContainerService", () => {
 
       const req = httpMock.expectOne((r) => r.url === "/container/types");
       expect(req.request.method).toBe("GET");
-      req.flush(
-        MockPiResponse.fromValue({
-          typeA: { description: "Type A", token_types: ["tt1", "tt2"] },
-          typeB: { description: "Type B", token_types: ["tt2", "tt3"] }
-        })
-      );
+      req.flush(MockPiResponse.fromValue({
+        typeA: { description: "Type A", token_types: ["tt1", "tt2"] },
+        typeB: { description: "Type B", token_types: ["tt2", "tt3"] }
+      }));
       await Promise.resolve();
 
       expect(containerService.containerTypeOptions()).toEqual([
@@ -707,6 +704,7 @@ describe("ContainerService", () => {
   });
 
   describe("containerDetails", () => {
+
     it("containerDetail falls back to default when resource empty", () => {
       expect(containerService.containerDetail()).toEqual({
         containers: [],
@@ -721,21 +719,21 @@ describe("ContainerService", () => {
       containerService.containerSerial.set("c1");
       TestBed.tick();
 
-      const req = httpMock.expectOne(
-        (r) => r.url === "/container/" && r.params.has("container_serial") && r.params.get("container_serial") === "c1"
-      );
+      const req = httpMock.expectOne((r) => r.url === "/container/" && r.params.has("container_serial") && r.params.get("container_serial") === "c1");
       expect(req.request.method).toBe("GET");
-      req.flush(
-        MockPiResponse.fromValue({
-          count: 1,
-          containers: [{ serial: "c1", type: "typeA", realms: [], states: [], tokens: [], users: [] }]
-        })
-      );
+      req.flush(MockPiResponse.fromValue({
+        count: 1,
+        containers: [
+          { serial: "c1", type: "typeA", realms: [], states: [], tokens: [], users: [] }
+        ]
+      }));
       await Promise.resolve();
 
       expect(containerService.containerDetail()).toEqual({
         count: 1,
-        containers: [{ serial: "c1", type: "typeA", realms: [], states: [], tokens: [], users: [] }]
+        containers: [
+          { serial: "c1", type: "typeA", realms: [], states: [], tokens: [], users: [] }
+        ]
       });
     });
 
@@ -745,13 +743,10 @@ describe("ContainerService", () => {
       containerService.containerSerial.set("c2");
       TestBed.tick();
 
-      const req = httpMock.expectOne(
-        (r) => r.url === "/container/" && r.params.has("container_serial") && r.params.get("container_serial") === "c2"
-      );
+      const req = httpMock.expectOne((r) => r.url === "/container/" && r.params.has("container_serial") && r.params.get("container_serial") === "c2");
       expect(req.request.method).toBe("GET");
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403,
-        statusText: "Permission denied"
+        status: 403, statusText: "Permission denied"
       });
       await Promise.resolve();
 
@@ -793,11 +788,9 @@ describe("ContainerService", () => {
         { serial: "c2", type: "typeB", realms: [], states: [], tokens: [], users: [] },
         { serial: "c3", type: "typeC", realms: [], states: [], tokens: [], users: [] }
       ];
-      req.flush(
-        MockPiResponse.fromValue({
-          containers: mockContainers
-        })
-      );
+      req.flush(MockPiResponse.fromValue({
+        containers: mockContainers
+      }));
       await Promise.resolve();
 
       expect(containerService.containersForTokenType()).toEqual(["c1", "c2"]);

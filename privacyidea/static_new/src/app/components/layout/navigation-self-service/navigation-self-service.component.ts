@@ -65,7 +65,14 @@ export class NavigationSelfServiceComponent {
 
   readonly excludedKeys = new Set<string>(["editable", "username"]);
 
-  readonly detailOrder: string[] = ["givenname", "surname", "description", "email", "phone", "mobile"];
+  readonly detailOrder: string[] = [
+    "givenname",
+    "surname",
+    "description",
+    "email",
+    "phone",
+    "mobile"
+  ];
 
   userData = this.userService.user;
 

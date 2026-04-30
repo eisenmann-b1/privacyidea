@@ -124,7 +124,7 @@ export class MockAuthService implements AuthServiceInterface {
     dialog_no_token: false,
     search_on_enter: false,
     timeout_action: "",
-    token_rollover: { totp: [""] },
+    token_rollover: {"totp": [""]},
     hide_welcome: false,
     hide_buttons: false,
     deletion_confirmation: false,

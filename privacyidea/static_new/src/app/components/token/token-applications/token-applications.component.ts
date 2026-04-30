@@ -26,12 +26,18 @@ import { TokenApplicationsSshComponent } from "./token-applications-ssh/token-ap
 @Component({
   selector: "app-token-applications",
   standalone: true,
-  imports: [TokenApplicationsSshComponent, TokenApplicationsOfflineComponent, MatSelectModule, ScrollToTopDirective],
+  imports: [
+    TokenApplicationsSshComponent,
+    TokenApplicationsOfflineComponent,
+    MatSelectModule,
+    ScrollToTopDirective
+  ],
   templateUrl: "./token-applications.component.html",
   styleUrls: ["./token-applications.component.scss"]
 })
 export class TokenApplicationsComponent {
-  private readonly machineService: MachineServiceInterface = inject(MachineService);
+  private readonly machineService: MachineServiceInterface =
+    inject(MachineService);
 
   selectedApplicationType = this.machineService.selectedApplicationType;
 }

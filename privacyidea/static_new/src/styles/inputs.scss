@@ -84,10 +84,7 @@ $input-focus-outline: theme.$focus-outline;
   max-width: 932px;
 }
 
-::ng-deep
-  mat-form-field:has(input):not(.sticky-header *):not(.filter-paginator-container *):not(td *):not(
-    .condition-value-container *
-  ):not(.login-form *) {
+::ng-deep mat-form-field:has(input):not(.sticky-header *):not(.filter-paginator-container *):not(td *):not(.condition-value-container *):not(.login-form *) {
   height: 76.5px;
 }
 

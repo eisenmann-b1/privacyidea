@@ -101,7 +101,7 @@
                   @case ("active") {
                     <span
                       (click)="toggleActive(element)"
-                      [matTooltip]="tableUtilsService.getTooltipForColumn(column.key, element)"
+                      [matTooltip]="tableUtilsService.getTooltipForColumn(column.key,element)"
                       [ngClass]="tableUtilsService.getClassForColumn(column.key, element)">
                       {{ tableUtilsService.getDisplayText(column.key, element) }}
                     </span>
@@ -137,7 +137,9 @@
           i18n
           i18n-aria-label
           mat-header-cell>
-          <div class="flex just-center">Actions</div>
+          <div class="flex just-center">
+            Actions
+          </div>
         </th>
         <td
           *matCellDef="let element"

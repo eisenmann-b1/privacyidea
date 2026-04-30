@@ -17,7 +17,8 @@
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <div class="list-item-card">
-  <mat-expansion-panel #panel>
+  <mat-expansion-panel
+    #panel>
     <mat-expansion-panel-header class="mat-expansion-panel-header">
       <mat-panel-title>
         <div class="task-name">
@@ -35,7 +36,7 @@
                 mat-icon-button
                 matTooltip="Save Changes"
                 [disabled]="!canSave"
-                (click)="$event.stopPropagation(); savePeriodicTask()">
+                (click)="$event.stopPropagation(); savePeriodicTask();">
                 <mat-icon>save</mat-icon>
               </button>
               <button
@@ -48,7 +49,7 @@
               <button
                 mat-icon-button
                 matTooltip="Edit Periodic Task"
-                (click)="$event.stopPropagation(); isEditMode.set(true)">
+                (click)="$event.stopPropagation(); isEditMode.set(true);">
                 <mat-icon>edit</mat-icon>
               </button>
             }

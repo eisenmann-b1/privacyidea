@@ -46,22 +46,14 @@ export class MockContentService implements ContentServiceInterface {
   onTokensGetSerial = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_GET_SERIAL);
   onTokensImport = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_IMPORT);
   onTokensContainers = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_CONTAINERS);
-  onTokensContainersCreate = computed(() =>
-    [ROUTE_PATHS.TOKENS_CONTAINERS_CREATE, ROUTE_PATHS.TOKENS_CONTAINERS_WIZARD].includes(this.routeUrl())
-  );
+  onTokensContainersCreate = computed(() => [ROUTE_PATHS.TOKENS_CONTAINERS_CREATE, ROUTE_PATHS.TOKENS_CONTAINERS_WIZARD].includes(this.routeUrl()));
   onTokensContainersDetails = computed(() => this.routeUrl().startsWith(ROUTE_PATHS.TOKENS_CONTAINERS_DETAILS));
   onTokensAssignToken = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_ASSIGN_TOKEN);
   onTokensWizard = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_WIZARD);
   onTokensContainersWizard = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_CONTAINERS_WIZARD);
-  onAnyTokensRoute = computed(
-    () => this.routeUrl() === ROUTE_PATHS.TOKENS || this.routeUrl().startsWith(ROUTE_PATHS.TOKENS + "/")
-  );
-  onAnyUsersRoute = computed(
-    () => this.routeUrl() === ROUTE_PATHS.USERS || this.routeUrl().startsWith(ROUTE_PATHS.USERS + "/")
-  );
-  onTokensContainersTemplates: Signal<boolean> = computed(
-    () => this.routeUrl() === ROUTE_PATHS.TOKENS_CONTAINERS_TEMPLATES
-  );
+  onAnyTokensRoute = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS || this.routeUrl().startsWith(ROUTE_PATHS.TOKENS + "/"));
+  onAnyUsersRoute = computed(() => this.routeUrl() === ROUTE_PATHS.USERS || this.routeUrl().startsWith(ROUTE_PATHS.USERS + "/"));
+  onTokensContainersTemplates: Signal<boolean> = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_CONTAINERS_TEMPLATES);
   onEvents = computed(() => this.routeUrl() === ROUTE_PATHS.EVENTS);
   onConfigurationSystem: Signal<boolean> = computed(() => this.routeUrl() === ROUTE_PATHS.CONFIGURATION_SYSTEM);
   onConfigurationTokenTypes: Signal<boolean> = computed(() => this.routeUrl() === ROUTE_PATHS.CONFIGURATION_TOKENTYPES);

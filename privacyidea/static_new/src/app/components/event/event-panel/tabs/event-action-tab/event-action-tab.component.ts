@@ -73,7 +73,7 @@ export class EventActionTabComponent {
     });
 
     // Rebuild options form when selectedAction changes
-    this.selectedAction.valueChanges.subscribe((actionValue) => {
+    this.selectedAction.valueChanges.subscribe(actionValue => {
       const options = this.eventService.moduleActions()[actionValue] || {};
       this.rebuildOptionsForm(options);
       // Emit after rebuilding, as structure/values may have changed
@@ -83,7 +83,7 @@ export class EventActionTabComponent {
 
   rebuildOptionsForm(options: Record<string, any>, emitEvent: boolean = true) {
     // Remove controls that are not in the new options
-    Object.keys(this.selectedOptions.controls).forEach((key) => {
+    Object.keys(this.selectedOptions.controls).forEach(key => {
       if (!(key in options)) {
         this.selectedOptions.removeControl(key, { emitEvent: emitEvent });
       }

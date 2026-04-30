@@ -82,7 +82,7 @@ export class SystemConfigComponent implements OnInit {
           "UiLoginDisplayHelpButton",
           "UiLoginDisplayRealmBox"
         ];
-        booleanKeys.forEach((key) => {
+        booleanKeys.forEach(key => {
           if (this.params[key] !== undefined) {
             this.params[key] = isChecked(this.params[key]);
           }
@@ -93,7 +93,7 @@ export class SystemConfigComponent implements OnInit {
     // Keep SMTP identifiers in sync with the SMTP servers service
     effect(() => {
       const servers = this.smtpService.smtpServers();
-      this.smtpIdentifiers = servers.map((s) => s.identifier);
+      this.smtpIdentifiers = servers.map(s => s.identifier);
     });
   }
 
@@ -151,7 +151,7 @@ export class SystemConfigComponent implements OnInit {
     this.systemService.getDocumentation().subscribe({
       next: (documentation) => {
         this.dialog.open(SystemDocumentationDialogComponent, {
-          data: { documentation }
+          data: { documentation },
         });
       },
       error: (error: any) => {

@@ -43,7 +43,7 @@
       [(ngModel)]="passphraseResponse"
       [disabled]="userStorePassphrase()"
       [type]="showPassphrase ? 'text' : 'password'"
-      matInput />
+      matInput>
     <button
       (click)="toggleShowPassphrase()"
       [attr.aria-label]="'Toggle passphrase visibility'"
@@ -51,9 +51,10 @@
       mat-icon-button
       matSuffix
       type="button">
-      <mat-icon>{{ showPassphrase ? "visibility_off" : "visibility" }}</mat-icon>
+      <mat-icon>{{ showPassphrase ? 'visibility_off' : 'visibility' }}</mat-icon>
     </button>
-    <mat-hint i18n>
+    <mat-hint
+      i18n>
       This is the correct answer to the passphrase prompt the user has to enter to successfully register the container.
     </mat-hint>
   </mat-form-field>
@@ -63,7 +64,7 @@
       [(ngModel)]="repeatPassphraseResponse"
       [disabled]="userStorePassphrase()"
       [type]="showRepeatPassphrase ? 'text' : 'password'"
-      matInput />
+      matInput>
     <button
       (click)="showRepeatPassphrase = !showRepeatPassphrase"
       [attr.aria-label]="'Toggle passphrase visibility'"
@@ -71,7 +72,7 @@
       mat-icon-button
       matSuffix
       type="button">
-      <mat-icon>{{ showRepeatPassphrase ? "visibility_off" : "visibility" }}</mat-icon>
+      <mat-icon>{{ showRepeatPassphrase ? 'visibility_off' : 'visibility' }}</mat-icon>
     </button>
     @if (passphraseMismatch) {
       <mat-hint

@@ -33,19 +33,19 @@ global.console = {
 global.IntersectionObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),
   unobserve: jest.fn(),
-  disconnect: jest.fn()
+  disconnect: jest.fn(),
 }));
 
 global.ResizeObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),
   unobserve: jest.fn(),
-  disconnect: jest.fn()
+  disconnect: jest.fn(),
 }));
 
 global.MutationObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),
   disconnect: jest.fn(),
-  takeRecords: jest.fn(() => [])
+  takeRecords: jest.fn(() => []),
 }));
 
 Object.defineProperty(window, "matchMedia", {
@@ -59,8 +59,8 @@ Object.defineProperty(window, "matchMedia", {
     removeListener: jest.fn(), // deprecated
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn()
-  }))
+    dispatchEvent: jest.fn(),
+  })),
 });
 
 const realConsoleError = console.error;

@@ -607,6 +607,7 @@ describe("TokenEnrollmentComponent", () => {
           })
         );
       });
+
     });
   });
 

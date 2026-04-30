@@ -27,8 +27,7 @@ import { SystemService } from "../../../../services/system/system.service";
 import { MockAuthService } from "../../../../../testing/mock-services/mock-auth-service";
 import { AuthService } from "../../../../services/auth/auth.service";
 import {
-  DAYPASSWORD_HASHLIB,
-  DAYPASSWORD_OTP_LENGTH,
+  DAYPASSWORD_HASHLIB, DAYPASSWORD_OTP_LENGTH,
   DAYPASSWORD_TIME_STEP,
   TOTP_HASHLIB,
   TOTP_TIME_STEP
@@ -43,12 +42,9 @@ describe("EnrollDaypasswordComponent", () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [EnrollDaypasswordComponent, BrowserAnimationsModule],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
+      providers: [provideHttpClient(), provideHttpClientTesting(),
         { provide: SystemService, useClass: MockSystemService },
-        { provide: AuthService, useClass: MockAuthService }
-      ]
+        { provide: AuthService, useClass: MockAuthService }]
     }).compileComponents();
 
     systemService = TestBed.inject(SystemService) as unknown as MockSystemService;

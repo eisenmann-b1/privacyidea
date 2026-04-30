@@ -36,6 +36,7 @@ describe("PrivacyideaServerService", () => {
   let contentService: MockContentService;
 
   beforeEach(() => {
+
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
@@ -136,9 +137,8 @@ describe("PrivacyideaServerService", () => {
     const req = httpMock.expectOne(service.privacyideaServerBaseUrl);
     expect(req.request.method).toBe("GET");
     req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-      status: 403,
-      statusText: "Permission denied"
-    });
+        status: 403, statusText: "Permission denied"
+      });
     await lastValueFrom(of({})); // Wait for async updates
 
     expect(service.remoteServerOptions()).toEqual([]);

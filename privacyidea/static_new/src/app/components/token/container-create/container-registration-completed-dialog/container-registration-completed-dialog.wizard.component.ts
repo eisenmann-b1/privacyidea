@@ -33,7 +33,13 @@ import { environment } from "../../../../../environments/environment";
   selector: "app-container-registration-completed-dialog-wizard",
   templateUrl: "./container-registration-completed-dialog.wizard.component.html",
   styleUrls: ["./container-registration-completed-dialog.component.scss"],
-  imports: [MatDialogContent, MatDialogActions, MatButton, MatDialogClose, AsyncPipe]
+  imports: [
+    MatDialogContent,
+    MatDialogActions,
+    MatButton,
+    MatDialogClose,
+    AsyncPipe
+  ]
 })
 export class ContainerRegistrationCompletedDialogWizardComponent extends ContainerRegistrationCompletedDialogComponent {
   public readonly authService: AuthServiceInterface = inject(AuthService);

@@ -67,8 +67,8 @@ export class EventConditionListComponent {
   inputName = input<string>("");
   focusConditionName = input<string | null>(null);
   toolTipText = input<string>("");
-  newConditionValue = output<{ conditionName: string; conditionValue: any }>();
-  actionButtonClicked = output<{ conditionName: string; conditionValue: any }>();
+  newConditionValue = output<{ conditionName: string, conditionValue: any }>();
+  actionButtonClicked = output<{ conditionName: string, conditionValue: any }>();
 
   editConditions = linkedSignal(() => {
     return this.conditions();
@@ -131,10 +131,7 @@ export class EventConditionListComponent {
 
   getMultiValues(value: string | string[]): string[] {
     if (typeof value === "string") {
-      return value
-        .split(",")
-        .map((value) => value.trim())
-        .filter((value) => value.length > 0);
+      return value.split(",").map(value => value.trim()).filter(value => value.length > 0);
     } else if (Array.isArray(value)) {
       return value;
     }

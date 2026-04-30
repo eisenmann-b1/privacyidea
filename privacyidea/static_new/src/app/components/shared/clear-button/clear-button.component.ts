@@ -24,7 +24,11 @@ import { MatTooltip } from "@angular/material/tooltip";
 @Component({
   selector: "app-clear-button",
   templateUrl: "./clear-button.component.html",
-  imports: [MatIcon, MatIconButton, MatTooltip],
+  imports: [
+    MatIcon,
+    MatIconButton,
+    MatTooltip
+  ],
   styleUrls: ["./clear-button.component.scss"]
 })
 export class ClearButtonComponent {

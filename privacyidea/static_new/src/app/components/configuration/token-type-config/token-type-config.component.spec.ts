@@ -71,7 +71,7 @@ describe("TokenTypeConfigComponent", () => {
     component.formData.set({
       "question.question.1": "Q1",
       "question.question.2": "Q2",
-      other: "val"
+      "other": "val"
     });
     expect(component.questionKeys).toEqual(["question.question.1", "question.question.2"]);
   });
@@ -80,7 +80,7 @@ describe("TokenTypeConfigComponent", () => {
     component.formData.set({
       "yubikey.apiid.ID1": "KEY1",
       "yubikey.apiid.ID2": "KEY2",
-      other: "val"
+      "other": "val"
     });
     expect(component.yubikeyApiIds).toEqual(["yubikey.apiid.ID1", "yubikey.apiid.ID2"]);
   });
@@ -139,7 +139,7 @@ describe("TokenTypeConfigComponent", () => {
   it("should create new yubikey key", async () => {
     const promise = component.yubikeyAddNewKey({ apiId: "myID", apiKey: "", generateKey: true });
 
-    const req = httpMock.expectOne((req) => req.url.endsWith("/system/random?len=20&encode=b64"));
+    const req = httpMock.expectOne(req => req.url.endsWith("/system/random?len=20&encode=b64"));
     expect(req.request.method).toBe("GET");
     req.flush({ result: { status: true, value: "new-random-key" } });
 
@@ -150,7 +150,7 @@ describe("TokenTypeConfigComponent", () => {
   it("should only add, but not generate api key", async () => {
     const promise = component.yubikeyAddNewKey({ apiId: "myID", apiKey: "123", generateKey: false });
 
-    httpMock.expectNone((req) => req.url.endsWith("/system/random?len=20&encode=b64"));
+    httpMock.expectNone(req => req.url.endsWith("/system/random?len=20&encode=b64"));
 
     await promise;
     expect(component.formData()["yubikey.apiid.myID"]).toBe("123");
@@ -159,7 +159,7 @@ describe("TokenTypeConfigComponent", () => {
   it("generateKey wins over apiKey if both are provided", async () => {
     const promise = component.yubikeyAddNewKey({ apiId: "myID", apiKey: "123", generateKey: true });
 
-    const req = httpMock.expectOne((req) => req.url.endsWith("/system/random?len=20&encode=b64"));
+    const req = httpMock.expectOne(req => req.url.endsWith("/system/random?len=20&encode=b64"));
     expect(req.request.method).toBe("GET");
     req.flush({ result: { status: true, value: "new-random-key" } });
 
@@ -179,7 +179,7 @@ describe("TokenTypeConfigComponent", () => {
     const snackBarSpy = jest.spyOn(notificationService, "openSnackBar");
     const promise = component.yubikeyAddNewKey({ apiId: "myID", apiKey: "", generateKey: true });
 
-    const req = httpMock.expectOne((req) => req.url.endsWith("/system/random?len=20&encode=b64"));
+    const req = httpMock.expectOne(req => req.url.endsWith("/system/random?len=20&encode=b64"));
     req.error(new ProgressEvent("error"));
 
     await promise;
@@ -194,6 +194,7 @@ describe("TokenTypeConfigComponent", () => {
   });
 
   describe("Fragment handling and panel expansion", () => {
+
     it("expandedPanel should be null if no fragment is defined", () => {
       expect(component.expandedPanel).toBeNull();
     });

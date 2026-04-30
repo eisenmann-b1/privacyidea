@@ -71,12 +71,10 @@ describe("SubscriptionExpiryService", () => {
   });
 
   it("does not open when no expiring items", () => {
-    subsMock.subscriptionsResource.set(
-      makeSubs({
-        a: { application: "app1", timedelta: -40, date_till: "2026-01-01" },
-        b: { application: "app2", timedelta: 5, date_till: "2026-03-01" }
-      })
-    );
+    subsMock.subscriptionsResource.set(makeSubs({
+      a: { application: "app1", timedelta: -40, date_till: "2026-01-01" },
+      b: { application: "app2", timedelta: 5, date_till: "2026-03-01" }
+    }));
     (authMock.isAuthenticated as any).set(true);
 
     const service = TestBed.inject(SubscriptionExpiryService);

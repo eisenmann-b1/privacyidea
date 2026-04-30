@@ -246,13 +246,13 @@ export class EnrollPasskeyComponent implements OnInit {
         this.notificationService.openSnackBar(
           "Error during final Passkey registration step. Attempting to clean up token."
         );
-        (await lastValueFrom(this.tokenService.deleteToken(detail.serial)).catch(() => {
+        await lastValueFrom(this.tokenService.deleteToken(detail.serial)).catch(() => {
           this.notificationService.openSnackBar(
             `Failed to delete token ${detail.serial} after registration error. Please check manually.`
           );
           throw new Error(errorStep3);
         }),
-          this.notificationService.openSnackBar(`Token ${detail.serial} deleted due to registration error.`));
+          this.notificationService.openSnackBar(`Token ${detail.serial} deleted due to registration error.`);
         throw Error(errorStep3);
       })
       .then((finalResponse) => {

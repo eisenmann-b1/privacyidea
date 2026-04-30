@@ -57,10 +57,7 @@ import {
 } from "../../../services/session-timer/session-timer.service";
 import { ResolverService, ResolverServiceInterface } from "../../../services/resolver/resolver.service";
 import { SmtpService, SmtpServiceInterface } from "../../../services/smtp/smtp.service";
-import {
-  RadiusServerService,
-  RadiusServerServiceInterface
-} from "../../../services/radius-server/radius-server.service";
+import { RadiusServerService, RadiusServerServiceInterface } from "../../../services/radius-server/radius-server.service";
 import { SmsGatewayService, SmsGatewayServiceInterface } from "../../../services/sms-gateway/sms-gateway.service";
 import {
   PrivacyideaServerService,

@@ -70,8 +70,7 @@ export class ConfigService implements ConfigServiceInterface {
   });
 
   loadConfig() {
-    this.http
-      .get<PiResponse<Record<any, any>>>(environment.proxyUrl + "/config")
+    this.http.get<PiResponse<Record<any, any>>>(environment.proxyUrl + "/config")
       .pipe(
         catchError((error) => {
           console.error("Failed to load config:", error);

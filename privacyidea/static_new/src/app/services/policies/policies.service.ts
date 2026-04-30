@@ -261,13 +261,13 @@ export class PolicyService implements PolicyServiceInterface {
    * Filter policy actions by the actionFilter signal and already added actions.
    * @returns {PolicyActionGroups} The filtered policy actions grouped by scope and group.
    */
-  // currentActionGroupsFiltered = computed<PolicyActionGroups>(() => {
-  //   return this.filteredPolicyActionGroups(this.alreadyAddedActionNames(), this.actionFilter());
-  // });
+    // currentActionGroupsFiltered = computed<PolicyActionGroups>(() => {
+    //   return this.filteredPolicyActionGroups(this.alreadyAddedActionNames(), this.actionFilter());
+    // });
 
   _allPolicies = computed(() => {
     if (!this.allPoliciesResource.hasValue()) return [];
-    return this.allPoliciesResource.value()?.result?.value ?? [];
+    return this.allPoliciesResource.value()?.result?.value ?? []
   });
 
   getEmptyPolicy(): PolicyDetail {

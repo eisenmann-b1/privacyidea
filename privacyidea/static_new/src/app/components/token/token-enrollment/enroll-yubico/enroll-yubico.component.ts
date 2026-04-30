@@ -130,11 +130,11 @@ export class EnrollYubicoComponent implements OnInit {
   };
 
   goToYubicoConfig() {
-    this.contentService.router.navigate([ROUTE_PATHS.CONFIGURATION_TOKENTYPES], { fragment: "yubico" });
+    this.contentService.router.navigate([ROUTE_PATHS.CONFIGURATION_TOKENTYPES], { fragment: 'yubico' });
   }
 
   onYubicoConfigKeydown(event: KeyboardEvent) {
-    if (event.key === "Enter" || event.key === " ") {
+    if (event.key === 'Enter' || event.key === ' ') {
       this.goToYubicoConfig();
     }
   }

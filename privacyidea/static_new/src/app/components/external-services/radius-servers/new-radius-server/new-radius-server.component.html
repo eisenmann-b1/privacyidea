@@ -48,8 +48,10 @@
           required />
       </app-clearable-input>
       <mat-hint i18n>The unique identifying name of the RADIUS server definition.</mat-hint>
-      @if (radiusForm.get("identifier")?.hasError("required")) {
-        <mat-error i18n>Identifier is <strong>required</strong> </mat-error>
+      @if (radiusForm.get('identifier')?.hasError('required')) {
+        <mat-error
+          i18n>Identifier is <strong>required</strong>
+        </mat-error>
       }
     </mat-form-field>
 
@@ -67,8 +69,10 @@
             placeholder="1.2.3.4"
             required />
         </app-clearable-input>
-        @if (radiusForm.get("server")?.hasError("required")) {
-          <mat-error i18n>Server is <strong>required</strong> </mat-error>
+        @if (radiusForm.get('server')?.hasError('required')) {
+          <mat-error
+            i18n>Server is <strong>required</strong>
+          </mat-error>
         }
       </mat-form-field>
 
@@ -98,8 +102,10 @@
             required
             type="password" />
         </app-clearable-input>
-        @if (radiusForm.get("secret")?.hasError("required")) {
-          <mat-error i18n>Secret is <strong>required</strong> </mat-error>
+        @if (radiusForm.get('secret')?.hasError('required')) {
+          <mat-error
+            i18n>Secret is <strong>required</strong>
+          </mat-error>
         }
       </mat-form-field>
 
@@ -159,8 +165,7 @@
     <div class="checkbox-group">
       <mat-checkbox
         formControlName="message_authenticator"
-        i18n
-        >Require Message-Authenticator
+        i18n>Require Message-Authenticator
       </mat-checkbox>
     </div>
 

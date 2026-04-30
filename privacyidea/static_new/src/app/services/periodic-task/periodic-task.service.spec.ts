@@ -67,7 +67,9 @@ describe("PeriodicTaskService", () => {
   it("should enable a periodic task", async () => {
     const mockResponse = { result: { status: true, value: "4" } };
     const promise = service.enablePeriodicTask("4");
-    const req = httpTestingController.expectOne((r) => r.url.includes("periodictask/enable/4") && r.method === "POST");
+    const req = httpTestingController.expectOne(
+      r => r.url.includes("periodictask/enable/4") && r.method === "POST"
+    );
     expect(req.request.body).toEqual({});
     req.flush(mockResponse);
     const result = await promise;
@@ -77,7 +79,7 @@ describe("PeriodicTaskService", () => {
   it("should handle error when enabling a periodic task", async () => {
     service.periodicTasksResource.reload = jest.fn();
     const promise = service.enablePeriodicTask("4");
-    const req = httpTestingController.expectOne((r) => r.url.includes("periodictask/enable/4"));
+    const req = httpTestingController.expectOne(r => r.url.includes("periodictask/enable/4"));
     req.flush(null, { status: 401, statusText: "Enabling periodic task not allowed" });
     const result = await promise;
     expect(notificationMock.openSnackBar).toHaveBeenCalledWith("Failed to enable periodic task! ");
@@ -88,7 +90,7 @@ describe("PeriodicTaskService", () => {
   it("should disable a periodic task", async () => {
     const mockResponse = { result: { status: true, value: "4" } };
     const promise = service.disablePeriodicTask("6");
-    const req = httpTestingController.expectOne((r) => r.url.includes("periodictask/disable/6"));
+    const req = httpTestingController.expectOne(r => r.url.includes("periodictask/disable/6"));
     expect(req.request.body).toEqual({});
     req.flush(mockResponse);
     const result = await promise;
@@ -98,7 +100,7 @@ describe("PeriodicTaskService", () => {
   it("should handle error when disabling a periodic task", async () => {
     service.periodicTasksResource.reload = jest.fn();
     const promise = service.disablePeriodicTask("6");
-    const req = httpTestingController.expectOne((r) => r.url.includes("periodictask/disable/6"));
+    const req = httpTestingController.expectOne(r => r.url.includes("periodictask/disable/6"));
     req.flush(null, { status: 500, statusText: "Server Error" });
     const result = await promise;
     expect(notificationMock.openSnackBar).toHaveBeenCalledWith("Failed to disable periodic task! ");
@@ -112,7 +114,7 @@ describe("PeriodicTaskService", () => {
       expect(res).toEqual(mockResponse);
       done();
     });
-    const req = httpTestingController.expectOne((r) => r.url.includes("periodictask/4") && r.method === "DELETE");
+    const req = httpTestingController.expectOne(r => r.url.includes("periodictask/4") && r.method === "DELETE");
     req.flush(mockResponse);
   });
 
@@ -123,7 +125,7 @@ describe("PeriodicTaskService", () => {
         done();
       }
     });
-    const req = httpTestingController.expectOne((r) => r.url.includes("4") && r.method === "DELETE");
+    const req = httpTestingController.expectOne(r => r.url.includes("4") && r.method === "DELETE");
     req.flush({ result: { error: { message: "fail" } } }, { status: 400, statusText: "Bad Request" });
   });
 
@@ -133,17 +135,17 @@ describe("PeriodicTaskService", () => {
       expect(res?.result).toEqual(EMPTY_PERIODIC_TASK);
       done();
     });
-    const req = httpTestingController.expectOne((r) => r.url.includes("/periodictask/") && r.method === "POST");
+    const req = httpTestingController.expectOne(r => r.url.includes("/periodictask/") && r.method === "POST");
     req.flush(mockResponse);
   });
 
   it("should handle error when saving a periodic task", (done) => {
     service.savePeriodicTask(EMPTY_PERIODIC_TASK).subscribe((response) => {
-      expect(response).toBeUndefined();
-      expect(notificationMock.openSnackBar).toHaveBeenCalledWith("Failed to save periodic task. failure message");
-      done();
+        expect(response).toBeUndefined();
+        expect(notificationMock.openSnackBar).toHaveBeenCalledWith("Failed to save periodic task. failure message");
+        done();
     });
-    const req = httpTestingController.expectOne((r) => r.url.includes("/periodictask/") && r.method === "POST");
+    const req = httpTestingController.expectOne(r => r.url.includes("/periodictask/") && r.method === "POST");
     req.flush({ result: { error: { message: "failure message" } } }, { status: 400, statusText: "Bad Request" });
   });
 
@@ -151,8 +153,8 @@ describe("PeriodicTaskService", () => {
     const mockOptions = { result: { value: { opt1: { type: "str", description: "desc" } } } };
     service.moduleOptions.set = jest.fn();
     service.fetchAllModuleOptions();
-    PERIODIC_TASK_MODULES.forEach((module) => {
-      const req = httpTestingController.expectOne((r) => r.url.includes(`periodictask/options/${module}`));
+    PERIODIC_TASK_MODULES.forEach(module => {
+      const req = httpTestingController.expectOne(r => r.url.includes(`periodictask/options/${module}`));
       req.flush(mockOptions);
     });
     expect(service.moduleOptions.set).toHaveBeenCalledWith(
@@ -166,8 +168,8 @@ describe("PeriodicTaskService", () => {
   it("should handle error when fetching module options", () => {
     service.fetchAllModuleOptions();
     // Only flush error for the first request; others will be cancelled
-    const reqs = PERIODIC_TASK_MODULES.map((module) =>
-      httpTestingController.expectOne((r) => r.url.includes(`periodictask/options/${module}`))
+    const reqs = PERIODIC_TASK_MODULES.map(module =>
+      httpTestingController.expectOne(r => r.url.includes(`periodictask/options/${module}`))
     );
     reqs[0].flush(null, { status: 500, statusText: "Server Error" });
     // Do NOT flush the rest, as they are cancelled

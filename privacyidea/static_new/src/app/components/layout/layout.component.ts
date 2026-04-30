@@ -32,16 +32,7 @@ import { NavigationSelfServiceWizardComponent } from "./navigation-self-service/
   selector: "layout",
   templateUrl: "layout.component.html",
   standalone: true,
-  imports: [
-    RouterOutlet,
-    MatProgressBar,
-    MatDrawer,
-    MatDrawerContainer,
-    MatDrawerContent,
-    NavigationComponent,
-    NavigationSelfServiceComponent,
-    NavigationSelfServiceWizardComponent
-  ],
+  imports: [RouterOutlet, MatProgressBar, MatDrawer, MatDrawerContainer, MatDrawerContent, NavigationComponent, NavigationSelfServiceComponent, NavigationSelfServiceWizardComponent],
   styleUrl: "./layout.component.scss"
 })
 export class LayoutComponent {

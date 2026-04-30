@@ -16,18 +16,10 @@
 
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
-<div
-  class="token-type-config-container"
-  #scrollContainer>
+<div class="token-type-config-container" #scrollContainer>
   <div #stickySentinel></div>
-  <div
-    class="flex-row just-space-between ali-center sticky-header"
-    #stickyHeader>
-    <h3
-      class="margin-8"
-      i18n>
-      Token Type Configuration
-    </h3>
+  <div class="flex-row just-space-between ali-center sticky-header" #stickyHeader>
+    <h3 class="margin-8" i18n>Token Type Configuration</h3>
     <button
       (click)="save()"
       [disabled]="!authService.actionAllowed('configwrite') || !hasChanges()"
@@ -47,7 +39,8 @@
       [formData]="formData()"
       [hashLibs]="hashLibs()"
       [totpSteps]="totpSteps()"></app-totp-config>
-    <app-u2f-config [formData]="formData()"></app-u2f-config>
+    <app-u2f-config
+      [formData]="formData()"></app-u2f-config>
     <app-webauthn-config
       (formDataChange)="formData.set($event)"
       [formData]="formData()"></app-webauthn-config>

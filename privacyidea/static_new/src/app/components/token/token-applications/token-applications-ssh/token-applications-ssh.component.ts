@@ -66,7 +66,11 @@ export class TokenApplicationsSshComponent {
   protected readonly tokenService: TokenServiceInterface = inject(TokenService);
   protected readonly contentService: ContentServiceInterface = inject(ContentService);
 
-  readonly columnsKeyMap = this.tableUtilsService.pickColumns("serial", "service_id", "user");
+  readonly columnsKeyMap = this.tableUtilsService.pickColumns(
+    "serial",
+    "service_id",
+    "user"
+  );
   readonly columnKeys = [...this.tableUtilsService.getColumnKeys(this.columnsKeyMap)];
   pageSizeOptions = this.tableUtilsService.pageSizeOptions;
   length = computed(() => this.machineService.tokenApplications()?.length ?? 0);

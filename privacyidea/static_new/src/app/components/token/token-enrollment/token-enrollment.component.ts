@@ -618,7 +618,7 @@ export class TokenEnrollmentComponent implements AfterViewInit, OnDestroy {
       component: TokenCompleteEnrollmentComponent,
       data: this.enrolledDialogData()
     });
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.enrollResponse.set(result);
         this.enrolledDialogData.set({
@@ -649,7 +649,7 @@ export class TokenEnrollmentComponent implements AfterViewInit, OnDestroy {
       component: TokenVerifyEnrollmentComponent,
       data: this.enrolledDialogData()
     });
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.enrollResponse.set(result);
         this._handleEnrollmentResponse(result);

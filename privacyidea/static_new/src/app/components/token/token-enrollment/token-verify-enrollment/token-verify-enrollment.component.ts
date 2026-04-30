@@ -18,7 +18,7 @@
  **/
 
 import { Component, computed, inject } from "@angular/core";
-import { toSignal } from "@angular/core/rxjs-interop";
+import { toSignal } from '@angular/core/rxjs-interop';
 import { AbstractDialogComponent } from "../../../shared/dialog/abstract-dialog/abstract-dialog.component";
 import { TokenEnrollmentData } from "../../../../mappers/token-api-payload/_token-api-payload.mapper";
 import { DialogWrapperComponent } from "../../../shared/dialog/dialog-wrapper/dialog-wrapper.component";
@@ -63,9 +63,7 @@ export class TokenVerifyEnrollmentComponent extends AbstractDialogComponent<Toke
 
   verifyOTPControl = new FormControl("", { nonNullable: true, validators: Validators.required });
 
-  private readonly statusSignal = toSignal(this.verifyOTPControl.statusChanges, {
-    initialValue: this.verifyOTPControl.status
-  });
+  private readonly statusSignal = toSignal(this.verifyOTPControl.statusChanges, { initialValue: this.verifyOTPControl.status });
   invalidInputSignal = computed(() => {
     this.statusSignal();
     return this.verifyOTPControl.invalid;

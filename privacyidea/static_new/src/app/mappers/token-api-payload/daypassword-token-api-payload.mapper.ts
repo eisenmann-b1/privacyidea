@@ -74,7 +74,7 @@ export class DaypasswordApiPayloadMapper
       otpLength: payload.otplen !== undefined ? Number(payload.otplen) : undefined,
       hashAlgorithm: payload.hashlib ?? undefined,
       ...(payload.timeStep !== undefined && { timeStep: `${payload.timeStep}` }),
-      ...(payload.genkey !== undefined && { generateOnServer: parseBooleanValue(payload.genkey) })
+      ...(payload.genkey !== undefined && { generateOnServer: parseBooleanValue(payload.genkey) }),
     };
   }
 

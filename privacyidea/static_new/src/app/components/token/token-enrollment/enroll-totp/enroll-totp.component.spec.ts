@@ -37,12 +37,9 @@ describe("EnrollTotpComponent", () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [EnrollTotpComponent, BrowserAnimationsModule],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
+      providers: [provideHttpClient(), provideHttpClientTesting(),
         { provide: AuthService, useClass: MockAuthService },
-        { provide: SystemService, useClass: MockSystemService }
-      ]
+        { provide: SystemService, useClass: MockSystemService }]
     }).compileComponents();
 
     authService = TestBed.inject(AuthService) as unknown as MockAuthService;
@@ -230,9 +227,7 @@ describe("EnrollTotpComponent", () => {
     component.ngOnInit();
 
     // 2-step checkbox should be present
-    const twoStepCheckbox = fixture.debugElement.nativeElement.querySelector(
-      'mat-checkbox[formcontrolname="twoStepControl"]'
-    );
+    const twoStepCheckbox = fixture.debugElement.nativeElement.querySelector("mat-checkbox[formcontrolname=\"twoStepControl\"]");
     expect(twoStepCheckbox).toBeDefined();
 
     expect(component.twoStepControl.value).toBe(true);
@@ -267,9 +262,7 @@ describe("EnrollTotpComponent", () => {
     component.ngOnInit();
 
     // 2-step checkbox should be present
-    const twoStepCheckbox = fixture.debugElement.nativeElement.querySelector(
-      'mat-checkbox[formcontrolname="twoStepControl"]'
-    );
+    const twoStepCheckbox = fixture.debugElement.nativeElement.querySelector("mat-checkbox[formcontrolname=\"twoStepControl\"]");
     expect(twoStepCheckbox).toBeDefined();
 
     expect(component.twoStepControl.value).toBe(false);
@@ -332,9 +325,7 @@ describe("EnrollTotpComponent", () => {
     component.ngOnInit();
 
     // 2-step checkbox should NOT be present
-    const twoStepCheckbox = fixture.debugElement.nativeElement.querySelector(
-      'mat-checkbox[formcontrolname="twoStepControl"]'
-    );
+    const twoStepCheckbox = fixture.debugElement.nativeElement.querySelector("mat-checkbox[formcontrolname=\"twoStepControl\"]");
     expect(twoStepCheckbox).toBeNull();
 
     expect(component.twoStepControl.value).toBe(false);

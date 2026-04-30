@@ -37,15 +37,14 @@ describe("EventActionTabComponent", () => {
       providers: [
         provideHttpClient(),
         { provide: AuthService, useClass: MockAuthService },
-        { provide: EventService, useClass: MockEventService }
-      ]
+        { provide: EventService, useClass: MockEventService }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(EventActionTabComponent);
     component = fixture.componentInstance;
     // Provide required inputs
     fixture.componentRef.setInput("action", "add_token_info");
-    fixture.componentRef.setInput("options", { key: "test_key", value: "test_value" });
+    fixture.componentRef.setInput("options", { "key": "test_key", "value": "test_value" });
     fixture.componentRef.setInput("isEditMode", true);
     component.newAction = { emit: jest.fn() } as any;
     component.newOptions = { emit: jest.fn() } as any;
@@ -68,11 +67,11 @@ describe("EventActionTabComponent", () => {
   });
 
   it("should update selectedOptions and emit on option change", () => {
-    component.selectedOptions.get("key")?.setValue("another_key");
-    component.selectedOptions.get("value")?.setValue("");
+    component.selectedOptions.get('key')?.setValue('another_key');
+    component.selectedOptions.get('value')?.setValue('');
 
-    expect(component.selectedOptions.value).toEqual({ key: "another_key", value: "" });
-    expect(component.newOptions.emit).toHaveBeenCalledWith({ key: "another_key", value: "" });
+    expect(component.selectedOptions.value).toEqual({"key": "another_key", "value": ""});
+    expect(component.newOptions.emit).toHaveBeenCalledWith({"key": "another_key", "value": ""});
   });
 
   it("should also emit empty options", () => {
@@ -80,9 +79,9 @@ describe("EventActionTabComponent", () => {
     expect(Object.keys(component.selectedOptions.value)).toEqual(["opt1", "opt2", "opt3"]);
     expect(component.newOptions.emit).toHaveBeenCalledWith({});
 
-    component.selectedOptions.get("opt3")?.setValue("newValue");
-    expect(component.selectedOptions.value).toEqual({ opt1: "", opt2: "", opt3: "newValue" });
-    expect(component.newOptions.emit).toHaveBeenCalledWith({ opt1: "", opt2: "", opt3: "newValue" });
+    component.selectedOptions.get('opt3')?.setValue('newValue');
+    expect(component.selectedOptions.value).toEqual({"opt1": "", "opt2": "", "opt3": "newValue"});
+    expect(component.newOptions.emit).toHaveBeenCalledWith({"opt1": "", "opt2": "", "opt3": "newValue"});
   });
 
   it("onActionSelectionChange should emit selected action", () => {

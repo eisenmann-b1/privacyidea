@@ -179,7 +179,7 @@ describe("Edge cases", () => {
   test("setFromMap drops asterisk-only values", () => {
     const source = new Map<string, string>([
       ["description", "*"],
-      ["user", "alice"]
+      ["user", "alice"],
     ]);
     const fv = new FilterValue();
     fv.setFromMap(source);

@@ -27,7 +27,12 @@ import {
 
 @Component({
   selector: "app-tiqr-enroll-url",
-  imports: [MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle],
+  imports: [
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle
+  ],
   templateUrl: "./tiqr-enroll-url.component.html",
   styleUrl: "./tiqr-enroll-url.component.scss"
 })

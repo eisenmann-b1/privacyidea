@@ -276,7 +276,9 @@ describe("MachineService resources and signals", () => {
 
       const req = httpMock.expectOne((r) => r.url.includes("/machine/"));
       expect(req.request.method).toBe("GET");
-      const machines = [{ hostname: "test", id: 1, ip: "127.0.0.1", resolver_name: "test" }];
+      const machines = [
+        { hostname: "test", id: 1, ip: "127.0.0.1", resolver_name: "test" }
+      ];
       req.flush(MockPiResponse.fromValue(machines));
       await Promise.resolve();
 
@@ -291,8 +293,7 @@ describe("MachineService resources and signals", () => {
       const req = httpMock.expectOne((r) => r.url.includes("/machine/"));
       expect(req.request.method).toBe("GET");
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403,
-        statusText: "Permission denied"
+        status: 403, statusText: "Permission denied"
       });
       await Promise.resolve();
 
@@ -313,7 +314,7 @@ describe("MachineService resources and signals", () => {
       const req = httpMock.expectOne((r) => r.url.includes("/machine/token"));
       expect(req.request.method).toBe("GET");
       const applications = [
-        { application: "test", hostname: "localhost", id: 0, options: {}, serial: "1234", type: "ssh" }
+        { application: "test", hostname: "localhost", id: 0, options: {}, serial: "1234", type: "ssh"}
       ];
       req.flush(MockPiResponse.fromValue(applications));
       await Promise.resolve();
@@ -329,8 +330,7 @@ describe("MachineService resources and signals", () => {
       const req = httpMock.expectOne((r) => r.url.includes("/machine/token"));
       expect(req.request.method).toBe("GET");
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403,
-        statusText: "Permission denied"
+        status: 403, statusText: "Permission denied"
       });
       await Promise.resolve();
 

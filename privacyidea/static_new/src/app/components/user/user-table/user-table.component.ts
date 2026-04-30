@@ -127,7 +127,7 @@ export class UserTableComponent {
   });
 
   totalLength: WritableSignal<number> = linkedSignal({
-    source: () => (this.userService.usersResource.hasValue() ? this.userService.usersResource.value() : undefined),
+    source: () => this.userService.usersResource.hasValue() ? this.userService.usersResource.value() : undefined,
     computation: (userResource, previous) => {
       if (userResource) {
         return userResource.result?.value?.length ?? 0;

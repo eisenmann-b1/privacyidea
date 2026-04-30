@@ -63,7 +63,10 @@ describe("NotificationService", () => {
     jest.setSystemTime(Date.parse("2025-01-01T00:00:00.000Z"));
 
     TestBed.configureTestingModule({
-      providers: [NotificationService, { provide: MatSnackBar, useClass: MockMatSnackBar }]
+      providers: [
+        NotificationService,
+        { provide: MatSnackBar, useClass: MockMatSnackBar }
+      ]
     });
 
     service = TestBed.inject(NotificationService);

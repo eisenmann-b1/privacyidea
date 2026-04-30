@@ -24,5 +24,7 @@ export class MockSubscriptionService {
   reload = jest.fn();
   deleteSubscription = jest.fn(() => of(MockPiResponse.fromValue(true)));
   uploadSubscriptionFile = jest.fn(() => of(MockPiResponse.fromValue({})));
-  subscriptionsResource = new MockHttpResourceRef<PiResponse<Record<string, any>>>(MockPiResponse.fromValue({}));
+  subscriptionsResource = new MockHttpResourceRef<PiResponse<Record<string, any>>>(
+    MockPiResponse.fromValue({})
+  );
 }

@@ -39,7 +39,7 @@ export class SaveAndExitDialogComponent extends AbstractDialogComponent<
       type: "confirm",
       icon: "save",
       disabled: this.data.saveExitDisabled,
-      hidden: !this.data.allowSaveExit
+      hidden: !this.data.allowSaveExit,
     },
     {
       label: this.data.discardButtonText || $localize`Discard`,

@@ -47,39 +47,36 @@ import { PasskeyApiPayloadMapper } from "./passkey-token-api-payload.mapper";
 import type { TokenTypeKey } from "../../services/token/token.service";
 
 // Registry mapping token type strings to mapper instances
-export const tokenApiPayloadMapperRegistry: Partial<Record<TokenTypeKey, TokenApiPayloadMapper<TokenEnrollmentData>>> =
-  {
-    hotp: new HotpApiPayloadMapper(),
-    totp: new TotpApiPayloadMapper(),
-    spass: new SpassApiPayloadMapper(),
-    motp: new MotpApiPayloadMapper(),
-    sshkey: new SshkeyApiPayloadMapper(),
-    yubikey: new YubikeyApiPayloadMapper(),
-    remote: new RemoteApiPayloadMapper(),
-    yubico: new YubicoApiPayloadMapper(),
-    radius: new RadiusApiPayloadMapper(),
-    sms: new SmsApiPayloadMapper(),
-    "4eyes": new FourEyesApiPayloadMapper(),
-    applspec: new ApplspecApiPayloadMapper(),
-    certificate: new CertificateApiPayloadMapper(),
-    daypassword: new DaypasswordApiPayloadMapper(),
-    email: new EmailApiPayloadMapper(),
-    indexedsecret: new IndexedSecretApiPayloadMapper(),
-    paper: new PaperApiPayloadMapper(),
-    push: new PushApiPayloadMapper(),
-    question: new QuestionApiPayloadMapper(),
-    registration: new RegistrationApiPayloadMapper(),
-    tan: new TanApiPayloadMapper(),
-    tiqr: new TiqrApiPayloadMapper(),
-    u2f: new U2fApiPayloadMapper(),
-    vasco: new VascoApiPayloadMapper(),
-    webauthn: new WebAuthnApiPayloadMapper(),
-    passkey: new PasskeyApiPayloadMapper()
-  };
+export const tokenApiPayloadMapperRegistry: Partial<Record<TokenTypeKey, TokenApiPayloadMapper<TokenEnrollmentData>>> = {
+  hotp: new HotpApiPayloadMapper(),
+  totp: new TotpApiPayloadMapper(),
+  spass: new SpassApiPayloadMapper(),
+  motp: new MotpApiPayloadMapper(),
+  sshkey: new SshkeyApiPayloadMapper(),
+  yubikey: new YubikeyApiPayloadMapper(),
+  remote: new RemoteApiPayloadMapper(),
+  yubico: new YubicoApiPayloadMapper(),
+  radius: new RadiusApiPayloadMapper(),
+  sms: new SmsApiPayloadMapper(),
+  "4eyes": new FourEyesApiPayloadMapper(),
+  applspec: new ApplspecApiPayloadMapper(),
+  certificate: new CertificateApiPayloadMapper(),
+  daypassword: new DaypasswordApiPayloadMapper(),
+  email: new EmailApiPayloadMapper(),
+  indexedsecret: new IndexedSecretApiPayloadMapper(),
+  paper: new PaperApiPayloadMapper(),
+  push: new PushApiPayloadMapper(),
+  question: new QuestionApiPayloadMapper(),
+  registration: new RegistrationApiPayloadMapper(),
+  tan: new TanApiPayloadMapper(),
+  tiqr: new TiqrApiPayloadMapper(),
+  u2f: new U2fApiPayloadMapper(),
+  vasco: new VascoApiPayloadMapper(),
+  webauthn: new WebAuthnApiPayloadMapper(),
+  passkey: new PasskeyApiPayloadMapper(),
+};
 
 // Function to retrieve the correct mapper for a given token type
-export function getTokenApiPayloadMapper(
-  tokenType: TokenTypeKey
-): TokenApiPayloadMapper<TokenEnrollmentData> | undefined {
+export function getTokenApiPayloadMapper(tokenType: TokenTypeKey): TokenApiPayloadMapper<TokenEnrollmentData> | undefined {
   return tokenApiPayloadMapperRegistry[tokenType];
 }

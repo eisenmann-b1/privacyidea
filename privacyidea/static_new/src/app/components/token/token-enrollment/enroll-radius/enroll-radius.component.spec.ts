@@ -32,11 +32,8 @@ describe("EnrollRadiusComponent", () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [EnrollRadiusComponent, BrowserAnimationsModule],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        { provide: SystemService, useClass: MockSystemService }
-      ]
+      providers: [provideHttpClient(), provideHttpClientTesting(),
+        {provide: SystemService, useClass: MockSystemService}]
     }).compileComponents();
 
     fixture = TestBed.createComponent(EnrollRadiusComponent);

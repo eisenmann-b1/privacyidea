@@ -24,11 +24,7 @@ import { MatSort, MatSortModule } from "@angular/material/sort";
 import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
-import {
-  RadiusServer,
-  RadiusServerService,
-  RadiusServerServiceInterface
-} from "../../../services/radius-server/radius-server.service";
+import { RadiusServer, RadiusServerService, RadiusServerServiceInterface } from "../../../services/radius-server/radius-server.service";
 import { NewRadiusServerComponent } from "./new-radius-server/new-radius-server.component";
 import { AuthService, AuthServiceInterface } from "../../../services/auth/auth.service";
 import { MatTooltipModule } from "@angular/material/tooltip";

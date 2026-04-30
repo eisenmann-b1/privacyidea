@@ -81,7 +81,7 @@ export class SubscriptionService {
   });
 
   reload(): void {
-    this.reloadTrigger.update((v) => v + 1);
+    this.reloadTrigger.update(v => v + 1);
   }
 
   deleteSubscription(application: string): Observable<PiResponse<boolean>> {

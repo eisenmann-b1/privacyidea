@@ -45,13 +45,13 @@ describe("MachinesComponent", () => {
         provideHttpClientTesting(),
         { provide: MachineService, useValue: machineServiceMock }
       ]
-    })
-      .overrideComponent(MachinesComponent, {
-        set: {
-          providers: [{ provide: MatDialog, useValue: { open: jest.fn() } }]
-        }
-      })
-      .compileComponents();
+    }).overrideComponent(MachinesComponent, {
+      set: {
+        providers: [
+          { provide: MatDialog, useValue: { open: jest.fn() } }
+        ]
+      }
+    }).compileComponents();
 
     fixture = TestBed.createComponent(MachinesComponent);
     component = fixture.componentInstance;

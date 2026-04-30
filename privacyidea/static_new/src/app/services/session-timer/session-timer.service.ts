@@ -126,8 +126,7 @@ export class SessionTimerService implements SessionTimerServiceInterface {
 
   private handleSessionTimeout(): void {
     this.notificationService.openSnackBar(
-      $localize`Your session has expired. You will be logged out and redirected to the login page.`
-    );
+      $localize`Your session has expired. You will be logged out and redirected to the login page.`);
     // Keep notification visible for 1.5s before logging out to ensure the user sees it
     setTimeout(() => {
       this.clearRefreshInterval();

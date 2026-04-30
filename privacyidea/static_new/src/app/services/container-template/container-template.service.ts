@@ -122,7 +122,7 @@ export class ContainerTemplateService implements ContainerTemplateServiceInterfa
 
   // --- Signals & Computed ---
   readonly templates: WritableSignal<ContainerTemplate[]> = linkedSignal({
-    source: () => (this.templatesResource.hasValue() ? this.templatesResource.value() : undefined),
+    source: () => this.templatesResource.hasValue() ? this.templatesResource.value() : undefined,
     computation: (templatesResource, previous) => templatesResource?.result?.value?.templates ?? previous?.value ?? []
   });
 

@@ -884,6 +884,7 @@ describe("TokenService", () => {
   });
 
   describe("tokenSerialResource / tokenOptions", () => {
+
     it("tokenOptions falls back to default when resource empty", () => {
       expect(tokenService.tokenOptions()).toEqual([]);
     });
@@ -909,8 +910,7 @@ describe("TokenService", () => {
       const req = mockBackend.expectOne((r) => r.url === "/token/");
       expect(req.request.method).toBe("GET");
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403,
-        statusText: "Permission denied"
+        status: 403, statusText: "Permission denied"
       });
       await Promise.resolve();
 
@@ -920,6 +920,7 @@ describe("TokenService", () => {
   });
 
   describe("tokenTypesResource / tokenTypeOptions", () => {
+
     it("tokenTypeOptions falls back to default when resource empty", () => {
       expect(tokenService.tokenTypeOptions()).toEqual([]);
     });
@@ -936,16 +937,13 @@ describe("TokenService", () => {
 
       expect(tokenService.tokenTypesResource.hasValue()).toBe(true);
       expect(tokenService.tokenTypeOptions()).toHaveLength(1);
-      expect(tokenService.tokenTypeOptions()).toEqual([
-        {
-          key: "hotp",
-          name: "HOTP",
-          info: "text",
-          text:
-            "The HOTP token is an event based token. With a smartphone app like the privacyIDEA Authenticator" +
-            " you can turn your smartphone into an authentication device."
-        }
-      ]);
+      expect(tokenService.tokenTypeOptions()).toEqual([{
+        key: "hotp",
+        name: "HOTP",
+        info: "text",
+        text: "The HOTP token is an event based token. With a smartphone app like the privacyIDEA Authenticator" +
+          " you can turn your smartphone into an authentication device."
+      }]);
     });
 
     it("should handle error state from tokenTypesResource", async () => {
@@ -955,8 +953,7 @@ describe("TokenService", () => {
       const req = mockBackend.expectOne((r) => r.url === "/auth/rights");
       expect(req.request.method).toBe("GET");
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403,
-        statusText: "Permission denied"
+        status: 403, statusText: "Permission denied"
       });
       await Promise.resolve();
 
@@ -966,6 +963,7 @@ describe("TokenService", () => {
   });
 
   describe("tokenResource / tokenResourceValue", () => {
+
     it("tokenResourceValue falls back to default when resource empty", () => {
       expect(tokenService.tokenResourceValue()).toBeNull();
     });
@@ -991,8 +989,7 @@ describe("TokenService", () => {
       const req = mockBackend.expectOne((r) => r.url === "/token/");
       expect(req.request.method).toBe("GET");
       req.flush(MockPiResponse.fromError({ message: "Permission denied" }), {
-        status: 403,
-        statusText: "Permission denied"
+        status: 403, statusText: "Permission denied"
       });
       await Promise.resolve();
 

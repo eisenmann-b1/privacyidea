@@ -28,4 +28,5 @@ import { UserUtilsPanelSelfServiceComponent } from "@components/layout/user-util
   templateUrl: "./navigation-self-service.wizard.component.html",
   styleUrl: "./navigation-self-service.component.scss"
 })
-export class NavigationSelfServiceWizardComponent extends NavigationSelfServiceComponent {}
+export class NavigationSelfServiceWizardComponent extends NavigationSelfServiceComponent {
+}

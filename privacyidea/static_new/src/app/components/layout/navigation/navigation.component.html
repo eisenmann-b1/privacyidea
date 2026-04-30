@@ -30,7 +30,7 @@
           height="307"
           i18n-alt
           i18n-aria-label
-          ngSrc="{{ customLogo() }}"
+          ngSrc="{{customLogo()}}"
           ngSrcset="1x"
           sizes="(max-width: 307px) 100vw, 307px"
           width="307" />
@@ -84,7 +84,8 @@
           width="575" />
       </a>
     }
-    <p class="margin-bottom-0 version-text">
+    <p
+      class="margin-bottom-0 version-text">
       {{ versionText() }}
     </p>
     <p class="footer-text">
@@ -98,8 +99,7 @@
       in collaboration with
       <a
         href="https://github.com/privacyidea/privacyidea"
-        target="_blank"
-        >community contributors
+        target="_blank">community contributors
       </a>
     </p>
   </div>
@@ -119,7 +119,8 @@
   }
 
   <mat-accordion>
-    <mat-expansion-panel [expanded]="router.url.startsWith(ROUTE_PATHS.TOKENS) && !router.url.includes('containers')">
+    <mat-expansion-panel
+      [expanded]="router.url.startsWith(ROUTE_PATHS.TOKENS) && !router.url.includes('containers')">
       <mat-expansion-panel-header (click)="router.navigate([ROUTE_PATHS.TOKENS])">
         <mat-panel-title>
           <mat-icon>shield</mat-icon>
@@ -207,8 +208,8 @@
         <mat-list-item>
           <button
             [ngClass]="
-              contentService.routeUrl() === ROUTE_PATHS.TOKENS_GET_SERIAL ? 'card-button-active' : 'card-button-1'
-            "
+                contentService.routeUrl() === ROUTE_PATHS.TOKENS_GET_SERIAL ? 'card-button-active' : 'card-button-1'
+              "
             [routerLink]="[ROUTE_PATHS.TOKENS_GET_SERIAL]"
             i18n
             mat-stroked-button>
@@ -314,9 +315,8 @@
         }
         <mat-list-item>
           <button
-            [ngClass]="
-              contentService.routeUrl() === ROUTE_PATHS.USERS_RESOLVERS ? 'card-button-active' : 'card-button-1'
-            "
+            [ngClass]="contentService.routeUrl() === ROUTE_PATHS.USERS_RESOLVERS ?
+                  'card-button-active' : 'card-button-1'"
             [routerLink]="[ROUTE_PATHS.USERS_RESOLVERS]"
             mat-stroked-button>
             <mat-icon class="ms--database"></mat-icon>
@@ -413,11 +413,7 @@
         <mat-list-item>
           @if (authService.actionAllowed("smtpserver_read")) {
             <button
-              [ngClass]="
-                contentService.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SMTP
-                  ? 'card-button-active'
-                  : 'card-button-1'
-              "
+              [ngClass]="contentService.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SMTP ? 'card-button-active' : 'card-button-1'"
               [routerLink]="[ROUTE_PATHS.EXTERNAL_SERVICES_SMTP]"
               mat-stroked-button>
               <mat-icon>email</mat-icon>
@@ -428,11 +424,7 @@
         <mat-list-item>
           @if (authService.actionAllowed("radiusserver_read")) {
             <button
-              [ngClass]="
-                contentService.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_RADIUS
-                  ? 'card-button-active'
-                  : 'card-button-1'
-              "
+              [ngClass]="contentService.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_RADIUS ? 'card-button-active' : 'card-button-1'"
               [routerLink]="[ROUTE_PATHS.EXTERNAL_SERVICES_RADIUS]"
               mat-stroked-button>
               <mat-icon>vpn_lock</mat-icon>
@@ -443,9 +435,7 @@
         <mat-list-item>
           @if (authService.actionAllowed("smtpserver_read")) {
             <button
-              [ngClass]="
-                contentService.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SMS ? 'card-button-active' : 'card-button-1'
-              "
+              [ngClass]="contentService.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SMS ? 'card-button-active' : 'card-button-1'"
               [routerLink]="[ROUTE_PATHS.EXTERNAL_SERVICES_SMS]"
               mat-stroked-button>
               <mat-icon>sms</mat-icon>
@@ -456,11 +446,7 @@
         <mat-list-item>
           @if (authService.actionAllowed("caconnectorread")) {
             <button
-              [ngClass]="
-                contentService.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_CA_CONNECTORS
-                  ? 'card-button-active'
-                  : 'card-button-1'
-              "
+              [ngClass]="contentService.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_CA_CONNECTORS ? 'card-button-active' : 'card-button-1'"
               [routerLink]="[ROUTE_PATHS.EXTERNAL_SERVICES_CA_CONNECTORS]"
               mat-stroked-button>
               <mat-icon>assured_workload</mat-icon>
@@ -471,11 +457,7 @@
         <mat-list-item>
           @if (authService.actionAllowed("privacyideaserver_read")) {
             <button
-              [ngClass]="
-                contentService.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_PRIVACYIDEA
-                  ? 'card-button-active'
-                  : 'card-button-1'
-              "
+              [ngClass]="contentService.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_PRIVACYIDEA ? 'card-button-active' : 'card-button-1'"
               [routerLink]="[ROUTE_PATHS.EXTERNAL_SERVICES_PRIVACYIDEA]"
               mat-stroked-button>
               <mat-icon class="mdi--pi-logo"></mat-icon>
@@ -486,11 +468,7 @@
         <mat-list-item>
           @if (authService.actionAllowed("tokengroup_list")) {
             <button
-              [ngClass]="
-                contentService.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_TOKENGROUPS
-                  ? 'card-button-active'
-                  : 'card-button-1'
-              "
+              [ngClass]="contentService.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_TOKENGROUPS ? 'card-button-active' : 'card-button-1'"
               [routerLink]="[ROUTE_PATHS.EXTERNAL_SERVICES_TOKENGROUPS]"
               mat-stroked-button>
               <mat-icon>local_police</mat-icon>
@@ -501,11 +479,7 @@
         <mat-list-item>
           @if (authService.actionAllowed("serviceid_list")) {
             <button
-              [ngClass]="
-                contentService.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SERVICE_IDS
-                  ? 'card-button-active'
-                  : 'card-button-1'
-              "
+              [ngClass]="contentService.routeUrl() === ROUTE_PATHS.EXTERNAL_SERVICES_SERVICE_IDS ? 'card-button-active' : 'card-button-1'"
               [routerLink]="[ROUTE_PATHS.EXTERNAL_SERVICES_SERVICE_IDS]"
               mat-stroked-button>
               <mat-icon>storage</mat-icon>
@@ -524,12 +498,11 @@
         </mat-panel-title>
       </mat-expansion-panel-header>
       <mat-list>
-        @if (authService.actionAllowed("configread")) {
+        @if (authService.actionAllowed('configread')) {
           <mat-list-item>
             <button
-              [ngClass]="
-                contentService.routeUrl() === ROUTE_PATHS.CONFIGURATION_SYSTEM ? 'card-button-active' : 'card-button-1'
-              "
+              [ngClass]="contentService.routeUrl() === ROUTE_PATHS.CONFIGURATION_SYSTEM
+              ? 'card-button-active' : 'card-button-1'"
               [routerLink]="[ROUTE_PATHS.CONFIGURATION_SYSTEM]"
               mat-stroked-button>
               <mat-icon>build</mat-icon>
@@ -539,7 +512,8 @@
         }
         <mat-list-item>
           <button
-            [ngClass]="contentService.routeUrl() === ROUTE_PATHS.SUBSCRIPTION ? 'card-button-active' : 'card-button-1'"
+            [ngClass]="contentService.routeUrl() === ROUTE_PATHS.SUBSCRIPTION ? 'card-button-active' :
+            'card-button-1'"
             [routerLink]="[ROUTE_PATHS.SUBSCRIPTION]"
             class="card-button-1"
             mat-stroked-button>
@@ -549,11 +523,7 @@
         </mat-list-item>
         <mat-list-item>
           <button
-            [ngClass]="
-              contentService.routeUrl() === ROUTE_PATHS.CONFIGURATION_TOKENTYPES
-                ? 'card-button-active'
-                : 'card-button-1'
-            "
+            [ngClass]="contentService.routeUrl() === ROUTE_PATHS.CONFIGURATION_TOKENTYPES ? 'card-button-active' : 'card-button-1'"
             [routerLink]="[ROUTE_PATHS.CONFIGURATION_TOKENTYPES]"
             class="card-button-1"
             mat-stroked-button>
@@ -564,11 +534,7 @@
         @if (authService.actionAllowed("machinelist")) {
           <mat-list-item>
             <button
-              [ngClass]="
-                contentService.routeUrl() === ROUTE_PATHS.CONFIGURATION_MACHINES
-                  ? 'card-button-active'
-                  : 'card-button-1'
-              "
+              [ngClass]="contentService.routeUrl() === ROUTE_PATHS.CONFIGURATION_MACHINES ? 'card-button-active' : 'card-button-1'"
               [routerLink]="[ROUTE_PATHS.CONFIGURATION_MACHINES]"
               mat-stroked-button>
               <mat-icon>point_of_sale</mat-icon>
@@ -579,9 +545,8 @@
         @if (authService.actionAllowed("mresolverread")) {
           <mat-list-item>
             <button
-              [ngClass]="
-                contentService.routeUrl() === ROUTE_PATHS.MACHINE_RESOLVER ? 'card-button-active' : 'card-button-1'
-              "
+              [ngClass]="contentService.routeUrl() === ROUTE_PATHS.MACHINE_RESOLVER
+              ? 'card-button-active' : 'card-button-1'"
               [routerLink]="[ROUTE_PATHS.MACHINE_RESOLVER]"
               mat-stroked-button>
               <mat-icon>lan</mat-icon>

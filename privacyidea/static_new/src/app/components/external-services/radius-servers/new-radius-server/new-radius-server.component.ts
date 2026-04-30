@@ -19,11 +19,7 @@
 import { Component, effect, inject, OnDestroy, OnInit, signal } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
-import {
-  RadiusServer,
-  RadiusServerService,
-  RadiusServerServiceInterface
-} from "../../../../services/radius-server/radius-server.service";
+import { RadiusServer, RadiusServerService, RadiusServerServiceInterface } from "../../../../services/radius-server/radius-server.service";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatCheckboxModule } from "@angular/material/checkbox";

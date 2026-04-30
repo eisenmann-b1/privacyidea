@@ -68,7 +68,10 @@ export class ContainerRegistrationConfigComponent {
   });
 
   get passphraseMismatch(): boolean {
-    return !this.userStorePassphrase() && this.passphraseResponse() !== this.repeatPassphraseResponse();
+    return (
+      !this.userStorePassphrase() &&
+      this.passphraseResponse() !== this.repeatPassphraseResponse()
+    );
   }
 
   toggleShowPassphrase() {

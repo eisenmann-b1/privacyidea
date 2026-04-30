@@ -49,7 +49,8 @@ describe("PeriodicTaskEditComponent", () => {
         { provide: PeriodicTaskService, useClass: MockPeriodicTaskService },
         { provide: SystemService, useClass: MockSystemService }
       ]
-    }).compileComponents();
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(PeriodicTaskEditComponent);
     component = fixture.componentInstance;
@@ -156,5 +157,6 @@ describe("PeriodicTaskEditComponent", () => {
       });
       expect(component.allowSave).toBe(true);
     });
+
   });
 });

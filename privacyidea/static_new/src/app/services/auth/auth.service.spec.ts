@@ -29,7 +29,11 @@ import { Router } from "@angular/router";
 import { NotificationService } from "../notification/notification.service";
 
 const b64url = (obj: any) =>
-  Buffer.from(JSON.stringify(obj)).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  Buffer.from(JSON.stringify(obj))
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
 
 const ensureAtob = () => {
   if (!(global as any).atob) {
@@ -441,7 +445,11 @@ describe("AuthService", () => {
       role: "admin",
       authtype: "cookie",
       exp: 0,
-      rights: ["foo=bar", "baz=qux=quux", "simple"]
+      rights: [
+        "foo=bar",
+        "baz=qux=quux",
+        "simple"
+      ]
     };
     authService.authData.set(authData as unknown as AuthData);
     const result = authService.rightsWithValues();

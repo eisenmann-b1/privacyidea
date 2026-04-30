@@ -44,7 +44,7 @@ describe("WelcomeDialogComponent", () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: MatDialogRef, useValue: dialogRefMock },
-        { provide: AuthService, useValue: authMock }
+        { provide: AuthService, useValue: authMock },
       ]
     });
 

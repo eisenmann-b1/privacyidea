@@ -17,7 +17,8 @@
  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <div class="list-item-card">
-  <mat-expansion-panel #panel>
+  <mat-expansion-panel
+    #panel>
     <mat-expansion-panel-header class="mat-expansion-panel-header">
       <mat-panel-title>
         @if (!panel.expanded) {
@@ -41,7 +42,7 @@
               mat-icon-button
               matTooltip="Save Periodic Task"
               [disabled]="!canSave"
-              (click)="$event.stopPropagation(); savePeriodicTask()">
+              (click)="$event.stopPropagation(); savePeriodicTask();">
               <mat-icon>save</mat-icon>
             </button>
             <button

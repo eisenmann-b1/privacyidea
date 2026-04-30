@@ -21,6 +21,7 @@ import { ThemeSwitcherComponent } from "./theme-switcher.component";
 import { signal } from "@angular/core";
 import { ThemeService } from "../../../services/theme/theme.service";
 
+
 describe("ThemeSwitcherComponent", () => {
   let mockThemeService: {
     currentTheme: ReturnType<typeof signal<"light" | "dark" | "system">>;
@@ -47,7 +48,8 @@ describe("ThemeSwitcherComponent", () => {
     setMatchMedia(systemPrefersDark);
     mockThemeService.currentTheme.set(theme);
 
-    const fixture: ComponentFixture<ThemeSwitcherComponent> = TestBed.createComponent(ThemeSwitcherComponent);
+    const fixture: ComponentFixture<ThemeSwitcherComponent> =
+      TestBed.createComponent(ThemeSwitcherComponent);
     const component = fixture.componentInstance;
     fixture.detectChanges();
     return { fixture, component };

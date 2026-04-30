@@ -70,7 +70,7 @@ describe("TokenEnrollmentDataComponent", () => {
       container_serial: "CONT123",
       googleurl: { img: "img", value: "123" }
     });
-    expect(component["qrCode"]()).toEqual("img");
+    expect(component["qrCode"]()).toEqual(("img"));
     expect(component["url"]()).toEqual("123");
   });
 
@@ -110,14 +110,12 @@ describe("TokenEnrollmentDataComponent", () => {
   });
 
   it("should call enrollToken and update enrolledData on regenerateQRCode", () => {
-    mockTokenService.enrollToken = jest.fn().mockReturnValue(
-      of({
-        detail: {
-          serial: "SERIAL123",
-          googleurl: { img: "new_img", value: "456" }
-        }
-      })
-    );
+    mockTokenService.enrollToken = jest.fn().mockReturnValue(of({
+      detail: {
+        serial: "SERIAL123",
+        googleurl: { img: "new_img", value: "456" }
+      }
+    }));
     fixture.componentRef.setInput("enrollmentParameters", {
       data: { serial: "SERIAL123" },
       mapper: { map: jest.fn() }
@@ -133,8 +131,6 @@ describe("TokenEnrollmentDataComponent", () => {
 
   it("should open notification if no enrollmentParameters are available on regenerateQRCode", () => {
     component.regenerateQRCode();
-    expect(mockNotificationService.openSnackBar).toHaveBeenCalledWith(
-      "Enrollment parameters are missing. Cannot regenerate token."
-    );
+    expect(mockNotificationService.openSnackBar).toHaveBeenCalledWith("Enrollment parameters are missing. Cannot regenerate token.");
   });
 });

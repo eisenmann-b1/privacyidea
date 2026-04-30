@@ -27,7 +27,12 @@ import {
 
 @Component({
   selector: "app-registration-code",
-  imports: [MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle],
+  imports: [
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle
+  ],
   templateUrl: "./registration-code.component.html",
   styleUrl: "./registration-code.component.scss"
 })

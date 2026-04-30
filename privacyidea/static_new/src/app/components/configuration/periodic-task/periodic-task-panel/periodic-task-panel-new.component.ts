@@ -49,7 +49,7 @@ import { EMPTY_PERIODIC_TASK } from "../../../../services/periodic-task/periodic
   styleUrl: "./periodic-task-panel.component.scss"
 })
 export class PeriodicTaskPanelNewComponent extends PeriodicTaskPanelComponent {
-  @ViewChild("panel") panel!: MatExpansionPanel;
+  @ViewChild('panel') panel!: MatExpansionPanel;
   @Output() taskSaved = new EventEmitter<void>();
 
   override cancelEdit(): void {

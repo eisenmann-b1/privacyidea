@@ -28,9 +28,10 @@ describe("RegistrationCodeComponent", () => {
     TestBed.resetTestingModule();
     fixture = TestBed.createComponent(RegistrationCodeComponent);
     component = fixture.componentInstance;
-  });
+  })
 
   it("should create", () => {
     expect(component).toBeTruthy();
   });
+
 });

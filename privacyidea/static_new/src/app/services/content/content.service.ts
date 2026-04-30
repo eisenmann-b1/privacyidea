@@ -106,19 +106,16 @@ export class ContentService implements ContentServiceInterface {
   onUserDetails = computed(() => this.routeUrl().startsWith(ROUTE_PATHS.USERS_DETAILS + "/"));
   onUserRealms = computed(() => this.routeUrl() === ROUTE_PATHS.USERS_REALMS);
   onTokensEnrollment = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_ENROLLMENT);
-  onTokenEnrollmentLikely = computed(
-    () =>
-      // allow token details for rollover
-      this.onTokensEnrollment() || this.onTokenDetails() || this.onTokensWizard() || this.onTokensContainersTemplates()
+  onTokenEnrollmentLikely = computed(() =>
+    // allow token details for rollover
+    this.onTokensEnrollment() || this.onTokenDetails() || this.onTokensWizard() || this.onTokensContainersTemplates()
   );
   onTokensChallenges = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_CHALLENGES);
   onTokensApplications = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_APPLICATIONS);
   onTokensGetSerial = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_GET_SERIAL);
   onTokensImport = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_IMPORT);
   onTokensContainers = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_CONTAINERS);
-  onTokensContainersCreate = computed(() =>
-    [ROUTE_PATHS.TOKENS_CONTAINERS_CREATE, ROUTE_PATHS.TOKENS_CONTAINERS_WIZARD].includes(this.routeUrl())
-  );
+  onTokensContainersCreate = computed(() => [ROUTE_PATHS.TOKENS_CONTAINERS_CREATE, ROUTE_PATHS.TOKENS_CONTAINERS_WIZARD].includes(this.routeUrl()));
   onTokensContainersDetails = computed(() => this.routeUrl().startsWith(ROUTE_PATHS.TOKENS_CONTAINERS_DETAILS));
   onTokensAssignToken = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_ASSIGN_TOKEN);
   onTokensWizard = computed(() => this.routeUrl() === ROUTE_PATHS.TOKENS_WIZARD);

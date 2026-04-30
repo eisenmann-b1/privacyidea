@@ -82,7 +82,7 @@ export class RadiusServerService implements RadiusServerServiceInterface {
   });
 
   radiusServers: WritableSignal<RadiusServer[]> = linkedSignal({
-    source: () => (this.radiusServerResource.hasValue() ? this.radiusServerResource.value() : undefined),
+    source: () => this.radiusServerResource.hasValue() ? this.radiusServerResource.value() : undefined,
     computation: (source, previous) =>
       Object.entries(source?.result?.value ?? {}).map(([identifier, server]) => ({ ...server, identifier })) ??
       previous?.value ??

@@ -25,9 +25,11 @@ import { Observable } from "rxjs";
 import { MockVersioningService } from "../../../testing/mock-services";
 
 describe("userAgentInterceptor", () => {
+
   const run = (req: HttpRequest<any>, next: (req: HttpRequest<any>) => Observable<HttpEvent<any>>) =>
     TestBed.runInInjectionContext(() => userAgentInterceptor(req, next));
   let versioningService: MockVersioningService;
+
 
   beforeEach(() => {
     TestBed.resetTestingModule();

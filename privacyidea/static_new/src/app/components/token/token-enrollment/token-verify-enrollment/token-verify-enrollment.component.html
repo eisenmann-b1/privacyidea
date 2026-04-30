@@ -26,6 +26,7 @@
   cancelButtonLabel="Close"
   i18n-cancelButtonLabel="@@closeButtonLabel"
   (close)="close()">
+
   <app-token-enrolled-text
     [serial]="responseDetails?.serial"
     [containerSerial]="enrollData?.containerSerial"
@@ -37,9 +38,7 @@
 
   <span
     class="margin-bottom-16"
-    i18n
-    >However, to activate your token you still need to verify the enrollment.</span
-  >
+    i18n>However, to activate your token you still need to verify the enrollment.</span>
 
   @if (data.showEnrollData !== false) {
     <app-token-enrollment-data
@@ -60,4 +59,5 @@
       {{ verifyMessage }}
     </mat-hint>
   </mat-form-field>
+
 </app-dialog-wrapper>

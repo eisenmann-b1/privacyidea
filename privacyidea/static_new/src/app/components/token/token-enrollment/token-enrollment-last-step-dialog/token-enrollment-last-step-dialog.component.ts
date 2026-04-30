@@ -62,13 +62,11 @@ export class TokenEnrollmentLastStepDialogComponent extends AbstractDialogCompon
     this.data.response?.detail?.googleurl?.value ??
     this.data.response?.detail?.motpurl?.value ??
     this.data.response?.detail?.otpkey?.value ??
-    this.data.response?.detail?.tiqrenroll?.value ??
-    "";
+    this.data.response?.detail?.tiqrenroll?.value ?? "";
   protected readonly rollover = this.data.rollover ?? false;
 
-  title: Signal<string> = computed(() =>
-    this.rollover ? $localize`Token Successfully Rolled Over` : $localize`Token Successfully Enrolled`
-  );
+  title: Signal<string> = computed(() => this.rollover ? $localize`Token Successfully Rolled Over` :
+    $localize`Token Successfully Enrolled`);
 
   showQRCode(): boolean {
     return !NO_QR_CODE_TOKEN_TYPES.includes(this.data.tokenType);

@@ -74,7 +74,7 @@ export class MockEventService implements EventServiceInterface {
   moduleActions: Signal<EventActions> = computed(() => ({
     actionA: {
       opt1: { type: "bool", desc: "desc1", required: true },
-      opt2: { type: "int", desc: "desc2", visibleIf: "opt1" },
+      opt2: { type: "int", desc: "desc2", visibleIf: "opt1"},
       opt3: { type: "str", desc: "desc3", visibleIf: "opt2", visibleValue: 3 }
     },
     actionB: {

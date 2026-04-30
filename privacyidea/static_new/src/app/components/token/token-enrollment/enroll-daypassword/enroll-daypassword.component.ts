@@ -166,9 +166,7 @@ export class EnrollDaypasswordComponent implements OnInit {
     }
   }
 
-  enrollmentArgsGetter = (
-    basicOptions: TokenEnrollmentData
-  ): {
+  enrollmentArgsGetter = (basicOptions: TokenEnrollmentData): {
     data: DaypasswordEnrollmentData;
     mapper: DaypasswordApiPayloadMapper;
   } | null => {

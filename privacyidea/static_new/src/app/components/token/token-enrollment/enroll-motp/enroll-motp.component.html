@@ -46,7 +46,9 @@
   <input
     class="hidden-input"
     type="password" />
-  <h4 i18n>mOTP PIN</h4>
+  <h4 i18n>
+    mOTP PIN
+  </h4>
   <span i18n>The mOTP PIN is the PIN that needs to be entered on the mobile device.</span>
   <div class="motp-pin-input">
     <mat-form-field class="input-width-l">
@@ -70,9 +72,7 @@
         i18n-placeholder
         matInput
         placeholder="Repeat Password" />
-      @if (
-        repeatMotpPinControl.hasError("motpPinMismatch") && (repeatMotpPinControl.touched || repeatMotpPinControl.dirty)
-      ) {
+      @if (repeatMotpPinControl.hasError("motpPinMismatch") && (repeatMotpPinControl.touched || repeatMotpPinControl.dirty)) {
         <mat-error i18n>mOTP PINs do not match.</mat-error>
       }
     </mat-form-field>

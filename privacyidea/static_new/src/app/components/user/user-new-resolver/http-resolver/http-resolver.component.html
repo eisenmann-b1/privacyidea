@@ -630,7 +630,9 @@
 
           <div class="auth-panel-body">
             <app-http-config
-              [description]="'Configure the endpoint to retrieve a list of users from the user store. The above defined attributes are added to the request as search parameters if they are available in the request.'"
+              [description]="
+                'Configure the endpoint to retrieve a list of users from the user store. The above defined attributes are added to the request as search parameters if they are available in the request.'
+              "
               [endpointHint]="'Possible tags: {userid} {username} {password} {givenname}'"
               [formGroup]="configGetUserListGroup"
               [title]="'User List'" />
@@ -644,7 +646,9 @@
 
           <div class="auth-panel-body">
             <app-http-config
-              [description]="'Configure the endpoint to retrieve a single user for the UID. For example, privacyIDEA only stores the UID of the token owner. To resolve the complete user, this endpoint is used.'"
+              [description]="
+                'Configure the endpoint to retrieve a single user for the UID. For example, privacyIDEA only stores the UID of the token owner. To resolve the complete user, this endpoint is used.'
+              "
               [endpointHint]="'Possible tags: {userid}'"
               [formGroup]="configGetUserByIdGroup"
               [title]="'Get User by ID'" />
@@ -658,7 +662,9 @@
 
           <div class="auth-panel-body">
             <app-http-config
-              [description]="'Configure the endpoint to retrieve a single user for the username. For example, when a user tries to authenticate against privacyIDEA, only the username is provided. To resolve the complete user and evaluate if the user exists, this endpoint is used.'"
+              [description]="
+                'Configure the endpoint to retrieve a single user for the username. For example, when a user tries to authenticate against privacyIDEA, only the username is provided. To resolve the complete user and evaluate if the user exists, this endpoint is used.'
+              "
               [endpointHint]="'Possible tags: {username}'"
               [formGroup]="configGetUserByNameGroup"
               [title]="'Get User by Name'" />
@@ -673,8 +679,12 @@
 
             <div class="auth-panel-body">
               <app-http-config
-                [description]="'Configure the endpoint to create a new user in the user store. The above defined attributes can be set in the UI and will be added to the request body. Additionally, you can define a password which must be specified in the request mapping using the tag &quot;{password}&quot;.'"
-                [endpointHint]="'Possible tags: {username} {userid} {surname} {givenname} {email} {mobile} {phone} {password}'"
+                [description]="
+                  'Configure the endpoint to create a new user in the user store. The above defined attributes can be set in the UI and will be added to the request body. Additionally, you can define a password which must be specified in the request mapping using the tag &quot;{password}&quot;.'
+                "
+                [endpointHint]="
+                  'Possible tags: {username} {userid} {surname} {givenname} {email} {mobile} {phone} {password}'
+                "
                 [formGroup]="configCreateUserGroup"
                 [title]="'Create User'" />
             </div>
@@ -687,8 +697,12 @@
 
             <div class="auth-panel-body">
               <app-http-config
-                [description]="'Configure the endpoint to edit an existing user in the user store. The above defined attributes can be set in the UI and will be added to the request body. Additionally, you can define custom request parameters in the request mapping.'"
-                [endpointHint]="'Possible tags: {username} {userid} {surname} {givenname} {email} {mobile} {phone} {password}'"
+                [description]="
+                  'Configure the endpoint to edit an existing user in the user store. The above defined attributes can be set in the UI and will be added to the request body. Additionally, you can define custom request parameters in the request mapping.'
+                "
+                [endpointHint]="
+                  'Possible tags: {username} {userid} {surname} {givenname} {email} {mobile} {phone} {password}'
+                "
                 [formGroup]="configEditUserGroup"
                 [title]="'Edit User'" />
             </div>

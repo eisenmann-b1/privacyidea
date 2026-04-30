@@ -92,8 +92,7 @@ describe("UserDetailsComponent", () => {
         {
           provide: BreakpointObserver,
           useValue: {
-            observe: (query: string) =>
-              breakpointSubject.pipe(map((b) => ({ matches: b[query] || false, breakpoints: {} })))
+            observe: (query: string) => breakpointSubject.pipe(map((b) => ({ matches: b[query] || false, breakpoints: {} })))
           }
         },
         {

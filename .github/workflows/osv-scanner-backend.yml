@@ -24,12 +24,38 @@ permissions: {}
 
 jobs:
   scan:
+    name: Scan Python dependencies
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       security-events: write  # upload SARIF to the Security tab
-      actions: read           # required by the reusable workflow for SARIF upload
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
-    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@c51854704019a247608d928f370c98740469d4b5" # v2.3.5
-    with:
-      scan-args: |-
-        --lockfile=requirements.txt:requirements.txt
+      - name: Install osv-scanner
+        env:
+          OSV_SCANNER_VERSION: v2.3.5
+        run: |
+          set -euo pipefail
+          curl -sSL -o osv-scanner \
+            "https://github.com/google/osv-scanner/releases/download/${OSV_SCANNER_VERSION}/osv-scanner_linux_amd64"
+          chmod +x osv-scanner
+          sudo mv osv-scanner /usr/local/bin/osv-scanner
+          osv-scanner --version
+
+      - name: Run osv-scanner
+        # Reporting-only: surface findings but don't block merges. Triage via the Security tab.
+        continue-on-error: true
+        run: |
+          osv-scanner scan \
+            --lockfile=requirements.txt \
+            --format=sarif \
+            --output=osv-results.sarif
+
+      - name: Upload SARIF to the Security tab
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
+        with:
+          sarif_file: osv-results.sarif
+          category: osv-scanner-backend
